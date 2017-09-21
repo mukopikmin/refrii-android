@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -16,13 +18,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.daimajia.swipe.util.Attributes;
 
 import java.util.List;
 
@@ -66,18 +68,6 @@ public class BoxActivity extends AppCompatActivity
         showProgressBar();
 
         listView = (ListView) findViewById(R.id.listView);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ListView listView = (ListView) parent;
-                Food food = (Food) listView.getItemAtPosition(position);
-                Toast.makeText(BoxActivity.this, food.getName(), Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(BoxActivity.this, FoodActivity.class);
-                intent.putExtra("foodId", selectedBox.getFoods().get(position).getId());
-                startActivity(intent);
-            }
-        });
 
         setSupportActionBar(toolbar);
         sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE);
@@ -187,8 +177,57 @@ public class BoxActivity extends AppCompatActivity
     }
 
     private void setFoods(Box box) {
-        FoodListAdapter arrayAdapter = new FoodListAdapter(this, box.getFoods());
-        listView.setAdapter(arrayAdapter);
+        FoodListAdapter mAdapter = new FoodListAdapter(this, box.getFoods());
+        listView.setAdapter(mAdapter);
+        mAdapter.setMode(Attributes.Mode.Single);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Food food = (Food) parent.getItemAtPosition(position);
+                Toast.makeText(BoxActivity.this, food.getName(), Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(BoxActivity.this, FoodActivity.class);
+                intent.putExtra("foodId", food.getId());
+                startActivity(intent);
+            }
+        });
+        listView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Log.e("ListView", "OnTouch");
+                return false;
+            }
+        });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(BoxActivity.this, "OnItemLongClickListener", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                Log.e("ListView", "onScrollStateChanged");
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
+        });
+
+        listView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("ListView", "onItemSelected:" + position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Log.e("ListView", "onNothingSelected:");
+            }
+        });
     }
 
     private void showProgressBar() {
