@@ -2,11 +2,12 @@ package com.refrii.client;
 
 import android.util.Log;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class User {
+public class User implements Serializable {
     private int id;
     private String name;
     private String email;

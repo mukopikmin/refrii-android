@@ -52,12 +52,7 @@
                 android:drawablePadding="32dp"
                 android:text="amount"
                 android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_constraintLeft_creator="1"
-                tools:layout_constraintTop_creator="1" />
+                android:layout_marginBottom="16dp" />
 
             <TextView
                 android:id="@+id/amountTextView"
@@ -69,12 +64,7 @@
                 android:drawablePadding="32dp"
                 android:text="amount"
                 android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_constraintLeft_creator="1"
-                tools:layout_constraintTop_creator="1" />
+                android:layout_marginBottom="16dp" />
 
             <TextView
                 android:id="@+id/expirationDateTextView"
@@ -86,12 +76,7 @@
                 android:drawablePadding="32dp"
                 android:text="expiration date"
                 android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_constraintLeft_creator="1"
-                tools:layout_constraintTop_creator="1" />
+                android:layout_marginBottom="16dp" />
 
 
             <TextView
@@ -104,12 +89,7 @@
                 android:drawablePadding="32dp"
                 android:text="created user"
                 android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_constraintLeft_creator="1"
-                tools:layout_constraintTop_creator="1" />
+                android:layout_marginBottom="16dp" />
 
             <TextView
                 android:id="@+id/updatedUserTextView"
@@ -121,12 +101,7 @@
                 android:drawablePadding="32dp"
                 android:text="updated user"
                 android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_constraintLeft_creator="1"
-                tools:layout_constraintTop_creator="1" />
+                android:layout_marginBottom="16dp"/>
         </LinearLayout>
     </ScrollView>
 

@@ -1,11 +1,12 @@
 package com.refrii.client;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class Box {
+public class Box implements Serializable {
     private int id;
     private String name;
     private String notice;

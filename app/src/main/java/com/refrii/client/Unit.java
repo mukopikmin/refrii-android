@@ -1,12 +1,13 @@
 package com.refrii.client;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by yusuke on 2017/09/01.
  */
 
-public class Unit {
+public class Unit implements Serializable {
     private int id;
     private String label;
     private double step;

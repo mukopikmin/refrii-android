@@ -1,12 +1,13 @@
 package com.refrii.client;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by yusuke on 2017/09/01.
  */
 
-public class Food {
+public class Food implements Serializable {
     private int id;
     private String name;
     private String notice;

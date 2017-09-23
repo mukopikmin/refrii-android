@@ -47,6 +47,10 @@ public class FoodListAdapter extends BaseSwipeAdapter {
         this.jwt = sharedPreferences.getString("jwt", null);
     }
 
+    public void add(Food food) {
+        this.foods.add(food);
+    }
+
     @Override
     public int getSwipeLayoutResourceId(int position) {
         return R.id.foodListSwipeLayout;
@@ -66,8 +70,6 @@ public class FoodListAdapter extends BaseSwipeAdapter {
         v.findViewById(R.id.incrementImageView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("aaaaaaaaa", "AAAAAAAAAAAAAAAAAAAa" + position);
-
                 Food food = foods.get(position);
                 food.setAmount(food.getAmount() + 1);
                 updateFood(food, view);
@@ -76,7 +78,9 @@ public class FoodListAdapter extends BaseSwipeAdapter {
         v.findViewById(R.id.decrementImageView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context, "click decrement", Toast.LENGTH_SHORT).show();
+                Food food = foods.get(position);
+                food.setAmount(food.getAmount() - 1);
+                updateFood(food, view);
             }
         });
         return v;
@@ -116,7 +120,8 @@ public class FoodListAdapter extends BaseSwipeAdapter {
         call.enqueue(new Callback<Food>() {
             @Override
             public void onResponse(Call<Food> call, Response<Food> response) {
-                Snackbar.make(view, "Incremented amount", Snackbar.LENGTH_LONG)
+                Food food = response.body();
+                Snackbar.make(view, "Amount of " + food.getName() + " updated", Snackbar.LENGTH_LONG)
                         .setAction("Dismiss", null)
                         .show();
                 foodListAdapter.notifyDataSetChanged();

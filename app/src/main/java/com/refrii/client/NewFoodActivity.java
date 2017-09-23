@@ -1,6 +1,7 @@
 package com.refrii.client;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -44,6 +45,9 @@ public class NewFoodActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Intent intent = getIntent();
+        final int boxId = intent.getIntExtra("boxId", 0);
+
         spinner = (Spinner) findViewById(R.id.newFoodUnitSpinner);
 
         sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE);
@@ -74,7 +78,7 @@ public class NewFoodActivity extends AppCompatActivity {
                         .addFormDataPart("name", nameEditText.getText().toString())
                         .addFormDataPart("notice", noticeEditText.getText().toString())
                         .addFormDataPart("amount", amountEditText.getText().toString())
-                        .addFormDataPart("box_id", "6")
+                        .addFormDataPart("box_id", String.valueOf(boxId))
                         .addFormDataPart("unit_id", String.valueOf(selectedUnit.getId()))
                         .addFormDataPart("expiration_date", simpleDateFormat.format(expirationDate))
                         .build();
@@ -88,6 +92,11 @@ public class NewFoodActivity extends AppCompatActivity {
                     public void onResponse(Call<Food> call, Response<Food> response) {
                         if (response.code() == 201) {
                             // With success of creating food, exit this activity
+                            Food food = response.body();
+                            Log.d("aasssa",food.getName());
+                            Intent intent = new Intent();
+                            intent.putExtra("food", food);
+                            setResult(1, intent);
                             finish();
                         } else {
                             Log.d(TAG, "Failed with status: " + response.code());

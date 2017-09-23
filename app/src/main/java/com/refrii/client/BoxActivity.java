@@ -38,6 +38,7 @@ public class BoxActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "BoxActivity";
+    private static final int REQUEST_CODE = 1;
 
     private SharedPreferences sharedPreferences;
     private ListView listView;
@@ -47,6 +48,7 @@ public class BoxActivity extends AppCompatActivity
     private Box selectedBox;
     private String jwt;
     private FloatingActionButton floatingActionButton;
+    private FoodListAdapter foodListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +61,8 @@ public class BoxActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(BoxActivity.this, NewFoodActivity.class);
-                intent.putExtra("Box", selectedBox.getId());
-                startActivity(intent);
+                intent.putExtra("boxId", selectedBox.getId());
+                startActivityForResult(intent, REQUEST_CODE);
             }
         });
 
@@ -177,9 +179,9 @@ public class BoxActivity extends AppCompatActivity
     }
 
     private void setFoods(Box box) {
-        FoodListAdapter mAdapter = new FoodListAdapter(this, box.getFoods());
-        listView.setAdapter(mAdapter);
-        mAdapter.setMode(Attributes.Mode.Single);
+        this.foodListAdapter = new FoodListAdapter(this, box.getFoods());
+        listView.setAdapter(foodListAdapter);
+        foodListAdapter.setMode(Attributes.Mode.Single);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -276,5 +278,15 @@ public class BoxActivity extends AppCompatActivity
                         .show();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            Log.d(TAG, "aaaaaaaaaaaaaaaaaaa");
+            Food food = (Food) data.getSerializableExtra("food");
+            foodListAdapter.add(food);
+            foodListAdapter.notifyDataSetChanged();
+        }
     }
 }
