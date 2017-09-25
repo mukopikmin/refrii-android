@@ -5,6 +5,7 @@ import java.util.Map;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.FieldMap;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -32,4 +33,9 @@ public interface FoodService {
             @Header("Authorization") String token,
             @Path("id") int id,
             @Body RequestBody body);
+
+    @DELETE("/foods/{id}")
+    Call<Void> remove(
+            @Header("Authorization") String token,
+            @Path("id") int id);
 }

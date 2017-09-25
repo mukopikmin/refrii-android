@@ -43,6 +43,7 @@ public class NewFoodActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_food);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Register food");
         setSupportActionBar(toolbar);
 
         Intent intent = getIntent();
@@ -96,7 +97,7 @@ public class NewFoodActivity extends AppCompatActivity {
                             Log.d("aasssa",food.getName());
                             Intent intent = new Intent();
                             intent.putExtra("food", food);
-                            setResult(1, intent);
+                            setResult(RESULT_OK, intent);
                             finish();
                         } else {
                             Log.d(TAG, "Failed with status: " + response.code());

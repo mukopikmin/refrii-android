@@ -1,12 +1,20 @@
 package com.refrii.client;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
@@ -18,14 +26,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import okhttp3.MultipartBody;
@@ -49,6 +67,7 @@ public class BoxActivity extends AppCompatActivity
     private String jwt;
     private FloatingActionButton floatingActionButton;
     private FoodListAdapter foodListAdapter;
+    private PopupMenu popupMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,13 +96,26 @@ public class BoxActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         Menu menu = navigationView.getMenu();
         subMenu = menu.addSubMenu("Boxes");
+
+        View headerView = navigationView.getHeaderView(0);
+        TextView nameTextView = headerView.findViewById(R.id.nameNavHeaderTextView);
+        TextView mailTextView = headerView.findViewById(R.id.mailNavHeaderTextView);
+        ImageView avatarImageView = (ImageView) headerView.findViewById(R.id.avatarNavHeaderImageView);
+        String name = sharedPreferences.getString("name", "name");
+        String mail = sharedPreferences.getString("mail", "mail");
+        String avatarUrl = sharedPreferences.getString("avatar", null);
+        nameTextView.setText(name);
+        mailTextView.setText(mail);
+        if (avatarUrl != null) {
+            new ImageDownloadTask(avatarImageView).execute(avatarUrl);
+        }
 
         jwt = sharedPreferences.getString("jwt", null);
         if (jwt == null) {
@@ -119,7 +151,10 @@ public class BoxActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_box_info) {
+            Intent intent = new Intent(BoxActivity.this, BoxInfoActivity.class);
+            intent.putExtra("box", selectedBox);
+            startActivity(intent);
             return true;
         }
 
@@ -186,8 +221,6 @@ public class BoxActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Food food = (Food) parent.getItemAtPosition(position);
-                Toast.makeText(BoxActivity.this, food.getName(), Toast.LENGTH_SHORT).show();
-
                 Intent intent = new Intent(BoxActivity.this, FoodActivity.class);
                 intent.putExtra("foodId", food.getId());
                 startActivity(intent);
@@ -203,7 +236,45 @@ public class BoxActivity extends AppCompatActivity
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(BoxActivity.this, "OnItemLongClickListener", Toast.LENGTH_SHORT).show();
+                final Food food = (Food) parent.getItemAtPosition(position);
+                String[] items = { "Show", "Remove", "Cancel" };
+                new AlertDialog.Builder(BoxActivity.this)
+                        .setTitle(food.getName())
+                        .setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0:
+                                        Intent intent = new Intent(BoxActivity.this, FoodActivity.class);
+                                        intent.putExtra("foodId", food.getId());
+                                        startActivity(intent);
+                                        break;
+                                    case 1:
+                                        Toast.makeText(BoxActivity.this, "Needs implementation to remove this food", Toast.LENGTH_LONG).show();;
+                                        FoodService service = RetrofitFactory.create(FoodService.class);
+                                        Call<Void> call = service.remove("Bearer " + jwt, food.getId());
+                                        call.enqueue(new Callback<Void>() {
+                                            @Override
+                                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                                if (response.code() == 204) {
+                                                    foodListAdapter.remove(food);
+                                                    foodListAdapter.notifyDataSetChanged();
+                                                    Snackbar.make(listView, "Removed successfully", Snackbar.LENGTH_LONG)
+                                                            .setAction("Dismiss", null)
+                                                            .show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<Void> call, Throwable t) {
+
+                                            }
+                                        });
+                                        break;
+                                }
+                            }
+                        })
+                        .show();
                 return true;
             }
         });
@@ -283,10 +354,11 @@ public class BoxActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
-            Log.d(TAG, "aaaaaaaaaaaaaaaaaaa");
-            Food food = (Food) data.getSerializableExtra("food");
-            foodListAdapter.add(food);
-            foodListAdapter.notifyDataSetChanged();
+            if (resultCode == RESULT_OK) {
+                Food food = (Food) data.getSerializableExtra("food");
+                foodListAdapter.add(food);
+                foodListAdapter.notifyDataSetChanged();
+            }
         }
     }
 }

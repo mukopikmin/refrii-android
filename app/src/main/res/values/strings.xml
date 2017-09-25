@@ -95,4 +95,6 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_new_food">NewFoodActivity</string>
+    <string name="title_activity_box_info">BoxInfoActivity</string>
+    <string name="title_activity_edit_food">EditFoodActivity</string>
 </resources>

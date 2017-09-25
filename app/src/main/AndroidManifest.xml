@@ -41,6 +41,14 @@
             android:name=".NewFoodActivity"
             android:label="@string/title_activity_new_food"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".BoxInfoActivity"
+            android:label="@string/title_activity_box_info"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".EditFoodActivity"
+            android:label="@string/title_activity_edit_food"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

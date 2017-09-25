@@ -28,7 +28,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="495dp"
+            android:layout_height="match_parent"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
@@ -46,62 +46,62 @@
                 android:id="@+id/foodBoxTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:drawableLeft="@drawable/ic_menu_manage"
                 android:drawablePadding="32dp"
                 android:text="amount"
-                android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp" />
+                android:textColor="@android:color/black" />
 
             <TextView
                 android:id="@+id/amountTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:drawableLeft="@drawable/ic_menu_manage"
                 android:drawablePadding="32dp"
                 android:text="amount"
-                android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp" />
+                android:textColor="@android:color/black" />
 
             <TextView
                 android:id="@+id/expirationDateTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:drawableLeft="@drawable/ic_menu_camera"
                 android:drawablePadding="32dp"
                 android:text="expiration date"
-                android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp" />
+                android:textColor="@android:color/black" />
 
 
             <TextView
                 android:id="@+id/createdUserTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:drawableLeft="@drawable/ic_menu_slideshow"
                 android:drawablePadding="32dp"
                 android:text="created user"
-                android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp" />
+                android:textColor="@android:color/black" />
 
             <TextView
                 android:id="@+id/updatedUserTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:drawableLeft="@drawable/ic_menu_slideshow"
                 android:drawablePadding="32dp"
                 android:text="updated user"
-                android:textColor="@android:color/black"
-                android:layout_marginBottom="16dp"/>
+                android:textColor="@android:color/black" />
         </LinearLayout>
     </ScrollView>
 
