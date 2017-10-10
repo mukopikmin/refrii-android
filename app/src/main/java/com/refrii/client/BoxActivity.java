@@ -4,17 +4,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
@@ -26,13 +21,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -40,10 +31,6 @@ import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import okhttp3.MultipartBody;
@@ -51,6 +38,7 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.http.PUT;
 
 public class BoxActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -116,10 +104,16 @@ public class BoxActivity extends AppCompatActivity
         if (avatarUrl != null) {
             new ImageDownloadTask(avatarImageView).execute(avatarUrl);
         }
+    }
 
-        jwt = sharedPreferences.getString("jwt", null);
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        jwt = getSharedPreferences("DATA", Context.MODE_PRIVATE).getString("jwt", null);
         if (jwt == null) {
             Intent intent = new Intent(BoxActivity.this, SigninActivity.class);
+            intent.putExtra("email", sharedPreferences.getString("email", null));
             startActivity(intent);
         } else {
             getBoxes(jwt);
@@ -175,11 +169,7 @@ public class BoxActivity extends AppCompatActivity
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
             } else if (id == R.id.nav_signout) {
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove("jwt");
-                editor.commit();
-                Intent intent = new Intent(this, SigninActivity.class);
-                startActivity(intent);
+                signOut();
             }
         }
 
@@ -189,21 +179,30 @@ public class BoxActivity extends AppCompatActivity
     }
 
     private void getBoxes(String token) {
-        BoxService service = RetrofitFactory.create(BoxService.class);
-        Call<List<Box>> call = service.getBoxes("Bearer " + token);
-        call.enqueue(new Callback<List<Box>>() {
+        BoxService service = RetrofitFactory.getClient(BoxService.class, BoxActivity.this);
+        Call<List<Box>> call = service.getBoxes();
+        call.enqueue(new BasicCallback<List<Box>>(BoxActivity.this) {
             @Override
             public void onResponse(Call<List<Box>> call, Response<List<Box>> response) {
-                boxes = response.body();
-                selectedBox = boxes.get(0);
-                for (Box box : boxes) {
-                    subMenu.add(Menu.NONE, box.getId(), Menu.NONE, box.getName());
-                }
-                if (boxes.size() > 0) {
-                    setFoods(boxes.get(0));
-                }
+                super.onResponse(call, response);
 
-                hideProgressBar();
+                if (response.code() == 200) {
+                    boxes = response.body();
+                    selectedBox = boxes.get(0);
+                    subMenu.clear();
+                    for (Box box : boxes) {
+                        subMenu.add(Menu.NONE, box.getId(), Menu.NONE, box.getName());
+                    }
+                    if (boxes.size() > 0) {
+                        if (selectedBox == null) {
+                            setFoods(boxes.get(0));
+                        } else {
+                            setFoods(boxes.get(boxes.indexOf(selectedBox)));
+                        }
+                    }
+
+                    hideProgressBar();
+                }
             }
 
             @Override
@@ -251,7 +250,7 @@ public class BoxActivity extends AppCompatActivity
                                         break;
                                     case 1:
                                         Toast.makeText(BoxActivity.this, "Needs implementation to remove this food", Toast.LENGTH_LONG).show();;
-                                        FoodService service = RetrofitFactory.create(FoodService.class);
+                                        FoodService service = RetrofitFactory.getClient(FoodService.class, BoxActivity.this);
                                         Call<Void> call = service.remove("Bearer " + jwt, food.getId());
                                         call.enqueue(new Callback<Void>() {
                                             @Override
@@ -314,12 +313,12 @@ public class BoxActivity extends AppCompatActivity
     }
 
     private void updateFood(Food food, double amount) {
-        FoodService service = RetrofitFactory.create(FoodService.class);
+        FoodService service = RetrofitFactory.getClient(FoodService.class, BoxActivity.this);
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("amount", String.valueOf(food.getAmount()))
                 .build();
-        Call<Food> call = service.updateFood("Bearer " + jwt, food.getId(), body);
+        Call<Food> call = service.updateFood(food.getId(), body);
         call.enqueue(new Callback<Food>() {
             @Override
             public void onResponse(Call<Food> call, final Response<Food> response) {
@@ -360,5 +359,16 @@ public class BoxActivity extends AppCompatActivity
                 foodListAdapter.notifyDataSetChanged();
             }
         }
+    }
+
+    private void signOut() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("mail");
+        editor.remove("name");
+        editor.remove("jwt");
+        editor.commit();
+
+        Intent intent = new Intent(BoxActivity.this, SigninActivity.class);
+        startActivity(intent);
     }
 }

@@ -30,7 +30,6 @@ public interface FoodService {
 
     @PUT("/foods/{id}")
     Call<Food> updateFood(
-            @Header("Authorization") String token,
             @Path("id") int id,
             @Body RequestBody body);
 

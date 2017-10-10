@@ -85,11 +85,12 @@ public class FoodListAdapter extends BaseSwipeAdapter {
 
     @Override
     public void fillValues(int position, View convertView) {
+        Food food = foods.get(position);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
 
-        ((TextView)convertView.findViewById(R.id.nameFoodListTextView)).setText(foods.get(position).getName());
-        ((TextView)convertView.findViewById(R.id.expirationDateFoodListTextView)).setText(formatter.format(foods.get(position).getExpirationDate()));
-        ((TextView)convertView.findViewById(R.id.amountFoodListTextView)).setText(String.valueOf(foods.get(position).getAmountWithUnit()));
+        ((TextView)convertView.findViewById(R.id.nameFoodListTextView)).setText(food.getName());
+        ((TextView)convertView.findViewById(R.id.expirationDateFoodListTextView)).setText(formatter.format(food.getExpirationDate()));
+        ((TextView)convertView.findViewById(R.id.amountFoodListTextView)).setText(String.valueOf(food.getAmount() + " " + food.getUnit().getLabel()));
     }
 
     @Override
@@ -112,8 +113,8 @@ public class FoodListAdapter extends BaseSwipeAdapter {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("amount", String.valueOf(food.getAmount()))
                 .build();
-        FoodService service = RetrofitFactory.create(FoodService.class);
-        Call<Food> call = service.updateFood("Bearer " + jwt, food.getId(), body);
+        FoodService service = RetrofitFactory.getClient(FoodService.class, context);
+        Call<Food> call = service.updateFood(food.getId(), body);
         call.enqueue(new Callback<Food>() {
             @Override
             public void onResponse(Call<Food> call, Response<Food> response) {

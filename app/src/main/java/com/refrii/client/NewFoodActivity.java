@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -13,16 +12,12 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -84,7 +79,7 @@ public class NewFoodActivity extends AppCompatActivity {
                         .addFormDataPart("expiration_date", simpleDateFormat.format(expirationDate))
                         .build();
 
-                FoodService service = RetrofitFactory.create(FoodService.class);
+                FoodService service = RetrofitFactory.getClient(FoodService.class, NewFoodActivity.this);
                 Call<Food> call = service.addFood(
                         "Bearer " + sharedPreferences.getString("jwt", null),
                         body);
@@ -113,7 +108,7 @@ public class NewFoodActivity extends AppCompatActivity {
             }
         });
 
-        UnitService service = RetrofitFactory.create(UnitService.class);
+        UnitService service = RetrofitFactory.getClient(UnitService.class, NewFoodActivity.this);
         Call<List<Unit>> call = service.getUnits("Bearer " + token);
         call.enqueue(new Callback<List<Unit>>() {
             @Override

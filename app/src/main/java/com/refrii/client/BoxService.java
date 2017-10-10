@@ -9,7 +9,7 @@ import retrofit2.http.Path;
 
 public interface BoxService {
     @GET("/boxes")
-    Call<List<Box>> getBoxes(@Header("Authorization") String token);
+    Call<List<Box>> getBoxes();
 
     @GET("/boxes/{id}")
     Call<Box> getBox(

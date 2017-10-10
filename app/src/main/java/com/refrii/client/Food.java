@@ -82,22 +82,20 @@ public class Food implements Serializable {
         return updatedUser;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setAmount(double amount) {
         this.amount = amount;
     }
 
-    public String getAmountWithUnit() {
-        return amount + " " +  unit.getLabel();
+    public void setNotice(String notice) {
+        this.notice = notice;
     }
 
-    public String getCreatedInfo() {
-        return createdUser.getName() + " (" + createdUser.getEmail() + ")\n" +
-                createdAt;
-    }
-
-    public String getUpdatedInfo() {
-        return updatedUser.getName() + " (" + updatedUser.getEmail() + ")\n" +
-                updatedAt;
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
     public String toString() {

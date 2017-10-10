@@ -30,4 +30,15 @@
         android:positiveButtonText="@null"
         android:title="@string/pref_title_add_friends_to_messages" />
 
+    <Preference
+        android:title="Terms of service"
+        android:key="terms_of_service" />
+
+    <Preference
+        android:title="Privacy policy"
+        android:key="privacy_policy" />
+
+    <Preference
+        android:title="Open source software license"
+        android:key="oss_license" />
 </PreferenceScreen>
