@@ -213,7 +213,7 @@ public class BoxActivity extends AppCompatActivity
     }
 
     private void setFoods(Box box) {
-        this.foodListAdapter = new FoodListAdapter(this, box.getFoods());
+        foodListAdapter = new FoodListAdapter(this, box.getFoods());
         listView.setAdapter(foodListAdapter);
         foodListAdapter.setMode(Attributes.Mode.Single);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -249,7 +249,6 @@ public class BoxActivity extends AppCompatActivity
                                         startActivity(intent);
                                         break;
                                     case 1:
-                                        Toast.makeText(BoxActivity.this, "Needs implementation to remove this food", Toast.LENGTH_LONG).show();;
                                         FoodService service = RetrofitFactory.getClient(FoodService.class, BoxActivity.this);
                                         Call<Void> call = service.remove("Bearer " + jwt, food.getId());
                                         call.enqueue(new Callback<Void>() {

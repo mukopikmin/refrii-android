@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +37,10 @@ public class FoodActivity extends AppCompatActivity {
     private static final String TAG = "FoodActivity";
 
     private SharedPreferences sharedPreferences;
+    private ConstraintLayout constraintLayout;
+    private FloatingActionButton fab;
+    private ProgressBar progressBar;
+    private TextView foodEditedMessageTextView;
     private TextView foodNameTextView;
     private TextView foodBoxTextView;
     private TextView amountTextView;
@@ -61,6 +67,9 @@ public class FoodActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
+        progressBar = (ProgressBar) findViewById(R.id.foodProgressBar);
+        foodEditedMessageTextView = (TextView) findViewById(R.id.foodEditedMessageTextView);
         foodNameTextView = (TextView) findViewById(R.id.foodNameTextView);
         amountTextView = (TextView) findViewById(R.id.amountTextView);
         noticeTextView = (TextView) findViewById(R.id.noticeTextView);
@@ -73,7 +82,10 @@ public class FoodActivity extends AppCompatActivity {
         editNoticeImageView = (ImageView) findViewById(R.id.editNoticeImageView);
         editExpirationDateImageView = (ImageView) findViewById(R.id.editExpirationDateImageView);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        constraintLayout.setVisibility(View.GONE);
+        foodEditedMessageTextView.setVisibility(View.GONE);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,6 +125,8 @@ public class FoodActivity extends AppCompatActivity {
             }
         });
 
+        fab.setVisibility(View.GONE);
+
         editNameImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,6 +141,7 @@ public class FoodActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 food.setName(editText.getText().toString());
                                 setFoodOnView(food);
+                                onEdited();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -154,6 +169,7 @@ public class FoodActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 food.setAmount(Double.valueOf(editText.getText().toString()));
                                 setFoodOnView(food);
+                                onEdited();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -182,6 +198,7 @@ public class FoodActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 food.setNotice(editText.getText().toString());
                                 setFoodOnView(food);
+                                onEdited();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -212,6 +229,7 @@ public class FoodActivity extends AppCompatActivity {
                                 calendar.set(year, monthOfYear, dayOfMonth);
                                 food.setExpirationDate(calendar.getTime());
                                 setFoodOnView(food);
+                                onEdited();
                             }
                         },
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
@@ -255,10 +273,10 @@ public class FoodActivity extends AppCompatActivity {
                 super.onResponse(call, response);
 
                 if (response.code() == 200) {
-                    SimpleDateFormat timeFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-                    SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
                     food = response.body();
                     setFoodOnView(food);
+                    constraintLayout.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
                 }
             }
 
@@ -282,5 +300,10 @@ public class FoodActivity extends AppCompatActivity {
         expirationDateTextView.setText(dateFormatter.format(food.getExpirationDate()));
         createdUserTextView.setText(timeFormatter.format(food.getCreatedAt()) + " by " + food.getCreatedUser().getName());
         updatedUserTextView.setText(timeFormatter.format(food.getUpdatedAt()) + " by " + food.getUpdatedUser().getName());
+    }
+
+    private void onEdited() {
+        foodEditedMessageTextView.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.VISIBLE);
     }
 }

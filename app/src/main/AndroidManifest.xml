@@ -46,10 +46,6 @@
             android:label="@string/title_activity_box_info"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".EditFoodActivity"
-            android:label="@string/title_activity_edit_food"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".ErrorActivity"
             android:label="@string/title_activity_error"
             android:theme="@style/AppTheme.NoActionBar" />
