@@ -1,0 +1,50 @@
+- artifact: com.android.support:+:+
+  name: Android Support Libraries
+  copyrightHolder: The Android Open Source Project
+  license: apache2
+- artifact: com.google.android.gms:+:+
+  skip: true
+- artifact: com.android.support.constraint:+:+
+  name: Android Support Libraries
+  copyrightHolder: The Android Open Source Project
+  license: apache2
+- artifact: com.daimajia.androidanimations:library:+
+  name: AndroidAnimations Library
+  copyrightHolder: daimajia
+  license: MIT
+  licenseUrl: http://opensource.org/licenses/MIT
+  url: https://github.com/daimajia/AndroidAnimations
+- artifact: com.daimajia.easing:library:+
+  name: AndroidEasingFunctions Library
+  copyrightHolder: daimajia
+  license: MIT
+  licenseUrl: http://opensource.org/licenses/MIT
+  url: https://github.com/daimajia/AnimationEasingFunctions
+- artifact: com.daimajia.swipelayout:library:+
+  name: Android SwipeLayout Library
+  copyrightHolder: daimajia
+  license: MIT
+  licenseUrl: http://opensource.org/licenses/MIT
+  url: https://github.com/daimajia/AndroidSwipeLayout
+- artifact: com.google.code.gson:gson:+
+  name: Gson
+  copyrightHolder: Google Inc.
+  license: apache2
+- artifact: com.squareup.okhttp3:okhttp:+
+  name: OkHttp
+  copyrightHolder: square
+  license: apache2
+- artifact: com.squareup.okio:okio:+
+  name: Okio
+  copyrightHolder: square
+  license: apache2
+- artifact: com.squareup.retrofit2:+:+
+  name: Retrofit
+  copyrightHolder: square
+  license: apache2
+- artifact: de.hdodenhof:circleimageview:+
+  name: CircleImageView
+  copyrightHolder: Dodenhof
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/hdodenhof/CircleImageView

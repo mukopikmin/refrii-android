@@ -120,4 +120,6 @@ tags
 
 # End of https://www.gitignore.io/api/vim,java,macos,android
 
+!gradle-wrapper.jar
+app/src/main/assets
 app/google-services.json
