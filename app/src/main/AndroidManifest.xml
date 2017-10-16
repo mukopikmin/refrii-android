@@ -49,7 +49,15 @@
             android:name=".ErrorActivity"
             android:label="@string/title_activity_error"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".WebViewActivity"></activity>
+        <activity android:name=".WebViewActivity" />
+        <activity
+            android:name=".UnitsActivity"
+            android:label="@string/title_activity_units"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".UnitActivity"
+            android:label="@string/title_activity_unit"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

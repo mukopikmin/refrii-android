@@ -8,5 +8,5 @@ import retrofit2.http.Header;
 
 public interface UnitService {
     @GET("/units")
-    Call<List<Unit>> getUnits(@Header("Authorization") String token);
+    Call<List<Unit>> getUnits();
 }

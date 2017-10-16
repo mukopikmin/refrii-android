@@ -3,6 +3,7 @@ package com.refrii.client;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.auth.GoogleAuthException;
@@ -29,25 +30,12 @@ public class RetrofitFactory {
 
     private static final String TAG = "RetrofitFactory";
 
-//    public static <T> T getClient(Class<T> clazz, final Context context) {
-//        Gson gson = new GsonBuilder()
-//                .setLenient()
-//                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-//                .create();
-//        Retrofit retrofit = new Retrofit.Builder()
-////                .baseUrl("https://refrii-api.herokuapp.com/")
-//                .baseUrl("http://192.168.10.102:3000/")
-//                .addConverterFactory(GsonConverterFactory.create(gson))
-//                .build();
-//        return retrofit.create(clazz);
-//    }
-
     public static <T> T getClient(Class<T> clazz, final Context context) {
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(Chain chain) throws IOException {
-                        SharedPreferences sharedPreferences = context.getSharedPreferences("DATA", Context.MODE_PRIVATE);
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);//context.getSharedPreferences("DATA", Context.MODE_PRIVATE);
                         Request original = chain.request();
                         String jwt = sharedPreferences.getString("jwt", null);
                         Request request = original.newBuilder()

@@ -62,6 +62,14 @@ public class Box implements Serializable {
         return owner;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setNotice(String notice) {
+        this.notice = notice;
+    }
+
     public boolean equals(Object object) {
         Box box = (Box) object;
         return box.id == id;

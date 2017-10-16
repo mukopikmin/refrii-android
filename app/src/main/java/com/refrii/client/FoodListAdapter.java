@@ -1,7 +1,6 @@
 package com.refrii.client;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +12,7 @@ import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 
 import okhttp3.MultipartBody;
@@ -27,25 +27,23 @@ import retrofit2.Response;
 
 public class FoodListAdapter extends BaseSwipeAdapter {
 
-    private Context context;
-    private List<Food> foods;
-    private String jwt;
-    private FoodListAdapter foodListAdapter;
+    private Context mContext;
+    private List<Food> mFoods;
+    private FoodListAdapter mFoodListAdapter;
 
     public FoodListAdapter(Context context, List<Food> foods) {
-        this.context = context;
-        this.foods = foods;
-        foodListAdapter = this;
-        SharedPreferences sharedPreferences = context.getSharedPreferences("DATA", Context.MODE_PRIVATE);
-        this.jwt = sharedPreferences.getString("jwt", null);
+        mContext = context;
+        mFoods = foods;
+        mFoodListAdapter = this;
+        Collections.sort(foods);
     }
 
     public void add(Food food) {
-        this.foods.add(food);
+        this.mFoods.add(food);
     }
 
     public void remove(Food food) {
-        foods.remove(food);
+        mFoods.remove(food);
     }
 
     @Override
@@ -55,19 +53,19 @@ public class FoodListAdapter extends BaseSwipeAdapter {
 
     @Override
     public View generateView(final int position, ViewGroup parent) {
-        View v = LayoutInflater.from(context).inflate(R.layout.food_list_row, null);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.food_list_row, null);
         final SwipeLayout swipeLayout = (SwipeLayout)v.findViewById(getSwipeLayoutResourceId(position));
         swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
             @Override
             public void onDoubleClick(SwipeLayout layout, boolean surface) {
-                Toast.makeText(context, "DoubleClick", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show();
             }
         });
 
         v.findViewById(R.id.incrementImageView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Food food = foods.get(position);
+                Food food = mFoods.get(position);
                 food.setAmount(food.getAmount() + 1);
                 updateFood(food, view);
             }
@@ -75,7 +73,7 @@ public class FoodListAdapter extends BaseSwipeAdapter {
         v.findViewById(R.id.decrementImageView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Food food = foods.get(position);
+                Food food = mFoods.get(position);
                 food.setAmount(food.getAmount() - 1);
                 updateFood(food, view);
             }
@@ -85,7 +83,7 @@ public class FoodListAdapter extends BaseSwipeAdapter {
 
     @Override
     public void fillValues(int position, View convertView) {
-        Food food = foods.get(position);
+        Food food = mFoods.get(position);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
 
         ((TextView)convertView.findViewById(R.id.nameFoodListTextView)).setText(food.getName());
@@ -95,12 +93,12 @@ public class FoodListAdapter extends BaseSwipeAdapter {
 
     @Override
     public int getCount() {
-        return this.foods.size();
+        return this.mFoods.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return this.foods.get(position);
+        return this.mFoods.get(position);
     }
 
     @Override
@@ -113,7 +111,7 @@ public class FoodListAdapter extends BaseSwipeAdapter {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("amount", String.valueOf(food.getAmount()))
                 .build();
-        FoodService service = RetrofitFactory.getClient(FoodService.class, context);
+        FoodService service = RetrofitFactory.getClient(FoodService.class, mContext);
         Call<Food> call = service.updateFood(food.getId(), body);
         call.enqueue(new Callback<Food>() {
             @Override
@@ -122,7 +120,7 @@ public class FoodListAdapter extends BaseSwipeAdapter {
                 Snackbar.make(view, "Amount of " + food.getName() + " updated", Snackbar.LENGTH_LONG)
                         .setAction("Dismiss", null)
                         .show();
-                foodListAdapter.notifyDataSetChanged();
+                mFoodListAdapter.notifyDataSetChanged();
             }
 
             @Override

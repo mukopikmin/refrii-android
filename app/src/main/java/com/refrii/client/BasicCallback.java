@@ -30,6 +30,8 @@ public class BasicCallback<T> implements Callback<T> {
 
         switch (response.code()) {
             case 401:
+            case 403:
+            case 404:
                 intent = new Intent(mContext, SigninActivity.class);
                 mContext.startActivity(intent);
                 break;
@@ -42,6 +44,6 @@ public class BasicCallback<T> implements Callback<T> {
 
     @Override
     public void onFailure(Call<T> call, Throwable t) {
-
+        Log.e(TAG, t.getMessage());
     }
 }

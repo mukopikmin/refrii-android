@@ -15,7 +15,7 @@ import retrofit2.Response;
  * Created by yusuke on 2017/09/01.
  */
 
-public class Food implements Serializable {
+public class Food implements Serializable, Comparable<Food> {
     private int id;
     private String name;
     private String notice;
@@ -116,5 +116,10 @@ public class Food implements Serializable {
 
     public void increase(double diff) {
         this.amount += diff;
+    }
+
+    @Override
+    public int compareTo(Food food){
+        return (int) (this.expirationDate.getTime() - food.getExpirationDate().getTime());
     }
 }

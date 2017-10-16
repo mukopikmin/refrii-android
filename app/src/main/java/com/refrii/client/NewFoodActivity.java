@@ -80,16 +80,13 @@ public class NewFoodActivity extends AppCompatActivity {
                         .build();
 
                 FoodService service = RetrofitFactory.getClient(FoodService.class, NewFoodActivity.this);
-                Call<Food> call = service.addFood(
-                        "Bearer " + sharedPreferences.getString("jwt", null),
-                        body);
-                call.enqueue(new Callback<Food>() {
+                Call<Food> call = service.addFood(body);
+                call.enqueue(new BasicCallback<Food>(NewFoodActivity.this) {
                     @Override
                     public void onResponse(Call<Food> call, Response<Food> response) {
                         if (response.code() == 201) {
                             // With success of creating food, exit this activity
                             Food food = response.body();
-                            Log.d("aasssa",food.getName());
                             Intent intent = new Intent();
                             intent.putExtra("food", food);
                             setResult(RESULT_OK, intent);
@@ -109,7 +106,7 @@ public class NewFoodActivity extends AppCompatActivity {
         });
 
         UnitService service = RetrofitFactory.getClient(UnitService.class, NewFoodActivity.this);
-        Call<List<Unit>> call = service.getUnits("Bearer " + token);
+        Call<List<Unit>> call = service.getUnits();
         call.enqueue(new Callback<List<Unit>>() {
             @Override
             public void onResponse(Call<List<Unit>> call, Response<List<Unit>> response) {

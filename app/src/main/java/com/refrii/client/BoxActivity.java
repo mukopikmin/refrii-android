@@ -5,10 +5,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SubMenu;
@@ -38,7 +38,6 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.PUT;
 
 public class BoxActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -46,16 +45,14 @@ public class BoxActivity extends AppCompatActivity
     private static final String TAG = "BoxActivity";
     private static final int REQUEST_CODE = 1;
 
-    private SharedPreferences sharedPreferences;
-    private ListView listView;
-    private SubMenu subMenu;
-    private ProgressBar progressBar;
-    private List<Box> boxes;
-    private Box selectedBox;
-    private String jwt;
-    private FloatingActionButton floatingActionButton;
-    private FoodListAdapter foodListAdapter;
-    private PopupMenu popupMenu;
+    private FoodListAdapter mFoodListAdapter;
+    private List<Box> mBoxes;
+    private Box mBox;
+
+    private ListView mListView;
+    private SubMenu mSubMenu;
+    private ProgressBar mProgressBar;
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,23 +60,23 @@ public class BoxActivity extends AppCompatActivity
         setContentView(R.layout.activity_box);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(BoxActivity.this, NewFoodActivity.class);
-                intent.putExtra("boxId", selectedBox.getId());
+                intent.putExtra("boxId", mBox.getId());
                 startActivityForResult(intent, REQUEST_CODE);
             }
         });
 
-        progressBar = (ProgressBar) findViewById(R.id.boxProgressBar);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         showProgressBar();
 
-        listView = (ListView) findViewById(R.id.listView);
+        mListView = (ListView) findViewById(R.id.listView);
 
         setSupportActionBar(toolbar);
-        sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);//getSharedPreferences("DATA", Context.MODE_PRIVATE);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -90,12 +87,12 @@ public class BoxActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         Menu menu = navigationView.getMenu();
-        subMenu = menu.addSubMenu("Boxes");
+        mSubMenu = menu.addSubMenu("Boxes");
 
         View headerView = navigationView.getHeaderView(0);
         TextView nameTextView = headerView.findViewById(R.id.nameNavHeaderTextView);
         TextView mailTextView = headerView.findViewById(R.id.mailNavHeaderTextView);
-        ImageView avatarImageView = (ImageView) headerView.findViewById(R.id.avatarNavHeaderImageView);
+        ImageView avatarImageView = headerView.findViewById(R.id.avatarNavHeaderImageView);
         String name = sharedPreferences.getString("name", "name");
         String mail = sharedPreferences.getString("mail", "mail");
         String avatarUrl = sharedPreferences.getString("avatar", null);
@@ -107,17 +104,36 @@ public class BoxActivity extends AppCompatActivity
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mBox != null) {
+            SharedPreferences.Editor editor = getSharedPreferences("DATA", Context.MODE_PRIVATE).edit();
+            editor.putInt("selected_box_index", mBoxes.indexOf(mBox));
+            editor.commit();
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
-        jwt = getSharedPreferences("DATA", Context.MODE_PRIVATE).getString("jwt", null);
-        if (jwt == null) {
-            Intent intent = new Intent(BoxActivity.this, SigninActivity.class);
-            intent.putExtra("email", sharedPreferences.getString("email", null));
-            startActivity(intent);
-        } else {
-            getBoxes(jwt);
-        }
+        getBoxes();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.remove("selected_box_id");
+        editor.commit();
+
+//        jwt = getSharedPreferences("DATA", Context.MODE_PRIVATE).getString("jwt", null);
+//        if (jwt == null) {
+//            Intent intent = new Intent(BoxActivity.this, SigninActivity.class);
+//            intent.putExtra("email", sharedPreferences.getString("email", null));
+//            startActivity(intent);
+//        } else {
+//            getBoxes();
+//        }
     }
 
     @Override
@@ -147,7 +163,7 @@ public class BoxActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_box_info) {
             Intent intent = new Intent(BoxActivity.this, BoxInfoActivity.class);
-            intent.putExtra("box", selectedBox);
+            intent.putExtra("box", mBox);
             startActivity(intent);
             return true;
         }
@@ -159,17 +175,25 @@ public class BoxActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-        int boxIndex = boxes.indexOf(new Box(id));
+        int boxIndex = mBoxes.indexOf(new Box(id));
 
         if (boxIndex != -1) {
-            selectedBox = boxes.get(boxIndex);
-            setFoods(selectedBox);
+            mBox = mBoxes.get(boxIndex);
+            setFoods(mBox);
         } else {
-            if (id == R.id.nav_settings) {
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
-            } else if (id == R.id.nav_signout) {
-                signOut();
+            Intent intent;
+            switch (id) {
+                case R.id.nav_settings:
+                    intent = new Intent(this, SettingsActivity.class);
+                    startActivity(intent);
+                    break;
+                case R.id.nav_signout:
+                    signOut();
+                    break;
+                case R.id.nav_units:
+                    intent = new Intent(this, UnitsActivity.class);
+                    startActivity(intent);
+                    break;
             }
         }
 
@@ -178,8 +202,8 @@ public class BoxActivity extends AppCompatActivity
         return true;
     }
 
-    private void getBoxes(String token) {
-        BoxService service = RetrofitFactory.getClient(BoxService.class, BoxActivity.this);
+    private void getBoxes() {
+        final BoxService service = RetrofitFactory.getClient(BoxService.class, BoxActivity.this);
         Call<List<Box>> call = service.getBoxes();
         call.enqueue(new BasicCallback<List<Box>>(BoxActivity.this) {
             @Override
@@ -187,36 +211,29 @@ public class BoxActivity extends AppCompatActivity
                 super.onResponse(call, response);
 
                 if (response.code() == 200) {
-                    boxes = response.body();
-                    selectedBox = boxes.get(0);
-                    subMenu.clear();
-                    for (Box box : boxes) {
-                        subMenu.add(Menu.NONE, box.getId(), Menu.NONE, box.getName());
+                    mBoxes = response.body();
+                    mSubMenu.clear();
+                    for (Box box : mBoxes) {
+                        mSubMenu.add(Menu.NONE, box.getId(), Menu.NONE, box.getName());
                     }
-                    if (boxes.size() > 0) {
-                        if (selectedBox == null) {
-                            setFoods(boxes.get(0));
-                        } else {
-                            setFoods(boxes.get(boxes.indexOf(selectedBox)));
-                        }
+                    if (mBoxes.size() > 0) {
+                        SharedPreferences sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE);
+                        int boxIndex = sharedPreferences.getInt("selected_box_index", 0);
+                        mBox = mBoxes.get(boxIndex);
+                        setFoods(mBox);
                     }
 
                     hideProgressBar();
                 }
             }
-
-            @Override
-            public void onFailure(Call<List<Box>> call, Throwable t) {
-                Toast.makeText(BoxActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-            }
         });
     }
 
     private void setFoods(Box box) {
-        foodListAdapter = new FoodListAdapter(this, box.getFoods());
-        listView.setAdapter(foodListAdapter);
-        foodListAdapter.setMode(Attributes.Mode.Single);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mFoodListAdapter = new FoodListAdapter(this, box.getFoods());
+        mListView.setAdapter(mFoodListAdapter);
+        mFoodListAdapter.setMode(Attributes.Mode.Single);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Food food = (Food) parent.getItemAtPosition(position);
@@ -225,14 +242,14 @@ public class BoxActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
-        listView.setOnTouchListener(new View.OnTouchListener() {
+        mListView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 Log.e("ListView", "OnTouch");
                 return false;
             }
         });
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 final Food food = (Food) parent.getItemAtPosition(position);
@@ -250,14 +267,14 @@ public class BoxActivity extends AppCompatActivity
                                         break;
                                     case 1:
                                         FoodService service = RetrofitFactory.getClient(FoodService.class, BoxActivity.this);
-                                        Call<Void> call = service.remove("Bearer " + jwt, food.getId());
+                                        Call<Void> call = service.remove(food.getId());
                                         call.enqueue(new Callback<Void>() {
                                             @Override
                                             public void onResponse(Call<Void> call, Response<Void> response) {
                                                 if (response.code() == 204) {
-                                                    foodListAdapter.remove(food);
-                                                    foodListAdapter.notifyDataSetChanged();
-                                                    Snackbar.make(listView, "Removed successfully", Snackbar.LENGTH_LONG)
+                                                    mFoodListAdapter.remove(food);
+                                                    mFoodListAdapter.notifyDataSetChanged();
+                                                    Snackbar.make(mListView, "Removed successfully", Snackbar.LENGTH_LONG)
                                                             .setAction("Dismiss", null)
                                                             .show();
                                                 }
@@ -276,7 +293,7 @@ public class BoxActivity extends AppCompatActivity
                 return true;
             }
         });
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 Log.e("ListView", "onScrollStateChanged");
@@ -288,7 +305,7 @@ public class BoxActivity extends AppCompatActivity
             }
         });
 
-        listView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mListView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.e("ListView", "onItemSelected:" + position);
@@ -302,13 +319,13 @@ public class BoxActivity extends AppCompatActivity
     }
 
     private void showProgressBar() {
-        progressBar.setVisibility(View.VISIBLE);
-        floatingActionButton.hide();
+        mProgressBar.setVisibility(View.VISIBLE);
+        mFab.hide();
     }
 
     private void hideProgressBar() {
-        progressBar.setVisibility(View.GONE);
-        floatingActionButton.show();
+        mProgressBar.setVisibility(View.GONE);
+        mFab.show();
     }
 
     private void updateFood(Food food, double amount) {
@@ -323,7 +340,7 @@ public class BoxActivity extends AppCompatActivity
             public void onResponse(Call<Food> call, final Response<Food> response) {
                 hideProgressBar();
                 if (response.code() == 200) {
-                    Snackbar.make(listView, "Updated amount", Snackbar.LENGTH_LONG)
+                    Snackbar.make(mListView, "Updated amount", Snackbar.LENGTH_LONG)
                             .setAction("Revert", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -342,7 +359,7 @@ public class BoxActivity extends AppCompatActivity
             @Override
             public void onFailure(Call<Food> call, Throwable t) {
                 hideProgressBar();
-                Snackbar.make(listView, t.getMessage(), Snackbar.LENGTH_LONG)
+                Snackbar.make(mListView, t.getMessage(), Snackbar.LENGTH_LONG)
                         .setAction("Dismiss", null)
                         .show();
             }
@@ -354,17 +371,15 @@ public class BoxActivity extends AppCompatActivity
         if (requestCode == REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Food food = (Food) data.getSerializableExtra("food");
-                foodListAdapter.add(food);
-                foodListAdapter.notifyDataSetChanged();
+                mFoodListAdapter.add(food);
+                mFoodListAdapter.notifyDataSetChanged();
             }
         }
     }
 
     private void signOut() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove("mail");
-        editor.remove("name");
-        editor.remove("jwt");
+        SharedPreferences.Editor editor = getSharedPreferences("DATA", Context.MODE_PRIVATE).edit();
+        editor.clear();
         editor.commit();
 
         Intent intent = new Intent(BoxActivity.this, SigninActivity.class);

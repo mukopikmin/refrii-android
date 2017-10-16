@@ -1,10 +1,10 @@
 package com.refrii.client;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -48,7 +48,7 @@ public class SigninActivity extends AppCompatActivity implements GoogleApiClient
 
 
 
-        sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);//getSharedPreferences("DATA", Context.MODE_PRIVATE);
         String mailAddress = sharedPreferences.getString("mail", null);
         if (mailAddress != null) {
             getGoogleToken(mailAddress);

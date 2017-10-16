@@ -19,14 +19,10 @@ import retrofit2.http.Path;
 public interface FoodService {
 
     @GET("/foods/{id}")
-    Call<Food> getFood(
-            @Header("Authorization") String token,
-            @Path("id") int id);
+    Call<Food> getFood(@Path("id") int id);
 
     @POST("/foods")
-    Call<Food> addFood(
-            @Header("Authorization") String token,
-            @Body RequestBody body);
+    Call<Food> addFood(@Body RequestBody body);
 
     @PUT("/foods/{id}")
     Call<Food> updateFood(
@@ -34,7 +30,5 @@ public interface FoodService {
             @Body RequestBody body);
 
     @DELETE("/foods/{id}")
-    Call<Void> remove(
-            @Header("Authorization") String token,
-            @Path("id") int id);
+    Call<Void> remove(@Path("id") int id);
 }

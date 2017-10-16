@@ -1,10 +1,13 @@
 package com.refrii.client;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -13,11 +16,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,7 +41,8 @@ public class FoodActivity extends AppCompatActivity {
 
     private static final String TAG = "FoodActivity";
 
-    private SharedPreferences sharedPreferences;
+    private Food food;
+
     private ConstraintLayout constraintLayout;
     private FloatingActionButton fab;
     private ProgressBar progressBar;
@@ -52,15 +58,12 @@ public class FoodActivity extends AppCompatActivity {
     private ImageView editAmountImageView;
     private ImageView editNoticeImageView;
     private ImageView editExpirationDateImageView;
-    private Food food;
     private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food);
-
-        sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -89,6 +92,7 @@ public class FoodActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressBar.setVisibility(View.VISIBLE);
                 FoodService service = RetrofitFactory.getClient(FoodService.class, FoodActivity.this);
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
                 RequestBody body = new MultipartBody.Builder()
@@ -106,10 +110,10 @@ public class FoodActivity extends AppCompatActivity {
                     public void onResponse(Call<Food> call, Response<Food> response) {
                         if (response.code() == 200) {
                             Food food = response.body();
-                            Log.d("aasssa",food.getName());
                             Intent intent = new Intent();
                             intent.putExtra("food", food);
                             setResult(RESULT_OK, intent);
+                            progressBar.setVisibility(View.GONE);
                             finish();
                         } else {
                             Log.d(TAG, "Failed with status: " + response.code());
@@ -130,110 +134,36 @@ public class FoodActivity extends AppCompatActivity {
         editNameImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final EditText editText = new EditText(FoodActivity.this);
-                editText.setText(String.valueOf(food.getName()));
-
-                new AlertDialog.Builder(FoodActivity.this)
-                        .setTitle("Name")
-                        .setView(editText)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                food.setName(editText.getText().toString());
-                                setFoodOnView(food);
-                                onEdited();
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .show();
+                EditNameDialogFragment fragment = new EditNameDialogFragment();
+                fragment.setFood(food);
+                fragment.show(getFragmentManager(), "edit_name");
             }
         });
 
         editAmountImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final EditText editText = new EditText(FoodActivity.this);
-                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-                editText.setText(String.valueOf(food.getAmount()));
-
-                new AlertDialog.Builder(FoodActivity.this)
-                        .setTitle("Amount")
-                        .setView(editText)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                food.setAmount(Double.valueOf(editText.getText().toString()));
-                                setFoodOnView(food);
-                                onEdited();
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .show();
+                EditAmountDialogFragment fragment = new EditAmountDialogFragment();
+                fragment.setFood(food);
+                fragment.show(getFragmentManager(), "edit_amount");
             }
         });
 
         editNoticeImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final EditText editText = new EditText(FoodActivity.this);
-                editText.setSingleLine(false);
-                editText.setMaxLines(5);
-                editText.setText(String.valueOf(food.getNotice()));
-
-                new AlertDialog.Builder(FoodActivity.this)
-                        .setTitle("Notice")
-                        .setView(editText)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                food.setNotice(editText.getText().toString());
-                                setFoodOnView(food);
-                                onEdited();
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .show();
+                EditNoticeDialogFragment fragment = new EditNoticeDialogFragment();
+                fragment.setFood(food);
+                fragment.show(getFragmentManager(), "edit_notice");
             }
         });
 
         editExpirationDateImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final Calendar calendar = Calendar.getInstance();
-                calendar.setTime(food.getExpirationDate());
-                final DatePickerDialog datePickerDialog = new DatePickerDialog(
-                        FoodActivity.this,
-                        new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                Toast.makeText(FoodActivity.this,
-                                        String.valueOf(year) + "/" +
-                                                String.valueOf(monthOfYear + 1) + "/" +
-                                                String.valueOf(dayOfMonth),
-                                        Toast.LENGTH_SHORT).show();
-                                calendar.set(year, monthOfYear, dayOfMonth);
-                                food.setExpirationDate(calendar.getTime());
-                                setFoodOnView(food);
-                                onEdited();
-                            }
-                        },
-                        calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-                datePickerDialog.show();
+                EditDateDialogFragment fragment = new EditDateDialogFragment();
+                fragment.setFood(food);
+                fragment.show(getFragmentManager(), "edit_expiration_date");
             }
         });
     }
@@ -266,7 +196,7 @@ public class FoodActivity extends AppCompatActivity {
 
     private void setFood(int id) {
         FoodService service = RetrofitFactory.getClient(FoodService.class, FoodActivity.this);
-        Call<Food> call = service.getFood("Bearer " + sharedPreferences.getString("jwt", null), id);
+        Call<Food> call = service.getFood(id);
         call.enqueue(new BasicCallback<Food>(FoodActivity.this) {
             @Override
             public void onResponse(Call<Food> call, Response<Food> response) {
@@ -288,9 +218,11 @@ public class FoodActivity extends AppCompatActivity {
         });
     }
 
-    private void setFoodOnView(Food food) {
+    public void setFoodOnView(Food food) {
         SimpleDateFormat timeFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
+
+        long daysLeft = (food.getExpirationDate().getTime() - new Date().getTime()) / (24 * 60 * 60 * 1000);
 
         toolbar.setTitle(food.getName());
         foodNameTextView.setText(food.getName());
@@ -298,12 +230,165 @@ public class FoodActivity extends AppCompatActivity {
         amountTextView.setText(food.getAmount() + " " + food.getUnit().getLabel());
         noticeTextView.setText(food.getNotice());
         expirationDateTextView.setText(dateFormatter.format(food.getExpirationDate()));
+        if (daysLeft < 0) {
+            expirationDateTextView.append(" (" + Math.abs(daysLeft) + " days over)");
+            expirationDateTextView.setTextColor(Color.RED);
+        } else {
+            expirationDateTextView.append(" (" + Math.abs(daysLeft) + " days left)");
+        }
         createdUserTextView.setText(timeFormatter.format(food.getCreatedAt()) + " by " + food.getCreatedUser().getName());
         updatedUserTextView.setText(timeFormatter.format(food.getUpdatedAt()) + " by " + food.getUpdatedUser().getName());
     }
 
-    private void onEdited() {
+    public void onEdited() {
         foodEditedMessageTextView.setVisibility(View.VISIBLE);
         fab.setVisibility(View.VISIBLE);
+    }
+
+    public static class EditNameDialogFragment extends DialogFragment {
+        private Food mFood;
+        private EditText mEditText;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View content = inflater.inflate(R.layout.edit_text_dialog, null);
+            mEditText = content.findViewById(R.id.editText);
+            mEditText.setText(mFood.getName());
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                    .setTitle("Name")
+                    .setView(content)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            mFood.setName(mEditText.getText().toString());
+                            ((FoodActivity) getActivity()).setFoodOnView(mFood);
+                            ((FoodActivity) getActivity()).onEdited();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) { }
+                    });
+
+            return builder.create();
+        }
+
+        public void setFood(Food food) {
+            mFood = food;
+        }
+    }
+
+    public static class EditAmountDialogFragment extends DialogFragment {
+        private Food mFood;
+        private EditText mEditText;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View content = inflater.inflate(R.layout.edit_text_dialog, null);
+            mEditText = content.findViewById(R.id.editText);
+            mEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+            mEditText.setText(String.valueOf(mFood.getAmount()));
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                    .setTitle("Amount")
+                    .setView(content)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            mFood.setAmount(Double.valueOf(mEditText.getText().toString()));
+                            ((FoodActivity) getActivity()).setFoodOnView(mFood);
+                            ((FoodActivity) getActivity()).onEdited();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) { }
+                    });
+
+            return builder.create();
+        }
+
+        public void setFood(Food food) {
+            mFood = food;
+        }
+    }
+
+    public static class EditNoticeDialogFragment extends DialogFragment {
+        private Food mFood;
+        private EditText mEditText;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View content = inflater.inflate(R.layout.edit_text_dialog, null);
+            mEditText = content.findViewById(R.id.editText);
+            mEditText.setSingleLine(false);
+            mEditText.setMaxLines(5);
+            mEditText.setText(mFood.getNotice());
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                    .setTitle("Notice")
+                    .setView(content)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            mFood.setNotice(mEditText.getText().toString());
+                            ((FoodActivity) getActivity()).setFoodOnView(mFood);
+                            ((FoodActivity) getActivity()).onEdited();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) { }
+                    });
+
+            return builder.create();
+        }
+
+        public void setFood(Food food) {
+            mFood = food;
+        }
+    }
+
+    public static class EditDateDialogFragment extends DialogFragment {
+        private Food mFood;
+        private DatePicker mDatePicker;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View content = inflater.inflate(R.layout.edit_date_dialog, null);
+            mDatePicker = content.findViewById(R.id.datePicker);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(mFood.getExpirationDate());
+            mDatePicker.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                    .setView(content)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.set(mDatePicker.getYear(), mDatePicker.getMonth(), mDatePicker.getDayOfMonth());
+                            mFood.setExpirationDate(calendar.getTime());
+                            ((FoodActivity) getActivity()).setFoodOnView(mFood);
+                            ((FoodActivity) getActivity()).onEdited();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) { }
+                    });
+
+            return builder.create();
+        }
+
+        public void setFood(Food food) {
+            mFood = food;
+        }
     }
 }

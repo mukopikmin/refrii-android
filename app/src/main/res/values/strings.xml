@@ -98,4 +98,6 @@
     <string name="title_activity_box_info">BoxInfoActivity</string>
     <string name="title_activity_edit_food">EditFoodActivity</string>
     <string name="title_activity_error">ErrorActivity</string>
+    <string name="title_activity_units">UnitsActivity</string>
+    <string name="title_activity_unit">UnitActivity</string>
 </resources>
