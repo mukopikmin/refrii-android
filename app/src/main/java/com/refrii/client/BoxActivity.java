@@ -1,5 +1,8 @@
 package com.refrii.client;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
@@ -252,44 +256,11 @@ public class BoxActivity extends AppCompatActivity
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                final Food food = (Food) parent.getItemAtPosition(position);
-                String[] items = { "Show", "Remove", "Cancel" };
-                new AlertDialog.Builder(BoxActivity.this)
-                        .setTitle(food.getName())
-                        .setItems(items, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                switch (which) {
-                                    case 0:
-                                        Intent intent = new Intent(BoxActivity.this, FoodActivity.class);
-                                        intent.putExtra("foodId", food.getId());
-                                        startActivity(intent);
-                                        break;
-                                    case 1:
-                                        FoodService service = RetrofitFactory.getClient(FoodService.class, BoxActivity.this);
-                                        Call<Void> call = service.remove(food.getId());
-                                        call.enqueue(new Callback<Void>() {
-                                            @Override
-                                            public void onResponse(Call<Void> call, Response<Void> response) {
-                                                if (response.code() == 204) {
-                                                    mFoodListAdapter.remove(food);
-                                                    mFoodListAdapter.notifyDataSetChanged();
-                                                    Snackbar.make(mListView, "Removed successfully", Snackbar.LENGTH_LONG)
-                                                            .setAction("Dismiss", null)
-                                                            .show();
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onFailure(Call<Void> call, Throwable t) {
-
-                                            }
-                                        });
-                                        break;
-                                }
-                            }
-                        })
-                        .show();
+                FoodOptionDialogFragment fragment = new FoodOptionDialogFragment();
+                fragment.setFood((Food) parent.getItemAtPosition(position));
+                fragment.setFoodListAdapter(mFoodListAdapter);
+                fragment.setListView(mListView);
+                fragment.show(getFragmentManager(), "food_option");
                 return true;
             }
         });
@@ -384,5 +355,72 @@ public class BoxActivity extends AppCompatActivity
 
         Intent intent = new Intent(BoxActivity.this, SigninActivity.class);
         startActivity(intent);
+    }
+
+    public static class FoodOptionDialogFragment extends DialogFragment {
+        private Food mFood;
+        private FoodListAdapter mFoodListAdapter;
+        private ListView mListView;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            CharSequence[] items = {
+                    "Show",
+                    "Remove",
+                    "Cancel"
+            };
+            final Activity activity = getActivity();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity)
+                    .setTitle(mFood.getName())
+                    .setItems(items, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0:
+                                    Intent intent = new Intent(activity, FoodActivity.class);
+                                    intent.putExtra("foodId", mFood.getId());
+                                    startActivity(intent);
+                                    break;
+                                case 1:
+                                    FoodService service = RetrofitFactory.getClient(FoodService.class, activity);
+                                    Call<Void> call = service.remove(mFood.getId());
+                                    call.enqueue(new Callback<Void>() {
+                                        @Override
+                                        public void onResponse(Call<Void> call, Response<Void> response) {
+                                            if (response.code() == 204) {
+                                                mFoodListAdapter.remove(mFood);
+                                                mFoodListAdapter.notifyDataSetChanged();
+                                                Snackbar.make(mListView, "Removed successfully", Snackbar.LENGTH_LONG)
+                                                        .setAction("Dismiss", null)
+                                                        .show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<Void> call, Throwable t) {
+
+                                        }
+                                    });
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    });
+
+            return builder.create();
+        }
+
+        public void setFood(Food food) {
+            mFood = food;
+        }
+
+        public void setFoodListAdapter(FoodListAdapter foodListAdapter) {
+            mFoodListAdapter = foodListAdapter;
+        }
+
+        public void setListView(ListView listView) {
+            mListView = listView;
+        }
     }
 }
