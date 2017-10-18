@@ -119,12 +119,6 @@ public class FoodActivity extends AppCompatActivity {
                             Log.d(TAG, "Failed with status: " + response.code());
                         }
                     }
-
-                    @Override
-                    public void onFailure(Call<Food> call, Throwable t) {
-                        Log.d(TAG, t.getMessage());
-                        Toast.makeText(FoodActivity.this, t.getMessage(), Toast.LENGTH_LONG).show();
-                    }
                 });
             }
         });

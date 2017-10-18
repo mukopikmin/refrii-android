@@ -34,6 +34,14 @@ public class Unit implements Serializable {
         return updatedAt;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public void setStep(double step) {
+        this.step = step;
+    }
+
     public boolean equals(Object object) {
         Unit unit = (Unit) object;
         return label.equals(unit.getLabel());

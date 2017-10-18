@@ -80,7 +80,6 @@ public class BoxActivity extends AppCompatActivity
         mListView = (ListView) findViewById(R.id.listView);
 
         setSupportActionBar(toolbar);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);//getSharedPreferences("DATA", Context.MODE_PRIVATE);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -92,6 +91,16 @@ public class BoxActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         Menu menu = navigationView.getMenu();
         mSubMenu = menu.addSubMenu("Boxes");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         View headerView = navigationView.getHeaderView(0);
         TextView nameTextView = headerView.findViewById(R.id.nameNavHeaderTextView);
@@ -112,7 +121,7 @@ public class BoxActivity extends AppCompatActivity
         super.onPause();
 
         if (mBox != null) {
-            SharedPreferences.Editor editor = getSharedPreferences("DATA", Context.MODE_PRIVATE).edit();
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(BoxActivity.this).edit();
             editor.putInt("selected_box_index", mBoxes.indexOf(mBox));
             editor.commit();
         }
@@ -124,20 +133,11 @@ public class BoxActivity extends AppCompatActivity
 
         getBoxes();
 
-        SharedPreferences sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(BoxActivity.this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.remove("selected_box_id");
         editor.commit();
-
-//        jwt = getSharedPreferences("DATA", Context.MODE_PRIVATE).getString("jwt", null);
-//        if (jwt == null) {
-//            Intent intent = new Intent(BoxActivity.this, SigninActivity.class);
-//            intent.putExtra("email", sharedPreferences.getString("email", null));
-//            startActivity(intent);
-//        } else {
-//            getBoxes();
-//        }
     }
 
     @Override
@@ -349,7 +349,7 @@ public class BoxActivity extends AppCompatActivity
     }
 
     private void signOut() {
-        SharedPreferences.Editor editor = getSharedPreferences("DATA", Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.clear();
         editor.commit();
 
