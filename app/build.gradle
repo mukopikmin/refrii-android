@@ -42,4 +42,5 @@ dependencies {
     compile 'com.daimajia.androidanimations:library:2.3@aar'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     testCompile 'junit:junit:4.12'
+    compile 'com.google.code.findbugs:jsr305:2.0.1'
 }

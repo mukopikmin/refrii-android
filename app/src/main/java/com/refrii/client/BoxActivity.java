@@ -3,17 +3,16 @@ package com.refrii.client;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
@@ -31,7 +30,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.daimajia.swipe.util.Attributes;
 
@@ -43,8 +41,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class BoxActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class BoxActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "BoxActivity";
     private static final int REQUEST_CODE = 1;
@@ -123,7 +120,7 @@ public class BoxActivity extends AppCompatActivity
         if (mBox != null) {
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(BoxActivity.this).edit();
             editor.putInt("selected_box_index", mBoxes.indexOf(mBox));
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -137,7 +134,7 @@ public class BoxActivity extends AppCompatActivity
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.remove("selected_box_id");
-        editor.commit();
+        editor.apply();
     }
 
     @Override
@@ -177,7 +174,7 @@ public class BoxActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         int boxIndex = mBoxes.indexOf(new Box(id));
 
@@ -221,7 +218,7 @@ public class BoxActivity extends AppCompatActivity
                         mSubMenu.add(Menu.NONE, box.getId(), Menu.NONE, box.getName());
                     }
                     if (mBoxes.size() > 0) {
-                        SharedPreferences sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE);
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(BoxActivity.this);
                         int boxIndex = sharedPreferences.getInt("selected_box_index", 0);
                         mBox = mBoxes.get(boxIndex);
                         setFoods(mBox);
@@ -299,44 +296,6 @@ public class BoxActivity extends AppCompatActivity
         mFab.show();
     }
 
-    private void updateFood(Food food, double amount) {
-        FoodService service = RetrofitFactory.getClient(FoodService.class, BoxActivity.this);
-        RequestBody body = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("amount", String.valueOf(food.getAmount()))
-                .build();
-        Call<Food> call = service.updateFood(food.getId(), body);
-        call.enqueue(new Callback<Food>() {
-            @Override
-            public void onResponse(Call<Food> call, final Response<Food> response) {
-                hideProgressBar();
-                if (response.code() == 200) {
-                    Snackbar.make(mListView, "Updated amount", Snackbar.LENGTH_LONG)
-                            .setAction("Revert", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    // TODO: Revert process
-//                                    Food food = response.body();
-//                                    food.setAmount(amount);
-//                                    updateFood(food);
-                                }
-                            })
-                            .show();
-                } else {
-                    onFailure(call, new Throwable("Unexpected error"));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Food> call, Throwable t) {
-                hideProgressBar();
-                Snackbar.make(mListView, t.getMessage(), Snackbar.LENGTH_LONG)
-                        .setAction("Dismiss", null)
-                        .show();
-            }
-        });
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
@@ -351,7 +310,7 @@ public class BoxActivity extends AppCompatActivity
     private void signOut() {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.clear();
-        editor.commit();
+        editor.apply();
 
         Intent intent = new Intent(BoxActivity.this, SigninActivity.class);
         startActivity(intent);
