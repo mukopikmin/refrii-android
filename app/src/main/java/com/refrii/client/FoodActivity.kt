@@ -1,13 +1,11 @@
 package com.refrii.client
 
 import android.app.Activity
-import android.app.DatePickerDialog
 import android.app.Dialog
 import android.app.DialogFragment
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
@@ -23,7 +21,6 @@ import android.view.View
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -33,62 +30,36 @@ import java.util.Calendar
 import java.util.Date
 
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 
 class FoodActivity : AppCompatActivity() {
 
     private var food: Food? = null
 
-    private var constraintLayout: ConstraintLayout? = null
-    private var fab: FloatingActionButton? = null
-    private var progressBar: ProgressBar? = null
-    private var foodEditedMessageTextView: TextView? = null
-    private var foodNameTextView: TextView? = null
-    private var foodBoxTextView: TextView? = null
-    private var amountTextView: TextView? = null
-    private var noticeTextView: TextView? = null
-    private var expirationDateTextView: TextView? = null
-    private var createdUserTextView: TextView? = null
-    private var updatedUserTextView: TextView? = null
-    private var editNameImageView: ImageView? = null
-    private var editAmountImageView: ImageView? = null
-    private var editNoticeImageView: ImageView? = null
-    private var editExpirationDateImageView: ImageView? = null
-    private var toolbar: Toolbar? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_food)
 
-        toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setHomeButtonEnabled(true)
 
-        constraintLayout = findViewById(R.id.constraintLayout) as ConstraintLayout
-        progressBar = findViewById(R.id.foodProgressBar) as ProgressBar
-        foodEditedMessageTextView = findViewById(R.id.foodEditedMessageTextView) as TextView
-        foodNameTextView = findViewById(R.id.foodNameTextView) as TextView
-        amountTextView = findViewById(R.id.amountTextView) as TextView
-        noticeTextView = findViewById(R.id.noticeTextView) as TextView
-        expirationDateTextView = findViewById(R.id.expirationDateTextView) as TextView
-        createdUserTextView = findViewById(R.id.createdUserTextView) as TextView
-        updatedUserTextView = findViewById(R.id.updatedUserTextView) as TextView
-        foodBoxTextView = findViewById(R.id.foodBoxTextView) as TextView
-        editNameImageView = findViewById(R.id.editNameImageView) as ImageView
-        editAmountImageView = findViewById(R.id.editAmountImageView) as ImageView
-        editNoticeImageView = findViewById(R.id.editNoticeImageView) as ImageView
-        editExpirationDateImageView = findViewById(R.id.editExpirationDateImageView) as ImageView
+        val constraintLayout = findViewById(R.id.constraintLayout) as ConstraintLayout
+        val progressBar = findViewById(R.id.foodProgressBar) as ProgressBar
+        val foodEditedMessageTextView = findViewById(R.id.foodEditedMessageTextView) as TextView
+        val editNameImageView = findViewById(R.id.editNameImageView) as ImageView
+        val editAmountImageView = findViewById(R.id.editAmountImageView) as ImageView
+        val editNoticeImageView = findViewById(R.id.editNoticeImageView) as ImageView
+        val editExpirationDateImageView = findViewById(R.id.editExpirationDateImageView) as ImageView
 
-        constraintLayout!!.visibility = View.GONE
-        foodEditedMessageTextView!!.visibility = View.GONE
+        constraintLayout.visibility = View.GONE
+        foodEditedMessageTextView.visibility = View.GONE
 
-        fab = findViewById(R.id.fab) as FloatingActionButton
-        fab!!.setOnClickListener {
-            progressBar!!.visibility = View.VISIBLE
+        val fab = findViewById(R.id.fab) as FloatingActionButton
+        fab.setOnClickListener {
+            progressBar.visibility = View.VISIBLE
             val service = RetrofitFactory.getClient(FoodService::class.java, this@FoodActivity)
             val formatter = SimpleDateFormat("yyyy/MM/dd")
             val body = MultipartBody.Builder()
@@ -108,7 +79,7 @@ class FoodActivity : AppCompatActivity() {
                         val intent = Intent()
                         intent.putExtra("food", food)
                         setResult(Activity.RESULT_OK, intent)
-                        progressBar!!.visibility = View.GONE
+                        progressBar.visibility = View.GONE
                         finish()
                     } else {
                         Log.d(TAG, "Failed with status: " + response.code())
@@ -117,27 +88,29 @@ class FoodActivity : AppCompatActivity() {
             })
         }
 
-        fab!!.visibility = View.GONE
+        fab.visibility = View.GONE
 
-        editNameImageView!!.setOnClickListener {
+        editNameImageView.setOnClickListener {
+            val args = Bundle()
+            args.putSerializable("food", food)
             val fragment = EditNameDialogFragment()
             fragment.setFood(food)
             fragment.show(fragmentManager, "edit_name")
         }
 
-        editAmountImageView!!.setOnClickListener {
+        editAmountImageView.setOnClickListener {
             val fragment = EditAmountDialogFragment()
             fragment.setFood(food)
             fragment.show(fragmentManager, "edit_amount")
         }
 
-        editNoticeImageView!!.setOnClickListener {
+        editNoticeImageView.setOnClickListener {
             val fragment = EditNoticeDialogFragment()
             fragment.setFood(food)
             fragment.show(fragmentManager, "edit_notice")
         }
 
-        editExpirationDateImageView!!.setOnClickListener {
+        editExpirationDateImageView.setOnClickListener {
             val fragment = EditDateDialogFragment()
             fragment.setFood(food)
             fragment.show(fragmentManager, "edit_expiration_date")
@@ -166,6 +139,8 @@ class FoodActivity : AppCompatActivity() {
     }
 
     private fun setFood(id: Int) {
+        val constraintLayout = findViewById(R.id.constraintLayout) as ConstraintLayout
+        val progressBar = findViewById(R.id.foodProgressBar) as ProgressBar
         val service = RetrofitFactory.getClient(FoodService::class.java, this@FoodActivity)
         val call = service.getFood(id)
         call.enqueue(object : BasicCallback<Food>(this@FoodActivity) {
@@ -175,8 +150,8 @@ class FoodActivity : AppCompatActivity() {
                 if (response.code() == 200) {
                     food = response.body()
                     setFoodOnView(food)
-                    constraintLayout!!.visibility = View.VISIBLE
-                    progressBar!!.visibility = View.GONE
+                    constraintLayout.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
                 }
             }
 
@@ -188,37 +163,54 @@ class FoodActivity : AppCompatActivity() {
     }
 
     fun setFoodOnView(food: Food?) {
+        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val foodNameTextView = findViewById(R.id.foodNameTextView) as TextView
+        val amountTextView = findViewById(R.id.amountTextView) as TextView
+        val noticeTextView = findViewById(R.id.noticeTextView) as TextView
+        val expirationDateTextView = findViewById(R.id.expirationDateTextView) as TextView
+        val createdUserTextView = findViewById(R.id.createdUserTextView) as TextView
+        val updatedUserTextView = findViewById(R.id.updatedUserTextView) as TextView
+        val foodBoxTextView = findViewById(R.id.foodBoxTextView) as TextView
+
         val timeFormatter = SimpleDateFormat("yyyy/MM/dd HH:mm")
         val dateFormatter = SimpleDateFormat("yyyy/MM/dd")
 
         val daysLeft = (food!!.expirationDate!!.time - Date().time) / (24 * 60 * 60 * 1000)
 
-        toolbar!!.title = food.name
-        foodNameTextView!!.text = food.name
-        foodBoxTextView!!.text = food.box!!.name
-        amountTextView!!.text = food.amount.toString() + " " + food.unit!!.label
-        noticeTextView!!.text = food.notice
-        expirationDateTextView!!.text = dateFormatter.format(food.expirationDate)
+        toolbar.title = food.name
+        foodNameTextView.text = food.name
+        foodBoxTextView.text = food.box!!.name
+        amountTextView.text = food.amount.toString() + " " + food.unit!!.label
+        noticeTextView.text = food.notice
+        expirationDateTextView.text = dateFormatter.format(food.expirationDate)
         if (daysLeft < 0) {
-            expirationDateTextView!!.append(" (" + Math.abs(daysLeft) + " days over)")
-            expirationDateTextView!!.setTextColor(Color.RED)
+            expirationDateTextView.append(" (" + Math.abs(daysLeft) + " days over)")
+            expirationDateTextView.setTextColor(Color.RED)
         } else {
-            expirationDateTextView!!.append(" (" + Math.abs(daysLeft) + " days left)")
+            expirationDateTextView.append(" (" + Math.abs(daysLeft) + " days left)")
         }
-        createdUserTextView!!.text = timeFormatter.format(food.createdAt) + " by " + food.createdUser!!.name
-        updatedUserTextView!!.text = timeFormatter.format(food.updatedAt) + " by " + food.updatedUser!!.name
+        createdUserTextView.text = timeFormatter.format(food.createdAt) + " by " + food.createdUser!!.name
+        updatedUserTextView.text = timeFormatter.format(food.updatedAt) + " by " + food.updatedUser!!.name
     }
 
     fun onEdited() {
-        foodEditedMessageTextView!!.visibility = View.VISIBLE
-        fab!!.visibility = View.VISIBLE
+        val foodEditedMessageTextView = findViewById(R.id.foodEditedMessageTextView) as TextView
+        val fab = findViewById(R.id.fab) as FloatingActionButton
+
+        foodEditedMessageTextView.visibility = View.VISIBLE
+        fab.visibility = View.VISIBLE
     }
 
     class EditNameDialogFragment : DialogFragment() {
         private var mFood: Food? = null
         private var mEditText: EditText? = null
+        private val onPositiveButtonClickListener = DialogInterface.OnClickListener { dialogInterface, i ->
+            mFood!!.name = mEditText!!.text.toString()
+            (activity as FoodActivity).setFoodOnView(mFood)
+            (activity as FoodActivity).onEdited()
+        }
 
-        override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val content = inflater.inflate(R.layout.edit_text_dialog, null)
             mEditText = content.findViewById(R.id.editText)
@@ -227,11 +219,7 @@ class FoodActivity : AppCompatActivity() {
             val builder = AlertDialog.Builder(activity)
                     .setTitle("Name")
                     .setView(content)
-                    .setPositiveButton("OK") { dialogInterface, i ->
-                        mFood!!.name = mEditText!!.text.toString()
-                        (activity as FoodActivity).setFoodOnView(mFood)
-                        (activity as FoodActivity).onEdited()
-                    }
+                    .setPositiveButton("OK", onPositiveButtonClickListener)
                     .setNegativeButton("Cancel") { dialogInterface, i -> }
 
             return builder.create()
@@ -246,7 +234,7 @@ class FoodActivity : AppCompatActivity() {
         private var mFood: Food? = null
         private var mEditText: EditText? = null
 
-        override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val content = inflater.inflate(R.layout.edit_text_dialog, null)
             mEditText = content.findViewById(R.id.editText)
@@ -275,7 +263,7 @@ class FoodActivity : AppCompatActivity() {
         private var mFood: Food? = null
         private var mEditText: EditText? = null
 
-        override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val content = inflater.inflate(R.layout.edit_text_dialog, null)
             mEditText = content.findViewById(R.id.editText)
@@ -305,7 +293,7 @@ class FoodActivity : AppCompatActivity() {
         private var mFood: Food? = null
         private var mDatePicker: DatePicker? = null
 
-        override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val content = inflater.inflate(R.layout.edit_date_dialog, null)
             mDatePicker = content.findViewById(R.id.datePicker)
@@ -334,7 +322,6 @@ class FoodActivity : AppCompatActivity() {
     }
 
     companion object {
-
         private val TAG = "FoodActivity"
     }
 }

@@ -29,10 +29,6 @@ class Food : Serializable, Comparable<Food> {
     val updatedUser: User? = null
     val box: Box? = null
 
-//    override fun toString(): String? {
-//        return this.name
-//    }
-
     override fun equals(obj: Any?): Boolean {
         val food = obj as Food?
         return this.id == food!!.id

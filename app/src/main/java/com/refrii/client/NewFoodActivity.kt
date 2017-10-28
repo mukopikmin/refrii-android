@@ -26,9 +26,6 @@ import retrofit2.Response
 
 class NewFoodActivity : AppCompatActivity() {
 
-    private var sharedPreferences: SharedPreferences? = null
-    private var spinner: Spinner? = null
-
     private var units: List<Unit>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,10 +38,7 @@ class NewFoodActivity : AppCompatActivity() {
         val intent = intent
         val boxId = intent.getIntExtra("boxId", 0)
 
-        spinner = findViewById(R.id.newFoodUnitSpinner) as Spinner
-
-        sharedPreferences = getSharedPreferences("DATA", Context.MODE_PRIVATE)
-        val token = sharedPreferences!!.getString("jwt", null)
+        val spinner = findViewById(R.id.newFoodUnitSpinner) as Spinner
 
         val fab = findViewById(R.id.fab) as FloatingActionButton
         fab.setOnClickListener {
@@ -99,24 +93,24 @@ class NewFoodActivity : AppCompatActivity() {
 
         val service = RetrofitFactory.getClient(UnitService::class.java, this@NewFoodActivity)
         val call = service.units
-        call.enqueue(object : Callback<List<Unit>> {
-            override fun onResponse(call: Call<List<Unit>>, response: Response<List<Unit>>) {
+        call.enqueue(object : BasicCallback<MutableList<Unit>>(this@NewFoodActivity) {
+            override fun onResponse(call: Call<MutableList<Unit>>, response: Response<MutableList<Unit>>) {
+                super.onResponse(call, response)
+
                 units = response.body()
                 val adapter = ArrayAdapter<String>(this@NewFoodActivity, android.R.layout.simple_spinner_dropdown_item)
-                for (unit in units!!) {
-                    adapter.add(unit.label)
-                }
-                spinner!!.adapter = adapter
+                units!!.forEach { adapter.add(it.label) }
+                spinner.adapter = adapter
             }
 
-            override fun onFailure(call: Call<List<Unit>>, t: Throwable) {
+            override fun onFailure(call: Call<MutableList<Unit>>, t: Throwable) {
+                super.onFailure(call, t)
                 Toast.makeText(this@NewFoodActivity, t.message, Toast.LENGTH_LONG).show()
             }
         })
     }
 
     companion object {
-
         private val TAG = "NewFoodActivity"
     }
 

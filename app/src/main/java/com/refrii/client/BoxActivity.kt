@@ -3,17 +3,13 @@ package com.refrii.client
 import android.app.Activity
 import android.app.Dialog
 import android.app.DialogFragment
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.util.Log
-import android.view.MotionEvent
-import android.view.SubMenu
 import android.view.View
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
@@ -32,54 +28,36 @@ import android.widget.TextView
 
 import com.daimajia.swipe.util.Attributes
 
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-import kotlin.jvm.javaClass
-
 class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private var mFoodListAdapter: FoodListAdapter? = null
     private var mBoxes: List<Box>? = null
     private var mBox: Box? = null
-
-    private var mListView: ListView? = null
-    private var mSubMenu: SubMenu? = null
-    private var mProgressBar: ProgressBar? = null
-    private var mFab: FloatingActionButton? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_box)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
 
-        mFab = findViewById(R.id.fab) as FloatingActionButton
-        mFab!!.setOnClickListener {
+        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val fab = findViewById(R.id.fab) as FloatingActionButton
+
+        setSupportActionBar(toolbar)
+
+        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout
+        val toggle = ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer.addDrawerListener(toggle)
+        toggle.syncState()
+
+        fab.setOnClickListener {
             val intent = Intent(this@BoxActivity, NewFoodActivity::class.java)
             intent.putExtra("boxId", mBox!!.id)
             startActivityForResult(intent, REQUEST_CODE)
         }
 
-        mProgressBar = findViewById(R.id.progressBar) as ProgressBar
         showProgressBar()
-
-        mListView = findViewById(R.id.listView) as ListView
-
-        setSupportActionBar(toolbar)
-
-        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout
-        val toggle = ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer.addDrawerListener(toggle)
-        toggle.syncState()
-
-        val navigationView = findViewById(R.id.nav_view) as NavigationView
-        navigationView.setNavigationItemSelectedListener(this)
-        val menu = navigationView.menu
-        mSubMenu = menu.addSubMenu("Boxes")
     }
 
     public override fun onStart() {
@@ -97,8 +75,10 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         val name = sharedPreferences.getString("name", "name")
         val mail = sharedPreferences.getString("mail", "mail")
         val avatarUrl = sharedPreferences.getString("avatar", null)
+
         nameTextView.text = name
         mailTextView.text = mail
+
         if (avatarUrl != null) {
             ImageDownloadTask(avatarImageView).execute(avatarUrl)
         }
@@ -117,10 +97,10 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     public override fun onResume() {
         super.onResume()
 
-        getBoxes()
-
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
         val editor = sharedPreferences.edit()
+
+        getBoxes()
 
         editor.remove("selected_box_id")
         editor.apply()
@@ -193,10 +173,14 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 super.onResponse(call, response)
 
                 if (response.code() == 200) {
+                    val navigationView = findViewById(R.id.nav_view) as NavigationView
+                    navigationView.setNavigationItemSelectedListener(this@BoxActivity)
+                    val menu = navigationView.menu.findItem(R.id.menu_boxes)
+                    menu.subMenu.clear()
+
                     mBoxes = response.body()
-                    mSubMenu!!.clear()
                     for (box in mBoxes!!) {
-                        mSubMenu!!.add(Menu.NONE, box.id, Menu.NONE, box.name)
+                        menu.subMenu.add(Menu.NONE, box.id, Menu.NONE, box.name)
                     }
                     if (mBoxes!!.size > 0) {
                         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
@@ -212,20 +196,22 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun setFoods(box: Box) {
-        mFoodListAdapter = FoodListAdapter(this, box.foods!!)
-        mListView!!.adapter = mFoodListAdapter
-        mFoodListAdapter!!.mode = Attributes.Mode.Single
-        mListView!!.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+        val mFoodListAdapter = FoodListAdapter(this, box.foods!!)
+        val mListView = findViewById(R.id.listView) as ListView
+
+        mListView.adapter = mFoodListAdapter
+        mFoodListAdapter.mode = Attributes.Mode.Single
+        mListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             val food = parent.getItemAtPosition(position) as Food
             val intent = Intent(this@BoxActivity, FoodActivity::class.java)
             intent.putExtra("foodId", food.id)
             startActivity(intent)
         }
-        mListView!!.setOnTouchListener { v, event ->
+        mListView.setOnTouchListener { v, event ->
             Log.e("ListView", "OnTouch")
             false
         }
-        mListView!!.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, view, position, id ->
+        mListView.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, view, position, id ->
             val fragment = FoodOptionDialogFragment()
             fragment.setFood(parent.getItemAtPosition(position) as Food)
             fragment.setFoodListAdapter(mFoodListAdapter)
@@ -233,7 +219,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
             fragment.show(fragmentManager, "food_option")
             true
         }
-        mListView!!.setOnScrollListener(object : AbsListView.OnScrollListener {
+        mListView.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
                 Log.e("ListView", "onScrollStateChanged")
             }
@@ -243,7 +229,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
             }
         })
 
-        mListView!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        mListView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 Log.e("ListView", "onItemSelected:" + position)
             }
@@ -255,21 +241,30 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun showProgressBar() {
-        mProgressBar!!.visibility = View.VISIBLE
-        mFab!!.hide()
+        val mProgressBar = findViewById(R.id.progressBar) as ProgressBar
+        val mFab = findViewById(R.id.fab) as FloatingActionButton
+
+        mProgressBar.visibility = View.VISIBLE
+        mFab.hide()
     }
 
     private fun hideProgressBar() {
-        mProgressBar!!.visibility = View.GONE
-        mFab!!.show()
+        val mProgressBar = findViewById(R.id.progressBar) as ProgressBar
+        val mFab = findViewById(R.id.fab) as FloatingActionButton
+
+        mProgressBar.visibility = View.GONE
+        mFab.show()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                val food = data.getSerializableExtra("food") as Food
-                mFoodListAdapter!!.add(food)
-                mFoodListAdapter!!.notifyDataSetChanged()
+                val food = data!!.getSerializableExtra("food") as Food
+                val mListView = findViewById(R.id.listView) as ListView
+                val mFoodListAdapter = mListView.adapter as FoodListAdapter
+
+                mFoodListAdapter.add(food)
+                mFoodListAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -288,7 +283,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         private var mFoodListAdapter: FoodListAdapter? = null
         private var mListView: ListView? = null
 
-        override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val items = arrayOf<CharSequence>("Show", "Remove", "Cancel")
             val activity = activity
 
@@ -302,7 +297,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                                 startActivity(intent)
                             }
                             1 -> {
-                                val service = RetrofitFactory.getClient<FoodService>(FoodService::class.java, activity)
+                                val service = RetrofitFactory.getClient(FoodService::class.java, activity)
                                 val call = service.remove(mFood!!.id)
                                 call.enqueue(object : Callback<Void> {
                                     override fun onResponse(call: Call<Void>, response: Response<Void>) {

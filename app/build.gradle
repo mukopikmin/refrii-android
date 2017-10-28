@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.refrii.client"
         minSdkVersion 21
@@ -29,6 +29,10 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"//追加。
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"//リフレクション（プロパティ名やクラス名取得）を利用するときは追加
+    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"//テストプロジェクトを利用する場合追加
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"//テストプロジェクトを利用する場合追加
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support:support-v4:26.+'
     compile 'com.android.support:design:26.+'
@@ -42,9 +46,5 @@ dependencies {
     compile 'com.daimajia.easing:library:2.0@aar'
     compile 'com.daimajia.androidanimations:library:2.3@aar'
     compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"//追加。
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"//リフレクション（プロパティ名やクラス名取得）を利用するときは追加
-    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"//テストプロジェクトを利用する場合追加
-    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"//テストプロジェクトを利用する場合追加
     testCompile 'junit:junit:4.12'
 }

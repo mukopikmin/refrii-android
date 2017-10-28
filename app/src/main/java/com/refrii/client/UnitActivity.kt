@@ -102,7 +102,7 @@ class UnitActivity : AppCompatActivity() {
         private var mEditText: EditText? = null
         private var mUnit: Unit? = null
 
-        override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val content = inflater.inflate(R.layout.edit_text_dialog, null)
             mEditText = content.findViewById(R.id.editText)
@@ -129,7 +129,7 @@ class UnitActivity : AppCompatActivity() {
         private var mEditText: EditText? = null
         private var mUnit: Unit? = null
 
-        override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             val content = inflater.inflate(R.layout.edit_text_dialog, null)
             mEditText = content.findViewById(R.id.editText)

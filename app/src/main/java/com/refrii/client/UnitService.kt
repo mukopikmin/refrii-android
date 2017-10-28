@@ -2,15 +2,14 @@ package com.refrii.client
 
 import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.PUT
-import retrofit2.http.Path
+import retrofit2.http.*
 
 interface UnitService {
     @get:GET("/units")
-    val units: Call<List<Unit>>
+    val units: Call<MutableList<Unit>>
+
+    @POST("/units")
+    fun createUnit(@Body body: RequestBody): Call<Unit>
 
     @PUT("/units/{id}")
     fun updateUnit(

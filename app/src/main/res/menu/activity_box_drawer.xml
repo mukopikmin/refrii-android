@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
-        android:title="Actions"
-        android:orderInCategory="20" >
-        <menu>
-            <item
-                android:id="@+id/nav_units"
-                android:icon="@drawable/ic_exposure_black"
-                android:title="Units" />
-            <item
-                android:id="@+id/nav_settings"
-                android:icon="@android:drawable/ic_menu_preferences"
-                android:title="Settings" />
-
-            <item
-                android:id="@+id/nav_signout"
-                android:icon="@android:drawable/ic_lock_power_off"
-                android:title="Sign out" />
-        </menu>
+        android:id="@+id/menu_boxes"
+        android:title="Box list">
+        <menu />
     </item>
+    <group>
+        <item
+            android:id="@+id/nav_units"
+            android:icon="@drawable/ic_exposure_black"
+            android:title="Units" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="Settings" />
+
+        <item
+            android:id="@+id/nav_signout"
+            android:icon="@android:drawable/ic_lock_power_off"
+            android:title="Sign out" />
+    </group>
 </menu>

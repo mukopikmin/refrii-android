@@ -100,4 +100,5 @@
     <string name="title_activity_error">ErrorActivity</string>
     <string name="title_activity_units">UnitsActivity</string>
     <string name="title_activity_unit">UnitActivity</string>
+    <string name="title_activity_new_unit">NewUnitActivity</string>
 </resources>
