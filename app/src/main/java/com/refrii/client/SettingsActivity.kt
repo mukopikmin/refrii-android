@@ -21,6 +21,10 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
+import android.R.attr.versionName
+import android.content.pm.PackageInfo
+
+
 
 /**
  * A [PreferenceActivity] that presents a set of application settings. On
@@ -115,6 +119,11 @@ class SettingsActivity : AppCompatPreferenceActivity() {
                 startActivity(intent)
                 true
             }
+
+            val versionPreference = findPreference("version")
+            val packageInfo = activity.packageManager.getPackageInfo(activity.packageName, 0)
+            val version = packageInfo.versionName
+            versionPreference.summary = version
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {

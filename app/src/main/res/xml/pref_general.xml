@@ -50,4 +50,8 @@
     <Preference
         android:title="Open source software license"
         android:key="oss_license" />
+
+    <Preference
+        android:title="Version"
+        android:key="version" />
 </PreferenceScreen>

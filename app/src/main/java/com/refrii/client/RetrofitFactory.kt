@@ -33,16 +33,16 @@ object RetrofitFactory {
     fun <T> getClient(clazz: Class<T>, context: Context): T {
         val httpClient = OkHttpClient.Builder()
                 .addInterceptor { chain ->
-                    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)//context.getSharedPreferences("DATA", Context.MODE_PRIVATE);
+                    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
                     val original = chain.request()
                     val jwt = sharedPreferences.getString("jwt", null)
                     val request = original.newBuilder()
                             .header("Accept", "application/json")
-                            .header("Authorization", "Bearer " + jwt!!)
-                            .method(original.method(), original.body())
-                            .build()
-
-                    chain.proceed(request)
+                    if (jwt != null) {
+                        request.header("Authorization", "Bearer " + jwt)
+                    }
+                    request.method(original.method(), original.body())
+                    chain.proceed(request.build())
                 }
                 .build()
         val gson = GsonBuilder()
