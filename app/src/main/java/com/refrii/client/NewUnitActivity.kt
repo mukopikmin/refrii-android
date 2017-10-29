@@ -19,11 +19,11 @@ class NewUnitActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_unit)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
-        val labelEditText = findViewById(R.id.labelEditText) as EditText
-        val fab = findViewById(R.id.fab) as FloatingActionButton
+        val labelEditText = findViewById<EditText>(R.id.labelEditText) as EditText
+        val fab = findViewById<EditText>(R.id.fab) as FloatingActionButton
 
         fab.setOnClickListener { view ->
             createUnit(labelEditText.text.toString())

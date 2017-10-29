@@ -3,6 +3,7 @@ package com.refrii.client
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.webkit.WebIconDatabase
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
@@ -12,7 +13,7 @@ class WebViewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_view)
 
-        val webView = findViewById(R.id.webView) as WebView
+        val webView = findViewById<WebView>(R.id.webView) as WebView
         webView.webViewClient = WebViewClient()
         webView.settings.javaScriptEnabled = true
 

@@ -33,19 +33,19 @@ class UnitActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_unit)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
         val intent = intent
         mUnit = intent.getSerializableExtra("unit") as Unit
 
-        val labelTextView = findViewById(R.id.labelTextView) as TextView
-        val stepTextView = findViewById(R.id.stepTextView) as TextView
-        val createdTextView = findViewById(R.id.createdTextView) as TextView
-        val updatedTextView = findViewById(R.id.updatedTextView) as TextView
-        val labelImageView = findViewById(R.id.labelImageView) as ImageView
-        val stepImageView = findViewById(R.id.stepImageView) as ImageView
-        val fab = findViewById(R.id.fab) as FloatingActionButton
+        val labelTextView = findViewById<TextView>(R.id.labelTextView) as TextView
+        val stepTextView = findViewById<TextView>(R.id.stepTextView) as TextView
+        val createdTextView = findViewById<TextView>(R.id.createdTextView) as TextView
+        val updatedTextView = findViewById<TextView>(R.id.updatedTextView) as TextView
+        val labelImageView = findViewById<ImageView>(R.id.labelImageView) as ImageView
+        val stepImageView = findViewById<ImageView>(R.id.stepImageView) as ImageView
+        val fab = findViewById<FloatingActionButton>(R.id.fab) as FloatingActionButton
 
         setUnit(mUnit)
 
@@ -65,10 +65,10 @@ class UnitActivity : AppCompatActivity() {
     }
 
     fun setUnit(unit: Unit?) {
-        val labelTextView = findViewById(R.id.labelTextView) as TextView
-        val stepTextView = findViewById(R.id.stepTextView) as TextView
-        val createdTextView = findViewById(R.id.createdTextView) as TextView
-        val updatedTextView = findViewById(R.id.updatedTextView) as TextView
+        val labelTextView = findViewById<TextView>(R.id.labelTextView) as TextView
+        val stepTextView = findViewById<TextView>(R.id.stepTextView) as TextView
+        val createdTextView = findViewById<TextView>(R.id.createdTextView) as TextView
+        val updatedTextView = findViewById<TextView>(R.id.updatedTextView) as TextView
 
         val formatter = SimpleDateFormat("yyyy/MM/dd HH/mm")
 

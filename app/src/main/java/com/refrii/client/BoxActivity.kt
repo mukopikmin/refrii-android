@@ -27,6 +27,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 
 import com.daimajia.swipe.util.Attributes
+import kotterknife.bindView
 
 import retrofit2.Call
 import retrofit2.Callback
@@ -34,19 +35,21 @@ import retrofit2.Response
 
 class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private val toolbar: Toolbar by bindView(R.id.toolbar)
+    private val fab: FloatingActionButton by bindView(R.id.fab)
+    private val drawer: DrawerLayout by bindView(R.id.drawer_layout)
+    private val navigationView: NavigationView by bindView(R.id.nav_view)
+    private val mListView: ListView by bindView(R.id.listView)
+    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+
     private var mBoxes: List<Box>? = null
     private var mBox: Box? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_box)
-
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
-        val fab = findViewById(R.id.fab) as FloatingActionButton
-
         setSupportActionBar(toolbar)
 
-        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout
         val toggle = ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer.addDrawerListener(toggle)
         toggle.syncState()
@@ -64,8 +67,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         super.onStart()
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val navigationView = findViewById(R.id.nav_view) as NavigationView
         navigationView.setNavigationItemSelectedListener(this)
 
         val headerView = navigationView.getHeaderView(0)
@@ -107,7 +108,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     override fun onBackPressed() {
-        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START)
         } else {
@@ -126,7 +126,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
-
 
         if (id == R.id.action_box_info) {
             val intent = Intent(this@BoxActivity, BoxInfoActivity::class.java)
@@ -160,7 +159,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
             }
         }
 
-        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout
         drawer.closeDrawer(GravityCompat.START)
         return true
     }
@@ -173,7 +171,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 super.onResponse(call, response)
 
                 if (response.code() == 200) {
-                    val navigationView = findViewById(R.id.nav_view) as NavigationView
                     navigationView.setNavigationItemSelectedListener(this@BoxActivity)
                     val menu = navigationView.menu.findItem(R.id.menu_boxes)
                     menu.subMenu.clear()
@@ -197,7 +194,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
     private fun setFoods(box: Box) {
         val mFoodListAdapter = FoodListAdapter(this, box.foods!!)
-        val mListView = findViewById(R.id.listView) as ListView
+//        val mListView = findViewById<ListView>(R.id.listView) as ListView
 
         mListView.adapter = mFoodListAdapter
         mFoodListAdapter.mode = Attributes.Mode.Single
@@ -241,26 +238,20 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun showProgressBar() {
-        val mProgressBar = findViewById(R.id.progressBar) as ProgressBar
-        val mFab = findViewById(R.id.fab) as FloatingActionButton
-
         mProgressBar.visibility = View.VISIBLE
-        mFab.hide()
+        fab.hide()
     }
 
     private fun hideProgressBar() {
-        val mProgressBar = findViewById(R.id.progressBar) as ProgressBar
-        val mFab = findViewById(R.id.fab) as FloatingActionButton
-
         mProgressBar.visibility = View.GONE
-        mFab.show()
+        fab.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 val food = data!!.getSerializableExtra("food") as Food
-                val mListView = findViewById(R.id.listView) as ListView
+                val mListView = findViewById<ListView>(R.id.listView) as ListView
                 val mFoodListAdapter = mListView.adapter as FoodListAdapter
 
                 mFoodListAdapter.add(food)

@@ -41,23 +41,23 @@ class FoodActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_food)
 
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setHomeButtonEnabled(true)
 
-        val constraintLayout = findViewById(R.id.constraintLayout) as ConstraintLayout
-        val progressBar = findViewById(R.id.foodProgressBar) as ProgressBar
-        val foodEditedMessageTextView = findViewById(R.id.foodEditedMessageTextView) as TextView
-        val editNameImageView = findViewById(R.id.editNameImageView) as ImageView
-        val editAmountImageView = findViewById(R.id.editAmountImageView) as ImageView
-        val editNoticeImageView = findViewById(R.id.editNoticeImageView) as ImageView
-        val editExpirationDateImageView = findViewById(R.id.editExpirationDateImageView) as ImageView
+        val constraintLayout = findViewById<ConstraintLayout>(R.id.constraintLayout) as ConstraintLayout
+        val progressBar = findViewById<ProgressBar>(R.id.foodProgressBar) as ProgressBar
+        val foodEditedMessageTextView = findViewById<TextView>(R.id.foodEditedMessageTextView) as TextView
+        val editNameImageView = findViewById<TextView>(R.id.editNameImageView) as ImageView
+        val editAmountImageView = findViewById<ImageView>(R.id.editAmountImageView) as ImageView
+        val editNoticeImageView = findViewById<ImageView>(R.id.editNoticeImageView) as ImageView
+        val editExpirationDateImageView = findViewById<ImageView>(R.id.editExpirationDateImageView) as ImageView
 
         constraintLayout.visibility = View.GONE
         foodEditedMessageTextView.visibility = View.GONE
 
-        val fab = findViewById(R.id.fab) as FloatingActionButton
+        val fab = findViewById<FloatingActionButton>(R.id.fab) as FloatingActionButton
         fab.setOnClickListener {
             progressBar.visibility = View.VISIBLE
             val service = RetrofitFactory.getClient(FoodService::class.java, this@FoodActivity)
@@ -139,8 +139,8 @@ class FoodActivity : AppCompatActivity() {
     }
 
     private fun setFood(id: Int) {
-        val constraintLayout = findViewById(R.id.constraintLayout) as ConstraintLayout
-        val progressBar = findViewById(R.id.foodProgressBar) as ProgressBar
+        val constraintLayout = findViewById<ConstraintLayout>(R.id.constraintLayout) as ConstraintLayout
+        val progressBar = findViewById<ProgressBar>(R.id.foodProgressBar) as ProgressBar
         val service = RetrofitFactory.getClient(FoodService::class.java, this@FoodActivity)
         val call = service.getFood(id)
         call.enqueue(object : BasicCallback<Food>(this@FoodActivity) {
@@ -163,14 +163,14 @@ class FoodActivity : AppCompatActivity() {
     }
 
     fun setFoodOnView(food: Food?) {
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
-        val foodNameTextView = findViewById(R.id.foodNameTextView) as TextView
-        val amountTextView = findViewById(R.id.amountTextView) as TextView
-        val noticeTextView = findViewById(R.id.noticeTextView) as TextView
-        val expirationDateTextView = findViewById(R.id.expirationDateTextView) as TextView
-        val createdUserTextView = findViewById(R.id.createdUserTextView) as TextView
-        val updatedUserTextView = findViewById(R.id.updatedUserTextView) as TextView
-        val foodBoxTextView = findViewById(R.id.foodBoxTextView) as TextView
+        val toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
+        val foodNameTextView = findViewById<TextView>(R.id.foodNameTextView) as TextView
+        val amountTextView = findViewById<TextView>(R.id.amountTextView) as TextView
+        val noticeTextView = findViewById<TextView>(R.id.noticeTextView) as TextView
+        val expirationDateTextView = findViewById<TextView>(R.id.expirationDateTextView) as TextView
+        val createdUserTextView = findViewById<TextView>(R.id.createdUserTextView) as TextView
+        val updatedUserTextView = findViewById<TextView>(R.id.updatedUserTextView) as TextView
+        val foodBoxTextView = findViewById<TextView>(R.id.foodBoxTextView) as TextView
 
         val timeFormatter = SimpleDateFormat("yyyy/MM/dd HH:mm")
         val dateFormatter = SimpleDateFormat("yyyy/MM/dd")
@@ -194,8 +194,8 @@ class FoodActivity : AppCompatActivity() {
     }
 
     fun onEdited() {
-        val foodEditedMessageTextView = findViewById(R.id.foodEditedMessageTextView) as TextView
-        val fab = findViewById(R.id.fab) as FloatingActionButton
+        val foodEditedMessageTextView = findViewById<TextView>(R.id.foodEditedMessageTextView) as TextView
+        val fab = findViewById<FloatingActionButton>(R.id.fab) as FloatingActionButton
 
         foodEditedMessageTextView.visibility = View.VISIBLE
         fab.visibility = View.VISIBLE

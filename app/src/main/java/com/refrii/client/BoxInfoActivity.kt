@@ -35,20 +35,20 @@ class BoxInfoActivity : AppCompatActivity() {
         val box = intent.getSerializableExtra("box") as Box
 
         setContentView(R.layout.activity_box_info)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         toolbar.title = box.name
         setSupportActionBar(toolbar)
 
-        val nameTextView = findViewById(R.id.shareTextView) as TextView
-        val noticeTextView = findViewById(R.id.noticeTextView) as TextView
-        val createdUserTextView = findViewById(R.id.ownerBoxInfoTextView) as TextView
-        val sharedUsersTextView = findViewById(R.id.sharedUsersTextView) as TextView
-        val createdAtTextView = findViewById(R.id.createdAtBoxInfoTextView) as TextView
-        val updatedAtTextView = findViewById(R.id.updatedAtBoxInfoTextView) as TextView
-        val editNameImageView = findViewById(R.id.editNameImageView) as ImageView
-        val editNoticeImageView = findViewById(R.id.editNoticeImageView) as ImageView
-        val shareImageView = findViewById(R.id.shareImageView) as ImageView
-        val fab = findViewById(R.id.floatingActionButton) as FloatingActionButton
+        val nameTextView = findViewById<TextView>(R.id.shareTextView) as TextView
+        val noticeTextView = findViewById<TextView>(R.id.noticeTextView) as TextView
+        val createdUserTextView = findViewById<TextView>(R.id.ownerBoxInfoTextView) as TextView
+        val sharedUsersTextView = findViewById<TextView>(R.id.sharedUsersTextView) as TextView
+        val createdAtTextView = findViewById<TextView>(R.id.createdAtBoxInfoTextView) as TextView
+        val updatedAtTextView = findViewById<TextView>(R.id.updatedAtBoxInfoTextView) as TextView
+        val editNameImageView = findViewById<ImageView>(R.id.editNameImageView) as ImageView
+        val editNoticeImageView = findViewById<ImageView>(R.id.editNoticeImageView) as ImageView
+        val shareImageView = findViewById<ImageView>(R.id.shareImageView) as ImageView
+        val fab = findViewById<FloatingActionButton>(R.id.floatingActionButton) as FloatingActionButton
 
         val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm")
 
@@ -103,7 +103,7 @@ class BoxInfoActivity : AppCompatActivity() {
                 super.onResponse(call, response)
 
                 if (response.code() == 200) {
-                    val view = findViewById(R.id.floatingActionButton)
+                    val view = findViewById<FloatingActionButton>(R.id.floatingActionButton)
                     Snackbar.make(view, "This box is successfully updated", Snackbar.LENGTH_LONG)
                             .setAction("Dismiss", null).show()
                 }

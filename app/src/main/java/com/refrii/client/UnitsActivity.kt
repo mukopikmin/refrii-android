@@ -2,6 +2,7 @@ package com.refrii.client
 
 import android.app.Activity
 import android.content.Intent
+import android.content.Loader
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
@@ -20,16 +21,16 @@ class UnitsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_units)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
-        val fab = findViewById(R.id.fab) as FloatingActionButton
+        val fab = findViewById<FloatingActionButton>(R.id.fab) as FloatingActionButton
         fab.setOnClickListener { view ->
             val intent = Intent(this@UnitsActivity, NewUnitActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE)
         }
 
-        val listView = findViewById(R.id.listView) as ListView
+        val listView = findViewById<ListView>(R.id.listView) as ListView
 
         listView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
             val unit = mUnits!![i]
@@ -48,7 +49,7 @@ class UnitsActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK && data != null) {
                 val unit = data.getSerializableExtra("unit") as Unit
                 mUnits!!.add(unit)
-                val listView = findViewById(R.id.listView) as ListView
+                val listView = findViewById<ListView>(R.id.listView) as ListView
                 val adapter = listView.adapter as ArrayAdapter<String>
                 adapter.add(unit.label)
                 listView.deferNotifyDataSetChanged()
@@ -70,7 +71,7 @@ class UnitsActivity : AppCompatActivity() {
                     for (unit in mUnits!!) {
                         adapter.add(unit.label)
                     }
-                    val listView = findViewById(R.id.listView) as ListView
+                    val listView = findViewById<ListView>(R.id.listView) as ListView
                     listView.adapter = adapter
                 }
             }

@@ -31,20 +31,20 @@ class NewFoodActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_food)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         toolbar.title = "Register food"
         setSupportActionBar(toolbar)
 
         val intent = intent
         val boxId = intent.getIntExtra("boxId", 0)
 
-        val spinner = findViewById(R.id.newFoodUnitSpinner) as Spinner
+        val spinner = findViewById<Spinner>(R.id.newFoodUnitSpinner) as Spinner
 
-        val fab = findViewById(R.id.fab) as FloatingActionButton
+        val fab = findViewById<FloatingActionButton>(R.id.fab) as FloatingActionButton
         fab.setOnClickListener {
-            val nameEditText = findViewById(R.id.newFoodNameEditText) as EditText
-            val noticeEditText = findViewById(R.id.newFoodNoticeEditText) as EditText
-            val amountEditText = findViewById(R.id.newFoodAmountEditText) as EditText
+            val nameEditText = findViewById<EditText>(R.id.newFoodNameEditText) as EditText
+            val noticeEditText = findViewById<EditText>(R.id.newFoodNoticeEditText) as EditText
+            val amountEditText = findViewById<EditText>(R.id.newFoodAmountEditText) as EditText
 
             val selectedUnitLabel = spinner!!.selectedItem.toString()
             var selectedUnit: Unit? = null

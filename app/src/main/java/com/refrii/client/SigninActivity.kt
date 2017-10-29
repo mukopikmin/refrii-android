@@ -39,7 +39,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signin)
 
-        signInButton = findViewById(R.id.googleSignInButton) as SignInButton
+        signInButton = findViewById<SignInButton>(R.id.googleSignInButton) as SignInButton
 
 
 
