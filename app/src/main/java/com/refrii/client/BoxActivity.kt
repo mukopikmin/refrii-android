@@ -32,6 +32,9 @@ import kotterknife.bindView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import rx.Subscriber
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -59,8 +62,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
             intent.putExtra("boxId", mBox!!.id)
             startActivityForResult(intent, REQUEST_CODE)
         }
-
-        showProgressBar()
     }
 
     public override fun onStart() {
@@ -164,54 +165,53 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun getBoxes() {
-        val service = RetrofitFactory.getClient<BoxService>(BoxService::class.java, this@BoxActivity)
-        val call = service.boxes
-        call.enqueue(object : BasicCallback<List<Box>>(this@BoxActivity) {
-            override fun onResponse(call: Call<List<Box>>, response: Response<List<Box>>) {
-                super.onResponse(call, response)
+        showProgressBar()
 
-                if (response.code() == 200) {
-                    navigationView.setNavigationItemSelectedListener(this@BoxActivity)
-                    val menu = navigationView.menu.findItem(R.id.menu_boxes)
-                    menu.subMenu.clear()
+        RetrofitFactory.getClient(BoxService::class.java, this).getBoxes()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Subscriber<List<Box>>() {
+                    override fun onNext(boxes: List<Box>) {
+                        navigationView.setNavigationItemSelectedListener(this@BoxActivity)
+                        val menu = navigationView.menu.findItem(R.id.menu_boxes)
+                        menu.subMenu.clear()
 
-                    mBoxes = response.body()
-                    for (box in mBoxes!!) {
-                        menu.subMenu.add(Menu.NONE, box.id, Menu.NONE, box.name)
+                        mBoxes = boxes
+                        for (box in boxes) {
+                            menu.subMenu.add(Menu.NONE, box.id, Menu.NONE, box.name)
+                        }
+                        if (boxes.isNotEmpty()) {
+                            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
+                            val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
+                            mBox = boxes[boxIndex]
+                            setFoods(mBox!!)
+                        }
                     }
-                    if (mBoxes!!.size > 0) {
-                        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
-                        val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
-                        mBox = mBoxes!![boxIndex]
-                        setFoods(mBox!!)
+
+                    override fun onCompleted() {
+                        hideProgressBar()
                     }
 
-                    hideProgressBar()
-                }
-            }
-        })
+                    override fun onError(e: Throwable?) {
+                    }
+                })
     }
 
     private fun setFoods(box: Box) {
-        val mFoodListAdapter = FoodListAdapter(this, box.foods!!)
-//        val mListView = findViewById<ListView>(R.id.listView) as ListView
+        val foodListAdapter = FoodListAdapter(this, box.foods!!)
 
-        mListView.adapter = mFoodListAdapter
-        mFoodListAdapter.mode = Attributes.Mode.Single
+        mListView.adapter = foodListAdapter
+        foodListAdapter.mode = Attributes.Mode.Single
         mListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
             val food = parent.getItemAtPosition(position) as Food
             val intent = Intent(this@BoxActivity, FoodActivity::class.java)
             intent.putExtra("foodId", food.id)
             startActivity(intent)
         }
-        mListView.setOnTouchListener { v, event ->
-            Log.e("ListView", "OnTouch")
-            false
-        }
         mListView.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, view, position, id ->
             val fragment = FoodOptionDialogFragment()
             fragment.setFood(parent.getItemAtPosition(position) as Food)
-            fragment.setFoodListAdapter(mFoodListAdapter)
+            fragment.setFoodListAdapter(foodListAdapter)
             fragment.setListView(mListView)
             fragment.show(fragmentManager, "food_option")
             true
@@ -249,8 +249,8 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                val food = data!!.getSerializableExtra("food") as Food
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                val food = data.getSerializableExtra("food") as Food
                 val mListView = findViewById<ListView>(R.id.listView) as ListView
                 val mFoodListAdapter = mListView.adapter as FoodListAdapter
 
