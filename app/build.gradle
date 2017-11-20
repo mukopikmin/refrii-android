@@ -4,6 +4,7 @@ apply plugin: 'com.cookpad.android.licensetools'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 26
@@ -58,7 +59,11 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
 
+    kapt 'io.realm:realm-android:0.81.1'
+
     testCompile 'junit:junit:4.12'
+
+    annotationProcessor 'io.realm:realm-android:0.81.1'
 }
 
 kapt {

@@ -1,15 +1,18 @@
-package com.refrii.client
+package com.refrii.client.views.activities
 
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.View
 import android.widget.EditText
+import com.refrii.client.BasicCallback
+import com.refrii.client.R
+import com.refrii.client.RetrofitFactory
+import com.refrii.client.models.Unit
+import com.refrii.client.services.UnitService
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.Response

@@ -1,26 +1,22 @@
-package com.refrii.client
+package com.refrii.client.services
 
+import com.refrii.client.models.Food
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
-import retrofit2.http.FieldMap
 import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Part
-import retrofit2.http.PartMap
 import retrofit2.http.Path
+import rx.Observable
 
 interface FoodService {
-
     @GET("/foods/{id}")
-    fun getFood(@Path("id") id: Int): Call<Food>
+    fun getFood(@Path("id") id: Int): Observable<Food>
 
     @POST("/foods")
-    fun addFood(@Body body: RequestBody): Call<Food>
+    fun addFood(@Body body: RequestBody): Observable<Food>
 
     @PUT("/foods/{id}")
     fun updateFood(

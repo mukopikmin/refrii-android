@@ -3,6 +3,8 @@ package com.refrii.client
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.refrii.client.views.activities.ErrorActivity
+import com.refrii.client.views.activities.SigninActivity
 
 import retrofit2.Call
 import retrofit2.Callback

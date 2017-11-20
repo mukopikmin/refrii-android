@@ -1,5 +1,6 @@
-package com.refrii.client
+package com.refrii.client.services
 
+import com.refrii.client.models.Unit
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.*

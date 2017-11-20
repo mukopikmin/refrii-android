@@ -1,4 +1,4 @@
-package com.refrii.client
+package com.refrii.client.views.activities
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.View
 import android.widget.TextView
 
 import com.google.android.gms.auth.GoogleAuthException
@@ -16,10 +15,13 @@ import com.google.android.gms.auth.UserRecoverableAuthException
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.auth.api.signin.GoogleSignInResult
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
+import com.refrii.client.R
+import com.refrii.client.RetrofitFactory
+import com.refrii.client.models.Credential
+import com.refrii.client.services.AuthService
 
 import java.io.IOException
 import java.util.HashMap

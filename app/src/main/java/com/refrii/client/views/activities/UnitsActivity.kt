@@ -1,8 +1,7 @@
-package com.refrii.client
+package com.refrii.client.views.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.content.Loader
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
@@ -10,6 +9,9 @@ import android.support.v7.widget.Toolbar
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import com.refrii.client.*
+import com.refrii.client.models.Unit
+import com.refrii.client.services.UnitService
 
 import retrofit2.Call
 import retrofit2.Response

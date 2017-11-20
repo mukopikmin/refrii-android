@@ -1,4 +1,4 @@
-package com.refrii.client
+package com.refrii.client.tasks
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,24 +10,20 @@ import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
 
-/**
- * Created by yusuke on 2017/09/24.
- */
-
 internal class ImageDownloadTask(private val imageView: ImageView) : AsyncTask<String, Void, Bitmap>() {
 
     override fun doInBackground(vararg params: String): Bitmap? {
         val image: Bitmap
-        try {
+        return try {
             val imageUrl = URL(params[0])
             val imageIs: InputStream
             imageIs = imageUrl.openStream()
             image = BitmapFactory.decodeStream(imageIs)
-            return image
+            image
         } catch (e: MalformedURLException) {
-            return null
+            null
         } catch (e: IOException) {
-            return null
+            null
         }
 
     }

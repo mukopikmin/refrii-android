@@ -6,4 +6,9 @@
         android:orderInCategory="100"
         android:title="About this box"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_box_sync"
+        android:orderInCategory="100"
+        android:title="Sync"
+        app:showAsAction="never" />
 </menu>

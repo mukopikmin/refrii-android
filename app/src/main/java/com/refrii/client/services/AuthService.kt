@@ -1,8 +1,8 @@
-package com.refrii.client
+package com.refrii.client.services
 
+import com.refrii.client.models.Credential
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Path
 import retrofit2.http.QueryMap
 
 interface AuthService {

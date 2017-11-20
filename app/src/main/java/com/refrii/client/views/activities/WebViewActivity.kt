@@ -1,11 +1,10 @@
-package com.refrii.client
+package com.refrii.client.views.activities
 
-import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.webkit.WebIconDatabase
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.refrii.client.R
 
 class WebViewActivity : AppCompatActivity() {
 

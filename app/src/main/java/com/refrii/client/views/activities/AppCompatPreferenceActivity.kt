@@ -1,4 +1,4 @@
-package com.refrii.client
+package com.refrii.client.views.activities
 
 import android.content.res.Configuration
 import android.os.Bundle

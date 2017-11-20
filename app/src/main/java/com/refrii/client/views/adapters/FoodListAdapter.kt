@@ -1,4 +1,4 @@
-package com.refrii.client
+package com.refrii.client.views.adapters
 
 import android.content.Context
 import android.support.design.widget.Snackbar
@@ -10,19 +10,18 @@ import android.widget.Toast
 
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.adapters.BaseSwipeAdapter
+import com.refrii.client.BasicCallback
+import com.refrii.client.R
+import com.refrii.client.RetrofitFactory
+import com.refrii.client.models.Food
+import com.refrii.client.services.FoodService
 
 import java.text.SimpleDateFormat
 import java.util.Collections
 
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
-
-/**
- * Created by yusuke on 2017/09/17.
- */
 
 class FoodListAdapter(private val mContext: Context, private val mFoods: MutableList<Food>) : BaseSwipeAdapter() {
     private val mFoodListAdapter: FoodListAdapter

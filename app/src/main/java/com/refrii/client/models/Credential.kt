@@ -1,4 +1,4 @@
-package com.refrii.client
+package com.refrii.client.models
 
 import java.util.Date
 
