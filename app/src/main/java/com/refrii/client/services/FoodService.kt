@@ -21,8 +21,8 @@ interface FoodService {
     @PUT("/foods/{id}")
     fun updateFood(
             @Path("id") id: Int,
-            @Body body: RequestBody): Call<Food>
+            @Body body: RequestBody): Observable<Food>
 
     @DELETE("/foods/{id}")
-    fun remove(@Path("id") id: Int): Call<Void>
+    fun remove(@Path("id") id: Int): Observable<Void>
 }

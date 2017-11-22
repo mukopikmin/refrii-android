@@ -19,16 +19,16 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
 import com.refrii.client.R
-import com.refrii.client.RetrofitFactory
+import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Credential
 import com.refrii.client.services.AuthService
 
 import java.io.IOException
 import java.util.HashMap
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import rx.Subscriber
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
 
@@ -133,28 +133,30 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                 editor.putString("google-token", googleToken)
                 editor.commit()
 
-                val service = RetrofitFactory.getClient(AuthService::class.java, this@SigninActivity)
-
                 val params = HashMap<String, String>()
                 params.put("token", googleToken)
 
-                val call = service.getToken(params)
-                call.enqueue(object : Callback<Credential> {
-                    override fun onResponse(call: Call<Credential>, response: Response<Credential>) {
-                        val credential = response.body()
-                        Log.e(TAG, response.body()!!.jwt)
+                RetrofitFactory.getClient(AuthService::class.java, this@SigninActivity)
+                        .getToken(params)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object: Subscriber<Credential>() {
+                            override fun onNext(t: Credential) {
+                                val editor = sharedPreferences!!.edit()
+                                editor.putString("jwt", t.jwt)
+                                editor.putLong("expires_at", t.expiresAt!!.time)
+                                editor.commit()
+                                finish()
+                            }
 
-                        val editor = sharedPreferences!!.edit()
-                        editor.putString("jwt", credential!!.jwt)
-                        editor.putLong("expires_at", credential.expiresAt!!.time)
-                        editor.commit()
-                        finish()
-                    }
+                            override fun onCompleted() {
+                            }
 
-                    override fun onFailure(call: Call<Credential>, t: Throwable) {
-                        Log.d(TAG, t.message)
-                    }
-                })
+                            override fun onError(e: Throwable) {
+                                Log.d(TAG, e.message)
+                            }
+
+                        })
             }
         }.execute(accountName)
     }

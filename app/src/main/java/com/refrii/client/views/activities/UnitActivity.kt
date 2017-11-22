@@ -15,17 +15,17 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import com.refrii.client.BasicCallback
 import com.refrii.client.R
-import com.refrii.client.RetrofitFactory
+import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.services.UnitService
 import com.refrii.client.models.Unit
 
 import java.text.SimpleDateFormat
 
 import okhttp3.MultipartBody
-import retrofit2.Call
-import retrofit2.Response
+import rx.Subscriber
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class UnitActivity : AppCompatActivity() {
 
@@ -79,24 +79,29 @@ class UnitActivity : AppCompatActivity() {
         updatedTextView.text = formatter.format(unit.updatedAt)
     }
 
-    fun updateUnit(unit: Unit?, view: View) {
-        val service = RetrofitFactory.getClient(UnitService::class.java, this@UnitActivity)
+    private fun updateUnit(unit: Unit?, view: View) {
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("label", unit!!.label!!)
                 .addFormDataPart("step", unit.step.toString())
                 .build()
-        val call = service.updateUnit(unit.id, body)
-        call.enqueue(object : BasicCallback<Unit>(this@UnitActivity) {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                super.onResponse(call, response)
+        RetrofitFactory.getClient(UnitService::class.java, this@UnitActivity)
+                .updateUnit(unit.id, body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Subscriber<Unit>() {
+                    override fun onCompleted() {
+                        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show()
+                    }
 
-                if (response.code() == 200) {
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show()
-                }
-            }
-        })
+                    override fun onNext(t: Unit?) {
+                    }
+
+                    override fun onError(e: Throwable?) {
+                    }
+
+                })
     }
 
     class EditLabelDialogFragment : DialogFragment() {

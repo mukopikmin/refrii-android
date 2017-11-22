@@ -1,4 +1,4 @@
-package com.refrii.client
+package com.refrii.client.factories
 
 import android.content.Context
 import android.preference.PreferenceManager

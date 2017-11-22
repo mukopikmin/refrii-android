@@ -6,7 +6,7 @@ import okhttp3.MultipartBody
 
 import java.io.Serializable
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 open class Food : RealmObject(), Serializable, Comparable<Food> {
     @PrimaryKey
@@ -42,24 +42,6 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
         this.amount += diff
     }
 
-    fun toMultipartBody(): MultipartBody {
-        val formatter = SimpleDateFormat("yyyy/MM/dd")
-        val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
-        if (name != null) {
-            builder.addFormDataPart("name", name)
-        }
-        return MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("name", name!!)
-                .addFormDataPart("notice", notice!!)
-                .addFormDataPart("amount", amount.toString())
-                .addFormDataPart("box_id", box!!.id.toString())
-                .addFormDataPart("unit_id", unit!!.id.toString())
-                .addFormDataPart("expiration_date", formatter.format(expirationDate))
-                .build()
-    }
-
-    override fun compareTo(food: Food): Int {
-        return (this.expirationDate!!.time - food.expirationDate!!.time).toInt()
-    }
+    override fun compareTo(other: Food): Int =
+            (this.expirationDate!!.time - other.expirationDate!!.time).toInt()
 }

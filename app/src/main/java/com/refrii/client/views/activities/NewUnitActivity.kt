@@ -3,62 +3,67 @@ package com.refrii.client.views.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.widget.EditText
-import com.refrii.client.BasicCallback
+import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.RetrofitFactory
+import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Unit
 import com.refrii.client.services.UnitService
+import kotterknife.bindView
 import okhttp3.MultipartBody
-import retrofit2.Call
-import retrofit2.Response
+import rx.Subscriber
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class NewUnitActivity : AppCompatActivity() {
 
+    private val toolbar: Toolbar by bindView(R.id.toolbar)
+    private val labelEditText: EditText by bindView(R.id.labelEditText)
+    private val fab: EditText by bindView(R.id.fab)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_new_unit)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
-        val labelEditText = findViewById<EditText>(R.id.labelEditText) as EditText
-        val fab = findViewById<EditText>(R.id.fab) as FloatingActionButton
-
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             createUnit(labelEditText.text.toString())
         }
     }
 
     private fun createUnit(label: String) {
-        val service = RetrofitFactory.getClient(UnitService::class.java, this@NewUnitActivity)
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("label", label)
                 .addFormDataPart("step", "1")
                 .build()
-        service.createUnit(body).enqueue(object: BasicCallback<Unit>(this@NewUnitActivity) {
-            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                super.onResponse(call, response)
 
-                if (response.code() == 201) {
-                    val unit = response.body() as Unit
-                    val intent = Intent()
+        RetrofitFactory.getClient(UnitService::class.java, this@NewUnitActivity)
+                .createUnit(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Subscriber<Unit>() {
+                    override fun onCompleted() { }
 
-                    intent.putExtra("unit", unit)
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
-                } else {
-                    Log.d(TAG, "Failed with status: " + response.code())
-                }
-            }
-        })
+                    override fun onNext(t: Unit?) {
+                        val intent = Intent()
+
+                        intent.putExtra("unit", t)
+                        setResult(Activity.RESULT_OK, intent)
+                        finish()
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Toast.makeText(this@NewUnitActivity, e.message, Toast.LENGTH_LONG).show()
+                    }
+
+                })
     }
 
     companion object {
-        private val TAG = "NewUnitActivity"
+        private const val TAG = "NewUnitActivity"
     }
 }

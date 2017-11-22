@@ -12,9 +12,8 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import com.refrii.client.BasicCallback
 import com.refrii.client.R
-import com.refrii.client.RetrofitFactory
+import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.views.fragments.CalendarPickerDialogFragment
@@ -25,8 +24,6 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
 import okhttp3.MultipartBody
-import retrofit2.Call
-import retrofit2.Response
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -83,7 +80,7 @@ class FoodActivity : AppCompatActivity() {
         }
 
         editAmountImageView.setOnClickListener {
-            val fragment = EditDoubleDialogFragment.newInstance("Amount", mFood!!.amount!!)
+            val fragment = EditDoubleDialogFragment.newInstance("Amount", mFood!!.amount)
             fragment.setTargetFragment(null, EDIT_AMOUNT_REQUEST_CODE)
             fragment.show(fragmentManager, "edit_amount")
         }
@@ -209,7 +206,6 @@ class FoodActivity : AppCompatActivity() {
     }
 
     private fun updateFood(food: Food) {
-        val service = RetrofitFactory.getClient(FoodService::class.java, this@FoodActivity)
         val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -220,30 +216,42 @@ class FoodActivity : AppCompatActivity() {
                 .addFormDataPart("unit_id", food.unit!!.id.toString())
                 .addFormDataPart("expiration_date", formatter.format(food.expirationDate))
                 .build()
-        val call = service.updateFood(food.id, body)
-        call.enqueue(object : BasicCallback<Food>(this@FoodActivity) {
-            override fun onResponse(call: Call<Food>, response: Response<Food>) {
-                if (response.code() == 200) {
-                    val food = response.body()
-                    val intent = Intent()
 
-                    mRealm!!.executeTransaction { realm ->
-                        realm.copyToRealmOrUpdate(food)
+        RetrofitFactory.getClient(FoodService::class.java, this@FoodActivity)
+                .updateFood(food.id, body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Subscriber<Food>() {
+                    override fun onNext(t: Food?) {
+                        t ?: return
+
+                        val intent = Intent()
+
+                        mRealm!!.executeTransaction { realm ->
+                            realm.copyToRealmOrUpdate(food)
+                        }
+
+                        intent.putExtra("food_id", t.id)
+                        setResult(Activity.RESULT_OK, intent)
+                        progressBar.visibility = View.GONE
+                        finish()
                     }
 
-                    intent.putExtra("food_id", food!!.id)
-                    setResult(Activity.RESULT_OK, intent)
-                    progressBar.visibility = View.GONE
-                    finish()
-                } else {
-                    Toast.makeText(this@FoodActivity, "Failed with status: ${response.code()}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        })
+                    override fun onCompleted() {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        e ?: return
+
+                        Toast.makeText(this@FoodActivity, e.message, Toast.LENGTH_SHORT).show()
+                    }
+                })
     }
 
     private fun syncFood(id: Int) {
-        RetrofitFactory.getClient(FoodService::class.java, this).getFood(id)
+        RetrofitFactory.getClient(FoodService::class.java, this)
+                .getFood(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Subscriber<Food>() {

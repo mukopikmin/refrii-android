@@ -7,27 +7,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.adapters.BaseSwipeAdapter
-import com.refrii.client.BasicCallback
 import com.refrii.client.R
-import com.refrii.client.RetrofitFactory
+import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Food
 import com.refrii.client.services.FoodService
-
-import java.text.SimpleDateFormat
-import java.util.Collections
-
 import okhttp3.MultipartBody
-import retrofit2.Call
-import retrofit2.Response
+import rx.Subscriber
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+import java.text.SimpleDateFormat
+import java.util.*
 
-class FoodListAdapter(private val mContext: Context, private val mFoods: MutableList<Food>) : BaseSwipeAdapter() {
-    private val mFoodListAdapter: FoodListAdapter
+class FoodListAdapter(
+        private val mContext: Context,
+        private val mFoods: MutableList<Food>) : BaseSwipeAdapter() {
+
+    private val mFoodListAdapter: FoodListAdapter = this
 
     init {
-        mFoodListAdapter = this
         Collections.sort(mFoods)
     }
 
@@ -39,74 +38,71 @@ class FoodListAdapter(private val mContext: Context, private val mFoods: Mutable
         mFoods.remove(food)
     }
 
-    override fun getSwipeLayoutResourceId(position: Int): Int {
-        return R.id.foodListSwipeLayout
-    }
+    override fun getSwipeLayoutResourceId(position: Int): Int = R.id.foodListSwipeLayout
 
     override fun generateView(position: Int, parent: ViewGroup): View {
         val v = LayoutInflater.from(mContext).inflate(R.layout.food_list_row, null)
         val swipeLayout = v.findViewById<View>(getSwipeLayoutResourceId(position)) as SwipeLayout
-        swipeLayout.setOnDoubleClickListener { layout, surface -> Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show() }
+
+        swipeLayout.setOnDoubleClickListener { _, _ -> Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show() }
 
         v.findViewById<View>(R.id.incrementImageView).setOnClickListener { view ->
             val food = mFoods[position]
             food.amount = food.amount + 1
             updateFood(food, view)
         }
+
         v.findViewById<View>(R.id.decrementImageView).setOnClickListener { view ->
             val food = mFoods[position]
             food.amount = food.amount - 1
             updateFood(food, view)
         }
+
         return v
     }
 
     override fun fillValues(position: Int, convertView: View) {
         val food = mFoods[position]
-        val formatter = SimpleDateFormat("yyyy/MM/dd")
+        val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
 
         (convertView.findViewById<View>(R.id.nameFoodListTextView) as TextView).text = food.name
         (convertView.findViewById<View>(R.id.expirationDateFoodListTextView) as TextView).text = formatter.format(food.expirationDate)
         (convertView.findViewById<View>(R.id.amountFoodListTextView) as TextView).text = (food.amount.toString() + " " + food.unit!!.label).toString()
     }
 
-    override fun getCount(): Int {
-        return this.mFoods.size
-    }
+    override fun getCount(): Int = this.mFoods.size
 
-    override fun getItem(position: Int): Any {
-        return this.mFoods[position]
-    }
+    override fun getItem(position: Int): Any = this.mFoods[position]
 
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
+    override fun getItemId(position: Int): Long = position.toLong()
 
     private fun updateFood(food: Food, view: View) {
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("amount", food.amount.toString())
                 .build()
-        val service = RetrofitFactory.getClient(FoodService::class.java, mContext)
-        val call = service.updateFood(food.id, body)
-        call.enqueue(object : BasicCallback<Food>(mContext) {
-            override fun onResponse(call: Call<Food>, response: Response<Food>) {
-                super.onResponse(call, response)
 
-                val food = response.body()
-                Snackbar.make(view, "Amount of " + food!!.name + " updated", Snackbar.LENGTH_LONG)
-                        .setAction("Dismiss", null)
-                        .show()
-                mFoodListAdapter.notifyDataSetChanged()
-            }
+        RetrofitFactory.getClient(FoodService::class.java, mContext)
+                .updateFood(food.id, body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Subscriber<Food>() {
+                    override fun onError(e: Throwable) {
+                        Snackbar.make(view, e.message.toString(), Snackbar.LENGTH_LONG)
+                                .setAction("Dismiss", null)
+                                .show()
+                    }
 
-            override fun onFailure(call: Call<Food>, t: Throwable) {
-                super.onFailure(call, t)
+                    override fun onCompleted() {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
 
-                Snackbar.make(view, t.message.toString(), Snackbar.LENGTH_LONG)
-                        .setAction("Dismiss", null)
-                        .show()
-            }
-        })
+                    override fun onNext(t: Food) {
+                        Snackbar.make(view, "Amount of " + t.name + " updated", Snackbar.LENGTH_LONG)
+                                .setAction("Dismiss", null)
+                                .show()
+                        mFoodListAdapter.notifyDataSetChanged()
+                    }
+                })
     }
 }

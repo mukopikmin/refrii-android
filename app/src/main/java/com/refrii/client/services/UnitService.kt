@@ -4,16 +4,17 @@ import com.refrii.client.models.Unit
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.*
+import rx.Observable
 
 interface UnitService {
-    @get:GET("/units")
-    val units: Call<MutableList<Unit>>
+    @GET("/units")
+    fun getUnits(): Observable<MutableList<Unit>>
 
     @POST("/units")
-    fun createUnit(@Body body: RequestBody): Call<Unit>
+    fun createUnit(@Body body: RequestBody): Observable<Unit>
 
     @PUT("/units/{id}")
     fun updateUnit(
             @Path("id") id: Int,
-            @Body body: RequestBody): Call<Unit>
+            @Body body: RequestBody): Observable<Unit>
 }

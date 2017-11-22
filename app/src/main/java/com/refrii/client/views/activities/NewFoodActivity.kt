@@ -6,15 +6,12 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
-import com.refrii.client.BasicCallback
 import com.refrii.client.R
-import com.refrii.client.RetrofitFactory
-import com.refrii.client.models.Box
+import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.services.UnitService
 import com.refrii.client.models.Food
 import com.refrii.client.models.Unit
@@ -26,8 +23,6 @@ import kotterknife.bindView
 import java.text.SimpleDateFormat
 
 import okhttp3.MultipartBody
-import retrofit2.Call
-import retrofit2.Response
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -83,23 +78,28 @@ class NewFoodActivity : AppCompatActivity() {
     private fun getUnits(): List<Unit>? = mRealm?.where(Unit::class.java)?.findAll()
 
     private fun syncUnits() {
-        val service = RetrofitFactory.getClient(UnitService::class.java, this@NewFoodActivity)
-        val call = service.units
-        call.enqueue(object : BasicCallback<MutableList<Unit>>(this@NewFoodActivity) {
-            override fun onResponse(call: Call<MutableList<Unit>>, response: Response<MutableList<Unit>>) {
-                super.onResponse(call, response)
+        RetrofitFactory.getClient(UnitService::class.java, this@NewFoodActivity)
+                .getUnits()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Subscriber<List<Unit>>() {
+                    override fun onCompleted() {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
 
-                mUnits = response.body()
-                val adapter = ArrayAdapter<String>(this@NewFoodActivity, android.R.layout.simple_spinner_dropdown_item)
-                mUnits!!.forEach { adapter.add(it.label) }
-                spinner.adapter = adapter
-            }
+                    override fun onError(e: Throwable?) {
+                        e ?: return
 
-            override fun onFailure(call: Call<MutableList<Unit>>, t: Throwable) {
-                super.onFailure(call, t)
-                Toast.makeText(this@NewFoodActivity, t.message, Toast.LENGTH_LONG).show()
-            }
-        })
+                        Toast.makeText(this@NewFoodActivity, e.message, Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onNext(t: List<Unit>) {
+                        mUnits = t
+                        val adapter = ArrayAdapter<String>(this@NewFoodActivity, android.R.layout.simple_spinner_dropdown_item)
+                        t.forEach { adapter.add(it.label) }
+                        spinner.adapter = adapter
+                    }
+                })
     }
 
     private fun addFood(name: String, notice: String, amount: Double, boxId: Int, unitId: Int, expirationDate: Date) {

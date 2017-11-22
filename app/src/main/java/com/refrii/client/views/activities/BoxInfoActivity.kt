@@ -10,9 +10,8 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.refrii.client.BasicCallback
 import com.refrii.client.R
-import com.refrii.client.RetrofitFactory
+import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Box
 import com.refrii.client.services.BoxService
 import com.refrii.client.views.fragments.EditTextDialogFragment
@@ -21,8 +20,6 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
 import okhttp3.MultipartBody
-import retrofit2.Call
-import retrofit2.Response
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -139,24 +136,31 @@ class BoxInfoActivity : AppCompatActivity() {
     }
 
     private fun updateBox(box: Box) {
-        val service = RetrofitFactory.getClient(BoxService::class.java, this@BoxInfoActivity)
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("name", box.name!!)
                 .addFormDataPart("notice", box.notice!!)
                 .build()
-        val call = service.updateBox(box.id, body)
-        call.enqueue(object : BasicCallback<Box>(this@BoxInfoActivity) {
-            override fun onResponse(call: Call<Box>, response: Response<Box>) {
-                super.onResponse(call, response)
 
-                if (response.code() == 200) {
-                    val view = findViewById<FloatingActionButton>(R.id.floatingActionButton)
-                    Snackbar.make(view, "This box is successfully updated", Snackbar.LENGTH_LONG)
-                            .setAction("Dismiss", null).show()
-                }
-            }
-        })
+        RetrofitFactory.getClient(BoxService::class.java, this@BoxInfoActivity)
+                .updateBox(box.id, body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Subscriber<Box>() {
+                    override fun onNext(t: Box?) { }
+
+                    override fun onError(e: Throwable?) {
+                        e ?: return
+
+                        Toast.makeText(this@BoxInfoActivity, e.message, Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onCompleted() {
+                        Snackbar.make(fab, "This box is successfully updated", Snackbar.LENGTH_LONG)
+                                .setAction("Dismiss", null).show()
+                    }
+
+                })
     }
 
     private fun syncBox(box: Box) {

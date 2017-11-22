@@ -10,11 +10,13 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import com.refrii.client.*
+import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Unit
 import com.refrii.client.services.UnitService
 
-import retrofit2.Call
-import retrofit2.Response
+import rx.Subscriber
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class UnitsActivity : AppCompatActivity() {
 
@@ -59,25 +61,28 @@ class UnitsActivity : AppCompatActivity() {
         }
     }
 
-    fun setUnits() {
-        val service = RetrofitFactory.getClient(UnitService::class.java, this@UnitsActivity)
-        val call = service.units
-        call.enqueue(object : BasicCallback<MutableList<Unit>>(this@UnitsActivity) {
-            override fun onResponse(call: Call<MutableList<Unit>>, response: Response<MutableList<Unit>>) {
-                super.onResponse(call, response)
-
-                if (response.code() == 200) {
-                    mUnits = response.body()
-
-                    val adapter = ArrayAdapter<String>(this@UnitsActivity, android.R.layout.simple_list_item_1)
-                    for (unit in mUnits!!) {
-                        adapter.add(unit.label)
+    private fun setUnits() {
+        RetrofitFactory.getClient(UnitService::class.java, this@UnitsActivity)
+                .getUnits()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Subscriber<List<Unit>>() {
+                    override fun onError(e: Throwable?) {
                     }
-                    val listView = findViewById<ListView>(R.id.listView) as ListView
-                    listView.adapter = adapter
-                }
-            }
-        })
+
+                    override fun onCompleted() {
+                    }
+
+                    override fun onNext(t: List<Unit>) {
+                        mUnits = t.toMutableList()
+
+                        val adapter = ArrayAdapter<String>(this@UnitsActivity, android.R.layout.simple_list_item_1)
+                        t.forEach { adapter.add(it.label) }
+
+                        val listView = findViewById<ListView>(R.id.listView) as ListView
+                        listView.adapter = adapter
+                    }
+                })
     }
 
     companion object {

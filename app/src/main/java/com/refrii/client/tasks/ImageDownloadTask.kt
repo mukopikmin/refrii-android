@@ -10,13 +10,15 @@ import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
 
-internal class ImageDownloadTask(private val imageView: ImageView) : AsyncTask<String, Void, Bitmap>() {
+class ImageDownloadTask(private val imageView: ImageView) : AsyncTask<String, Void, Bitmap>() {
 
     override fun doInBackground(vararg params: String): Bitmap? {
         val image: Bitmap
+
         return try {
             val imageUrl = URL(params[0])
             val imageIs: InputStream
+
             imageIs = imageUrl.openStream()
             image = BitmapFactory.decodeStream(imageIs)
             image

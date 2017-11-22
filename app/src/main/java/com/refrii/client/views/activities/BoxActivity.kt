@@ -1,14 +1,11 @@
 package com.refrii.client.views.activities
 
 import android.app.Activity
-import android.app.Dialog
-import android.app.DialogFragment
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.support.design.widget.NavigationView
@@ -23,6 +20,7 @@ import android.widget.*
 
 import com.daimajia.swipe.util.Attributes
 import com.refrii.client.*
+import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.services.BoxService
@@ -34,9 +32,6 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
 
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -271,7 +266,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         mListView.adapter = foodListAdapter
         foodListAdapter.mode = Attributes.Mode.Single
 
-        mListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+        mListView.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
             val food = parent.getItemAtPosition(position) as Food
             val intent = Intent(this@BoxActivity, FoodActivity::class.java)
 
@@ -280,7 +275,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
             startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
         }
 
-        mListView.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, view, position, id ->
+        mListView.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, _, position, _ ->
             val food = parent.getItemAtPosition(position) as Food
             val options = arrayOf("Show", "Remove", "Cancel")
             val fragment = OptionsPickerDialogFragment.newInstance(food.name!!, options, food.id)
@@ -309,27 +304,27 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode != Activity.RESULT_OK || data == null) return
+
         when (requestCode) {
             ADD_FOOD_REQUEST_CODE -> {
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    val foodId = data.getIntExtra("food_id", 0)
-                    val food = mRealm?.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
-                    val foodListAdapter = mListView.adapter as FoodListAdapter
+                val foodId = data.getIntExtra("food_id", 0)
+                val food = mRealm?.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
+                val foodListAdapter = mListView.adapter as FoodListAdapter
 
-                    Log.e(TAG, food.toString())
+                Log.e(TAG, food.toString())
 
-                    if (food != null) {
-                        mRealm?.let { realm ->
-                            realm.executeTransaction {
-                                foodListAdapter.add(food)
-                            }
+                if (food != null) {
+                    mRealm?.let { realm ->
+                        realm.executeTransaction {
+                            foodListAdapter.add(food)
                         }
-                        foodListAdapter.notifyDataSetChanged()
                     }
+                    foodListAdapter.notifyDataSetChanged()
                 }
             }
             EDIT_FOOD_REQUEST_CODE -> {
-                val foodId = data?.getIntExtra("food_id", 0)
+                val foodId = data.getIntExtra("food_id", 0)
                 val food = mRealm?.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
 
                 Snackbar.make(mListView, "${food!!.name!!} Updated successfully", Snackbar.LENGTH_LONG)
@@ -338,7 +333,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
             }
             FOOD_OPTIONS_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val option = data?.getIntExtra("option", -1)
+                    val option = data.getIntExtra("option", -1)
 
                     when(option) {
                         0 -> {
@@ -365,28 +360,34 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun removeFood(food: Food) {
-        val service = RetrofitFactory.getClient(FoodService::class.java, this)
+        RetrofitFactory.getClient(FoodService::class.java, this)
+                .remove(food.id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Subscriber<Void>() {
+                    override fun onNext(t: Void?) {
+                        val foodListAdapter = mListView.adapter as FoodListAdapter
 
-        service.remove(food.id).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.code() == 204) {
-                    val foodListAdapter = mListView.adapter as FoodListAdapter
-                    mRealm?.let { realm ->
-                        realm.executeTransaction {
-                            foodListAdapter.remove(food)
+                        mRealm?.let { realm ->
+                            realm.executeTransaction {
+                                foodListAdapter.remove(food)
+                            }
                         }
+                        foodListAdapter.notifyDataSetChanged()
+                        Snackbar.make(mListView, "Removed successfully", Snackbar.LENGTH_LONG)
+                                .setAction("Dismiss", null)
+                                .show()
                     }
-                    foodListAdapter.notifyDataSetChanged()
-                    Snackbar.make(mListView, "Removed successfully", Snackbar.LENGTH_LONG)
-                            .setAction("Dismiss", null)
-                            .show()
-                }
-            }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.e(TAG, t.message)
-            }
-        })
+                    override fun onCompleted() {
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        e ?: return
+
+                        Toast.makeText(this@BoxActivity, e.message, Toast.LENGTH_LONG).show()
+                    }
+                })
     }
 
     private fun signOut() {

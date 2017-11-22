@@ -19,5 +19,5 @@ interface BoxService {
     @PUT("/boxes/{id}")
     fun updateBox(
             @Path("id") id: Int,
-            @Body body: RequestBody): Call<Box>
+            @Body body: RequestBody): Observable<Box>
 }
