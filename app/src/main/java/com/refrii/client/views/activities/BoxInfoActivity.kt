@@ -40,7 +40,7 @@ class BoxInfoActivity : AppCompatActivity() {
     private val fab: FloatingActionButton by bindView(R.id.floatingActionButton)
     private val toolbar: Toolbar by bindView(R.id.toolbar)
 
-    private var mRealm: Realm? = null
+    private lateinit var mRealm: Realm
     private var mBox: Box? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,9 +52,7 @@ class BoxInfoActivity : AppCompatActivity() {
 
         val boxId = intent.getIntExtra("box_id", 0)
 
-        mBox = mRealm?.where(Box::class.java)
-                ?.equalTo("id", boxId)
-                ?.findFirst()
+        mBox = mRealm.where(Box::class.java)?.equalTo("id", boxId)?.findFirst()
 
         mBox?.let {
             setBox(it)
@@ -105,17 +103,13 @@ class BoxInfoActivity : AppCompatActivity() {
 
         when(requestCode) {
             EDIT_NAME_REQUEST_CODE -> {
-                mRealm?.let { realm ->
-                    realm.executeTransaction { mBox?.name = data.getStringExtra("text") }
-                    mBox?.let { setBox(it) }
-                }
+                mRealm.executeTransaction { mBox?.name = data.getStringExtra("text") }
+                mBox?.let { setBox(it) }
                 onEdited()
             }
             EDIT_NOTICE_REQUEST_CODE -> {
-                mRealm?.let { realm ->
-                    realm.executeTransaction { mBox?.notice = data.getStringExtra("text") }
-                    mBox?.let { setBox(it) }
-                }
+                mRealm.executeTransaction { mBox?.notice = data.getStringExtra("text") }
+                mBox?.let { setBox(it) }
                 onEdited()
             }
         }
@@ -173,10 +167,8 @@ class BoxInfoActivity : AppCompatActivity() {
                     override fun onNext(t: Box) {
                         Log.d(TAG, "Box synced")
 
-                        mRealm?.let { realm ->
-                            realm.executeTransaction { realm.copyToRealmOrUpdate(t) }
-                            setBox(t)
-                        }
+                        mRealm.executeTransaction { mRealm.copyToRealmOrUpdate(t) }
+                        setBox(t)
                     }
 
                 })

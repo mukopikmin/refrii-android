@@ -5,21 +5,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.util.Log
-import android.view.View
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
-
 import com.daimajia.swipe.util.Attributes
-import com.refrii.client.*
+import com.refrii.client.R
 import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
@@ -31,7 +30,6 @@ import com.refrii.client.views.fragments.OptionsPickerDialogFragment
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
-
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -47,7 +45,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
     private var mBoxes: List<Box>? = null
     private var mBox: Box? = null
-    private var mRealm: Realm? = null
+    private lateinit var mRealm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,18 +75,19 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     public override fun onPause() {
         super.onPause()
 
-        mBox?.let {
-            val editor = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity).edit()
-            editor.putInt("selected_box_index", mBoxes!!.indexOf(it))
-            editor.apply()
+        mBox?.let { box ->
+            mBoxes?.let { boxes ->
+                val editor = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity).edit()
+                editor.putInt("selected_box_index", boxes.indexOf(box))
+                editor.apply()
+            }
         }
     }
 
     public override fun onResume() {
         super.onResume()
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
-        val editor = sharedPreferences.edit()
+        val editor = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity).edit()
 
         editor.remove("selected_box_id")
         editor.apply()
@@ -100,7 +99,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     public override fun onDestroy() {
         super.onDestroy()
 
-        mRealm?.close()
+        mRealm.close()
     }
 
     override fun onBackPressed() {
@@ -160,26 +159,23 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun getBoxes() {
-        mRealm?.let { realm ->
-            mBoxes = realm.where(Box::class.java).findAll()
-            mNavigationView.setNavigationItemSelectedListener(this@BoxActivity)
-            val menu = mNavigationView.menu.findItem(R.id.menu_boxes)
-            menu.subMenu.clear()
+        mBoxes = mRealm.where(Box::class.java).findAll()
+        mNavigationView.setNavigationItemSelectedListener(this@BoxActivity)
+        val menu = mNavigationView.menu.findItem(R.id.menu_boxes)
+        menu.subMenu.clear()
 
-            showProgressBar()
-            realm.executeTransaction {
-                mBoxes!!.forEach { menu.subMenu.add(Menu.NONE, it.id, Menu.NONE, it.name) }
+        showProgressBar()
+        mRealm.executeTransaction {
+            mBoxes!!.forEach { menu.subMenu.add(Menu.NONE, it.id, Menu.NONE, it.name) }
 
-                if (mBoxes!!.isNotEmpty()) {
-                    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
-                    val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
-                    mBox = mBoxes!![boxIndex]
-                    setFoods(mBox!!)
-                }
+            if (mBoxes!!.isNotEmpty()) {
+                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
+                val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
+                mBox = mBoxes!![boxIndex]
+                setFoods(mBox!!)
             }
-            hideProgressBar()
         }
-
+        hideProgressBar()
     }
 
     private fun syncBoxes() {
@@ -201,14 +197,12 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     }
 
                     override fun onNext(boxes: List<Box>) {
-                        mRealm?.let { realm ->
-                            realm.where(Box::class.java).findAll().forEach { box->
-                                realm.executeTransaction { box.deleteFromRealm() }
-                            }
+                        mRealm.where(Box::class.java).findAll().forEach { box ->
+                            mRealm.executeTransaction { box.deleteFromRealm() }
+                        }
 
-                            boxes.forEach { box ->
-                                realm.executeTransaction { realm.copyToRealmOrUpdate(box) }
-                            }
+                        boxes.forEach { box ->
+                            mRealm.executeTransaction { mRealm.copyToRealmOrUpdate(box) }
                         }
 
                         mBoxes = boxes
@@ -303,23 +297,17 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         when (requestCode) {
             ADD_FOOD_REQUEST_CODE -> {
                 val foodId = data.getIntExtra("food_id", 0)
-                val food = mRealm?.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
+                val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
                 val foodListAdapter = mListView.adapter as FoodListAdapter
 
-                Log.e(TAG, food.toString())
-
                 if (food != null) {
-                    mRealm?.let { realm ->
-                        realm.executeTransaction {
-                            foodListAdapter.add(food)
-                        }
-                    }
+                    mRealm.executeTransaction { foodListAdapter.add(food) }
                     foodListAdapter.notifyDataSetChanged()
                 }
             }
             EDIT_FOOD_REQUEST_CODE -> {
                 val foodId = data.getIntExtra("food_id", 0)
-                val food = mRealm?.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
+                val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
 
                 Snackbar.make(mListView, "${food!!.name!!} Updated successfully", Snackbar.LENGTH_LONG)
                         .setAction("Dismiss", null)
@@ -342,7 +330,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                         }
                         1 -> {
                             val foodId = data.getIntExtra("target_id", 0)
-                            val food = mRealm?.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
+                            val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
 
                             food?.let { removeFood(it) }
                         }
@@ -362,11 +350,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     override fun onNext(t: Void?) {
                         val foodListAdapter = mListView.adapter as FoodListAdapter
 
-                        mRealm?.let { realm ->
-                            realm.executeTransaction {
-                                foodListAdapter.remove(food)
-                            }
-                        }
+                        mRealm.executeTransaction { foodListAdapter.remove(food) }
                         foodListAdapter.notifyDataSetChanged()
                         Snackbar.make(mListView, "Removed successfully", Snackbar.LENGTH_LONG)
                                 .setAction("Dismiss", null)

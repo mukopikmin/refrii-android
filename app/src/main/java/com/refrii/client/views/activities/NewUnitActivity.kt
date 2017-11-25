@@ -12,6 +12,8 @@ import com.refrii.client.R
 import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Unit
 import com.refrii.client.services.UnitService
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import kotterknife.bindView
 import okhttp3.MultipartBody
 import rx.Subscriber
@@ -22,7 +24,10 @@ class NewUnitActivity : AppCompatActivity() {
 
     private val toolbar: Toolbar by bindView(R.id.toolbar)
     private val labelEditText: EditText by bindView(R.id.labelEditText)
+    private val stepEditText: EditText by bindView(R.id.stepEditText)
     private val fab: FloatingActionButton by bindView(R.id.fab)
+
+    private lateinit var mRealm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,16 +35,22 @@ class NewUnitActivity : AppCompatActivity() {
         setContentView(R.layout.activity_new_unit)
         setSupportActionBar(toolbar)
 
+        Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
+        mRealm = Realm.getDefaultInstance()
+
         fab.setOnClickListener {
-            createUnit(labelEditText.text.toString())
+            val label = labelEditText.text.toString()
+            val step = stepEditText.text.toString().toDouble()
+
+            createUnit(label, step)
         }
     }
 
-    private fun createUnit(label: String) {
+    private fun createUnit(label: String, step: Double) {
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("label", label)
-                .addFormDataPart("step", "1")
+                .addFormDataPart("step", step.toString())
                 .build()
 
         RetrofitFactory.getClient(UnitService::class.java, this@NewUnitActivity)
@@ -53,6 +64,8 @@ class NewUnitActivity : AppCompatActivity() {
 
                     override fun onNext(t: Unit) {
                         val intent = Intent()
+
+                        mRealm.executeTransaction { mRealm.copyToRealmOrUpdate(t) }
 
                         intent.putExtra("unit", t)
                         setResult(Activity.RESULT_OK, intent)

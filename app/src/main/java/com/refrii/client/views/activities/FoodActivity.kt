@@ -11,15 +11,18 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import com.refrii.client.R
 import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
+import com.refrii.client.services.FoodService
 import com.refrii.client.views.fragments.CalendarPickerDialogFragment
 import com.refrii.client.views.fragments.EditDoubleDialogFragment
 import com.refrii.client.views.fragments.EditTextDialogFragment
-import com.refrii.client.services.FoodService
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
@@ -50,7 +53,7 @@ class FoodActivity : AppCompatActivity() {
     private val fab: FloatingActionButton by bindView(R.id.fab)
 
     private var mFood: Food? = null
-    private var mRealm: Realm? = null
+    private lateinit var mRealm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,7 +114,7 @@ class FoodActivity : AppCompatActivity() {
     public override fun onDestroy() {
         super.onDestroy()
 
-        mRealm?.close()
+        mRealm.close()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -131,7 +134,7 @@ class FoodActivity : AppCompatActivity() {
 
         when (requestCode) {
             EDIT_NAME_REQUEST_CODE -> {
-                mRealm?.executeTransaction {
+                mRealm.executeTransaction {
                     mFood?.let {
                         it.name = data.getStringExtra("text")
                         setFoodOnView(it)
@@ -140,7 +143,7 @@ class FoodActivity : AppCompatActivity() {
                 }
             }
             EDIT_AMOUNT_REQUEST_CODE -> {
-                mRealm?.executeTransaction {
+                mRealm.executeTransaction {
                     mFood?.let {
                         it.amount = data.getDoubleExtra("number", 0.toDouble())
                         setFoodOnView(it)
@@ -149,7 +152,7 @@ class FoodActivity : AppCompatActivity() {
                 }
             }
             EDIT_NOTICE_REQUEST_CODE -> {
-                mRealm?.executeTransaction {
+                mRealm.executeTransaction {
                     mFood?.let {
                         it.notice = data.getStringExtra("text")
                         setFoodOnView(it)
@@ -158,7 +161,7 @@ class FoodActivity : AppCompatActivity() {
                 }
             }
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> {
-                mRealm?.executeTransaction {
+                mRealm.executeTransaction {
                     mFood?.let {
                         val date = Date()
                         date.time = data.getLongExtra("date", 0)
@@ -172,18 +175,16 @@ class FoodActivity : AppCompatActivity() {
     }
 
     private fun setFood(id: Int, boxId: Int) {
-        val food = mRealm?.where(Food::class.java)
-                ?.equalTo("id", id)
-                ?.findFirst() ?: return
-        val box = mRealm?.where(Box::class.java)
-                ?.equalTo("id", boxId)
-                ?.findFirst() ?: return
+        val food = mRealm.where(Food::class.java)?.equalTo("id", id)?.findFirst()
+        val box = mRealm.where(Box::class.java)?.equalTo("id", boxId)?.findFirst()
+
+        food ?: return
+        box ?: return
 
         mFood = food
-        mRealm?.executeTransaction { food.box = box }
+        mRealm.executeTransaction { food.box = box }
 
         setFoodOnView(food)
-
         onLoadFinished()
     }
 
@@ -229,7 +230,7 @@ class FoodActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Subscriber<Food>() {
                     override fun onNext(t: Food) {
-                        mRealm?.executeTransaction { it.copyToRealmOrUpdate(food) }
+                        mRealm.executeTransaction { it.copyToRealmOrUpdate(food) }
 
                         val intent = Intent()
                         intent.putExtra(getString(R.string.key_food_id), t.id)
@@ -268,9 +269,7 @@ class FoodActivity : AppCompatActivity() {
                         mFood = food
                         setFoodOnView(food)
 
-                        mRealm?.let {
-                            it.executeTransaction { it.copyToRealmOrUpdate(food) }
-                        }
+                        mRealm.executeTransaction { mRealm.copyToRealmOrUpdate(food) }
                     }
 
                 })
