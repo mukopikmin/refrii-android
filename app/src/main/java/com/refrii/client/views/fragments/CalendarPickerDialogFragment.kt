@@ -1,5 +1,6 @@
 package com.refrii.client.views.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.app.DialogFragment
@@ -14,6 +15,8 @@ import com.refrii.client.R
 import java.util.*
 
 class CalendarPickerDialogFragment : DialogFragment() {
+
+    @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val content = inflater.inflate(R.layout.edit_date_dialog, null)
@@ -30,7 +33,6 @@ class CalendarPickerDialogFragment : DialogFragment() {
         return AlertDialog.Builder(activity)
                 .setView(content)
                 .setPositiveButton("OK") { _, _ ->
-                    val calendar = Calendar.getInstance()
                     val intent = Intent()
 
                     calendar.set(datePicker.year, datePicker.month, datePicker.dayOfMonth)

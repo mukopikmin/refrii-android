@@ -1,5 +1,6 @@
 package com.refrii.client.models
 
+import android.util.Log
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import okhttp3.MultipartBody
@@ -31,17 +32,30 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
         return this.id == food.id
     }
 
-    fun decrease(diff: Double) {
+    override fun compareTo(other: Food): Int =
+            (this.expirationDate!!.time - other.expirationDate!!.time).toInt()
+
+    private fun decrease(diff: Double) {
         this.amount -= diff
         if (this.amount < 0) {
             this.amount = 0.0
         }
     }
 
-    fun increase(diff: Double) {
+    private fun increase(diff: Double) {
         this.amount += diff
     }
 
-    override fun compareTo(other: Food): Int =
-            (this.expirationDate!!.time - other.expirationDate!!.time).toInt()
+    private fun sync(other: Food): Food {
+        updatedAt?.let {
+            if (it < other.updatedAt) {
+                return other
+            }
+        }
+        return this
+    }
+
+    companion object {
+        private const val TAG = "Food"
+    }
 }

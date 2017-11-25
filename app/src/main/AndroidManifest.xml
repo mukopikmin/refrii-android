@@ -45,10 +45,6 @@
             android:name=".views.activities.BoxInfoActivity"
             android:label="@string/title_activity_box_info"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".views.activities.ErrorActivity"
-            android:label="@string/title_activity_error"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".views.activities.WebViewActivity" />
         <activity
             android:name=".views.activities.UnitsActivity"
@@ -61,7 +57,7 @@
         <activity
             android:name=".views.activities.NewUnitActivity"
             android:label="@string/title_activity_new_unit"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

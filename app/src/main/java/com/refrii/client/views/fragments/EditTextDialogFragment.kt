@@ -1,11 +1,11 @@
 package com.refrii.client.views.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.app.DialogFragment
 import android.app.PendingIntent
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -14,6 +14,8 @@ import android.widget.EditText
 import com.refrii.client.R
 
 class EditTextDialogFragment : DialogFragment() {
+
+    @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val content = inflater.inflate(R.layout.edit_text_dialog, null)

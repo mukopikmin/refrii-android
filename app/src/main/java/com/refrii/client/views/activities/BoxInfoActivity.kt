@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -19,7 +20,6 @@ import com.refrii.client.views.fragments.UserPickerDialogFragment
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
-import okhttp3.MultipartBody
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -51,64 +51,72 @@ class BoxInfoActivity : AppCompatActivity() {
         mRealm = Realm.getDefaultInstance()
 
         val boxId = intent.getIntExtra("box_id", 0)
-        mBox = mRealm!!.where(Box::class.java)
-                .equalTo("id", boxId)
-                .findFirst()
 
-        if (mBox == null) {
-            finish()
-            return
-        }
+        mBox = mRealm?.where(Box::class.java)
+                ?.equalTo("id", boxId)
+                ?.findFirst()
 
         mBox?.let {
             setBox(it)
             syncBox(it)
         }
 
+        onLoaded()
+
         editNameImageView.setOnClickListener {
-            val fragment = EditTextDialogFragment.newInstance("Name", mBox!!.name!!)
-            fragment.setTargetFragment(null, EDIT_NAME_REQUEST_CODE)
-            fragment.show(fragmentManager, "edit_name")
+            mBox?.let { box ->
+                box.name?.let {
+                    val fragment = EditTextDialogFragment.newInstance("Name", it)
+                    fragment.setTargetFragment(null, EDIT_NAME_REQUEST_CODE)
+                    fragment.show(fragmentManager, "edit_name")
+                }
+            }
         }
 
         editNoticeImageView.setOnClickListener {
-            val fragment = EditTextDialogFragment.newInstance("Notice", mBox!!.notice!!, true)
-            fragment.setTargetFragment(null, EDIT_NOTICE_REQUEST_CODE)
-            fragment.show(fragmentManager, "edit_notice")
+            mBox?.let { box ->
+                box.notice?.let {
+                    val fragment = EditTextDialogFragment.newInstance("Notice", it, true)
+                    fragment.setTargetFragment(null, EDIT_NOTICE_REQUEST_CODE)
+                    fragment.show(fragmentManager, "edit_notice")
+                }
+            }
         }
 
         shareImageView.setOnClickListener {
-            val fragment = UserPickerDialogFragment.newInstance("Shared users", mBox!!.invitedUsers!!)
-            fragment.setTargetFragment(null, EDIT_SHARED_USERS_REQUEST_CODE)
-            fragment.show(fragmentManager, "contact_us")
+            mBox?.let { box ->
+                box.invitedUsers?.let {
+                    val fragment = UserPickerDialogFragment.newInstance("Shared users", it)
+                    fragment.setTargetFragment(null, EDIT_SHARED_USERS_REQUEST_CODE)
+                    fragment.show(fragmentManager, "contact_us")
+                }
+            }
         }
 
-        fab.setOnClickListener { updateBox(mBox!!) }
+        fab.setOnClickListener {
+            mBox?.let { updateBox(it) }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        data ?: return
+
         when(requestCode) {
             EDIT_NAME_REQUEST_CODE -> {
-                data ?: return
-
                 mRealm?.let { realm ->
-                    realm.executeTransaction {
-                        mBox?.name = data.getStringExtra("text")
-                    }
-                    setBox(mBox!!)
+                    realm.executeTransaction { mBox?.name = data.getStringExtra("text") }
+                    mBox?.let { setBox(it) }
                 }
+                onEdited()
             }
             EDIT_NOTICE_REQUEST_CODE -> {
-                data ?: return
-
                 mRealm?.let { realm ->
-                    realm.executeTransaction {
-                        mBox?.notice = data.getStringExtra("text")
-                    }
-                    setBox(mBox!!)
+                    realm.executeTransaction { mBox?.notice = data.getStringExtra("text") }
+                    mBox?.let { setBox(it) }
                 }
+                onEdited()
             }
         }
     }
@@ -121,45 +129,32 @@ class BoxInfoActivity : AppCompatActivity() {
 
         nameTextView.text = box.name
         noticeTextView.text = box.notice
-        createdUserTextView.text = box.owner!!.name
+        box.owner?.let { createdUserTextView.text = it.name }
         createdAtTextView.text = formatter.format(box.createdAt)
         updatedAtTextView.text = formatter.format(box.updatedAt)
-
-        var sharedUsers = ""
-        for (user in box.invitedUsers!!) {
-            sharedUsers += user.name
-            if (box.invitedUsers!![box.invitedUsers!!.size - 1] !== user) {
-                sharedUsers += System.getProperty("line.separator")
-            }
-        }
-        sharedUsersTextView.text = sharedUsers
+        sharedUsersTextView.text = box.invitedUsers?.map { it.name }?.joinToString(System.getProperty("line.separator"))
     }
 
     private fun updateBox(box: Box) {
-        val body = MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("name", box.name!!)
-                .addFormDataPart("notice", box.notice!!)
-                .build()
-
         RetrofitFactory.getClient(BoxService::class.java, this@BoxInfoActivity)
-                .updateBox(box.id, body)
+                .updateBox(box.id, box.toMultipartBody())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Subscriber<Box>() {
-                    override fun onNext(t: Box?) { }
+                    override fun onNext(t: Box) {
+                        setBox(t)
+                    }
 
-                    override fun onError(e: Throwable?) {
-                        e ?: return
-
+                    override fun onError(e: Throwable) {
                         Toast.makeText(this@BoxInfoActivity, e.message, Toast.LENGTH_LONG).show()
                     }
 
                     override fun onCompleted() {
+                        onLoaded()
+
                         Snackbar.make(fab, "This box is successfully updated", Snackbar.LENGTH_LONG)
                                 .setAction("Dismiss", null).show()
                     }
-
                 })
     }
 
@@ -169,29 +164,34 @@ class BoxInfoActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Subscriber<Box>() {
-                    override fun onError(e: Throwable?) {
-                        e ?: return
-
+                    override fun onError(e: Throwable) {
                         Toast.makeText(this@BoxInfoActivity, e.toString(), Toast.LENGTH_SHORT).show()
                     }
 
                     override fun onCompleted() { }
 
-                    override fun onNext(t: Box?) {
-                        t ?: return
-
+                    override fun onNext(t: Box) {
                         Log.d(TAG, "Box synced")
 
                         mRealm?.let { realm ->
-                            realm.executeTransaction {
-                                realm.copyToRealmOrUpdate(t)
-                            }
-
+                            realm.executeTransaction { realm.copyToRealmOrUpdate(t) }
                             setBox(t)
                         }
                     }
 
                 })
+    }
+
+    private fun onLoaded() {
+        fab.visibility = View.GONE
+    }
+
+    private fun onLoading() {
+
+    }
+
+    private fun onEdited() {
+        fab.visibility = View.VISIBLE
     }
 
     companion object {

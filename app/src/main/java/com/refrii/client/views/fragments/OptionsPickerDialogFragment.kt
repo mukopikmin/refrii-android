@@ -7,20 +7,22 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.util.Log
 
 class OptionsPickerDialogFragment : DialogFragment() {
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bundle = arguments
         val title = bundle.getString("title")
         val options = bundle.getStringArray("options")
-        val foodId = bundle.getInt("food_id", 0)
+        val targetId = bundle.getInt("target_id", 0)
 
         return AlertDialog.Builder(activity)
                 .setTitle(title)
                 .setItems(options) { _, which ->
                     val intent = Intent()
                     intent.putExtra("option", which)
-                    intent.putExtra("food_id", foodId)
+                    intent.putExtra("target_id", targetId)
 
                     val pendingIntent = activity.createPendingResult(targetRequestCode, intent, PendingIntent.FLAG_ONE_SHOT)
                     pendingIntent.send(Activity.RESULT_OK)
@@ -29,13 +31,13 @@ class OptionsPickerDialogFragment : DialogFragment() {
     }
 
     companion object {
-        fun newInstance(title: String, options: Array<String>, foodId: Int): OptionsPickerDialogFragment {
+        fun newInstance(title: String, options: Array<String>, targetId: Int): OptionsPickerDialogFragment {
             val instance = OptionsPickerDialogFragment()
             val bundle = Bundle()
 
             bundle.putString("title", title)
             bundle.putStringArray("options", options)
-            bundle.putInt("food_id", foodId)
+            bundle.putInt("target_id", targetId)
             instance.arguments = bundle
 
             return instance

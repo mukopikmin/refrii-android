@@ -1,5 +1,6 @@
 package com.refrii.client.tasks
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
@@ -10,6 +11,7 @@ import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
 
+@SuppressLint("StaticFieldLeak")
 class ImageDownloadTask(private val imageView: ImageView) : AsyncTask<String, Void, Bitmap>() {
 
     override fun doInBackground(vararg params: String): Bitmap? {

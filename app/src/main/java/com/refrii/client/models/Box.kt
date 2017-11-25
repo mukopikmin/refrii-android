@@ -2,6 +2,7 @@ package com.refrii.client.models
 
 import io.realm.*
 import io.realm.annotations.PrimaryKey
+import okhttp3.MultipartBody
 import java.io.Serializable
 import java.util.Date
 
@@ -22,11 +23,13 @@ open class Box : RealmObject(), Serializable {
         other ?: return false
 
         val box = other as Box
+
         return box.id == id
     }
 
     override fun hashCode(): Int {
         var result = id
+
         result = 31 * result + (name?.hashCode() ?: 0)
         result = 31 * result + (notice?.hashCode() ?: 0)
         result = 31 * result + (imageUrl?.hashCode() ?: 0)
@@ -36,16 +39,29 @@ open class Box : RealmObject(), Serializable {
         result = 31 * result + (foods?.hashCode() ?: 0)
         result = 31 * result + (invitedUsers?.hashCode() ?: 0)
         result = 31 * result + (owner?.hashCode() ?: 0)
+
         return result
     }
 
-    fun sync(other: Box): Box {
+    private fun sync(other: Box): Box {
         updatedAt?.let {
             if (it < other.updatedAt) {
                 return other
             }
         }
         return this
+    }
+
+    fun toMultipartBody(): MultipartBody {
+        val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
+
+        builder.addFormDataPart("id", id.toString())
+        builder.addFormDataPart("is_invited", isInvited.toString())
+        name?.let { builder.addFormDataPart("name", it) }
+        notice?.let { builder.addFormDataPart("notice", it) }
+        imageUrl?.let { builder.addFormDataPart("imageUrl", it) }
+
+        return builder.build()
     }
 
     companion object {

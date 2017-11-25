@@ -3,6 +3,7 @@ package com.refrii.client.views.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.widget.EditText
@@ -21,7 +22,7 @@ class NewUnitActivity : AppCompatActivity() {
 
     private val toolbar: Toolbar by bindView(R.id.toolbar)
     private val labelEditText: EditText by bindView(R.id.labelEditText)
-    private val fab: EditText by bindView(R.id.fab)
+    private val fab: FloatingActionButton by bindView(R.id.fab)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,14 +47,15 @@ class NewUnitActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Subscriber<Unit>() {
-                    override fun onCompleted() { }
+                    override fun onCompleted() {
+                        finish()
+                    }
 
-                    override fun onNext(t: Unit?) {
+                    override fun onNext(t: Unit) {
                         val intent = Intent()
 
                         intent.putExtra("unit", t)
                         setResult(Activity.RESULT_OK, intent)
-                        finish()
                     }
 
                     override fun onError(e: Throwable) {

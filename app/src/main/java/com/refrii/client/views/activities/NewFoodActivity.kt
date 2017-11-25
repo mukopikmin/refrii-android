@@ -84,12 +84,9 @@ class NewFoodActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Subscriber<List<Unit>>() {
                     override fun onCompleted() {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }
 
-                    override fun onError(e: Throwable?) {
-                        e ?: return
-
+                    override fun onError(e: Throwable) {
                         Toast.makeText(this@NewFoodActivity, e.message, Toast.LENGTH_LONG).show()
                     }
 
@@ -125,9 +122,7 @@ class NewFoodActivity : AppCompatActivity() {
 
                     override fun onNext(t: Food) {
                         mRealm?.let { realm ->
-                            realm.executeTransaction {
-                                realm.copyToRealmOrUpdate(t)
-                            }
+                            realm.executeTransaction { realm.copyToRealmOrUpdate(t) }
                         }
 
                         val intent = Intent()
@@ -136,9 +131,7 @@ class NewFoodActivity : AppCompatActivity() {
                         finish()
                     }
 
-                    override fun onError(e: Throwable?) {
-                        e ?: return
-
+                    override fun onError(e: Throwable) {
                         Toast.makeText(this@NewFoodActivity, e.message, Toast.LENGTH_LONG).show()
                     }
 

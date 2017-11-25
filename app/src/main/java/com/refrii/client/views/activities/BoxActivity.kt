@@ -203,9 +203,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     override fun onNext(boxes: List<Box>) {
                         mRealm?.let { realm ->
                             realm.where(Box::class.java).findAll().forEach { box->
-                                realm.executeTransaction {
-                                    box.deleteFromRealm()
-                                }
+                                realm.executeTransaction { box.deleteFromRealm() }
                             }
 
                             boxes.forEach { box ->
@@ -238,9 +236,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         nameTextView.text = name
         mailTextView.text = mail
 
-        if (avatarUrl != null) {
-            ImageDownloadTask(avatarImageView).execute(avatarUrl)
-        }
+        avatarUrl?.let { ImageDownloadTask(avatarImageView).execute(avatarUrl) }
     }
 
     private fun setBoxesOnNavigation(boxes: List<Box>) {
@@ -253,10 +249,9 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         if (boxes.isNotEmpty()) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
             val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
+
             mBox = boxes[boxIndex]
-            mBox?.let {
-                setFoods(it)
-            }
+            mBox?.let { setFoods(it) }
         }
     }
 
@@ -288,7 +283,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
         mListView.setOnScrollListener(object : AbsListView.OnScrollListener {
             override fun onScrollStateChanged(view: AbsListView, scrollState: Int) { }
-
             override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) { }
         })
     }
@@ -337,7 +331,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
                     when(option) {
                         0 -> {
-                            val foodId = data.getIntExtra("food_id", 0)
+                            val foodId = data.getIntExtra("target_id", 0)
                             val intent = Intent(this, FoodActivity::class.java)
 
                             intent.apply {
@@ -347,7 +341,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                             startActivity(intent)
                         }
                         1 -> {
-                            val foodId = data.getIntExtra("food_id", 0)
+                            val foodId = data.getIntExtra("target_id", 0)
                             val food = mRealm?.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
 
                             food?.let { removeFood(it) }

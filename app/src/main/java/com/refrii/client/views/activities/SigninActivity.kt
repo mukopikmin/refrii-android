@@ -1,7 +1,7 @@
 package com.refrii.client.views.activities
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -22,6 +22,7 @@ import com.refrii.client.R
 import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Credential
 import com.refrii.client.services.AuthService
+import kotterknife.bindView
 
 import java.io.IOException
 import java.util.HashMap
@@ -32,21 +33,17 @@ import rx.schedulers.Schedulers
 
 class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
 
+    private val signInButton: SignInButton by bindView(R.id.googleSignInButton)
+
     private var googleApiClient: GoogleApiClient? = null
     private var googleSignInAccount: GoogleSignInAccount? = null
-    private var sharedPreferences: SharedPreferences? = null
-    private var signInButton: SignInButton? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_signin)
 
-        signInButton = findViewById<SignInButton>(R.id.googleSignInButton) as SignInButton
-
-
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)//getSharedPreferences("DATA", Context.MODE_PRIVATE);
-        val mailAddress = sharedPreferences!!.getString("mail", null)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val mailAddress = sharedPreferences.getString("mail", null)
         if (mailAddress != null) {
             getGoogleToken(mailAddress)
         }
@@ -59,8 +56,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                 .addApi(Auth.GOOGLE_SIGN_IN_API, googleSigninOptions)
                 .build()
 
-        signInButton!!.setOnClickListener {
-            Log.e(TAG, "aaaaaaaaaaaaaaaaaaaaaaaaaa")
+        signInButton.setOnClickListener {
             val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
             startActivityForResult(signInIntent, RC_SIGN_IN)
         }
@@ -70,8 +66,8 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     public override fun onResume() {
         super.onResume()
 
-        for (i in 0 until signInButton!!.childCount) {
-            val v = signInButton!!.getChildAt(i)
+        for (i in 0 until signInButton.childCount) {
+            val v = signInButton.getChildAt(i)
 
             if (v is TextView) {
                 v.setPadding(0, 0, 20, 0)
@@ -89,16 +85,19 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
         if (requestCode == RC_SIGN_IN) {
             val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            val editor = sharedPreferences!!.edit()
 
             if (result.isSuccess) {
+                val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+
                 googleSignInAccount = result.signInAccount
                 getGoogleToken(googleSignInAccount!!.email)
 
-                editor.putString("mail", googleSignInAccount!!.email)
-                editor.putString("name", googleSignInAccount!!.displayName)
-                editor.putString("avatar", googleSignInAccount!!.photoUrl.toString())
-                editor.commit()
+                editor.apply {
+                    putString("mail", googleSignInAccount!!.email)
+                    putString("name", googleSignInAccount!!.displayName)
+                    putString("avatar", googleSignInAccount!!.photoUrl.toString())
+                }
+                editor.apply()
             }
         }
     }
@@ -107,64 +106,74 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
     }
 
+    @SuppressLint("StaticFieldLeak")
     private fun getGoogleToken(accountName: String) {
         object : AsyncTask<String, Void, String>() {
             override fun doInBackground(vararg accounts: String): String? {
-                val scopes = AUTH_SCOPE
-                var token: String? = null
-                try {
-                    token = GoogleAuthUtil.getToken(this@SigninActivity, accounts[0], scopes)
-                    Log.e(TAG, token)
+                return try {
+                    GoogleAuthUtil.getToken(this@SigninActivity, accounts[0], AUTH_SCOPE)
                 } catch (e: IOException) {
                     Log.e(TAG, e.message)
+
+                    null
                 } catch (e: UserRecoverableAuthException) {
                     startActivityForResult(e.intent, RC_SIGN_IN)
+
+                    null
                 } catch (e: GoogleAuthException) {
                     Log.e(TAG, e.message)
-                }
 
-                return token
+                    null
+                }
             }
 
-            override fun onPostExecute(googleToken: String) {
+            override fun onPostExecute(googleToken: String?) {
                 super.onPostExecute(googleToken)
 
-                val editor = sharedPreferences!!.edit()
+                googleToken ?: return
+
+                val editor = PreferenceManager.getDefaultSharedPreferences(this@SigninActivity).edit()
                 editor.putString("google-token", googleToken)
-                editor.commit()
+                editor.apply()
 
-                val params = HashMap<String, String>()
-                params.put("token", googleToken)
-
-                RetrofitFactory.getClient(AuthService::class.java, this@SigninActivity)
-                        .getToken(params)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object: Subscriber<Credential>() {
-                            override fun onNext(t: Credential) {
-                                val editor = sharedPreferences!!.edit()
-                                editor.putString("jwt", t.jwt)
-                                editor.putLong("expires_at", t.expiresAt!!.time)
-                                editor.commit()
-                                finish()
-                            }
-
-                            override fun onCompleted() {
-                            }
-
-                            override fun onError(e: Throwable) {
-                                Log.d(TAG, e.message)
-                            }
-
-                        })
+                getJwt(googleToken)
             }
         }.execute(accountName)
     }
 
-    companion object {
+    private fun getJwt(googleToken: String) {
+        val params = HashMap<String, String>()
+        params.put("token", googleToken)
 
-        private val RC_SIGN_IN = 1
+        RetrofitFactory.getClient(AuthService::class.java, this@SigninActivity)
+                .getToken(params)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object: Subscriber<Credential>() {
+                    override fun onNext(t: Credential) {
+                        val editor = PreferenceManager.getDefaultSharedPreferences(this@SigninActivity).edit()
+                        editor.apply {
+                            putString("jwt", t.jwt)
+                            putLong("expires_at", t.expiresAt!!.time)
+                        }
+                        editor.apply()
+
+                        finish()
+                    }
+
+                    override fun onCompleted() {
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Log.d(TAG, e.message)
+                    }
+
+                })
+    }
+
+    companion object {
         private val TAG = "SigninActivity"
+        private val RC_SIGN_IN = 1
         private val AUTH_SCOPE = "oauth2:profile email "
     }
 }

@@ -54,24 +54,23 @@ class FoodActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_food)
-
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar!!.setHomeButtonEnabled(true)
-
-        constraintLayout.visibility = View.GONE
-        foodEditedMessageTextView.visibility = View.GONE
-
-        fab.setOnClickListener {
-            progressBar.visibility = View.VISIBLE
-            updateFood(mFood!!)
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setHomeButtonEnabled(true)
         }
 
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
         mRealm = Realm.getDefaultInstance()
 
-        fab.visibility = View.GONE
+        onLoading()
+
+        fab.setOnClickListener {
+            progressBar.visibility = View.VISIBLE
+            updateFood(mFood!!)
+        }
 
         editNameImageView.setOnClickListener {
             val fragment = EditTextDialogFragment.newInstance("Name", mFood!!.name!!)
@@ -117,7 +116,6 @@ class FoodActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
-
         var result = true
 
         when (id) {
@@ -133,52 +131,60 @@ class FoodActivity : AppCompatActivity() {
 
         when (requestCode) {
             EDIT_NAME_REQUEST_CODE -> {
-                mRealm!!.executeTransaction {
-                    mFood!!.name = data.getStringExtra("text")
-                    setFoodOnView(mFood!!)
-                    onEdited()
+                mRealm?.executeTransaction {
+                    mFood?.let {
+                        it.name = data.getStringExtra("text")
+                        setFoodOnView(it)
+                        onEdited()
+                    }
                 }
             }
             EDIT_AMOUNT_REQUEST_CODE -> {
-                mRealm!!.executeTransaction {
-                    mFood!!.amount = data.getDoubleExtra("number", 0.toDouble())
-                    setFoodOnView(mFood!!)
-                    onEdited()
+                mRealm?.executeTransaction {
+                    mFood?.let {
+                        it.amount = data.getDoubleExtra("number", 0.toDouble())
+                        setFoodOnView(it)
+                        onEdited()
+                    }
                 }
             }
             EDIT_NOTICE_REQUEST_CODE -> {
-                mRealm!!.executeTransaction {
-                    mFood!!.notice = data.getStringExtra("text")
-                    setFoodOnView(mFood!!)
-                    onEdited()
+                mRealm?.executeTransaction {
+                    mFood?.let {
+                        it.notice = data.getStringExtra("text")
+                        setFoodOnView(it)
+                        onEdited()
+                    }
                 }
             }
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> {
-                mRealm!!.executeTransaction {
-                    val date = Date()
-                    date.time = data.getLongExtra("date", 0)
-                    mFood!!.expirationDate = date
-                    setFoodOnView(mFood!!)
-                    onEdited()
+                mRealm?.executeTransaction {
+                    mFood?.let {
+                        val date = Date()
+                        date.time = data.getLongExtra("date", 0)
+                        it.expirationDate = date
+                        setFoodOnView(it)
+                        onEdited()
+                    }
                 }
             }
         }
     }
 
     private fun setFood(id: Int, boxId: Int) {
-        val food = mRealm!!.where(Food::class.java)
-                .equalTo("id", id)
-                .findFirst()
-        mFood = food
-        val box = mRealm!!.where(Box::class.java)
-                .equalTo("id", boxId)
-                .findFirst()
-        mRealm!!.executeTransaction { mFood!!.box = box }
+        val food = mRealm?.where(Food::class.java)
+                ?.equalTo("id", id)
+                ?.findFirst() ?: return
+        val box = mRealm?.where(Box::class.java)
+                ?.equalTo("id", boxId)
+                ?.findFirst() ?: return
 
-        constraintLayout.visibility = View.VISIBLE
-        progressBar.visibility = View.GONE
+        mFood = food
+        mRealm?.executeTransaction { food.box = box }
 
         setFoodOnView(food)
+
+        onLoadFinished()
     }
 
     private fun setFoodOnView(food: Food) {
@@ -222,28 +228,23 @@ class FoodActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Subscriber<Food>() {
-                    override fun onNext(t: Food?) {
-                        t ?: return
+                    override fun onNext(t: Food) {
+                        mRealm?.executeTransaction { it.copyToRealmOrUpdate(food) }
 
                         val intent = Intent()
-
-                        mRealm!!.executeTransaction { realm ->
-                            realm.copyToRealmOrUpdate(food)
-                        }
-
-                        intent.putExtra("food_id", t.id)
+                        intent.putExtra(getString(R.string.key_food_id), t.id)
                         setResult(Activity.RESULT_OK, intent)
+
                         progressBar.visibility = View.GONE
+
                         finish()
                     }
 
                     override fun onCompleted() {
-                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                        Log.d(TAG, "Update completed.")
                     }
 
-                    override fun onError(e: Throwable?) {
-                        e ?: return
-
+                    override fun onError(e: Throwable) {
                         Toast.makeText(this@FoodActivity, e.message, Toast.LENGTH_SHORT).show()
                     }
                 })
@@ -255,20 +256,20 @@ class FoodActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Subscriber<Food>() {
-                    override fun onError(e: Throwable?) {
-                        e?.let { Toast.makeText(this@FoodActivity, it.message, Toast.LENGTH_LONG).show() }
+                    override fun onError(e: Throwable) {
+                        Toast.makeText(this@FoodActivity, e.message, Toast.LENGTH_LONG).show()
                     }
 
                     override fun onCompleted() {
-                        Log.d(TAG, "Update completed.")
+                        Log.d(TAG, "Sync completed.")
                     }
 
                     override fun onNext(food: Food) {
                         mFood = food
                         setFoodOnView(food)
 
-                        mRealm?.let { realm ->
-                            realm.executeTransaction { realm.copyToRealmOrUpdate(food) }
+                        mRealm?.let {
+                            it.executeTransaction { it.copyToRealmOrUpdate(food) }
                         }
                     }
 
@@ -280,8 +281,15 @@ class FoodActivity : AppCompatActivity() {
         fab.visibility = View.VISIBLE
     }
 
-    private fun showProgressBar() {
+    private fun onLoading() {
+        constraintLayout.visibility = View.GONE
+        foodEditedMessageTextView.visibility = View.GONE
+        fab.visibility = View.GONE
+    }
 
+    private fun onLoadFinished() {
+        constraintLayout.visibility = View.VISIBLE
+        progressBar.visibility = View.GONE
     }
 
     companion object {

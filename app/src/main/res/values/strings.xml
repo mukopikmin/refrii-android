@@ -101,4 +101,6 @@
     <string name="title_activity_units">UnitsActivity</string>
     <string name="title_activity_unit">UnitActivity</string>
     <string name="title_activity_new_unit">NewUnitActivity</string>
+    <string name="key_food_id">food_id</string>
+    <string name="message_cancel">Cancel</string>
 </resources>

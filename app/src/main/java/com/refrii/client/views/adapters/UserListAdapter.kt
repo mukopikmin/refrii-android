@@ -13,10 +13,9 @@ import com.refrii.client.R
 import com.refrii.client.models.User
 
 class UserListAdapter(
-        private val mContext: Context,
+        mContext: Context,
         private val names: List<String>,
-        private val emails: List<String>
-    ) : BaseAdapter() {
+        private val emails: List<String>) : BaseAdapter() {
 
     private val mLayoutInflater: LayoutInflater = mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 

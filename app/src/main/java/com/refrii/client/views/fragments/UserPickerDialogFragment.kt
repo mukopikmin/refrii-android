@@ -1,5 +1,6 @@
 package com.refrii.client.views.fragments
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.app.DialogFragment
 import android.content.Context
@@ -7,10 +8,6 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import com.refrii.client.R
@@ -18,6 +15,8 @@ import com.refrii.client.models.User
 import com.refrii.client.views.adapters.UserListAdapter
 
 class UserPickerDialogFragment : DialogFragment() {
+
+    @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = activity
         val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -28,19 +27,21 @@ class UserPickerDialogFragment : DialogFragment() {
         val emails = bundle.getStringArrayList("emails")
         val listView = content.findViewById<ListView>(R.id.listView)
         val shareTextView = content.findViewById<TextView>(R.id.shareTextView)
-
         val adapter = UserListAdapter(activity, names, emails)
-        listView.adapter = adapter
 
-        shareTextView.setOnClickListener { Log.e("aaa", "share") }
+        listView.adapter = adapter
+        shareTextView.setOnClickListener { Log.e(TAG, "share") }
 
         return AlertDialog.Builder(activity)
                 .setTitle(title)
                 .setView(content)
+                .setNegativeButton(getString(R.string.message_cancel)) { _, _ -> }
                 .create()
     }
 
     companion object {
+        private const val TAG = "UserPickerDialog"
+
         fun newInstance(title: String, users: List<User>): UserPickerDialogFragment {
             val instance = UserPickerDialogFragment()
             val bundle = Bundle()

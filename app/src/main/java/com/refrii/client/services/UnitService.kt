@@ -2,7 +2,6 @@ package com.refrii.client.services
 
 import com.refrii.client.models.Unit
 import okhttp3.RequestBody
-import retrofit2.Call
 import retrofit2.http.*
 import rx.Observable
 
@@ -17,4 +16,7 @@ interface UnitService {
     fun updateUnit(
             @Path("id") id: Int,
             @Body body: RequestBody): Observable<Unit>
+
+    @DELETE("/units/{id}")
+    fun deleteUnit(@Path("id") id: Int): Observable<Void>
 }

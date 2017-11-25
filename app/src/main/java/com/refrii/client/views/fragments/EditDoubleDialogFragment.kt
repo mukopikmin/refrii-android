@@ -14,6 +14,7 @@ import android.widget.EditText
 import com.refrii.client.R
 
 class EditDoubleDialogFragment : DialogFragment() {
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val content = inflater.inflate(R.layout.edit_text_dialog, null)
