@@ -12,20 +12,19 @@ import android.widget.Spinner
 import android.widget.Toast
 import com.refrii.client.R
 import com.refrii.client.factories.RetrofitFactory
-import com.refrii.client.services.UnitService
 import com.refrii.client.models.Food
 import com.refrii.client.models.Unit
 import com.refrii.client.services.FoodService
+import com.refrii.client.services.UnitService
+import com.refrii.client.views.fragments.CalendarPickerDialogFragment
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
-
-import java.text.SimpleDateFormat
-
 import okhttp3.MultipartBody
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.text.SimpleDateFormat
 import java.util.*
 
 class NewFoodActivity : AppCompatActivity() {
@@ -36,8 +35,9 @@ class NewFoodActivity : AppCompatActivity() {
     private val amountEditText: EditText by bindView(R.id.newFoodAmountEditText)
     private val spinner: Spinner by bindView(R.id.newFoodUnitSpinner)
     private val fab: FloatingActionButton by bindView(R.id.fab)
+    private val expirationDateEditText: EditText by bindView(R.id.newFoodExpirationDateEditText)
 
-    private var mRealm: Realm? = null
+    private lateinit var mRealm: Realm
     private var mUnits: List<Unit>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,16 +56,29 @@ class NewFoodActivity : AppCompatActivity() {
         mUnits = getUnits()
 
         fab.setOnClickListener {
+            val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
             val name = nameEditText.text.toString()
             val notice = noticeEditText.text.toString()
             val amount = amountEditText.text.toString().toDouble()
             val unitLabel = spinner.selectedItem.toString()
             val unit: Unit? = mUnits!!.firstOrNull { it.label == unitLabel }
-            val expirationDate = Date()
+            val expirationDate = formatter.parse(expirationDateEditText.text.toString())
 
             if (unit?.id != null) {
                 addFood(name, notice, amount, boxId, unit.id, expirationDate)
             }
+        }
+
+        val date = Date()
+        val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+        expirationDateEditText.setText(formatter.format(date))
+
+        expirationDateEditText.setOnClickListener {
+            val expirationDate = formatter.parse(expirationDateEditText.text.toString())
+            val fragment = CalendarPickerDialogFragment.newInstance(expirationDate)
+
+            fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
+            fragment.show(fragmentManager, "edit_expiration_date")
         }
     }
 
@@ -75,7 +88,23 @@ class NewFoodActivity : AppCompatActivity() {
         syncUnits()
     }
 
-    private fun getUnits(): List<Unit>? = mRealm?.where(Unit::class.java)?.findAll()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK) return
+        data ?: return
+
+        when (requestCode) {
+            EDIT_EXPIRATION_DATE_REQUEST_CODE -> {
+                val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+                val date = Date(data.getLongExtra("date", 0.toLong()))
+
+                expirationDateEditText.setText(formatter.format(date))
+            }
+        }
+    }
+
+    private fun getUnits(): List<Unit>? = mRealm.where(Unit::class.java)?.findAll()
 
     private fun syncUnits() {
         RetrofitFactory.getClient(UnitService::class.java, this@NewFoodActivity)
@@ -121,9 +150,7 @@ class NewFoodActivity : AppCompatActivity() {
                     }
 
                     override fun onNext(t: Food) {
-                        mRealm?.let { realm ->
-                            realm.executeTransaction { realm.copyToRealmOrUpdate(t) }
-                        }
+                        mRealm.executeTransaction { mRealm.copyToRealmOrUpdate(t) }
 
                         val intent = Intent()
                         intent.putExtra("food_id", t.id)
@@ -143,7 +170,8 @@ class NewFoodActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val TAG = "NewFoodActivity"
+        private const val TAG = "NewFoodActivity"
+        private const val EDIT_EXPIRATION_DATE_REQUEST_CODE = 101
     }
 
 }
