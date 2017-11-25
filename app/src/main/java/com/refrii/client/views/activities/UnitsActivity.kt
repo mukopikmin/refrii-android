@@ -7,13 +7,12 @@ import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
-import com.refrii.client.*
+import com.refrii.client.R
 import com.refrii.client.factories.RetrofitFactory
+import com.refrii.client.models.Food
 import com.refrii.client.models.Unit
 import com.refrii.client.services.UnitService
 import com.refrii.client.views.adapters.UnitListAdapter
@@ -21,7 +20,6 @@ import com.refrii.client.views.fragments.OptionsPickerDialogFragment
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
-
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -148,7 +146,13 @@ class UnitsActivity : AppCompatActivity() {
     }
 
     private fun removeUnit(unit: Unit) {
+        val foods = mRealm.where(Food::class.java).equalTo("unit.id", unit.id).findAll()
         val label = unit.label
+
+        if (foods.size > 0) {
+            Snackbar.make(listView, "$label is used by some foods. Can not remove.", Snackbar.LENGTH_LONG).show()
+            return
+        }
 
         RetrofitFactory.getClient(UnitService::class.java, this@UnitsActivity)
                 .deleteUnit(unit.id)
