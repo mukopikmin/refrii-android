@@ -1,17 +1,11 @@
 package com.refrii.client.views.activities
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.gms.auth.GoogleAuthException
-import com.google.android.gms.auth.GoogleAuthUtil
-import com.google.android.gms.auth.UserRecoverableAuthException
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -22,11 +16,13 @@ import com.refrii.client.R
 import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Credential
 import com.refrii.client.services.AuthService
+import com.refrii.client.tasks.RetrieveGoogleTokenTask
+import com.refrii.client.tasks.RetrieveGoogleTokenTaskCallback
 import kotterknife.bindView
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import java.io.IOException
+import java.lang.ref.WeakReference
 import java.util.*
 
 class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
@@ -107,37 +103,18 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
     override fun onConnectionFailed(connectionResult: ConnectionResult) {}
 
-    @SuppressLint("StaticFieldLeak")
     private fun getGoogleToken(accountName: String) {
-        object : AsyncTask<String, Void, String>() {
-            override fun doInBackground(vararg accounts: String): String? {
-                var token: String? = null
+        RetrieveGoogleTokenTask(WeakReference(this@SigninActivity), object : RetrieveGoogleTokenTaskCallback {
+            override fun onPostExecuted(result: String?) {
+                result ?: return
 
-                try {
-                    token = GoogleAuthUtil.getToken(this@SigninActivity, accounts[0], AUTH_SCOPE)
-                } catch (e: IOException) {
-                    Log.e(TAG, e.message)
-                } catch (e: UserRecoverableAuthException) {
-                    startActivityForResult(e.intent, GOOGLE_SIGNIN_REQUEST_CODE)
-                } catch (e: GoogleAuthException) {
-                    Log.e(TAG, e.message)
-                }
-
-                return token
-            }
-
-            override fun onPostExecute(googleToken: String?) {
-                super.onPostExecute(googleToken)
-
-                googleToken ?: return
-
-                val editor = PreferenceManager.getDefaultSharedPreferences(this@SigninActivity).edit()
-                editor.putString("google-token", googleToken)
+                val editor = PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
+                editor.putString("google-token", result)
                 editor.apply()
 
-                getJwt(googleToken)
+                getJwt(result)
             }
-        }.execute(accountName)
+        }).execute(accountName)
     }
 
     private fun getJwt(googleToken: String) {
@@ -151,6 +128,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                 .subscribe(object: Subscriber<Credential>() {
                     override fun onNext(t: Credential) {
                         val editor = PreferenceManager.getDefaultSharedPreferences(this@SigninActivity).edit()
+
                         editor.apply {
                             putString("jwt", t.jwt)
                             t.expiresAt?.let { putLong("expires_at", it.time) }
@@ -171,7 +149,6 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
     companion object {
         private val TAG = "SigninActivity"
-        private val AUTH_SCOPE = "oauth2:profile email "
         private val GOOGLE_SIGNIN_REQUEST_CODE = 101
     }
 }

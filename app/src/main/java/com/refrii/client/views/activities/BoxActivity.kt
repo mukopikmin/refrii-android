@@ -2,6 +2,7 @@ package com.refrii.client.views.activities
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
@@ -25,6 +26,7 @@ import com.refrii.client.models.Food
 import com.refrii.client.services.BoxService
 import com.refrii.client.services.FoodService
 import com.refrii.client.tasks.ImageDownloadTask
+import com.refrii.client.tasks.ImageDownloadTaskCallback
 import com.refrii.client.views.adapters.FoodListAdapter
 import com.refrii.client.views.fragments.OptionsPickerDialogFragment
 import io.realm.Realm
@@ -242,7 +244,13 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         nameTextView.text = name
         mailTextView.text = mail
 
-        avatarUrl?.let { ImageDownloadTask(avatarImageView).execute(avatarUrl) }
+        avatarUrl?.let {
+            ImageDownloadTask(object : ImageDownloadTaskCallback {
+                override fun onPostExecuted(result: Bitmap) {
+                    avatarImageView.setImageBitmap(result)
+                }
+            }).execute(avatarUrl)
+        }
     }
 
     private fun setBoxesOnNavigation(boxes: List<Box>) {

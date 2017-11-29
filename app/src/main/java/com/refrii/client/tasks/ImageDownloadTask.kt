@@ -1,38 +1,43 @@
 package com.refrii.client.tasks
 
-import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
-import android.widget.ImageView
+import android.util.Log
 
 import java.io.IOException
 import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
 
-@SuppressLint("StaticFieldLeak")
-class ImageDownloadTask(private val imageView: ImageView) : AsyncTask<String, Void, Bitmap>() {
+class ImageDownloadTask(
+        private val callback: ImageDownloadTaskCallback) : AsyncTask<String, Void, Bitmap>() {
 
     override fun doInBackground(vararg params: String): Bitmap? {
-        val image: Bitmap
+        var image: Bitmap? = null
 
-        return try {
+        try {
             val imageUrl = URL(params[0])
             val imageIs: InputStream
 
             imageIs = imageUrl.openStream()
             image = BitmapFactory.decodeStream(imageIs)
-            image
         } catch (e: MalformedURLException) {
-            null
+            Log.e(TAG, e.message)
         } catch (e: IOException) {
-            null
+            Log.e(TAG, e.message)
         }
 
+        return image
     }
 
     override fun onPostExecute(result: Bitmap) {
-        imageView.setImageBitmap(result)
+        super.onPostExecute(result)
+
+        callback.onPostExecuted(result)
+    }
+
+    companion object {
+        private const val TAG = "ImageDownloadTask"
     }
 }
