@@ -8,6 +8,7 @@ import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.TextView
+import android.widget.Toast
 import com.google.android.gms.auth.GoogleAuthException
 import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.UserRecoverableAuthException
@@ -30,10 +31,9 @@ import java.util.*
 
 class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
 
-    private val signInButton: SignInButton by bindView(R.id.googleSignInButton)
+    private val mSigninButton: SignInButton by bindView(R.id.googleSignInButton)
 
-    private var googleApiClient: GoogleApiClient? = null
-    private var googleSignInAccount: GoogleSignInAccount? = null
+    private var mGoogleSignInAccount: GoogleSignInAccount? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,21 +41,23 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val mailAddress = sharedPreferences.getString("mail", null)
-        if (mailAddress != null) {
-            getGoogleToken(mailAddress)
-        }
-
         val googleSigninOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build()
-        googleApiClient = GoogleApiClient.Builder(this)
+        val googleApiClient = GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, googleSigninOptions)
                 .build()
 
-        signInButton.setOnClickListener {
-            val signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
-            startActivityForResult(signInIntent, RC_SIGN_IN)
+        mailAddress?.let { getGoogleToken(it) }
+
+        mSigninButton.setOnClickListener {
+            if (googleApiClient.hasConnectedApi(Auth.GOOGLE_SIGN_IN_API)) {
+                googleApiClient.clearDefaultAccountAndReconnect();
+            }
+
+            val intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
+            startActivityForResult(intent, GOOGLE_SIGNIN_REQUEST_CODE)
         }
 
     }
@@ -63,8 +65,8 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     public override fun onResume() {
         super.onResume()
 
-        for (i in 0 until signInButton.childCount) {
-            val v = signInButton.getChildAt(i)
+        for (i in 0 until mSigninButton.childCount) {
+            val v = mSigninButton.getChildAt(i)
 
             if (v is TextView) {
                 v.setPadding(0, 0, 20, 0)
@@ -80,48 +82,48 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == RC_SIGN_IN) {
-            val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+        when (requestCode) {
+            GOOGLE_SIGNIN_REQUEST_CODE -> {
+                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
 
-            if (result.isSuccess) {
-                val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+                if (result.isSuccess) {
+                    mGoogleSignInAccount = result.signInAccount
+                    mGoogleSignInAccount?.let { account ->
+                        val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
 
-                googleSignInAccount = result.signInAccount
-                getGoogleToken(googleSignInAccount!!.email!!)
+                        editor.apply {
+                            putString("mail", account.email)
+                            putString("name", account.displayName)
+                            putString("avatar", account.photoUrl.toString())
+                        }
+                        editor.apply()
 
-                editor.apply {
-                    putString("mail", googleSignInAccount!!.email)
-                    putString("name", googleSignInAccount!!.displayName)
-                    putString("avatar", googleSignInAccount!!.photoUrl.toString())
+                        account.email?.let { getGoogleToken(it) }
+                    }
                 }
-                editor.apply()
             }
         }
     }
 
-    override fun onConnectionFailed(connectionResult: ConnectionResult) {
-
-    }
+    override fun onConnectionFailed(connectionResult: ConnectionResult) {}
 
     @SuppressLint("StaticFieldLeak")
     private fun getGoogleToken(accountName: String) {
         object : AsyncTask<String, Void, String>() {
             override fun doInBackground(vararg accounts: String): String? {
-                return try {
-                    GoogleAuthUtil.getToken(this@SigninActivity, accounts[0], AUTH_SCOPE)
+                var token: String? = null
+
+                try {
+                    token = GoogleAuthUtil.getToken(this@SigninActivity, accounts[0], AUTH_SCOPE)
                 } catch (e: IOException) {
                     Log.e(TAG, e.message)
-
-                    null
                 } catch (e: UserRecoverableAuthException) {
-                    startActivityForResult(e.intent, RC_SIGN_IN)
-
-                    null
+                    startActivityForResult(e.intent, GOOGLE_SIGNIN_REQUEST_CODE)
                 } catch (e: GoogleAuthException) {
                     Log.e(TAG, e.message)
-
-                    null
                 }
+
+                return token
             }
 
             override fun onPostExecute(googleToken: String?) {
@@ -151,18 +153,17 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                         val editor = PreferenceManager.getDefaultSharedPreferences(this@SigninActivity).edit()
                         editor.apply {
                             putString("jwt", t.jwt)
-                            putLong("expires_at", t.expiresAt!!.time)
+                            t.expiresAt?.let { putLong("expires_at", it.time) }
                         }
                         editor.apply()
-
-                        finish()
                     }
 
                     override fun onCompleted() {
+                        finish()
                     }
 
                     override fun onError(e: Throwable) {
-                        Log.d(TAG, e.message)
+                        Toast.makeText(this@SigninActivity, e.message, Toast.LENGTH_LONG).show()
                     }
 
                 })
@@ -170,7 +171,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
     companion object {
         private val TAG = "SigninActivity"
-        private val RC_SIGN_IN = 1
         private val AUTH_SCOPE = "oauth2:profile email "
+        private val GOOGLE_SIGNIN_REQUEST_CODE = 101
     }
 }
