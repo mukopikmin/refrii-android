@@ -8,7 +8,6 @@ import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.TextView
-
 import com.google.android.gms.auth.GoogleAuthException
 import com.google.android.gms.auth.GoogleAuthUtil
 import com.google.android.gms.auth.UserRecoverableAuthException
@@ -23,13 +22,11 @@ import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Credential
 import com.refrii.client.services.AuthService
 import kotterknife.bindView
-
-import java.io.IOException
-import java.util.HashMap
-
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.io.IOException
+import java.util.*
 
 class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener {
 
@@ -90,7 +87,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                 val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
 
                 googleSignInAccount = result.signInAccount
-                getGoogleToken(googleSignInAccount!!.email)
+                getGoogleToken(googleSignInAccount!!.email!!)
 
                 editor.apply {
                     putString("mail", googleSignInAccount!!.email)
