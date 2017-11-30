@@ -6,11 +6,12 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.view.MenuItem
 import android.widget.EditText
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Unit
+import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -34,6 +35,12 @@ class NewUnitActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_new_unit)
         setSupportActionBar(toolbar)
+        toolbar.title = "Add unit"
+        setSupportActionBar(toolbar)
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setHomeButtonEnabled(true)
+        }
 
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
         mRealm = Realm.getDefaultInstance()
@@ -76,6 +83,18 @@ class NewUnitActivity : AppCompatActivity() {
                     }
 
                 })
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        var result = true
+
+        when (id) {
+            android.R.id.home -> finish()
+            else -> result = super.onOptionsItemSelected(item)
+        }
+
+        return result
     }
 
     companion object {

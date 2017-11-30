@@ -11,9 +11,9 @@ import android.widget.Toast
 import com.daimajia.swipe.SwipeLayout
 import com.daimajia.swipe.adapters.BaseSwipeAdapter
 import com.refrii.client.R
-import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Food
 import com.refrii.client.services.FoodService
+import com.refrii.client.services.RetrofitFactory
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import okhttp3.MultipartBody

@@ -6,15 +6,16 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.view.MenuItem
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Food
 import com.refrii.client.models.Unit
 import com.refrii.client.services.FoodService
+import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
 import com.refrii.client.views.fragments.CalendarPickerDialogFragment
 import io.realm.Realm
@@ -42,36 +43,36 @@ class NewFoodActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_new_food)
+        toolbar.title = "Add food"
+        setSupportActionBar(toolbar)
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setHomeButtonEnabled(true)
+        }
 
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
         mRealm = Realm.getDefaultInstance()
 
-        toolbar.title = "Add food"
-        setSupportActionBar(toolbar)
-
         val intent = intent
         val boxId = intent.getIntExtra("boxId", 0)
+        val date = Date()
+        val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
 
         mUnits = getUnits()
+        expirationDateEditText.setText(formatter.format(date))
 
         fab.setOnClickListener {
-            val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
             val name = nameEditText.text.toString()
             val notice = noticeEditText.text.toString()
             val amount = amountEditText.text.toString().toDouble()
             val unitLabel = spinner.selectedItem.toString()
-            val unit: Unit? = mUnits!!.firstOrNull { it.label == unitLabel }
+            val unit: Unit? = mUnits?.firstOrNull { it.label == unitLabel }
             val expirationDate = formatter.parse(expirationDateEditText.text.toString())
 
-            if (unit?.id != null) {
-                addFood(name, notice, amount, boxId, unit.id, expirationDate)
-            }
+            unit?.let { addFood(name, notice, amount, boxId, unit.id, expirationDate) }
         }
-
-        val date = Date()
-        val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-        expirationDateEditText.setText(formatter.format(date))
 
         expirationDateEditText.setOnClickListener {
             val expirationDate = formatter.parse(expirationDateEditText.text.toString())
@@ -102,6 +103,18 @@ class NewFoodActivity : AppCompatActivity() {
                 expirationDateEditText.setText(formatter.format(date))
             }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        var result = true
+
+        when (id) {
+            android.R.id.home -> finish()
+            else -> result = super.onOptionsItemSelected(item)
+        }
+
+        return result
     }
 
     private fun getUnits(): List<Unit>? = mRealm.where(Unit::class.java)?.findAll()

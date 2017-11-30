@@ -16,10 +16,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.services.FoodService
+import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.views.fragments.CalendarPickerDialogFragment
 import com.refrii.client.views.fragments.EditDoubleDialogFragment
 import com.refrii.client.views.fragments.EditTextDialogFragment
@@ -57,7 +57,6 @@ class FoodActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_food)
         setSupportActionBar(toolbar)
         supportActionBar?.let {

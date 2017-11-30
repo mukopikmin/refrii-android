@@ -7,13 +7,14 @@ import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Food
 import com.refrii.client.models.Unit
+import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
 import com.refrii.client.views.adapters.UnitListAdapter
 import com.refrii.client.views.fragments.OptionsPickerDialogFragment
@@ -35,12 +36,15 @@ class UnitsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_units)
+        setSupportActionBar(toolbar)
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setHomeButtonEnabled(true)
+        }
 
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
         mRealm = Realm.getDefaultInstance()
-
-        setContentView(R.layout.activity_units)
-        setSupportActionBar(toolbar)
 
         fab.setOnClickListener {
             val intent = Intent(this@UnitsActivity, NewUnitActivity::class.java)
@@ -111,8 +115,20 @@ class UnitsActivity : AppCompatActivity() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        var result = true
+
+        when (id) {
+            android.R.id.home -> finish()
+            else -> result = super.onOptionsItemSelected(item)
+        }
+
+        return result
+    }
+
     private fun getUnits(): List<Unit>? {
-        val units = mRealm?.where(Unit::class.java)?.findAll()
+        val units = mRealm.where(Unit::class.java)?.findAll()
 
         units?.let {
             setUnits(it)

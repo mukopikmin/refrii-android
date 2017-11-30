@@ -7,14 +7,15 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Box
 import com.refrii.client.services.BoxService
+import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.views.fragments.EditTextDialogFragment
 import com.refrii.client.views.fragments.UserPickerDialogFragment
 import io.realm.Realm
@@ -46,6 +47,11 @@ class BoxInfoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_box_info)
+        setSupportActionBar(toolbar)
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setHomeButtonEnabled(true)
+        }
 
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
         mRealm = Realm.getDefaultInstance()
@@ -94,6 +100,18 @@ class BoxInfoActivity : AppCompatActivity() {
         fab.setOnClickListener {
             mBox?.let { updateBox(it) }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        var result = true
+
+        when (id) {
+            android.R.id.home -> finish()
+            else -> result = super.onOptionsItemSelected(item)
+        }
+
+        return result
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -1,4 +1,4 @@
-package com.refrii.client.factories
+package com.refrii.client.services
 
 import android.content.Context
 import android.preference.PreferenceManager
@@ -41,6 +41,7 @@ object RetrofitFactory {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(httpClient)
                 .build()
+
         return retrofit.create(clazz)
     }
 }

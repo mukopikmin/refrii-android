@@ -8,19 +8,19 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Unit
+import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
 import com.refrii.client.views.fragments.EditDoubleDialogFragment
 import com.refrii.client.views.fragments.EditTextDialogFragment
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
-import okhttp3.MultipartBody
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -46,6 +46,10 @@ class UnitActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_unit)
         setSupportActionBar(toolbar)
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setHomeButtonEnabled(true)
+        }
 
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
         mRealm = Realm.getDefaultInstance()
@@ -101,6 +105,18 @@ class UnitActivity : AppCompatActivity() {
                 onEdited()
             }
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        var result = true
+
+        when (id) {
+            android.R.id.home -> finish()
+            else -> result = super.onOptionsItemSelected(item)
+        }
+
+        return result
     }
 
     private fun getUnit(id: Int): Unit? =

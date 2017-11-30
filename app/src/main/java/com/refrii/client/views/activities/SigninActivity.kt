@@ -13,9 +13,9 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
 import com.refrii.client.R
-import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Credential
 import com.refrii.client.services.AuthService
+import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.tasks.RetrieveGoogleTokenTask
 import com.refrii.client.tasks.RetrieveGoogleTokenTaskCallback
 import kotterknife.bindView
@@ -108,9 +108,9 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
             override fun onPostExecuted(result: String?) {
                 result ?: return
 
-                val editor = PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
-                editor.putString("google-token", result)
-                editor.apply()
+//                val editor = PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
+//                editor.putString("google-token", result)
+//                editor.apply()
 
                 getJwt(result)
             }

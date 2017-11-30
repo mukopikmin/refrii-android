@@ -20,11 +20,11 @@ import android.view.View
 import android.widget.*
 import com.daimajia.swipe.util.Attributes
 import com.refrii.client.R
-import com.refrii.client.factories.RetrofitFactory
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.services.BoxService
 import com.refrii.client.services.FoodService
+import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.tasks.ImageDownloadTask
 import com.refrii.client.tasks.ImageDownloadTaskCallback
 import com.refrii.client.views.adapters.FoodListAdapter
@@ -51,7 +51,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_box)
         setSupportActionBar(mToolbar)
 
@@ -118,6 +117,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.box, menu)
+
         return true
     }
 
@@ -179,13 +179,15 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
         showProgressBar()
         mRealm.executeTransaction {
-            mBoxes!!.forEach { menu.subMenu.add(Menu.NONE, it.id, Menu.NONE, it.name) }
+            mBoxes?.forEach { menu.subMenu.add(Menu.NONE, it.id, Menu.NONE, it.name) }
 
-            if (mBoxes!!.isNotEmpty()) {
-                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
-                val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
-                mBox = mBoxes!![boxIndex]
-                setFoods(mBox!!)
+            mBoxes?.let {
+                if (it.isNotEmpty()) {
+                    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
+                    val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
+                    mBox = it[boxIndex]
+                    mBox?.let { setFoods(it) }
+                }
             }
         }
 
@@ -199,10 +201,8 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 .doOnSubscribe { showProgressBar() }
                 .doOnUnsubscribe { hideProgressBar() }
                 .subscribe(object: Subscriber<List<Box>>() {
-                    override fun onError(e: Throwable?) {
-                        e?.let {
-                            Toast.makeText(this@BoxActivity, it.message, Toast.LENGTH_LONG).show()
-                        }
+                    override fun onError(e: Throwable) {
+                        Toast.makeText(this@BoxActivity, e.message, Toast.LENGTH_LONG).show()
                         signOut()
                     }
 
@@ -359,7 +359,11 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                             val foodId = data.getIntExtra("target_id", 0)
                             val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
 
-                            food?.let { removeFood(it) }
+                            food?.let {
+                                removeFood(it)
+                                removeFoodSync(it)
+//                                syncBoxes()
+                            }
                         }
                         else -> return
                     }
@@ -369,21 +373,24 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun removeFood(food: Food) {
+        val foodListAdapter = mListView.adapter as FoodListAdapter
+
+        mRealm.executeTransaction { foodListAdapter.remove(food) }
+        foodListAdapter.notifyDataSetChanged()
+
+        Snackbar.make(mListView, "${food.name} is removed.", Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun removeFoodSync(food: Food) {
         RetrofitFactory.getClient(FoodService::class.java, this)
                 .remove(food.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object: Subscriber<Void>() {
-                    override fun onNext(t: Void?) {
-                        val foodListAdapter = mListView.adapter as FoodListAdapter
-
-                        mRealm.executeTransaction { foodListAdapter.remove(food) }
-                        foodListAdapter.notifyDataSetChanged()
-
-                        Snackbar.make(mListView, "Removed successfully", Snackbar.LENGTH_LONG).show()
-                    }
+                    override fun onNext(t: Void?) {}
 
                     override fun onCompleted() {
+                        Log.d(TAG, "Food removed successfully.")
                     }
 
                     override fun onError(e: Throwable) {
