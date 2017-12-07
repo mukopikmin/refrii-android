@@ -190,24 +190,24 @@ class FoodActivity : AppCompatActivity() {
     private fun setFoodOnView(food: Food) {
         val timeFormatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
         val dateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-        val daysLeft = (food.expirationDate!!.time - Date().time) / (24 * 60 * 60 * 1000)
+        val daysLeft = food.daysLeft()
 
         toolbar.title = food.name
         setSupportActionBar(toolbar)
 
         foodNameTextView.text = food.name
-        foodBoxTextView.text = food.box!!.name
-        amountTextView.text = "${food.amount} ${food.unit!!.label}"
+        foodBoxTextView.text = food.box?.name
+        amountTextView.text = "${food.amount} ${food.unit?.label}"
         noticeTextView.text = food.notice
-        createdUserTextView.text = timeFormatter.format(food.createdAt) + " by "// + food.createdUser!!.name
-        updatedUserTextView.text = timeFormatter.format(food.updatedAt) + " by "// + food.updatedUser!!.name
+        createdUserTextView.text = "${timeFormatter.format(food.createdAt)} by ${food.createdUser?.name}"
+        updatedUserTextView.text = "${timeFormatter.format(food.updatedAt)} by ${food.updatedUser?.name}"
         expirationDateTextView.text = dateFormatter.format(food.expirationDate)
 
         if (daysLeft < 0) {
-            expirationDateTextView.append(" (" + Math.abs(daysLeft) + " days over)")
+            expirationDateTextView.append(" (${Math.abs(daysLeft)} days over)")
             expirationDateTextView.setTextColor(Color.RED)
         } else {
-            expirationDateTextView.append(" (" + Math.abs(daysLeft) + " days left)")
+            expirationDateTextView.append(" (${Math.abs(daysLeft)} days left)")
         }
     }
 
@@ -276,13 +276,13 @@ class FoodActivity : AppCompatActivity() {
 
     private fun onEdited() {
         foodEditedMessageTextView.visibility = View.VISIBLE
-        fab.visibility = View.VISIBLE
+        fab.show()
     }
 
     private fun onLoading() {
         constraintLayout.visibility = View.GONE
         foodEditedMessageTextView.visibility = View.GONE
-        fab.visibility = View.GONE
+        fab.hide()
     }
 
     private fun onLoadFinished() {

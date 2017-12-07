@@ -69,6 +69,42 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 startActivityForResult(intent, ADD_FOOD_REQUEST_CODE)
             }
         }
+
+        mListView.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
+            mBox?.let { box ->
+                val food = parent.getItemAtPosition(position) as Food
+                val intent = Intent(this@BoxActivity, FoodActivity::class.java)
+
+                intent.putExtra("food_id", food.id)
+                intent.putExtra("box_id", box.id)
+                startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
+            }
+        }
+
+        mListView.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, _, position, _ ->
+            val food = parent.getItemAtPosition(position) as Food
+
+            food.name?.let { foodName ->
+                val options = arrayOf("Show", "Remove", "Cancel")
+                val fragment = OptionsPickerDialogFragment.newInstance(foodName, options, food.id)
+
+                fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
+                fragment.show(fragmentManager, "food_option")
+            }
+
+            true
+        }
+
+        mListView.setOnScrollListener(object : AbsListView.OnScrollListener {
+            override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {}
+            override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {}
+        })
+    }
+
+    public override fun onRestart() {
+        super.onRestart()
+
+        getBoxes()
     }
 
     public override fun onStart() {
@@ -177,7 +213,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         val menu = mNavigationView.menu.findItem(R.id.menu_boxes)
         menu.subMenu.clear()
 
-        showProgressBar()
         mRealm.executeTransaction {
             mBoxes?.forEach { menu.subMenu.add(Menu.NONE, it.id, Menu.NONE, it.name) }
 
@@ -187,11 +222,11 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
                     mBox = it[boxIndex]
                     mBox?.let { setFoods(it) }
+
+                    mListView.adapter = FoodListAdapter(this@BoxActivity, (mBox?.foods as List<Food>).toMutableList())
                 }
             }
         }
-
-        hideProgressBar()
     }
 
     private fun syncBoxes() {
@@ -211,10 +246,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     }
 
                     override fun onNext(boxes: List<Box>) {
-                        mRealm.where(Box::class.java).findAll().forEach { box ->
-                            mRealm.executeTransaction { box.deleteFromRealm() }
-                        }
-
                         boxes.forEach { box ->
                             mRealm.executeTransaction { mRealm.copyToRealmOrUpdate(box) }
                         }
@@ -266,6 +297,8 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
             mBox = boxes[boxIndex]
             mBox?.let { setFoods(it) }
+
+            setFoods(boxes[boxIndex])
         }
     }
 
@@ -276,36 +309,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
         mListView.adapter = foodListAdapter
         foodListAdapter.mode = Attributes.Mode.Single
-
-        mListView.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
-            mBox?.let { box ->
-                val food = parent.getItemAtPosition(position) as Food
-                val intent = Intent(this@BoxActivity, FoodActivity::class.java)
-
-                intent.putExtra("food_id", food.id)
-                intent.putExtra("box_id", box.id)
-                startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
-            }
-        }
-
-        mListView.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, _, position, _ ->
-            val food = parent.getItemAtPosition(position) as Food
-
-            food.name?.let { foodName ->
-                val options = arrayOf("Show", "Remove", "Cancel")
-                val fragment = OptionsPickerDialogFragment.newInstance(foodName, options, food.id)
-
-                fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
-                fragment.show(fragmentManager, "food_option")
-            }
-
-            true
-        }
-
-        mListView.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScrollStateChanged(view: AbsListView, scrollState: Int) { }
-            override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) { }
-        })
     }
 
     private fun showProgressBar() {
@@ -327,7 +330,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
                 val foodListAdapter = mListView.adapter as FoodListAdapter
 
-                if (food != null) {
+                food?.let {
                     mRealm.executeTransaction { foodListAdapter.add(food) }
                     foodListAdapter.notifyDataSetChanged()
                 }
@@ -336,9 +339,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 val foodId = data.getIntExtra("food_id", 0)
                 val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
 
-                food?.name?.let {
-                    Snackbar.make(mListView, "$it updated successfully", Snackbar.LENGTH_LONG).show()
-                }
+                food?.name?.let { Snackbar.make(mListView, "$it updated successfully", Snackbar.LENGTH_LONG).show() }
             }
             FOOD_OPTIONS_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
@@ -359,11 +360,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                             val foodId = data.getIntExtra("target_id", 0)
                             val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
 
-                            food?.let {
-                                removeFood(it)
-                                removeFoodSync(it)
-//                                syncBoxes()
-                            }
+                            food?.let { removeFood(it) }
                         }
                         else -> return
                     }
@@ -377,6 +374,8 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
         mRealm.executeTransaction { foodListAdapter.remove(food) }
         foodListAdapter.notifyDataSetChanged()
+
+        removeFoodSync(food)
 
         Snackbar.make(mListView, "${food.name} is removed.", Snackbar.LENGTH_LONG).show()
     }

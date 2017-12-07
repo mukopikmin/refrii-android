@@ -25,7 +25,7 @@ import java.util.*
 
 class FoodListAdapter(
         private val mContext: Context,
-        private val mFoods: MutableList<Food>) : BaseSwipeAdapter() {
+        public var mFoods: MutableList<Food>) : BaseSwipeAdapter() {
 
     private val mFoodListAdapter: FoodListAdapter = this
     private var mRealm: Realm
@@ -80,7 +80,7 @@ class FoodListAdapter(
 
         nameFoodListTextView.text = food.name
         expirationDateFoodListTextView.text = formatter.format(food.expirationDate)
-        amountFoodListTextView.text = food.amount.toString() + " " + food.unit!!.label
+        amountFoodListTextView.text = "${food.amount} ${food.unit?.label}"
     }
 
     override fun getCount(): Int = this.mFoods.size

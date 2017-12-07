@@ -1,12 +1,8 @@
 package com.refrii.client.models
 
-import android.util.Log
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
-import okhttp3.MultipartBody
-
 import java.io.Serializable
-import java.text.SimpleDateFormat
 import java.util.*
 
 open class Food : RealmObject(), Serializable, Comparable<Food> {
@@ -34,6 +30,14 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
 
     override fun compareTo(other: Food): Int =
             (this.expirationDate!!.time - other.expirationDate!!.time).toInt()
+
+    fun daysLeft(): Long {
+        expirationDate?.let {
+            return (it.time - Date().time) / (24 * 60 * 60 * 1000)
+        }
+
+        return 0
+    }
 
     private fun decrease(diff: Double) {
         this.amount -= diff
