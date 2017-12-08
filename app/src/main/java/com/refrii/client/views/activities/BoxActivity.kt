@@ -306,7 +306,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         val foodListAdapter = FoodListAdapter(this, box.foods!!)
 
         supportActionBar?.let { it.title = box.name }
-
         mListView.adapter = foodListAdapter
         foodListAdapter.mode = Attributes.Mode.Single
     }

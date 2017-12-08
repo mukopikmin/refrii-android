@@ -25,7 +25,7 @@ import java.util.*
 
 class FoodListAdapter(
         private val mContext: Context,
-        public var mFoods: MutableList<Food>) : BaseSwipeAdapter() {
+        private val mFoods: MutableList<Food>) : BaseSwipeAdapter() {
 
     private val mFoodListAdapter: FoodListAdapter = this
     private var mRealm: Realm
