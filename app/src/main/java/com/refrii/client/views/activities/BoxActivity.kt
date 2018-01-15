@@ -2,7 +2,7 @@ package com.refrii.client.views.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
+import android.graphics.*
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
@@ -12,13 +12,19 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
-import com.daimajia.swipe.util.Attributes
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
 import com.refrii.client.R
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
@@ -27,7 +33,7 @@ import com.refrii.client.services.FoodService
 import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.tasks.ImageDownloadTask
 import com.refrii.client.tasks.ImageDownloadTaskCallback
-import com.refrii.client.views.adapters.FoodListAdapter
+import com.refrii.client.views.adapters.FoodRecyclerViewAdapter
 import com.refrii.client.views.fragments.OptionsPickerDialogFragment
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -42,7 +48,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     private val mFab: FloatingActionButton by bindView(R.id.fab)
     private val mDrawer: DrawerLayout by bindView(R.id.drawer_layout)
     private val mNavigationView: NavigationView by bindView(R.id.nav_view)
-    private val mListView: ListView by bindView(R.id.listView)
+    private val mRecyclerView: RecyclerView by bindView(R.id.recyclerView)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
 
     private var mBoxes: List<Box>? = null
@@ -54,12 +60,68 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         setContentView(R.layout.activity_box)
         setSupportActionBar(mToolbar)
 
+        hideProgressBar()
+
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
         toggle.syncState()
 
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
         mRealm = Realm.getDefaultInstance()
+
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT) {
+            override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
+                val fromPos = viewHolder?.adapterPosition
+                val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
+
+
+                Log.e(TAG, viewHolder?.adapterPosition.toString())
+                val food = adapter.foods[fromPos!!]
+                Log.e(TAG, food.name)
+
+                mRealm.executeTransaction {
+                    adapter.remove(food)
+                    adapter.notifyItemRemoved(fromPos)
+                    adapter.notifyItemRangeChanged(fromPos, adapter.foods.size)
+                }
+
+                Snackbar.make(mRecyclerView, "test", Snackbar.LENGTH_LONG)
+                        .setAction("Undo") {
+                            mRealm.executeTransaction {
+                                mRealm.copyToRealmOrUpdate(food)
+                                adapter.add(food)
+                            }
+                            adapter.notifyDataSetChanged()
+                        }
+                        .show()
+            }
+
+            override fun onChildDraw(c: Canvas?, recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+                val p = Paint()
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    val itemView = viewHolder.itemView
+                    val height = itemView.bottom - itemView.top
+                    val width = height / 3
+
+                    if (dX > 0) {
+                        p.color = Color.parseColor("#388E3C")
+                        val background = RectF(itemView.left.toFloat(), itemView.top.toFloat(), dX, itemView.bottom.toFloat())
+                        c?.drawRect(background, p)
+                    } else {
+                        p.color = Color.parseColor("#D32F2F")
+                        val background = RectF(800.toFloat(), itemView.top.toFloat(), itemView.right.toFloat(), itemView.bottom.toFloat())
+                        c?.drawRect(background, p)
+                    }
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        })
+        itemTouchHelper.attachToRecyclerView(mRecyclerView)
+        mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
         mFab.setOnClickListener {
             mBox?.let {
@@ -69,36 +131,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 startActivityForResult(intent, ADD_FOOD_REQUEST_CODE)
             }
         }
-
-        mListView.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
-            mBox?.let { box ->
-                val food = parent.getItemAtPosition(position) as Food
-                val intent = Intent(this@BoxActivity, FoodActivity::class.java)
-
-                intent.putExtra("food_id", food.id)
-                intent.putExtra("box_id", box.id)
-                startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
-            }
-        }
-
-        mListView.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, _, position, _ ->
-            val food = parent.getItemAtPosition(position) as Food
-
-            food.name?.let { foodName ->
-                val options = arrayOf("Show", "Remove", "Cancel")
-                val fragment = OptionsPickerDialogFragment.newInstance(foodName, options, food.id)
-
-                fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
-                fragment.show(fragmentManager, "food_option")
-            }
-
-            true
-        }
-
-        mListView.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {}
-            override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {}
-        })
     }
 
     public override fun onRestart() {
@@ -222,8 +254,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
                     mBox = it[boxIndex]
                     mBox?.let { setFoods(it) }
-
-                    mListView.adapter = FoodListAdapter(this@BoxActivity, (mBox?.foods as List<Food>).toMutableList())
                 }
             }
         }
@@ -237,7 +267,9 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 .doOnUnsubscribe { hideProgressBar() }
                 .subscribe(object: Subscriber<List<Box>>() {
                     override fun onError(e: Throwable) {
+                        Log.e(TAG, e.message)
                         Toast.makeText(this@BoxActivity, e.message, Toast.LENGTH_LONG).show()
+
                         signOut()
                     }
 
@@ -297,17 +329,34 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
             mBox = boxes[boxIndex]
             mBox?.let { setFoods(it) }
-
-            setFoods(boxes[boxIndex])
         }
     }
 
     private fun setFoods(box: Box) {
-        val foodListAdapter = FoodListAdapter(this, box.foods!!)
+        val adapter = FoodRecyclerViewAdapter(box.foods!!)
+        val linearLayoutManager = LinearLayoutManager(this)
 
-        supportActionBar?.let { it.title = box.name }
-        mListView.adapter = foodListAdapter
-        foodListAdapter.mode = Attributes.Mode.Single
+        adapter.onItemClickListener = { food ->
+            val intent = Intent(this@BoxActivity, FoodActivity::class.java)
+
+            intent.putExtra("food_id", food.id)
+            intent.putExtra("box_id", box.id)
+            startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
+        }
+
+        adapter.onItemLongClickListener = { food ->
+            food.name?.let { foodName ->
+                val options = arrayOf("Show", "Remove", "Cancel")
+                val fragment = OptionsPickerDialogFragment.newInstance(foodName, options, food.id)
+
+                fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
+                fragment.show(fragmentManager, "food_option")
+            }
+        }
+
+        mRecyclerView.layoutManager = linearLayoutManager
+        mRecyclerView.adapter = adapter
+
     }
 
     private fun showProgressBar() {
@@ -327,18 +376,18 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
             ADD_FOOD_REQUEST_CODE -> {
                 val foodId = data.getIntExtra("food_id", 0)
                 val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
-                val foodListAdapter = mListView.adapter as FoodListAdapter
+                val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
 
                 food?.let {
-                    mRealm.executeTransaction { foodListAdapter.add(food) }
-                    foodListAdapter.notifyDataSetChanged()
+                    mRealm.executeTransaction { adapter.add(food) }
+                    adapter.notifyDataSetChanged()
                 }
             }
             EDIT_FOOD_REQUEST_CODE -> {
                 val foodId = data.getIntExtra("food_id", 0)
                 val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
 
-                food?.name?.let { Snackbar.make(mListView, "$it updated successfully", Snackbar.LENGTH_LONG).show() }
+                food?.name?.let { Snackbar.make(mRecyclerView, "$it updated successfully", Snackbar.LENGTH_LONG).show() }
             }
             FOOD_OPTIONS_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
@@ -369,14 +418,15 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun removeFood(food: Food) {
-        val foodListAdapter = mListView.adapter as FoodListAdapter
+        val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
 
-        mRealm.executeTransaction { foodListAdapter.remove(food) }
-        foodListAdapter.notifyDataSetChanged()
+        mRealm.executeTransaction {
+            adapter.remove(food)
+            adapter.notifyDataSetChanged()
+            removeFoodSync(food)
 
-        removeFoodSync(food)
-
-        Snackbar.make(mListView, "${food.name} is removed.", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(mRecyclerView, "${food.name} is removed.", Snackbar.LENGTH_LONG).show()
+        }
     }
 
     private fun removeFoodSync(food: Food) {

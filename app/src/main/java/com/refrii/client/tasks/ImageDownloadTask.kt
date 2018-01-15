@@ -10,8 +10,7 @@ import java.io.InputStream
 import java.net.MalformedURLException
 import java.net.URL
 
-class ImageDownloadTask(
-        private val callback: ImageDownloadTaskCallback) : AsyncTask<String, Void, Bitmap>() {
+class ImageDownloadTask(private val callback: ImageDownloadTaskCallback) : AsyncTask<String, Void, Bitmap>() {
 
     override fun doInBackground(vararg params: String): Bitmap? {
         var image: Bitmap? = null
