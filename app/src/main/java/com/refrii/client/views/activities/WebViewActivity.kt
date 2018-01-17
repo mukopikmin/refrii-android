@@ -3,7 +3,6 @@ package com.refrii.client.views.activities
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -12,7 +11,6 @@ import kotterknife.bindView
 
 class WebViewActivity : AppCompatActivity() {
 
-    private val toolbar: Toolbar by bindView(R.id.toolbar)
     private val webView: WebView by bindView(R.id.webView)
 
     @SuppressLint("SetJavaScriptEnabled")
