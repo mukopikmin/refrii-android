@@ -1,56 +1,125 @@
 package com.refrii.client.views.adapters
 
-import android.support.v7.widget.RecyclerView
+import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.daimajia.swipe.adapters.RecyclerSwipeAdapter
 import com.refrii.client.R
 import com.refrii.client.models.Food
+import com.refrii.client.services.FoodService
+import com.refrii.client.services.RetrofitFactory
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import okhttp3.MultipartBody
+import rx.Subscriber
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers.io
 import java.text.SimpleDateFormat
 import java.util.*
 
-class FoodRecyclerViewAdapter(val foods: MutableList<Food>) : RecyclerView.Adapter<FoodViewHolder>() {
+class FoodRecyclerViewAdapter(
+        private val context: Context,
+        private val foods: MutableList<Food>) : RecyclerSwipeAdapter<FoodViewHolder>() {
 
-    var onItemClickListener: (Food) -> Unit = {}
-    var onItemLongClickListener: (Food) -> Unit = {}
+    private var mRealm: Realm
+    private var mClickListener: View.OnClickListener? = null
+    private var mLongClickListener: View.OnLongClickListener? = null
+
+    init {
+        Realm.setDefaultConfiguration(RealmConfiguration.Builder(context).build())
+        mRealm = Realm.getDefaultInstance()
+    }
+
+    override fun getSwipeLayoutResourceId(position: Int): Int {
+        return R.id.swipeLayout
+    }
 
     override fun onBindViewHolder(holder: FoodViewHolder?, position: Int) {
-        val food = foods[position]
+        val id = foods[position].id
+        val food = mRealm.where(Food::class.java).equalTo("id", id).findFirst()
         val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
 
         holder?.name?.text = food.name
         holder?.expirationDate?.text = formatter.format(food.expirationDate)
         holder?.amount?.text = "${food.amount} ${food.unit?.label}"
+
+        holder?.swipeLayout?.surfaceView?.apply {
+            setOnClickListener {
+                mClickListener?.onClick(it.parent as View)
+            }
+
+            setOnLongClickListener {
+                mLongClickListener?.onLongClick(it.parent as View)
+
+                true
+            }
+        }
+
+        holder?.increment?.setOnClickListener {
+            mRealm.executeTransaction {
+                food.amount += 1
+                this.notifyDataSetChanged()
+                syncFood(food)
+            }
+        }
+
+        holder?.decrement?.setOnClickListener {
+            mRealm.executeTransaction {
+                food.amount -= 1
+                this.notifyDataSetChanged()
+                syncFood(food)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): FoodViewHolder {
-        val inflate = LayoutInflater.from(parent?.context).inflate(R.layout.food_list_row, parent, false)
-        val holder = FoodViewHolder(inflate)
+        val view = LayoutInflater.from(parent?.context).inflate(R.layout.food_list_row, parent, false)
 
-        holder.itemView.setOnClickListener {
-            val position = holder.adapterPosition
-            val food = foods[position]
-
-            onItemClickListener(food)
-        }
-
-        holder.itemView.setOnLongClickListener {
-            val position = holder.adapterPosition
-            val food = foods[position]
-
-            onItemLongClickListener(food)
-            true
-        }
-
-        return holder
+        return FoodViewHolder(view)
     }
 
     override fun getItemCount(): Int {
         return foods.size
     }
 
-    fun restore(food: Food) {
-        add(food)
-        notifyDataSetChanged()
+    fun setOnItemClickListener(listener: View.OnClickListener) {
+        this.mClickListener = listener
+    }
+
+    fun setOnItemLongClickListener(listener: View.OnLongClickListener) {
+        this.mLongClickListener = listener
+    }
+
+    private fun syncFood(food: Food) {
+        val body = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("amount", food.amount.toString())
+                .build()
+
+        RetrofitFactory.getClient(FoodService::class.java, context)
+                .updateFood(food.id, body)
+                .subscribeOn(io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Subscriber<Food>() {
+                    override fun onError(e: Throwable) {
+                        Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onCompleted() {
+                        Log.d(TAG, "Update completed.")
+                    }
+
+                    override fun onNext(t: Food) {
+//                        this.notifyDataSetChanged()
+                    }
+                })
+    }
+
+    fun getItemAtPosition(position: Int): Food {
+        return foods[position]
     }
 
     fun add(food: Food) {
@@ -59,5 +128,9 @@ class FoodRecyclerViewAdapter(val foods: MutableList<Food>) : RecyclerView.Adapt
 
     fun remove(food: Food) {
         foods.remove(food)
+    }
+
+    companion object {
+        private const val TAG = "FoodRecyclerAdapter"
     }
 }

@@ -2,11 +2,16 @@ package com.refrii.client.views.adapters
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
+import com.daimajia.swipe.SwipeLayout
 import com.refrii.client.R
 
 class FoodViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    var name = view.findViewById<TextView>(R.id.nameFoodListTextView)
-    var expirationDate = view.findViewById<TextView>(R.id.expirationDateFoodListTextView)
-    var amount = view.findViewById<TextView>(R.id.amountFoodListTextView)
+    val swipeLayout: SwipeLayout = view.findViewById(R.id.swipeLayout)
+    val name: TextView = view.findViewById(R.id.nameFoodListTextView)
+    val expirationDate: TextView = view.findViewById(R.id.expirationDateFoodListTextView)
+    val amount: TextView = view.findViewById(R.id.amountFoodListTextView)
+    val increment: ImageView = view.findViewById(R.id.incrementImageView)
+    val decrement: ImageView = view.findViewById(R.id.decrementImageView)
 }

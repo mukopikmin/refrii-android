@@ -59,6 +59,23 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
         return this
     }
 
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + (notice?.hashCode() ?: 0)
+        result = 31 * result + amount.hashCode()
+        result = 31 * result + (expirationDate?.hashCode() ?: 0)
+        result = 31 * result + isNeedsAdding.hashCode()
+        result = 31 * result + (imageUrl?.hashCode() ?: 0)
+        result = 31 * result + (createdAt?.hashCode() ?: 0)
+        result = 31 * result + (updatedAt?.hashCode() ?: 0)
+        result = 31 * result + (unit?.hashCode() ?: 0)
+        result = 31 * result + (createdUser?.hashCode() ?: 0)
+        result = 31 * result + (updatedUser?.hashCode() ?: 0)
+        result = 31 * result + (box?.hashCode() ?: 0)
+        return result
+    }
+
     companion object {
         private const val TAG = "Food"
     }

@@ -2,7 +2,7 @@ package com.refrii.client.views.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.*
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
@@ -16,7 +16,6 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -68,60 +67,9 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
         mRealm = Realm.getDefaultInstance()
-
-        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT) {
-            override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean {
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
-                val fromPos = viewHolder?.adapterPosition
-                val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
-
-
-                Log.e(TAG, viewHolder?.adapterPosition.toString())
-                val food = adapter.foods[fromPos!!]
-                Log.e(TAG, food.name)
-
-                mRealm.executeTransaction {
-                    adapter.remove(food)
-                    adapter.notifyItemRemoved(fromPos)
-                    adapter.notifyItemRangeChanged(fromPos, adapter.foods.size)
-                }
-
-                Snackbar.make(mRecyclerView, "test", Snackbar.LENGTH_LONG)
-                        .setAction("Undo") {
-                            mRealm.executeTransaction {
-                                mRealm.copyToRealmOrUpdate(food)
-                                adapter.add(food)
-                            }
-                            adapter.notifyDataSetChanged()
-                        }
-                        .show()
-            }
-
-            override fun onChildDraw(c: Canvas?, recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
-                val p = Paint()
-                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                    val itemView = viewHolder.itemView
-                    val height = itemView.bottom - itemView.top
-                    val width = height / 3
-
-                    if (dX > 0) {
-                        p.color = Color.parseColor("#388E3C")
-                        val background = RectF(itemView.left.toFloat(), itemView.top.toFloat(), dX, itemView.bottom.toFloat())
-                        c?.drawRect(background, p)
-                    } else {
-                        p.color = Color.parseColor("#D32F2F")
-                        val background = RectF(800.toFloat(), itemView.top.toFloat(), itemView.right.toFloat(), itemView.bottom.toFloat())
-                        c?.drawRect(background, p)
-                    }
-                }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
-        })
-        itemTouchHelper.attachToRecyclerView(mRecyclerView)
+//        itemTouchHelper.attachToRecyclerView(mRecyclerView)
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
 
         mFab.setOnClickListener {
             mBox?.let {
@@ -167,6 +115,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
         getBoxes()
         syncBoxes()
+
     }
 
     public override fun onDestroy() {
@@ -333,30 +282,39 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun setFoods(box: Box) {
-        val adapter = FoodRecyclerViewAdapter(box.foods!!)
-        val linearLayoutManager = LinearLayoutManager(this)
+        val adapter = FoodRecyclerViewAdapter(this, box.foods!!)
 
-        adapter.onItemClickListener = { food ->
-            val intent = Intent(this@BoxActivity, FoodActivity::class.java)
+        adapter.apply {
+            setOnItemClickListener(View.OnClickListener {
+                val intent = Intent(this@BoxActivity, FoodActivity::class.java)
+                val position = mRecyclerView.getChildAdapterPosition(it)
+                val food = adapter.getItemAtPosition(position)
 
-            intent.putExtra("food_id", food.id)
-            intent.putExtra("box_id", box.id)
-            startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
+                intent.putExtra("food_id", food.id)
+                intent.putExtra("box_id", box.id)
+                startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
+            })
+
+            setOnItemLongClickListener(View.OnLongClickListener {
+                Log.e(TAG, mRecyclerView.getChildAdapterPosition(it).toString())
+                Log.e(TAG, adapter.getItemAtPosition(mRecyclerView.getChildAdapterPosition(it)).toString())
+
+                val position = mRecyclerView.getChildAdapterPosition(it)
+                val food = adapter.getItemAtPosition(position)
+
+                food.name?.let {
+                    val options = arrayOf("Show", "Remove", "Cancel")
+                    val fragment = OptionsPickerDialogFragment.newInstance(it, options, food.id)
+
+                    fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
+                    fragment.show(fragmentManager, "food_option")
+                }
+
+                true
+            })
         }
 
-        adapter.onItemLongClickListener = { food ->
-            food.name?.let { foodName ->
-                val options = arrayOf("Show", "Remove", "Cancel")
-                val fragment = OptionsPickerDialogFragment.newInstance(foodName, options, food.id)
-
-                fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
-                fragment.show(fragmentManager, "food_option")
-            }
-        }
-
-        mRecyclerView.layoutManager = linearLayoutManager
         mRecyclerView.adapter = adapter
-
     }
 
     private fun showProgressBar() {
