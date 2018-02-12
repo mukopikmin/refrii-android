@@ -37,6 +37,7 @@ import com.refrii.client.views.fragments.OptionsPickerDialogFragment
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotterknife.bindView
+import okhttp3.MultipartBody
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -67,7 +68,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
         mRealm = Realm.getDefaultInstance()
-//        itemTouchHelper.attachToRecyclerView(mRecyclerView)
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -234,7 +234,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                         mBoxes = boxes
                         setBoxesOnNavigation(boxes)
                     }
-
                 })
     }
 
@@ -296,9 +295,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
             })
 
             setOnItemLongClickListener(View.OnLongClickListener {
-                Log.e(TAG, mRecyclerView.getChildAdapterPosition(it).toString())
-                Log.e(TAG, adapter.getItemAtPosition(mRecyclerView.getChildAdapterPosition(it)).toString())
-
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
 
@@ -312,9 +308,57 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
                 true
             })
-        }
 
+            setOnIncrementClickListener(View.OnClickListener {
+                val position = mRecyclerView.getChildAdapterPosition(it)
+                val food = adapter.getItemAtPosition(position)
+
+                mRealm.executeTransaction {
+                    food.amount = food.amount + 1
+                    syncFood(food)
+                }
+
+                notifyDataSetChanged()
+            })
+
+            setOnDecrementClickListener(View.OnClickListener {
+                val position = mRecyclerView.getChildAdapterPosition(it)
+                val food = adapter.getItemAtPosition(position)
+
+                mRealm.executeTransaction {
+                    food.amount = food.amount - 1
+                    syncFood(food)
+                }
+
+                notifyDataSetChanged()
+            })
+        }
         mRecyclerView.adapter = adapter
+    }
+
+    private fun syncFood(food: Food) {
+        val body = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("amount", food.amount.toString())
+                .build()
+
+        RetrofitFactory.getClient(FoodService::class.java, this)
+                .updateFood(food.id, body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Subscriber<Food>() {
+                    override fun onError(e: Throwable) {
+                        Toast.makeText(this@BoxActivity, e.message, Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onCompleted() {
+                        Log.d(TAG, "Update completed.")
+                    }
+
+                    override fun onNext(t: Food) {
+//                        this.notifyDataSetChanged()
+                    }
+                })
     }
 
     private fun showProgressBar() {

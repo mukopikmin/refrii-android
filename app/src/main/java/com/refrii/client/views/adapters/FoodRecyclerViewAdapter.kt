@@ -22,11 +22,14 @@ import java.util.*
 
 class FoodRecyclerViewAdapter(
         private val context: Context,
-        private val foods: MutableList<Food>) : RecyclerSwipeAdapter<FoodViewHolder>() {
+        var foods: MutableList<Food>) : RecyclerSwipeAdapter<FoodViewHolder>() {
 
     private var mRealm: Realm
     private var mClickListener: View.OnClickListener? = null
     private var mLongClickListener: View.OnLongClickListener? = null
+    private var mIncrementClickListener: View.OnClickListener? = null
+    private var mDecrementClickListener: View.OnClickListener? = null
+    private val self = this
 
     init {
         Realm.setDefaultConfiguration(RealmConfiguration.Builder(context).build())
@@ -59,19 +62,11 @@ class FoodRecyclerViewAdapter(
         }
 
         holder?.increment?.setOnClickListener {
-            mRealm.executeTransaction {
-                food.amount += 1
-                this.notifyDataSetChanged()
-                syncFood(food)
-            }
+            mIncrementClickListener?.onClick(it.parent.parent as View)
         }
 
         holder?.decrement?.setOnClickListener {
-            mRealm.executeTransaction {
-                food.amount -= 1
-                this.notifyDataSetChanged()
-                syncFood(food)
-            }
+            mDecrementClickListener?.onClick(it.parent.parent as View)
         }
     }
 
@@ -86,11 +81,20 @@ class FoodRecyclerViewAdapter(
     }
 
     fun setOnItemClickListener(listener: View.OnClickListener) {
-        this.mClickListener = listener
+        mClickListener = listener
     }
 
     fun setOnItemLongClickListener(listener: View.OnLongClickListener) {
-        this.mLongClickListener = listener
+        mLongClickListener = listener
+    }
+
+    fun setOnIncrementClickListener(listener: View.OnClickListener) {
+        mIncrementClickListener = listener
+        (self as RecyclerSwipeAdapter<FoodViewHolder>).notifyDataSetChanged()
+    }
+
+    fun setOnDecrementClickListener(listener: View.OnClickListener) {
+        mDecrementClickListener = listener
     }
 
     private fun syncFood(food: Food) {

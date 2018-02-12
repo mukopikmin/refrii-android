@@ -39,14 +39,14 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
         return 0
     }
 
-    private fun decrease(diff: Double) {
+    fun decrease(diff: Double) {
         this.amount -= diff
         if (this.amount < 0) {
             this.amount = 0.0
         }
     }
 
-    private fun increase(diff: Double) {
+    fun increase(diff: Double) {
         this.amount += diff
     }
 
