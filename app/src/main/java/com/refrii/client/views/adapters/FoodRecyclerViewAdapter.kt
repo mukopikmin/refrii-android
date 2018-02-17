@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter
 import com.refrii.client.R
+import com.refrii.client.RealmUtil
 import com.refrii.client.models.Food
 import com.refrii.client.services.FoodService
 import com.refrii.client.services.RetrofitFactory
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import okhttp3.MultipartBody
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
@@ -32,8 +32,8 @@ class FoodRecyclerViewAdapter(
     private val self = this
 
     init {
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder(context).build())
-        mRealm = Realm.getDefaultInstance()
+        Realm.init(context)
+        mRealm = RealmUtil.getInstance()
     }
 
     override fun getSwipeLayoutResourceId(position: Int): Int {

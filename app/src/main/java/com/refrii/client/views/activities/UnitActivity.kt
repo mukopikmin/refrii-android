@@ -13,13 +13,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
+import com.refrii.client.RealmUtil
 import com.refrii.client.models.Unit
 import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
 import com.refrii.client.views.fragments.EditDoubleDialogFragment
 import com.refrii.client.views.fragments.EditTextDialogFragment
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import kotterknife.bindView
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
@@ -51,8 +51,8 @@ class UnitActivity : AppCompatActivity() {
             it.setHomeButtonEnabled(true)
         }
 
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
-        mRealm = Realm.getDefaultInstance()
+        Realm.init(this)
+        mRealm = RealmUtil.getInstance()
 
         val intent = intent
         val unitId = intent.getIntExtra("unit_id", 0)

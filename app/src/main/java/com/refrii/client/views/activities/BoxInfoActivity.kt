@@ -13,13 +13,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
+import com.refrii.client.RealmUtil
 import com.refrii.client.models.Box
 import com.refrii.client.services.BoxService
 import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.views.fragments.EditTextDialogFragment
 import com.refrii.client.views.fragments.UserPickerDialogFragment
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import kotterknife.bindView
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
@@ -53,8 +53,8 @@ class BoxInfoActivity : AppCompatActivity() {
             it.setHomeButtonEnabled(true)
         }
 
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
-        mRealm = Realm.getDefaultInstance()
+        Realm.init(this)
+        mRealm = RealmUtil.getInstance()
 
         val boxId = intent.getIntExtra("box_id", 0)
 

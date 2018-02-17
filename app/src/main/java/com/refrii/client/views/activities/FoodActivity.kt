@@ -16,6 +16,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
+import com.refrii.client.RealmUtil
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.services.FoodService
@@ -24,7 +25,6 @@ import com.refrii.client.views.fragments.CalendarPickerDialogFragment
 import com.refrii.client.views.fragments.EditDoubleDialogFragment
 import com.refrii.client.views.fragments.EditTextDialogFragment
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import kotterknife.bindView
 import okhttp3.MultipartBody
 import rx.Subscriber
@@ -52,7 +52,8 @@ class FoodActivity : AppCompatActivity() {
     private val foodBoxTextView: TextView by bindView(R.id.foodBoxTextView)
     private val fab: FloatingActionButton by bindView(R.id.fab)
 
-    private var mFood: Food? = null
+    private lateinit var mFood: Food
+    private lateinit var mBox: Box
     private lateinit var mRealm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,14 +66,21 @@ class FoodActivity : AppCompatActivity() {
             it.setHomeButtonEnabled(true)
         }
 
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
-        mRealm = Realm.getDefaultInstance()
+        Realm.init(this)
+        mRealm = RealmUtil.getInstance()
 
-        onLoading()
+        val intent = intent
+        val foodId = intent.getIntExtra("food_id", 0)
+        val boxId = intent.getIntExtra("box_id", 0)
+
+        mFood = mRealm.where(Food::class.java).equalTo("id", foodId).findFirst()
+        mBox = mRealm.where(Box::class.java).equalTo("id", boxId).findFirst()
+
+        setFood(foodId, boxId)
 
         fab.setOnClickListener {
             progressBar.visibility = View.VISIBLE
-            updateFood(mFood!!)
+            updateFood(mFood, mBox)
         }
 
         editNameImageView.setOnClickListener {
@@ -103,12 +111,15 @@ class FoodActivity : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
 
-        val intent = intent
-        val foodId = intent.getIntExtra("food_id", 0)
-        val boxId = intent.getIntExtra("box_id", 0)
+        onLoading()
 
-        setFood(foodId, boxId)
-        syncFood(foodId)
+
+//        val intent = intent
+//        val foodId = intent.getIntExtra("food_id", 0)
+//        val boxId = intent.getIntExtra("box_id", 0)
+//
+//        setFood(foodId, boxId)
+//        syncFood(foodId)
     }
 
     public override fun onDestroy() {
@@ -135,38 +146,38 @@ class FoodActivity : AppCompatActivity() {
         when (requestCode) {
             EDIT_NAME_REQUEST_CODE -> {
                 mRealm.executeTransaction {
-                    mFood?.let {
+                    mFood.let {
                         it.name = data.getStringExtra("text")
-                        setFoodOnView(it)
+                        setFoodOnView(it, mBox)
                         onEdited()
                     }
                 }
             }
             EDIT_AMOUNT_REQUEST_CODE -> {
                 mRealm.executeTransaction {
-                    mFood?.let {
+                    mFood.let {
                         it.amount = data.getDoubleExtra("number", 0.toDouble())
-                        setFoodOnView(it)
+                        setFoodOnView(it, mBox)
                         onEdited()
                     }
                 }
             }
             EDIT_NOTICE_REQUEST_CODE -> {
                 mRealm.executeTransaction {
-                    mFood?.let {
+                    mFood.let {
                         it.notice = data.getStringExtra("text")
-                        setFoodOnView(it)
+                        setFoodOnView(it, mBox)
                         onEdited()
                     }
                 }
             }
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> {
                 mRealm.executeTransaction {
-                    mFood?.let {
+                    mFood.let {
                         val date = Date()
                         date.time = data.getLongExtra("date", 0)
                         it.expirationDate = date
-                        setFoodOnView(it)
+                        setFoodOnView(it, mBox)
                         onEdited()
                     }
                 }
@@ -176,19 +187,20 @@ class FoodActivity : AppCompatActivity() {
 
     private fun setFood(id: Int, boxId: Int) {
         val food = mRealm.where(Food::class.java)?.equalTo("id", id)?.findFirst()
+        Log.e(TAG, food.toString())
         val box = mRealm.where(Box::class.java)?.equalTo("id", boxId)?.findFirst()
 
         food ?: return
         box ?: return
 
         mFood = food
-        mRealm.executeTransaction { food.box = box }
+//        mRealm.executeTransaction { food.box = box }
 
-        setFoodOnView(food)
+        setFoodOnView(food, box)
         onLoadFinished()
     }
 
-    private fun setFoodOnView(food: Food) {
+    private fun setFoodOnView(food: Food, box: Box) {
         val timeFormatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
         val dateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
         val daysLeft = food.daysLeft()
@@ -197,7 +209,7 @@ class FoodActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         foodNameTextView.text = food.name
-        foodBoxTextView.text = food.box?.name
+        foodBoxTextView.text = box.name
         amountTextView.text = "${food.amount} ${food.unit?.label}"
         noticeTextView.text = food.notice
         createdUserTextView.text = "${timeFormatter.format(food.createdAt)} by ${food.createdUser?.name}"
@@ -212,14 +224,14 @@ class FoodActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateFood(food: Food) {
+    private fun updateFood(food: Food, box: Box) {
         val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("name", food.name!!)
                 .addFormDataPart("notice", food.notice!!)
                 .addFormDataPart("amount", food.amount.toString())
-                .addFormDataPart("box_id", food.box!!.id.toString())
+                .addFormDataPart("box_id", box.id.toString())
                 .addFormDataPart("unit_id", food.unit!!.id.toString())
                 .addFormDataPart("expiration_date", formatter.format(food.expirationDate))
                 .build()
@@ -267,7 +279,7 @@ class FoodActivity : AppCompatActivity() {
 
                     override fun onNext(food: Food) {
                         mFood = food
-                        setFoodOnView(food)
+                        setFoodOnView(food, mBox)
 
                         mRealm.executeTransaction { mRealm.copyToRealmOrUpdate(food) }
                     }

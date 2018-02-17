@@ -19,7 +19,7 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
     open var unit: Unit? = null
     open var createdUser: User? = null
     open var updatedUser: User? = null
-    open var box: Box? = null
+//    open var box: Box? = null
 
     override fun equals(other: Any?): Boolean {
         other ?: return false
@@ -72,7 +72,7 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
         result = 31 * result + (unit?.hashCode() ?: 0)
         result = 31 * result + (createdUser?.hashCode() ?: 0)
         result = 31 * result + (updatedUser?.hashCode() ?: 0)
-        result = 31 * result + (box?.hashCode() ?: 0)
+//        result = 31 * result + (box?.hashCode() ?: 0)
         return result
     }
 

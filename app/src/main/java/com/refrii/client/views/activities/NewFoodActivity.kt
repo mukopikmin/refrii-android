@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import com.refrii.client.R
+import com.refrii.client.RealmUtil
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.models.Unit
@@ -21,7 +22,6 @@ import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
 import com.refrii.client.views.fragments.CalendarPickerDialogFragment
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import kotterknife.bindView
 import okhttp3.MultipartBody
 import rx.Subscriber
@@ -54,8 +54,8 @@ class NewFoodActivity : AppCompatActivity() {
             it.setHomeButtonEnabled(true)
         }
 
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
-        mRealm = Realm.getDefaultInstance()
+        Realm.init(this)
+        mRealm = RealmUtil.getInstance()
 
         val intent = intent
         val boxId = intent.getIntExtra("boxId", 0)

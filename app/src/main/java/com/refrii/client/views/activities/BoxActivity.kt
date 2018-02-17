@@ -25,6 +25,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
+import com.refrii.client.RealmUtil
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.services.BoxService
@@ -35,7 +36,6 @@ import com.refrii.client.tasks.ImageDownloadTaskCallback
 import com.refrii.client.views.adapters.FoodRecyclerViewAdapter
 import com.refrii.client.views.fragments.OptionsPickerDialogFragment
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import kotterknife.bindView
 import okhttp3.MultipartBody
 import rx.Subscriber
@@ -57,6 +57,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_box)
         setSupportActionBar(mToolbar)
 
@@ -66,8 +67,12 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         mDrawer.addDrawerListener(toggle)
         toggle.syncState()
 
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
-        mRealm = Realm.getDefaultInstance()
+        Realm.init(this)
+//        mRealm = Realm.getDefaultInstance()
+        mRealm = RealmUtil.getInstance()
+
+        Log.e(TAG, mRealm.where(Food::class.java).findAll().size.toString())
+
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -81,16 +86,23 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         }
     }
 
-    public override fun onRestart() {
-        super.onRestart()
-
-        getBoxes()
-    }
-
     public override fun onStart() {
         super.onStart()
 
         setNavigationHeader()
+    }
+
+    public override fun onResume() {
+        super.onResume()
+
+        val editor = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity).edit()
+
+        editor.remove("selected_box_id")
+        editor.apply()
+
+        Log.e(TAG, "onResume")
+        getBoxes()
+//        syncBoxes()
     }
 
     public override fun onPause() {
@@ -105,17 +117,11 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         }
     }
 
-    public override fun onResume() {
-        super.onResume()
+    public override fun onRestart() {
+        super.onRestart()
 
-        val editor = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity).edit()
-
-        editor.remove("selected_box_id")
-        editor.apply()
-
+        Log.e(TAG, "onRestart")
         getBoxes()
-        syncBoxes()
-
     }
 
     public override fun onDestroy() {
@@ -238,8 +244,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun setNavigationHeader() {
-        super.onStart()
-
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         mNavigationView.setNavigationItemSelectedListener(this)
 

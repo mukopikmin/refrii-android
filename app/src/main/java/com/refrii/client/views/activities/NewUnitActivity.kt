@@ -10,11 +10,11 @@ import android.view.MenuItem
 import android.widget.EditText
 import android.widget.Toast
 import com.refrii.client.R
+import com.refrii.client.RealmUtil
 import com.refrii.client.models.Unit
 import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import kotterknife.bindView
 import okhttp3.MultipartBody
 import rx.Subscriber
@@ -42,8 +42,8 @@ class NewUnitActivity : AppCompatActivity() {
             it.setHomeButtonEnabled(true)
         }
 
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder(this).build())
-        mRealm = Realm.getDefaultInstance()
+        Realm.init(this)
+        mRealm = RealmUtil.getInstance()
 
         fab.setOnClickListener {
             val label = labelEditText.text.toString()
