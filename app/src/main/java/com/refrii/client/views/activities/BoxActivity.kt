@@ -70,8 +70,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         Realm.init(this)
         mRealm = RealmUtil.getInstance()
 
-        Log.e(TAG, mRealm.where(Food::class.java).findAll().size.toString())
-
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -230,28 +228,27 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     }
 
                     override fun onNext(boxes: List<Box>) {
-                        boxes.forEach { box ->
-                            mRealm.executeTransaction { mRealm.copyToRealmOrUpdate(box) }
+                        mRealm.executeTransaction { realm ->
+                            boxes.forEach { realm.copyToRealmOrUpdate(it) }
                         }
 
                         mBoxes = boxes
-                        setBoxesOnNavigation(boxes)
+                        mRecyclerView.adapter.notifyDataSetChanged()
                     }
                 })
     }
 
     private fun setNavigationHeader() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        mNavigationView.setNavigationItemSelectedListener(this)
-
         val headerView = mNavigationView.getHeaderView(0)
         val nameTextView = headerView.findViewById<TextView>(R.id.nameNavHeaderTextView)
         val mailTextView = headerView.findViewById<TextView>(R.id.mailNavHeaderTextView)
         val avatarImageView = headerView.findViewById<ImageView>(R.id.avatarNavHeaderImageView)
-
         val name = sharedPreferences.getString("name", "name")
         val mail = sharedPreferences.getString("mail", "mail")
         val avatarUrl = sharedPreferences.getString("avatar", null)
+
+        mNavigationView.setNavigationItemSelectedListener(this)
 
         nameTextView.text = name
         mailTextView.text = mail
@@ -262,22 +259,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     avatarImageView.setImageBitmap(result)
                 }
             }).execute(avatarUrl)
-        }
-    }
-
-    private fun setBoxesOnNavigation(boxes: List<Box>) {
-        val menu = mNavigationView.menu.findItem(R.id.menu_boxes)
-
-        mNavigationView.setNavigationItemSelectedListener(this@BoxActivity)
-        menu.subMenu.clear()
-        boxes.forEach { menu.subMenu.add(Menu.NONE, it.id, Menu.NONE, it.name) }
-
-        if (boxes.isNotEmpty()) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@BoxActivity)
-            val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
-
-            mBox = boxes[boxIndex]
-            mBox?.let { setFoods(it) }
         }
     }
 
@@ -357,7 +338,9 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     }
 
                     override fun onNext(t: Food) {
-//                        this.notifyDataSetChanged()
+                        mRealm.executeTransaction {
+                            it.copyToRealmOrUpdate(t)
+                        }
                     }
                 })
     }
