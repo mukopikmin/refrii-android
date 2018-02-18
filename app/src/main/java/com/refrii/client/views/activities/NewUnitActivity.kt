@@ -10,10 +10,10 @@ import android.view.MenuItem
 import android.widget.EditText
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.RealmUtil
 import com.refrii.client.models.Unit
 import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
+import com.refrii.client.utils.RealmUtil
 import io.realm.Realm
 import kotterknife.bindView
 import okhttp3.MultipartBody

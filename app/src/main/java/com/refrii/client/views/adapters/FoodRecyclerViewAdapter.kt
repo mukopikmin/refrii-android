@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter
 import com.refrii.client.R
-import com.refrii.client.RealmUtil
 import com.refrii.client.models.Food
 import com.refrii.client.services.FoodService
 import com.refrii.client.services.RetrofitFactory
+import com.refrii.client.utils.RealmUtil
 import io.realm.Realm
 import okhttp3.MultipartBody
 import rx.Subscriber

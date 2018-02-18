@@ -13,13 +13,13 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.RealmUtil
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.models.Unit
 import com.refrii.client.services.FoodService
 import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
+import com.refrii.client.utils.RealmUtil
 import com.refrii.client.views.fragments.CalendarPickerDialogFragment
 import io.realm.Realm
 import kotterknife.bindView

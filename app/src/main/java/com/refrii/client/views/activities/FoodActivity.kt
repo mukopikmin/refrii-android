@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -16,11 +15,11 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.RealmUtil
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.services.FoodService
 import com.refrii.client.services.RetrofitFactory
+import com.refrii.client.utils.RealmUtil
 import com.refrii.client.views.fragments.CalendarPickerDialogFragment
 import com.refrii.client.views.fragments.EditDoubleDialogFragment
 import com.refrii.client.views.fragments.EditTextDialogFragment
@@ -35,7 +34,6 @@ import java.util.*
 
 class FoodActivity : AppCompatActivity() {
 
-    private val constraintLayout: ConstraintLayout by bindView(R.id.constraintLayout)
     private val progressBar: ProgressBar by bindView(R.id.foodProgressBar)
     private val foodEditedMessageTextView: TextView by bindView(R.id.foodEditedMessageTextView)
     private val editNameImageView: ImageView by bindView(R.id.editNameImageView)
@@ -69,40 +67,28 @@ class FoodActivity : AppCompatActivity() {
         Realm.init(this)
         mRealm = RealmUtil.getInstance()
 
-        val intent = intent
-        val foodId = intent.getIntExtra("food_id", 0)
-        val boxId = intent.getIntExtra("box_id", 0)
-
-        mFood = mRealm.where(Food::class.java).equalTo("id", foodId).findFirst()
-        mBox = mRealm.where(Box::class.java).equalTo("id", boxId).findFirst()
-
-        setFood(foodId, boxId)
-
-        fab.setOnClickListener {
-            progressBar.visibility = View.VISIBLE
-            updateFood(mFood, mBox)
-        }
+        fab.setOnClickListener { updateFood(mFood, mBox) }
 
         editNameImageView.setOnClickListener {
-            val fragment = EditTextDialogFragment.newInstance("Name", mFood!!.name!!)
+            val fragment = EditTextDialogFragment.newInstance("Name", mFood.name!!)
             fragment.setTargetFragment(null, EDIT_NAME_REQUEST_CODE)
             fragment.show(fragmentManager, "edit_name")
         }
 
         editAmountImageView.setOnClickListener {
-            val fragment = EditDoubleDialogFragment.newInstance("Amount", mFood!!.amount)
+            val fragment = EditDoubleDialogFragment.newInstance("Amount", mFood.amount)
             fragment.setTargetFragment(null, EDIT_AMOUNT_REQUEST_CODE)
             fragment.show(fragmentManager, "edit_amount")
         }
 
         editNoticeImageView.setOnClickListener {
-            val fragment = EditTextDialogFragment.newInstance("Notice", mFood!!.notice!!, true)
+            val fragment = EditTextDialogFragment.newInstance("Notice", mFood.notice!!, true)
             fragment.setTargetFragment(null, EDIT_NOTICE_REQUEST_CODE)
             fragment.show(fragmentManager, "edit_notice")
         }
 
         editExpirationDateImageView.setOnClickListener {
-            val fragment = CalendarPickerDialogFragment.newInstance(mFood!!.expirationDate!!)
+            val fragment = CalendarPickerDialogFragment.newInstance(mFood.expirationDate!!)
             fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
             fragment.show(fragmentManager, "edit_expiration_date")
         }
@@ -111,15 +97,16 @@ class FoodActivity : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
 
-        onLoading()
+        val intent = intent
+        val foodId = intent.getIntExtra("food_id", 0)
+        val boxId = intent.getIntExtra("box_id", 0)
 
+        mFood = mRealm.where(Food::class.java).equalTo("id", foodId).findFirst()
+        mBox = mRealm.where(Box::class.java).equalTo("id", boxId).findFirst()
 
-//        val intent = intent
-//        val foodId = intent.getIntExtra("food_id", 0)
-//        val boxId = intent.getIntExtra("box_id", 0)
-//
-//        setFood(foodId, boxId)
-//        syncFood(foodId)
+        setFoodOnView(mFood, mBox)
+        syncFood(mFood)
+        onBeforeEdit()
     }
 
     public override fun onDestroy() {
@@ -146,58 +133,36 @@ class FoodActivity : AppCompatActivity() {
         when (requestCode) {
             EDIT_NAME_REQUEST_CODE -> {
                 mRealm.executeTransaction {
-                    mFood.let {
-                        it.name = data.getStringExtra("text")
-                        setFoodOnView(it, mBox)
-                        onEdited()
-                    }
+                    mFood.name = data.getStringExtra("text")
+                    setFoodOnView(mFood, mBox)
+                    onEdited()
                 }
             }
             EDIT_AMOUNT_REQUEST_CODE -> {
                 mRealm.executeTransaction {
-                    mFood.let {
-                        it.amount = data.getDoubleExtra("number", 0.toDouble())
-                        setFoodOnView(it, mBox)
-                        onEdited()
-                    }
+                    mFood.amount = data.getDoubleExtra("number", 0.toDouble())
+                    setFoodOnView(mFood, mBox)
+                    onEdited()
                 }
             }
             EDIT_NOTICE_REQUEST_CODE -> {
                 mRealm.executeTransaction {
-                    mFood.let {
-                        it.notice = data.getStringExtra("text")
-                        setFoodOnView(it, mBox)
-                        onEdited()
-                    }
+                    mFood.notice = data.getStringExtra("text")
+                    setFoodOnView(mFood, mBox)
+                    onEdited()
                 }
             }
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> {
                 mRealm.executeTransaction {
-                    mFood.let {
-                        val date = Date()
-                        date.time = data.getLongExtra("date", 0)
-                        it.expirationDate = date
-                        setFoodOnView(it, mBox)
-                        onEdited()
-                    }
+                    val date = Date()
+
+                    date.time = data.getLongExtra("date", 0)
+                    mFood.expirationDate = date
+                    setFoodOnView(mFood, mBox)
+                    onEdited()
                 }
             }
         }
-    }
-
-    private fun setFood(id: Int, boxId: Int) {
-        val food = mRealm.where(Food::class.java)?.equalTo("id", id)?.findFirst()
-        Log.e(TAG, food.toString())
-        val box = mRealm.where(Box::class.java)?.equalTo("id", boxId)?.findFirst()
-
-        food ?: return
-        box ?: return
-
-        mFood = food
-//        mRealm.executeTransaction { food.box = box }
-
-        setFoodOnView(food, box)
-        onLoadFinished()
     }
 
     private fun setFoodOnView(food: Food, box: Box) {
@@ -240,6 +205,8 @@ class FoodActivity : AppCompatActivity() {
                 .updateFood(food.id, body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { showProgressBar() }
+                .doOnUnsubscribe { hideProgressBar() }
                 .subscribe(object: Subscriber<Food>() {
                     override fun onNext(t: Food) {
                         mRealm.executeTransaction { it.copyToRealmOrUpdate(food) }
@@ -263,11 +230,13 @@ class FoodActivity : AppCompatActivity() {
                 })
     }
 
-    private fun syncFood(id: Int) {
+    private fun syncFood(food: Food) {
         RetrofitFactory.getClient(FoodService::class.java, this)
-                .getFood(id)
+                .getFood(food.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { showProgressBar() }
+                .doOnUnsubscribe { hideProgressBar() }
                 .subscribe(object: Subscriber<Food>() {
                     override fun onError(e: Throwable) {
                         Toast.makeText(this@FoodActivity, e.message, Toast.LENGTH_LONG).show()
@@ -287,27 +256,30 @@ class FoodActivity : AppCompatActivity() {
                 })
     }
 
+    private fun onBeforeEdit() {
+        foodEditedMessageTextView.visibility = View.GONE
+        fab.hide()
+    }
+
+
     private fun onEdited() {
         foodEditedMessageTextView.visibility = View.VISIBLE
         fab.show()
     }
 
-    private fun onLoading() {
-        constraintLayout.visibility = View.GONE
-        foodEditedMessageTextView.visibility = View.GONE
-        fab.hide()
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
     }
 
-    private fun onLoadFinished() {
-        constraintLayout.visibility = View.VISIBLE
+    private fun hideProgressBar() {
         progressBar.visibility = View.GONE
     }
 
     companion object {
-        private val TAG = "FoodActivity"
-        private val EDIT_NAME_REQUEST_CODE = 100
-        private val EDIT_AMOUNT_REQUEST_CODE = 101
-        private val EDIT_NOTICE_REQUEST_CODE = 102
-        private val EDIT_EXPIRATION_DATE_REQUEST_CODE = 103
+        private const val TAG = "FoodActivity"
+        private const val EDIT_NAME_REQUEST_CODE = 100
+        private const val EDIT_AMOUNT_REQUEST_CODE = 101
+        private const val EDIT_NOTICE_REQUEST_CODE = 102
+        private const val EDIT_EXPIRATION_DATE_REQUEST_CODE = 103
     }
 }

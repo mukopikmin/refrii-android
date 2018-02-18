@@ -25,7 +25,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.RealmUtil
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
 import com.refrii.client.services.BoxService
@@ -33,6 +32,7 @@ import com.refrii.client.services.FoodService
 import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.tasks.ImageDownloadTask
 import com.refrii.client.tasks.ImageDownloadTaskCallback
+import com.refrii.client.utils.RealmUtil
 import com.refrii.client.views.adapters.FoodRecyclerViewAdapter
 import com.refrii.client.views.fragments.OptionsPickerDialogFragment
 import io.realm.Realm
@@ -68,7 +68,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         toggle.syncState()
 
         Realm.init(this)
-//        mRealm = Realm.getDefaultInstance()
         mRealm = RealmUtil.getInstance()
 
         Log.e(TAG, mRealm.where(Food::class.java).findAll().size.toString())
@@ -100,9 +99,8 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         editor.remove("selected_box_id")
         editor.apply()
 
-        Log.e(TAG, "onResume")
         getBoxes()
-//        syncBoxes()
+        syncBoxes()
     }
 
     public override fun onPause() {
@@ -120,7 +118,6 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     public override fun onRestart() {
         super.onRestart()
 
-        Log.e(TAG, "onRestart")
         getBoxes()
     }
 
@@ -463,9 +460,9 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     companion object {
-        private val TAG = "BoxActivity"
-        private val ADD_FOOD_REQUEST_CODE = 101
-        private val FOOD_OPTIONS_REQUEST_CODE = 102
-        private val EDIT_FOOD_REQUEST_CODE = 103
+        private const val TAG = "BoxActivity"
+        private const val ADD_FOOD_REQUEST_CODE = 101
+        private const val FOOD_OPTIONS_REQUEST_CODE = 102
+        private const val EDIT_FOOD_REQUEST_CODE = 103
     }
 }

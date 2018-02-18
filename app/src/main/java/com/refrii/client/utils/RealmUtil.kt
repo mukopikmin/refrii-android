@@ -1,4 +1,4 @@
-package com.refrii.client
+package com.refrii.client.utils
 
 import io.realm.Realm
 import io.realm.RealmConfiguration

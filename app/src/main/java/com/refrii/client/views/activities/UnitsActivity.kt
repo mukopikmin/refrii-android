@@ -12,11 +12,11 @@ import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.RealmUtil
 import com.refrii.client.models.Food
 import com.refrii.client.models.Unit
 import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
+import com.refrii.client.utils.RealmUtil
 import com.refrii.client.views.adapters.UnitListAdapter
 import com.refrii.client.views.fragments.OptionsPickerDialogFragment
 import io.realm.Realm

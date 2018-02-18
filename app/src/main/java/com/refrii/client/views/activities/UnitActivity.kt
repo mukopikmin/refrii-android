@@ -13,10 +13,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.R
-import com.refrii.client.RealmUtil
 import com.refrii.client.models.Unit
 import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.services.UnitService
+import com.refrii.client.utils.RealmUtil
 import com.refrii.client.views.fragments.EditDoubleDialogFragment
 import com.refrii.client.views.fragments.EditTextDialogFragment
 import io.realm.Realm
