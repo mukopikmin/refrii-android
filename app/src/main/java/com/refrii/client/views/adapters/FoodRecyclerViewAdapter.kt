@@ -1,35 +1,30 @@
 package com.refrii.client.views.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.daimajia.swipe.adapters.RecyclerSwipeAdapter
+import com.daimajia.swipe.implments.SwipeItemRecyclerMangerImpl
 import com.refrii.client.R
 import com.refrii.client.models.Food
-import com.refrii.client.services.FoodService
-import com.refrii.client.services.RetrofitFactory
 import com.refrii.client.utils.RealmUtil
 import io.realm.Realm
-import okhttp3.MultipartBody
-import rx.Subscriber
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers.io
 import java.text.SimpleDateFormat
 import java.util.*
 
 class FoodRecyclerViewAdapter(
         private val context: Context,
-        var foods: MutableList<Food>) : RecyclerSwipeAdapter<FoodViewHolder>() {
+        private var foods: MutableList<Food>
+) : RecyclerSwipeAdapter<FoodViewHolder>() {
 
+    private var mItemManager = SwipeItemRecyclerMangerImpl(this)
     private var mRealm: Realm
-    private var mClickListener: View.OnClickListener? = null
-    private var mLongClickListener: View.OnLongClickListener? = null
-    private var mIncrementClickListener: View.OnClickListener? = null
-    private var mDecrementClickListener: View.OnClickListener? = null
-    private val self = this
+
+    var mClickListener: View.OnClickListener? = null
+    var mLongClickListener: View.OnLongClickListener? = null
+    var mIncrementClickListener: View.OnClickListener? = null
+    var mDecrementClickListener: View.OnClickListener? = null
 
     init {
         Realm.init(context)
@@ -68,6 +63,8 @@ class FoodRecyclerViewAdapter(
         holder?.decrement?.setOnClickListener {
             mDecrementClickListener?.onClick(it.parent.parent as View)
         }
+
+        mItemManager.bindView(holder?.itemView, position)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): FoodViewHolder {
@@ -78,48 +75,6 @@ class FoodRecyclerViewAdapter(
 
     override fun getItemCount(): Int {
         return foods.size
-    }
-
-    fun setOnItemClickListener(listener: View.OnClickListener) {
-        mClickListener = listener
-    }
-
-    fun setOnItemLongClickListener(listener: View.OnLongClickListener) {
-        mLongClickListener = listener
-    }
-
-    fun setOnIncrementClickListener(listener: View.OnClickListener) {
-        mIncrementClickListener = listener
-        (self as RecyclerSwipeAdapter<FoodViewHolder>).notifyDataSetChanged()
-    }
-
-    fun setOnDecrementClickListener(listener: View.OnClickListener) {
-        mDecrementClickListener = listener
-    }
-
-    private fun syncFood(food: Food) {
-        val body = MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("amount", food.amount.toString())
-                .build()
-
-        RetrofitFactory.getClient(FoodService::class.java, context)
-                .updateFood(food.id, body)
-                .subscribeOn(io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Food>() {
-                    override fun onError(e: Throwable) {
-                        Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
-                    }
-
-                    override fun onCompleted() {
-                        Log.d(TAG, "Update completed.")
-                    }
-
-                    override fun onNext(t: Food) {
-//                        this.notifyDataSetChanged()
-                    }
-                })
     }
 
     fun getItemAtPosition(position: Int): Food {

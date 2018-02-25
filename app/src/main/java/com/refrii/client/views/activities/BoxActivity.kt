@@ -24,6 +24,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import com.daimajia.swipe.util.Attributes
 import com.refrii.client.R
 import com.refrii.client.models.Box
 import com.refrii.client.models.Food
@@ -266,7 +267,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
         val adapter = FoodRecyclerViewAdapter(this, box.foods!!)
 
         adapter.apply {
-            setOnItemClickListener(View.OnClickListener {
+            mClickListener = View.OnClickListener {
                 val intent = Intent(this@BoxActivity, FoodActivity::class.java)
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
@@ -274,9 +275,9 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 intent.putExtra("food_id", food.id)
                 intent.putExtra("box_id", box.id)
                 startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
-            })
+            }
 
-            setOnItemLongClickListener(View.OnLongClickListener {
+            mLongClickListener = View.OnLongClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
 
@@ -289,9 +290,9 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                 }
 
                 true
-            })
+            }
 
-            setOnIncrementClickListener(View.OnClickListener {
+            mIncrementClickListener = View.OnClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
 
@@ -300,10 +301,10 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     syncFood(food)
                 }
 
-                notifyDataSetChanged()
-            })
+                notifyItemChanged(position)
+            }
 
-            setOnDecrementClickListener(View.OnClickListener {
+            mDecrementClickListener = View.OnClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
 
@@ -312,8 +313,10 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                     syncFood(food)
                 }
 
-                notifyDataSetChanged()
-            })
+                notifyItemChanged(position)
+            }
+
+            mode = Attributes.Mode.Single
         }
         mRecyclerView.adapter = adapter
     }
@@ -337,11 +340,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
                         Log.d(TAG, "Update completed.")
                     }
 
-                    override fun onNext(t: Food) {
-                        mRealm.executeTransaction {
-                            it.copyToRealmOrUpdate(t)
-                        }
-                    }
+                    override fun onNext(t: Food) {}
                 })
     }
 
