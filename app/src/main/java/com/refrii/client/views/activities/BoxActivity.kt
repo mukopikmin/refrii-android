@@ -100,6 +100,7 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
         getBoxes()
         syncBoxes()
+        getBoxes()
     }
 
     public override fun onPause() {
@@ -191,7 +192,9 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
     }
 
     private fun getBoxes() {
-        mBoxes = mRealm.where(Box::class.java).findAll()
+        mBoxes = mRealm.where(Box::class.java)
+                .findAll()
+                .sort("id")
         mNavigationView.setNavigationItemSelectedListener(this@BoxActivity)
         val menu = mNavigationView.menu.findItem(R.id.menu_boxes)
         menu.subMenu.clear()
@@ -230,11 +233,8 @@ class BoxActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelected
 
                     override fun onNext(boxes: List<Box>) {
                         mRealm.executeTransaction { realm ->
-                            boxes.forEach { realm.copyToRealmOrUpdate(it) }
+                            realm.copyToRealmOrUpdate(boxes)
                         }
-
-                        mBoxes = boxes
-                        mRecyclerView.adapter.notifyDataSetChanged()
                     }
                 })
     }
