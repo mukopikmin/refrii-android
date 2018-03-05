@@ -4,7 +4,7 @@ import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import okhttp3.MultipartBody
 import java.io.Serializable
-import java.util.Date
+import java.util.*
 
 open class Unit : RealmObject(), Serializable {
 
@@ -14,6 +14,7 @@ open class Unit : RealmObject(), Serializable {
     open var step: Double = 0.toDouble()
     open var createdAt: Date? = null
     open var updatedAt: Date? = null
+    open var user: User? = null
 
     override fun equals(other: Any?): Boolean {
         other ?: return false

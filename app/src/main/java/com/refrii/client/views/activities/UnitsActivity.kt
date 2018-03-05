@@ -3,6 +3,7 @@ package com.refrii.client.views.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
@@ -32,11 +33,12 @@ class UnitsActivity : AppCompatActivity() {
     private val fab: FloatingActionButton by bindView(R.id.fab)
 
     private lateinit var mRealm: Realm
-    private var mUnits: MutableList<Unit>? = null
+    private lateinit var mUnits: MutableList<Unit>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_units)
+
         setSupportActionBar(toolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
@@ -76,6 +78,7 @@ class UnitsActivity : AppCompatActivity() {
 
         getUnits()
         syncUnits()
+        getUnits()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -88,7 +91,7 @@ class UnitsActivity : AppCompatActivity() {
             NEW_UNIT_REQUEST_CODE -> {
                 val unit = data.getSerializableExtra("unit") as Unit
 
-                mUnits?.let {
+                mUnits.let {
                     it.add(unit)
                     listView.deferNotifyDataSetChanged()
                 }
@@ -97,7 +100,7 @@ class UnitsActivity : AppCompatActivity() {
                 val option = data.getIntExtra("option", -1)
                 val unitId = data.getIntExtra("target_id", 0)
 
-                when(option) {
+                when (option) {
                     0 -> {
                         val intent = Intent(this@UnitsActivity, UnitActivity::class.java)
 
@@ -128,7 +131,14 @@ class UnitsActivity : AppCompatActivity() {
     }
 
     private fun getUnits(): List<Unit>? {
-        val units = mRealm.where(Unit::class.java)?.findAll()
+        val userId = PreferenceManager.getDefaultSharedPreferences(this)
+                .getInt("id", 0)
+        val units = mRealm.where(Unit::class.java)
+                .equalTo("user.id", userId)
+                .or()
+                .isNull("user")
+                .findAll()
+                .sort("id")
 
         units?.let {
             setUnits(it)
@@ -139,7 +149,7 @@ class UnitsActivity : AppCompatActivity() {
     }
 
     private fun syncUnits() {
-        RetrofitFactory.getClient(UnitService::class.java, this@UnitsActivity)
+        RetrofitFactory.getClient(UnitService::class.java, this)
                 .getUnits()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -153,10 +163,8 @@ class UnitsActivity : AppCompatActivity() {
 
                     override fun onNext(t: List<Unit>) {
                         mRealm.executeTransaction {
-                            t.forEach { mRealm.copyToRealmOrUpdate(it) }
+                            mRealm.copyToRealmOrUpdate(t)
                         }
-                        mUnits?.let { setUnits(it) }
-                        mUnits = t.toMutableList()
                     }
                 })
     }
@@ -170,11 +178,11 @@ class UnitsActivity : AppCompatActivity() {
             return
         }
 
-        RetrofitFactory.getClient(UnitService::class.java, this@UnitsActivity)
+        RetrofitFactory.getClient(UnitService::class.java, this)
                 .deleteUnit(unit.id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object: Subscriber<Void>() {
+                .subscribe(object : Subscriber<Void>() {
                     override fun onCompleted() {
                         val unitListAdapter = listView.adapter as UnitListAdapter
 
@@ -193,13 +201,14 @@ class UnitsActivity : AppCompatActivity() {
     }
 
     private fun setUnits(units: List<Unit>) {
-        val adapter = UnitListAdapter(this@UnitsActivity, units)
+        val adapter = UnitListAdapter(this, units)
 
         listView.adapter = adapter
         adapter.notifyDataSetChanged()
     }
 
     companion object {
+        @Suppress("unused")
         private const val TAG = "UnitsActivity"
         private const val NEW_UNIT_REQUEST_CODE = 101
         private const val UNIT_OPTIONS_REQUEST_CODE = 102

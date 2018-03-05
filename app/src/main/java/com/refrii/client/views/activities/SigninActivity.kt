@@ -53,7 +53,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
             }
 
             val intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
-            startActivityForResult(intent, GOOGLE_SIGNIN_REQUEST_CODE)
+            startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
         }
 
     }
@@ -79,7 +79,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         super.onActivityResult(requestCode, resultCode, data)
 
         when (requestCode) {
-            GOOGLE_SIGNIN_REQUEST_CODE -> {
+            GOOGLE_SIGN_IN_REQUEST_CODE -> {
                 val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
 
                 if (result.isSuccess) {
@@ -119,7 +119,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
     private fun getJwt(googleToken: String) {
         val params = HashMap<String, String>()
-        params.put("token", googleToken)
+        params["token"] = googleToken
 
         RetrofitFactory.getClient(AuthService::class.java, this@SigninActivity)
                 .getToken(params)
@@ -131,9 +131,10 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
                         editor.apply {
                             putString("jwt", t.jwt)
-                            t.expiresAt?.let { putLong("expires_at", it.time) }
-                        }
-                        editor.apply()
+                            putLong("expires_at", t.expiresAt?.time ?: Date().time)
+                            putInt("id", t.user?.id ?: 0)
+                            putString("provider", t.user?.provider)
+                        }.apply()
                     }
 
                     override fun onCompleted() {
@@ -148,7 +149,8 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     }
 
     companion object {
-        private val TAG = "SigninActivity"
-        private val GOOGLE_SIGNIN_REQUEST_CODE = 101
+        @Suppress("unused")
+        private const val TAG = "SigninActivity"
+        private const val GOOGLE_SIGN_IN_REQUEST_CODE = 101
     }
 }

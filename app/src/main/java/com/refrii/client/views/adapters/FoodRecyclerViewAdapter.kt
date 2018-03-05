@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class FoodRecyclerViewAdapter(
-        private val context: Context,
+        context: Context,
         private var foods: MutableList<Food>
 ) : RecyclerSwipeAdapter<FoodViewHolder>() {
 
