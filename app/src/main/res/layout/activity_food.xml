@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.refrii.client.views.activities.FoodActivity">
+    tools:context="com.refrii.client.food.FoodActivity">
 
     <FrameLayout
         android:layout_width="match_parent"

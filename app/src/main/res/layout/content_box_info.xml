@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.refrii.client.views.activities.BoxInfoActivity"
+    tools:context="com.refrii.client.boxinfo.BoxInfoActivity"
     tools:showIn="@layout/activity_box_info">
 
     <android.support.constraint.ConstraintLayout

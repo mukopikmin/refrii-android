@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -17,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".views.activities.BoxActivity"
+            android:name=".foodlist.FoodListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -27,35 +28,35 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.activities.SigninActivity"
+            android:name=".signin.SigninActivity"
             android:label="@string/title_activity_signin"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".views.activities.FoodActivity"
+            android:name=".food.FoodActivity"
             android:label="@string/title_activity_food"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".views.activities.SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".views.activities.NewFoodActivity"
+            android:name=".newfood.NewFoodActivity"
             android:label="@string/title_activity_new_food"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".views.activities.BoxInfoActivity"
+            android:name=".boxinfo.BoxInfoActivity"
             android:label="@string/title_activity_box_info"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".views.activities.WebViewActivity" />
+        <activity android:name=".webview.WebViewActivity" />
         <activity
-            android:name=".views.activities.UnitsActivity"
+            android:name=".unitlist.UnitListActivity"
             android:label="@string/title_activity_units"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".views.activities.UnitActivity"
+            android:name=".unit.UnitActivity"
             android:label="@string/title_activity_unit"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".views.activities.NewUnitActivity"
+            android:name=".newunit.NewUnitActivity"
             android:label="@string/title_activity_new_unit"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
