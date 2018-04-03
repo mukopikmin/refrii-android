@@ -36,7 +36,6 @@
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="328ae9" />
                                       <entry key="foregroundImage" value="$USER_HOME$/Desktop/icon3.png" />
-                                      <entry key="generateWebIcon" value="false" />
                                       <entry key="showGrid" value="true" />
                                     </map>
                                   </option>
