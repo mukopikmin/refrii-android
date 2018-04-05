@@ -10,6 +10,8 @@ interface BoxInfoContract {
         fun showEditNameDialog(name: String?)
         fun showEditNoticeDialog(notice: String?)
         fun showEditSharedUsersDialog(users: List<User>?)
+        fun onBeforeEdit()
+        fun onEdited()
         fun onLoading()
         fun onLoaded()
         fun showSnackbar(message: String?)

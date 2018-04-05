@@ -44,11 +44,12 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
                 override fun onNext(t: Box?) {
                     mBox = t
                     mView?.setBox(t)
+                    mView?.showSnackbar("Box ${t?.name} is updated successfully")
                 }
 
                 override fun onCompleted() {
                     mView?.onLoaded()
-                    mView?.showSnackbar("Update completed")
+                    mView?.onBeforeEdit()
                 }
 
                 override fun onError(e: Throwable?) {
@@ -72,11 +73,13 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
 
     override fun updateName(name: String) {
         mBox?.name = name
+        mView?.onEdited()
         mView?.setBox(mBox)
     }
 
     override fun updateNotice(notice: String) {
         mBox?.notice = notice
+        mView?.onEdited()
         mView?.setBox(mBox)
     }
 

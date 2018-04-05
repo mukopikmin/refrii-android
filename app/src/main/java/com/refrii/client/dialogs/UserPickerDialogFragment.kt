@@ -26,7 +26,7 @@ class UserPickerDialogFragment : DialogFragment() {
         val names = bundle.getStringArrayList("names")
         val emails = bundle.getStringArrayList("emails")
         val listView = content.findViewById<ListView>(R.id.listView)
-        val shareTextView = content.findViewById<TextView>(R.id.shareTextView)
+        val shareTextView = content.findViewById<TextView>(R.id.nameTextView)
         val adapter = UserListAdapter(activity, names, emails)
 
         listView.adapter = adapter

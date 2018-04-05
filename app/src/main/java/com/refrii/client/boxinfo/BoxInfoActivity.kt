@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.App
@@ -24,17 +25,19 @@ import javax.inject.Inject
 
 class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
-    private val nameTextView: TextView by bindView(R.id.shareTextView)
-    private val noticeTextView: TextView by bindView(R.id.noticeTextView)
-    private val createdUserTextView: TextView by bindView(R.id.ownerBoxInfoTextView)
-    private val sharedUsersTextView: TextView by bindView(R.id.sharedUsersTextView)
-    private val createdAtTextView: TextView by bindView(R.id.createdAtBoxInfoTextView)
-    private val updatedAtTextView: TextView by bindView(R.id.updatedAtBoxInfoTextView)
-    private val editNameImageView: ImageView by bindView(R.id.editNameImageView)
-    private val editNoticeImageView: ImageView by bindView(R.id.editNoticeImageView)
-    private val shareImageView: ImageView by bindView(R.id.shareImageView)
-    private val fab: FloatingActionButton by bindView(R.id.floatingActionButton)
-    private val toolbar: Toolbar by bindView(R.id.toolbar)
+    private val mName: TextView by bindView(R.id.nameTextView)
+    private val mNotice: TextView by bindView(R.id.noticeTextView)
+    private val mOwner: TextView by bindView(R.id.ownerTextView)
+    private val mSharedUsers: TextView by bindView(R.id.sharedUsersTextView)
+    private val mCreated: TextView by bindView(R.id.createdTextView)
+    private val mUpdated: TextView by bindView(R.id.updatedTextView)
+    private val mEditName: ImageView by bindView(R.id.editNameImageView)
+    private val mEditNotice: ImageView by bindView(R.id.editNoticeImageView)
+    private val mShare: ImageView by bindView(R.id.shareImageView)
+    private val mFab: FloatingActionButton by bindView(R.id.floatingActionButton)
+    private val mToolbar: Toolbar by bindView(R.id.toolbar)
+    private val mEditedMessage: TextView by bindView(R.id.editedMessageTextView)
+    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
 
     @Inject
     lateinit var mPresenter: BoxInfoPresenter
@@ -45,16 +48,16 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_box_info)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
-        editNameImageView.setOnClickListener { mPresenter.editName() }
-        editNoticeImageView.setOnClickListener { mPresenter.editNotice() }
-        shareImageView.setOnClickListener { mPresenter.editSharedUsers() }
-        fab.setOnClickListener { mPresenter.updateBox() }
+        mEditName.setOnClickListener { mPresenter.editName() }
+        mEditNotice.setOnClickListener { mPresenter.editNotice() }
+        mShare.setOnClickListener { mPresenter.editSharedUsers() }
+        mFab.setOnClickListener { mPresenter.updateBox() }
     }
 
     override fun onStart() {
@@ -62,6 +65,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         val boxId = intent.getIntExtra("box_id", 0)
 
+        onBeforeEdit()
         mPresenter.takeView(this)
         mPresenter.getBox(boxId)
     }
@@ -84,31 +88,25 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         data ?: return
 
         when(requestCode) {
-            EDIT_NAME_REQUEST_CODE -> {
-                mPresenter.updateName(data.getStringExtra("text"))
-                onEdited()
-            }
-            EDIT_NOTICE_REQUEST_CODE -> {
-                mPresenter.updateNotice(data.getStringExtra("text"))
-                onEdited()
-            }
+            EDIT_NAME_REQUEST_CODE -> mPresenter.updateName(data.getStringExtra("text"))
+            EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
         }
     }
 
     override fun setBox(box: Box?) {
         box ?: return
 
-        toolbar.title = box.name
-        setSupportActionBar(toolbar)
+        mToolbar.title = box.name
+        setSupportActionBar(mToolbar)
 
         val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
 
-        nameTextView.text = box.name
-        noticeTextView.text = box.notice
-        box.owner?.let { createdUserTextView.text = it.name }
-        createdAtTextView.text = formatter.format(box.createdAt)
-        updatedAtTextView.text = formatter.format(box.updatedAt)
-        sharedUsersTextView.text = box.invitedUsers
+        mName.text = box.name
+        mNotice.text = box.notice
+        box.owner?.let { mOwner.text = it.name }
+        mCreated.text = formatter.format(box.createdAt)
+        mUpdated.text = formatter.format(box.updatedAt)
+        mSharedUsers.text = box.invitedUsers
                 ?.map { it.name }
                 ?.joinToString(System.getProperty("line.separator"))
     }
@@ -125,6 +123,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         notice ?: return
 
         val fragment = EditTextDialogFragment.newInstance("Notice", notice, true)
+
         fragment.setTargetFragment(null, EDIT_NOTICE_REQUEST_CODE)
         fragment.show(fragmentManager, "edit_notice")
     }
@@ -133,6 +132,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         users ?: return
 
         val fragment = UserPickerDialogFragment.newInstance("Shared users", users)
+
         fragment.setTargetFragment(null, EDIT_SHARED_USERS_REQUEST_CODE)
         fragment.show(fragmentManager, "contact_us")
     }
@@ -140,7 +140,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     override fun showSnackbar(message: String?) {
         message ?: return
 
-        Snackbar.make(nameTextView, message, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(mName, message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun showToast(message: String?) {
@@ -148,15 +148,21 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     }
 
     override fun onLoaded() {
-        fab.visibility = View.GONE
+        mProgressBar.visibility = View.GONE
     }
 
     override fun onLoading() {
-
+        mProgressBar.visibility = View.VISIBLE
     }
 
-    private fun onEdited() {
-        fab.visibility = View.VISIBLE
+    override fun onBeforeEdit() {
+        mFab.visibility = View.GONE
+        mEditedMessage.visibility = View.GONE
+    }
+
+    override fun onEdited() {
+        mFab.visibility = View.VISIBLE
+        mEditedMessage.visibility = View.VISIBLE
     }
 
     companion object {
