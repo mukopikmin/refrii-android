@@ -9,6 +9,7 @@ interface FoodContract {
     interface View {
         fun setFood(food: Food?, box: Box?)
         fun onBeforeEdit()
+        fun onEdited()
         fun showEditNameDialog(name: String?)
         fun showEditAmountDialog(amount: Double?)
         fun showEditNoticeDialog(notice: String?)

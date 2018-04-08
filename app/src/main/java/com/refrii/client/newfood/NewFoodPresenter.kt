@@ -33,7 +33,7 @@ constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Present
                 }
 
                 override fun onCompleted() {
-                    mView?.creteCompleted(mFood)
+                    mView?.createCompleted(mFood)
                 }
 
                 override fun onError(e: Throwable?) {

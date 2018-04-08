@@ -28,21 +28,21 @@ import javax.inject.Inject
 
 class FoodActivity : AppCompatActivity(), FoodContract.View {
 
-    private val progressBar: ProgressBar by bindView(R.id.foodProgressBar)
-    private val foodEditedMessageTextView: TextView by bindView(R.id.foodEditedMessageTextView)
-    private val editNameImageView: ImageView by bindView(R.id.editNameImageView)
-    private val editAmountImageView: ImageView by bindView(R.id.editAmountImageView)
-    private val editNoticeImageView: ImageView by bindView(R.id.editNoticeImageView)
-    private val editExpirationDateImageView: ImageView by bindView(R.id.editExpirationDateImageView)
-    private val toolbar: Toolbar by bindView(R.id.toolbar)
-    private val foodNameTextView: TextView by bindView(R.id.foodNameTextView)
-    private val amountTextView: TextView by bindView(R.id.amountTextView)
-    private val noticeTextView: TextView by bindView(R.id.noticeTextView)
-    private val expirationDateTextView: TextView by bindView(R.id.expirationDateTextView)
-    private val createdUserTextView: TextView by bindView(R.id.createdUserTextView)
-    private val updatedUserTextView: TextView by bindView(R.id.updatedUserTextView)
-    private val foodBoxTextView: TextView by bindView(R.id.foodBoxTextView)
-    private val fab: FloatingActionButton by bindView(R.id.fab)
+    private val mProgressBar: ProgressBar by bindView(R.id.foodProgressBar)
+    private val mEditedMessage: TextView by bindView(R.id.editedMessageTextView)
+    private val mEditName: ImageView by bindView(R.id.editNameImageView)
+    private val mEditAmount: ImageView by bindView(R.id.editAmountImageView)
+    private val mEditNotice: ImageView by bindView(R.id.editNoticeImageView)
+    private val mEditExpirationDate: ImageView by bindView(R.id.editExpirationDateImageView)
+    private val mToolbar: Toolbar by bindView(R.id.toolbar)
+    private val mName: TextView by bindView(R.id.foodNameTextView)
+    private val mAmount: TextView by bindView(R.id.amountTextView)
+    private val mNotice: TextView by bindView(R.id.noticeTextView)
+    private val mExpirationDate: TextView by bindView(R.id.expirationDateTextView)
+    private val mCreated: TextView by bindView(R.id.createdUserTextView)
+    private val mUpdate: TextView by bindView(R.id.updatedUserTextView)
+    private val mBoxName: TextView by bindView(R.id.foodBoxTextView)
+    private val mFab: FloatingActionButton by bindView(R.id.fab)
 
     @Inject
     lateinit var mPresenter: FoodPresenter
@@ -53,17 +53,17 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_food)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
-        fab.setOnClickListener { mPresenter.updateFood() }
-        editNameImageView.setOnClickListener { mPresenter.editName() }
-        editAmountImageView.setOnClickListener { mPresenter.editAmount() }
-        editNoticeImageView.setOnClickListener { mPresenter.editNotice() }
-        editExpirationDateImageView.setOnClickListener { mPresenter.editExpirationDate() }
+        mFab.setOnClickListener { mPresenter.updateFood() }
+        mEditName.setOnClickListener { mPresenter.editName() }
+        mEditAmount.setOnClickListener { mPresenter.editAmount() }
+        mEditNotice.setOnClickListener { mPresenter.editNotice() }
+        mEditExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
     }
 
     override fun onStart() {
@@ -96,24 +96,14 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         if (data == null || resultCode != Activity.RESULT_OK) return
 
         when (requestCode) {
-            EDIT_NAME_REQUEST_CODE -> {
-                mPresenter.updateName(data.getStringExtra("text"))
-                onEdited()
-            }
-            EDIT_AMOUNT_REQUEST_CODE -> {
-                mPresenter.updateAmount(data.getDoubleExtra("number", 0.toDouble()))
-                onEdited()
-            }
-            EDIT_NOTICE_REQUEST_CODE -> {
-                mPresenter.updateNotice(data.getStringExtra("text"))
-                onEdited()
-            }
+            EDIT_NAME_REQUEST_CODE -> mPresenter.updateName(data.getStringExtra("text"))
+            EDIT_AMOUNT_REQUEST_CODE -> mPresenter.updateAmount(data.getDoubleExtra("number", 0.toDouble()))
+            EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> {
                 val date = Date()
 
                 date.time = data.getLongExtra("date", 0)
                 mPresenter.updateExpirationDate(date)
-                onEdited()
             }
         }
     }
@@ -123,23 +113,23 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val dateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
         val daysLeft = food?.daysLeft()
 
-        toolbar.title = food?.name
-        setSupportActionBar(toolbar)
+        mToolbar.title = food?.name
+        setSupportActionBar(mToolbar)
 
-        foodNameTextView.text = food?.name
-        foodBoxTextView.text = box?.name
-        amountTextView.text = "${food?.amount} ${food?.unit?.label}"
-        noticeTextView.text = food?.notice
-        createdUserTextView.text = "${timeFormatter.format(food?.createdAt)} by ${food?.createdUser?.name}"
-        updatedUserTextView.text = "${timeFormatter.format(food?.updatedAt)} by ${food?.updatedUser?.name}"
-        expirationDateTextView.text = dateFormatter.format(food?.expirationDate)
+        mName.text = food?.name
+        mBoxName.text = box?.name
+        mAmount.text = "${food?.amount} ${food?.unit?.label}"
+        mNotice.text = food?.notice
+        mCreated.text = "${timeFormatter.format(food?.createdAt)} by ${food?.createdUser?.name}"
+        mUpdate.text = "${timeFormatter.format(food?.updatedAt)} by ${food?.updatedUser?.name}"
+        mExpirationDate.text = dateFormatter.format(food?.expirationDate)
 
         daysLeft?.let {
             if (daysLeft < 0) {
-                expirationDateTextView.append(" (${Math.abs(daysLeft)} days over)")
-                expirationDateTextView.setTextColor(Color.RED)
+                mExpirationDate.append(" (${Math.abs(daysLeft)} days over)")
+                mExpirationDate.setTextColor(Color.RED)
             } else {
-                expirationDateTextView.append(" (${Math.abs(daysLeft)} days left)")
+                mExpirationDate.append(" (${Math.abs(daysLeft)} days left)")
             }
         }
     }
@@ -181,27 +171,27 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     override fun onBeforeEdit() {
-        foodEditedMessageTextView.visibility = View.GONE
-        fab.hide()
+        mEditedMessage.visibility = View.GONE
+        mFab.hide()
     }
 
-    private fun onEdited() {
-        foodEditedMessageTextView.visibility = View.VISIBLE
-        fab.show()
+    override fun onEdited() {
+        mEditedMessage.visibility = View.VISIBLE
+        mFab.show()
     }
 
     override fun showProgressBar() {
-        progressBar.visibility = View.VISIBLE
+        mProgressBar.visibility = View.VISIBLE
     }
 
     override fun hideProgressBar() {
-        progressBar.visibility = View.GONE
+        mProgressBar.visibility = View.GONE
     }
 
     override fun showSnackbar(message: String?) {
-        message?.let {
-            Snackbar.make(foodNameTextView, it, Snackbar.LENGTH_SHORT).show()
-        }
+        message ?: return
+
+        Snackbar.make(mName, message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun showToast(message: String?) {

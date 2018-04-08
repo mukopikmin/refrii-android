@@ -8,10 +8,8 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Food
@@ -24,13 +22,14 @@ import javax.inject.Inject
 
 class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
-    private val toolbar: Toolbar by bindView(R.id.toolbar)
-    private val nameEditText: EditText by bindView(R.id.newFoodNameEditText)
-    private val noticeEditText: EditText by bindView(R.id.newFoodNoticeEditText)
-    private val amountEditText: EditText by bindView(R.id.newFoodAmountEditText)
-    private val spinner: Spinner by bindView(R.id.newFoodUnitSpinner)
-    private val fab: FloatingActionButton by bindView(R.id.fab)
-    private val expirationDateEditText: EditText by bindView(R.id.newFoodExpirationDateEditText)
+    private val mToolbar: Toolbar by bindView(R.id.toolbar)
+    private val mNameEditText: EditText by bindView(R.id.newFoodNameEditText)
+    private val mNoticeEditText: EditText by bindView(R.id.newFoodNoticeEditText)
+    private val mAmountEditText: EditText by bindView(R.id.newFoodAmountEditText)
+    private val mSpinner: Spinner by bindView(R.id.newFoodUnitSpinner)
+    private val mFab: FloatingActionButton by bindView(R.id.fab)
+    private val mExpirationDateEditText: EditText by bindView(R.id.newFoodExpirationDateEditText)
+    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
 
     @Inject
     lateinit var mPresenter: NewFoodPresenter
@@ -43,17 +42,17 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_new_food)
-        toolbar.title = "Add food"
-        setSupportActionBar(toolbar)
+        mToolbar.title = "Add food"
+        setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
-        expirationDateEditText.setText(formatter.format(Date()))
+        mExpirationDateEditText.setText(formatter.format(Date()))
 
-        fab.setOnClickListener { createFood() }
-        expirationDateEditText.setOnClickListener { showEditDateDialog() }
+        mFab.setOnClickListener { createFood() }
+        mExpirationDateEditText.setOnClickListener { showEditDateDialog() }
     }
 
     override fun onStart() {
@@ -79,7 +78,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
                 val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
                 val date = Date(data.getLongExtra("date", 0.toLong()))
 
-                expirationDateEditText.setText(formatter.format(date))
+                mExpirationDateEditText.setText(formatter.format(date))
             }
         }
     }
@@ -99,14 +98,13 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
     override fun setUnits(units: List<Unit>?) {
         units ?: return
 
-        spinner.adapter = ArrayAdapter<String>(this@NewFoodActivity, android.R.layout.simple_spinner_dropdown_item, units.map { it.label })
+        val unitLabels = units.map { it.label }
+        val adapter = ArrayAdapter<String>(this@NewFoodActivity, android.R.layout.simple_spinner_dropdown_item, unitLabels)
+
+        mSpinner.adapter = adapter
     }
 
-    private fun isCreatable(name: String): Boolean {
-        return !name.isEmpty()
-    }
-
-    override fun creteCompleted(food: Food?) {
+    override fun createCompleted(food: Food?) {
         food ?: return
 
         val intent = Intent()
@@ -117,28 +115,42 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
     }
 
     override fun showProgressBar() {
-
+        mFab.hide()
+        mProgressBar.visibility = View.VISIBLE
     }
 
     override fun hideProgressBar() {
+        mFab.show()
+        mProgressBar.visibility = View.GONE
     }
 
     override fun showToast(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
+    private fun isNotCreatable(): Boolean {
+        return mNameEditText.text.isBlank()
+                || mNoticeEditText.text.isBlank()
+                || mExpirationDateEditText.text.isBlank()
+    }
+
     private fun createFood() {
-        val name = nameEditText.text.toString()
-        val notice = noticeEditText.text.toString()
-        val amount = amountEditText.text.toString().toDouble()
-        val unit = mPresenter.pickUnit(spinner.selectedItem.toString())
-        val expirationDate = formatter.parse(expirationDateEditText.text.toString())
+        if (isNotCreatable()) {
+            showToast("Forms are not filled")
+            return
+        }
+
+        val name = mNameEditText.text.toString()
+        val notice = mNoticeEditText.text.toString()
+        val amount = mAmountEditText.text.toString().toDouble()
+        val unit = mPresenter.pickUnit(mSpinner.selectedItem.toString())
+        val expirationDate = formatter.parse(mExpirationDateEditText.text.toString())
 
         mPresenter.createFood(name, notice, amount, unit, expirationDate)
     }
 
     private fun showEditDateDialog() {
-        val expirationDate = formatter.parse(expirationDateEditText.text.toString())
+        val expirationDate = formatter.parse(mExpirationDateEditText.text.toString())
         val fragment = CalendarPickerDialogFragment.newInstance(expirationDate)
 
         fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
@@ -146,7 +158,6 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
     }
 
     companion object {
-        private const val TAG = "NewFoodActivity"
         private const val EDIT_EXPIRATION_DATE_REQUEST_CODE = 101
     }
 

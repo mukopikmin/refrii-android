@@ -100,20 +100,24 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     override fun updateName(name: String) {
         mFood?.name = name
         mView?.setFood(mFood, mBox)
+        mView?.onEdited()
     }
 
     override fun updateAmount(amount: Double) {
         mFood?.amount = amount
         mView?.setFood(mFood, mBox)
+        mView?.onEdited()
     }
 
     override fun updateNotice(notice: String) {
         mFood?.notice = notice
         mView?.setFood(mFood, mBox)
+        mView?.onEdited()
     }
 
     override fun updateExpirationDate(date: Date) {
         mFood?.expirationDate = date
         mView?.setFood(mFood, mBox)
+        mView?.onEdited()
     }
 }

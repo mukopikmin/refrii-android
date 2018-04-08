@@ -8,7 +8,7 @@ interface NewFoodContract {
 
     interface View {
         fun setUnits(units: List<Unit>?)
-        fun creteCompleted(food: Food?)
+        fun createCompleted(food: Food?)
         fun showProgressBar()
         fun hideProgressBar()
         fun showToast(message: String?)
