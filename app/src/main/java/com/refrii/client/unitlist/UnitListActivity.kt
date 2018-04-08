@@ -76,7 +76,6 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
         super.onStart()
 
         mPresenter.takeView(this)
-        hideProgressBar()
     }
 
     override fun onResume() {
@@ -96,27 +95,32 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
 
         when (requestCode) {
             NEW_UNIT_REQUEST_CODE -> {
-                val unit = data.getSerializableExtra("unit") as Unit
+                val preference = PreferenceManager.getDefaultSharedPreferences(this)
+                val userId = preference.getInt("id", 0)
 
-                mPresenter.mUnits?.let {
-                    it.add(unit)
-                    listView.deferNotifyDataSetChanged()
-
-                    showSnackbar("Unit created")
-                }
+                mPresenter.getUnits(userId)
+                showSnackbar("Unit added successfully")
             }
             UNIT_OPTIONS_REQUEST_CODE -> {
                 val option = data.getIntExtra("option", -1)
                 val unitId = data.getIntExtra("target_id", 0)
 
                 when (option) {
+                // Show
                     0 -> {
                         val intent = Intent(this@UnitListActivity, UnitActivity::class.java)
 
                         intent.putExtra("unit_id", unitId)
                         startActivity(intent)
                     }
-                    1 -> mPresenter.removeUnit(unitId)
+                // Remove
+                    1 -> {
+                        val preference = PreferenceManager.getDefaultSharedPreferences(this)
+                        val userId = preference.getInt("id", 0)
+
+                        mPresenter.removeUnit(unitId, userId)
+                    }
+                // Cancel
                     else -> return
                 }
             }
@@ -135,10 +139,10 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
         return result
     }
 
-    override fun setUnits(units: List<Unit>) {
-        val adapter = UnitListAdapter(this@UnitListActivity, units)
+    override fun setUnits(units: List<Unit>?) {
+        units ?: return
 
-        listView.adapter = adapter
+        listView.adapter = UnitListAdapter(this@UnitListActivity, units)
     }
 
     override fun showProgressBar() {
@@ -149,17 +153,16 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
         progressBar.visibility = View.GONE
     }
 
-    override fun showToast(message: String) {
+    override fun showToast(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun showSnackbar(message: String) {
+    override fun showSnackbar(message: String?) {
+        message ?: return
         Snackbar.make(listView, message, Snackbar.LENGTH_LONG).show()
     }
 
     companion object {
-        @Suppress("unused")
-        private const val TAG = "UnitListActivity"
         private const val NEW_UNIT_REQUEST_CODE = 101
         private const val UNIT_OPTIONS_REQUEST_CODE = 102
     }

@@ -10,7 +10,7 @@ class UnitListPresenter
 constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presenter {
 
     private var mView: UnitListContract.View? = null
-    var mUnits: MutableList<Unit>? = null
+    private var mUnits: List<Unit>? = null
 
     override fun takeView(view: UnitListContract.View) {
         mView = view
@@ -21,10 +21,8 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
 
         mApiRepository.getUnits(userId, object : ApiRepositoryCallback<List<Unit>> {
             override fun onNext(t: List<Unit>?) {
-                t?.let {
-                    mUnits = it.toMutableList()
-                    mView?.setUnits(it)
-                }
+                mUnits = t
+                mView?.setUnits(t)
             }
 
             override fun onCompleted() {
@@ -32,14 +30,12 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
             }
 
             override fun onError(e: Throwable?) {
-                e?.message?.let {
-                    mView?.showToast(it)
-                }
+                mView?.showToast(e?.message)
             }
         })
     }
 
-    override fun removeUnit(id: Int) {
+    override fun removeUnit(id: Int, userId: Int) {
         mView?.showProgressBar()
 
         mApiRepository.removeUnit(id, object : ApiRepositoryCallback<Void> {
@@ -47,13 +43,13 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
 
             override fun onCompleted() {
                 mView?.hideProgressBar()
-                mView?.showSnackbar("Unit is removed")
+                mView?.showSnackbar("Unit is removed successfully")
+
+                getUnits(userId)
             }
 
             override fun onError(e: Throwable?) {
-                e?.message?.let {
-                    mView?.showToast(it)
-                }
+                mView?.showToast(e?.message)
             }
 
         })
