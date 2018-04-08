@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, SigninContract.View {
 
     private val mSigninButton: SignInButton by bindView(R.id.googleSignInButton)
+    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
 
     @Inject
     lateinit var mPresenter: SigninPresenter
@@ -44,12 +47,12 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, googleSigninOptions)
                 .build()
-        val intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
 
         if (googleApiClient.hasConnectedApi(Auth.GOOGLE_SIGN_IN_API)) {
             googleApiClient.clearDefaultAccountAndReconnect()
         }
 
+        val intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
         startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
     }
 
@@ -59,6 +62,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val mailAddress = sharedPreferences.getString("mail", null)
 
+        onLoaded()
         mPresenter.takeView(this)
 
         // Auto re-authenticate if token expired
@@ -130,11 +134,11 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     }
 
     override fun onLoading() {
-
+        mProgressBar.visibility = View.VISIBLE
     }
 
     override fun onLoaded() {
-
+        mProgressBar.visibility = View.GONE
     }
 
     override fun showToast(message: String?) {
