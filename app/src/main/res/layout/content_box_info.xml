@@ -33,6 +33,7 @@
             android:id="@+id/editNameImageView"
             android:layout_width="16dp"
             android:layout_height="16dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
             app:layout_constraintLeft_toRightOf="@+id/nameLabel"
             app:layout_constraintTop_toBottomOf="@+id/include"
@@ -75,7 +76,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintLeft_toRightOf="@+id/noticeLabel"
             app:layout_constraintTop_toBottomOf="@+id/nameTextView"
             app:srcCompat="@drawable/ic_edit_black" />
@@ -148,7 +149,8 @@
             android:id="@+id/shareImageView"
             android:layout_width="16dp"
             android:layout_height="16dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintLeft_toRightOf="@+id/sharedUsersLabel"
             app:layout_constraintTop_toBottomOf="@+id/ownerTextView"
             app:srcCompat="@drawable/ic_edit_black" />

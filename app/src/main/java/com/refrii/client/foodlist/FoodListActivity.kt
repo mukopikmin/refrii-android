@@ -70,20 +70,13 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        mFab.setOnClickListener {
-            mPresenter.mBox?.let {
-                val intent = Intent(this@FoodListActivity, NewFoodActivity::class.java)
-
-                intent.putExtra("boxId", it.id)
-                startActivityForResult(intent, ADD_FOOD_REQUEST_CODE)
-            }
-        }
+        mFab.setOnClickListener { mPresenter.addFood() }
     }
 
     public override fun onStart() {
         super.onStart()
 
-        mPresenter.mView = this
+        mPresenter.takeView(this)
         mPresenter.getBoxes()
 
         setNavigationHeader()
@@ -166,7 +159,9 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         return true
     }
 
-    override fun setBoxes(boxes: List<Box>) {
+    override fun setBoxes(boxes: List<Box>?) {
+        boxes ?: return
+
         mNavigationView.setNavigationItemSelectedListener(this@FoodListActivity)
         val menu = mNavigationView.menu.findItem(R.id.menu_boxes)
         menu.subMenu.clear()
@@ -180,11 +175,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
             val box = boxes[boxIndex]
 
-            mPresenter.mBox = box
-
-            box.foods?.let {
-                setFoods(box, it)
-            }
+            mPresenter.selectBox(box)
         }
     }
 
@@ -212,7 +203,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         }
     }
 
-    private fun showFood(id: Int, box: Box?) {
+    override fun showFood(id: Int, box: Box?) {
         val intent = Intent(this@FoodListActivity, FoodActivity::class.java)
 
         intent.putExtra("food_id", id)
@@ -221,17 +212,21 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
     }
 
-    private fun showOptionsDialog(food: Food) {
-        food.name?.let {
-            val options = arrayOf("Show", "Remove", "Cancel")
-            val fragment = OptionsPickerDialogFragment.newInstance(it, options, food.id)
+    override fun showOptionsDialog(food: Food?) {
+        food ?: return
 
-            fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
-            fragment.show(fragmentManager, "food_option")
-        }
+        val name = food.name ?: return
+        val options = arrayOf("Show", "Remove", "Cancel")
+        val fragment = OptionsPickerDialogFragment.newInstance(name, options, food.id)
+
+        fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
+        fragment.show(fragmentManager, "food_option")
     }
 
-    override fun setFoods(box: Box, foods: List<Food>) {
+    override fun setFoods(box: Box?, foods: List<Food>?) {
+        box ?: return
+        foods ?: return
+
         val adapter = FoodRecyclerViewAdapter(foods)
 
         adapter.apply {
@@ -239,7 +234,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
 
-                showFood(food.id, mPresenter.mBox)
+                mPresenter.showFood(food.id)
             }
 
             mLongClickListener = View.OnLongClickListener {
@@ -284,11 +279,13 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mFab.show()
     }
 
-    override fun showToast(message: String) {
+    override fun showToast(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun showSnackbar(message: String) {
+    override fun showSnackbar(message: String?) {
+        message ?: return
+
         Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_SHORT).show()
     }
 
@@ -296,22 +293,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         if (resultCode != Activity.RESULT_OK || data == null) return
 
         when (requestCode) {
-            ADD_FOOD_REQUEST_CODE -> {
-//                val foodId = data.getIntExtra("food_id", 0)
-//                val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
-//                val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
-//
-//                food?.let {
-//                    mRealm.executeTransaction { adapter.add(food) }
-//                    adapter.notifyDataSetChanged()
-//                }
-            }
-            EDIT_FOOD_REQUEST_CODE -> {
-//                val foodId = data.getIntExtra("food_id", 0)
-//                val food = mRealm.where(Food::class.java)?.equalTo("id", foodId)?.findFirst()
-//
-//                food?.name?.let { Snackbar.make(mRecyclerView, "$it updated successfully", Snackbar.LENGTH_LONG).show() }
-            }
+            ADD_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
+            EDIT_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
             FOOD_OPTIONS_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     val option = data.getIntExtra("option", -1)
@@ -320,7 +303,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                     // Show
                         0 -> {
                             val foodId = data.getIntExtra("target_id", 0)
-                            showFood(foodId, mPresenter.mBox)
+                            mPresenter.showFood(foodId)
                         }
                     // Remove
                         1 -> {
@@ -333,6 +316,15 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 }
             }
         }
+    }
+
+    override fun addFood(box: Box?) {
+        box ?: return
+
+        val intent = Intent(this@FoodListActivity, NewFoodActivity::class.java)
+
+        intent.putExtra("boxId", box.id)
+        startActivityForResult(intent, ADD_FOOD_REQUEST_CODE)
     }
 
     private fun signOut() {
