@@ -13,6 +13,7 @@ interface UnitContract {
         fun onLoading()
         fun onLoaded()
         fun showToast(message: String?)
+        fun showSnackbar(message: String?)
     }
 
     interface Presenter {

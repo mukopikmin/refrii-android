@@ -4,10 +4,13 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.refrii.client.App
@@ -22,14 +25,16 @@ import javax.inject.Inject
 
 class UnitActivity : AppCompatActivity(), UnitContract.View {
 
-    private val toolbar: Toolbar by bindView(R.id.toolbar)
-    private val labelTextView: TextView by bindView(R.id.labelTextView)
-    private val stepTextView: TextView by bindView(R.id.stepTextView)
-    private val createdTextView: TextView by bindView(R.id.createdTextView)
-    private val updatedTextView: TextView by bindView(R.id.updatedTextView)
-    private val labelImageView: ImageView by bindView(R.id.labelImageView)
-    private val stepImageView: ImageView by bindView(R.id.stepImageView)
-    private val fab: FloatingActionButton by bindView(R.id.fab)
+    private val mToolbar: Toolbar by bindView(R.id.toolbar)
+    private val mLabel: TextView by bindView(R.id.labelTextView)
+    private val mStep: TextView by bindView(R.id.stepTextView)
+    private val mCreated: TextView by bindView(R.id.createdTextView)
+    private val mUpdated: TextView by bindView(R.id.updatedTextView)
+    private val mEditLabel: ImageView by bindView(R.id.labelImageView)
+    private val mEditStep: ImageView by bindView(R.id.stepImageView)
+    private val mFab: FloatingActionButton by bindView(R.id.fab)
+    private val mEditedMessage: TextView by bindView(R.id.editedMessageTextView)
+    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
 
     @Inject
     lateinit var mPresenter: UnitPresenter
@@ -40,15 +45,15 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_unit)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
-        labelImageView.setOnClickListener { mPresenter.editLabel() }
-        stepImageView.setOnClickListener { mPresenter.editStep() }
-        fab.setOnClickListener { mPresenter.updateUnit() }
+        mEditLabel.setOnClickListener { mPresenter.editLabel() }
+        mEditStep.setOnClickListener { mPresenter.editStep() }
+        mFab.setOnClickListener { mPresenter.updateUnit() }
     }
 
     override fun onStart() {
@@ -96,26 +101,28 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
 
         val formatter = SimpleDateFormat("yyyy/MM/dd HH/mm", Locale.getDefault())
 
-        labelTextView.text = unit.label
-        stepTextView.text = unit.step.toString()
-        createdTextView.text = formatter.format(unit.createdAt)
-        updatedTextView.text = formatter.format(unit.updatedAt)
+        mLabel.text = unit.label
+        mStep.text = unit.step.toString()
+        mCreated.text = formatter.format(unit.createdAt)
+        mUpdated.text = formatter.format(unit.updatedAt)
     }
 
     override fun onLoading() {
-        fab.hide()
+        mProgressBar.visibility = View.VISIBLE
     }
 
     override fun onLoaded() {
-        fab.show()
+        mProgressBar.visibility = View.GONE
     }
 
     override fun onBeforeEdit() {
-
+        mEditedMessage.visibility = View.GONE
+        mFab.hide()
     }
 
     override fun onEdited() {
-        fab.show()
+        mEditedMessage.visibility = View.VISIBLE
+        mFab.show()
     }
 
     override fun showEditLabelDialog(label: String?) {
@@ -140,8 +147,13 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
+    override fun showSnackbar(message: String?) {
+        message ?: return
+
+        Snackbar.make(mLabel, message, Snackbar.LENGTH_LONG).show()
+    }
+
     companion object {
-        private const val TAG = "UnitActivity"
         private const val EDIT_LABEL_REQUEST_CODE = 101
         private const val EDIT_STEP_REQUEST_CODE = 121
     }

@@ -20,8 +20,8 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <include layout="@layout/progressbar" />
     <include layout="@layout/content_unit" />
-
     <include layout="@layout/fab_check" />
 
 </android.support.design.widget.CoordinatorLayout>
