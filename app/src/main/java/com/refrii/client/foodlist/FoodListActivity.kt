@@ -293,7 +293,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         if (resultCode != Activity.RESULT_OK || data == null) return
 
         when (requestCode) {
-            ADD_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
+            ADD_FOOD_REQUEST_CODE -> {
+                showSnackbar("Food added successfully")
+                mPresenter.getBoxes()
+            }
             EDIT_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
             FOOD_OPTIONS_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {

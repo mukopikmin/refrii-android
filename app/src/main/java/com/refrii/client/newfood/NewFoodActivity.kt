@@ -130,7 +130,6 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
     private fun isNotCreatable(): Boolean {
         return mNameEditText.text.isBlank()
-                || mNoticeEditText.text.isBlank()
                 || mExpirationDateEditText.text.isBlank()
     }
 
