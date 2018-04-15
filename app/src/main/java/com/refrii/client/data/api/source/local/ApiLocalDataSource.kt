@@ -84,7 +84,7 @@ class ApiLocalDataSource(context: Context) : ApiDataSource {
             it.where(Unit::class.java)
                     .equalTo("id", id)
                     .findFirst()
-                    .deleteFromRealm()
+                    ?.deleteFromRealm()
         }
     }
 }

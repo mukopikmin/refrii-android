@@ -8,6 +8,7 @@ import java.io.Serializable
 import java.util.*
 
 open class Box : RealmObject(), Serializable {
+
     @PrimaryKey
     open var id: Int = 0
     open var name: String? = null
@@ -19,6 +20,7 @@ open class Box : RealmObject(), Serializable {
     open var foods: RealmList<Food>? = null
     open var invitedUsers: RealmList<User>? = null
     open var owner: User? = null
+    open var changeSets: RealmList<BoxChangeSet>? = null
 
     override fun equals(other: Any?): Boolean {
         other ?: return false

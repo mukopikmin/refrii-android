@@ -1,5 +1,6 @@
 package com.refrii.client.food
 
+import android.util.Log
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.source.ApiRepository
@@ -34,6 +35,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
 
             override fun onError(e: Throwable?) {
                 mView?.showToast(e?.message)
+                Log.e("AAAAA", e?.message)
             }
         })
     }

@@ -6,6 +6,7 @@ import java.io.Serializable
 import java.util.*
 
 open class User : RealmObject(), Serializable {
+
     @PrimaryKey
     open var id: Int = 0
     open var name: String? = null
