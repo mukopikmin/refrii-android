@@ -30,10 +30,12 @@ class ImageDownloadTask(private val callback: ImageDownloadTaskCallback) : Async
         return image
     }
 
-    override fun onPostExecute(result: Bitmap) {
+    override fun onPostExecute(result: Bitmap?) {
         super.onPostExecute(result)
 
-        callback.onPostExecuted(result)
+        result?.let {
+            callback.onPostExecuted(it)
+        }
     }
 
     companion object {
