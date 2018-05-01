@@ -128,13 +128,20 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    private fun isNotCreatable(): Boolean {
-        return mNameEditText.text.isBlank()
-                || mExpirationDateEditText.text.isBlank()
+    private fun validate(): Boolean {
+        if (mNameEditText.text.isBlank()) {
+            mNameEditText.error = "Name is empty"
+        }
+
+        if (mAmountEditText.text.isBlank()) {
+            mAmountEditText.error = "Amount is empty"
+        }
+
+        return mNameEditText.text.isNotBlank() && mAmountEditText.text.isNotBlank()
     }
 
     private fun createFood() {
-        if (isNotCreatable()) {
+        if (!validate()) {
             showToast("Forms are not filled")
             return
         }
