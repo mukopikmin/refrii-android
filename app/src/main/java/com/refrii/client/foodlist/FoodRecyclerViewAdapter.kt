@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerSwipeAdapter<FoodViewHolder>() {
-
     private var mItemManager = SwipeItemRecyclerMangerImpl(this)
 //    private var mRealm: Realm
 
@@ -29,7 +28,7 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerSwipeAda
         return R.id.swipeLayout
     }
 
-    override fun onBindViewHolder(holder: FoodViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: FoodViewHolder, position: Int) {
 //        val id = mFoods[position].id
 //        val food = mRealm.where(Food::class.java).equalTo("id", id).findFirst()
         val food = mFoods[position]
@@ -62,7 +61,7 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerSwipeAda
         mItemManager.bindView(holder?.itemView, position)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): FoodViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodViewHolder {
         val view = LayoutInflater.from(parent?.context).inflate(R.layout.food_list_row, parent, false)
 
         return FoodViewHolder(view)

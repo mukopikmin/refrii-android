@@ -4,27 +4,35 @@ import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.firebase.FirebaseApp
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Credential
 import kotterknife.bindView
 import java.util.*
 import javax.inject.Inject
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+
 
 class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, SigninContract.View {
 
     private val mSigninButton: SignInButton by bindView(R.id.googleSignInButton)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+    private lateinit var googleSignInClient: GoogleSignInClient
 
     @Inject
     lateinit var mPresenter: SigninPresenter
@@ -36,24 +44,17 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
         setContentView(R.layout.activity_signin)
 
+        val gso =GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+
         mSigninButton.setOnClickListener { googleSignin() }
     }
 
     private fun googleSignin() {
-        val googleSigninOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build()
-        val googleApiClient = GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSigninOptions)
-                .build()
-
-        if (googleApiClient.hasConnectedApi(Auth.GOOGLE_SIGN_IN_API)) {
-            googleApiClient.clearDefaultAccountAndReconnect()
-        }
-
-        val intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient)
-        startActivityForResult(intent, GOOGLE_SIGN_IN_REQUEST_CODE)
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST_CODE)
     }
 
     override fun onStart() {
@@ -87,7 +88,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         finishAffinity()
     }
 
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         when (requestCode) {
@@ -146,6 +147,7 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
     }
 
     companion object {
+        private const val TAG = "SigninActivity"
         private const val GOOGLE_SIGN_IN_REQUEST_CODE = 101
     }
 }

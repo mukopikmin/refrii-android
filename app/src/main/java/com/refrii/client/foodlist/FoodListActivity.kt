@@ -266,7 +266,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun onFoodUpdated() {
-        mRecyclerView.adapter.notifyDataSetChanged()
+        mRecyclerView.adapter?.notifyDataSetChanged()
     }
 
     override fun showProgressBar() {
