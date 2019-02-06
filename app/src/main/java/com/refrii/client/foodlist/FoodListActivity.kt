@@ -16,6 +16,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -24,6 +25,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.daimajia.swipe.util.Attributes
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoActivity
@@ -332,10 +335,20 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     private fun signOut() {
         val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+        val intent = Intent(this@FoodListActivity, SigninActivity::class.java)
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build()
+        val googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+        googleSignInClient.revokeAccess()
+                .addOnCompleteListener(this) {
+                    Log.w("AAAAAAAAAAAA", "AAAAAAAAAAAA")
+                }
+
         editor.clear()
         editor.apply()
 
-        val intent = Intent(this@FoodListActivity, SigninActivity::class.java)
         startActivity(intent)
     }
 

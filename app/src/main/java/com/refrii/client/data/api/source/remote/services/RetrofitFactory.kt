@@ -5,6 +5,7 @@ import android.preference.PreferenceManager
 
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.refrii.client.BuildConfig
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -35,13 +36,21 @@ object RetrofitFactory {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create()
         val retrofit = Retrofit.Builder()
-                .baseUrl("https://refrii-api.herokuapp.com/")
-                //       .baseUrl("http://192.168.10.102:3000/")
+                .baseUrl(getApiEndpoint())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(httpClient)
                 .build()
 
         return retrofit.create(clazz)
+    }
+
+    fun getApiEndpoint(): String {
+        val version = "v1"
+
+        return when (BuildConfig.FLAVOR) {
+            "debug" -> "https://refrii-api-staging.herokuapp.com/$version"
+            else -> "https://api.refrii.com/$version"
+        }
     }
 }

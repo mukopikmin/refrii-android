@@ -9,30 +9,26 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.SignInButton
-import com.google.android.gms.common.api.GoogleApiClient
-import com.google.firebase.FirebaseApp
+import com.google.android.gms.common.api.ApiException
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Credential
 import kotterknife.bindView
 import java.util.*
 import javax.inject.Inject
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 
 
-class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedListener, SigninContract.View {
+class SigninActivity : AppCompatActivity(), SigninContract.View {
 
-    private val mSigninButton: SignInButton by bindView(R.id.googleSignInButton)
+    private val mSignInButton: SignInButton by bindView(R.id.googleSignInButton)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
-    private lateinit var googleSignInClient: GoogleSignInClient
+
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
 
     @Inject
     lateinit var mPresenter: SigninPresenter
@@ -44,17 +40,14 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
         setContentView(R.layout.activity_signin)
 
-        val gso =GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        mSigninButton.setOnClickListener { googleSignin() }
-    }
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
-    private fun googleSignin() {
-        val signInIntent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST_CODE)
+        mSignInButton.setOnClickListener { googleSignIn() }
     }
 
     override fun onStart() {
@@ -70,12 +63,12 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
         mPresenter.auth(mailAddress)
     }
 
-    public override fun onResume() {
+    override fun onResume() {
         super.onResume()
 
         // Set sign in button text to center
-        for (i in 0 until mSigninButton.childCount) {
-            val v = mSigninButton.getChildAt(i)
+        for (i in 0 until mSignInButton.childCount) {
+            val v = mSignInButton.getChildAt(i)
 
             if (v is TextView) {
                 v.setPadding(0, 0, 20, 0)
@@ -93,31 +86,18 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
         when (requestCode) {
             GOOGLE_SIGN_IN_REQUEST_CODE -> {
-                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+                val task = GoogleSignIn.getSignedInAccountFromIntent(data)
 
-                if (result.isSuccess) {
-                    onGoogleSigninSuccess(result.signInAccount)
+                try {
+                    val account = task.getResult(ApiException::class.java)
+
+                    onGoogleSignInSuccess(account)
+                } catch (e: ApiException) {
+                    Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
                 }
             }
         }
     }
-
-    private fun onGoogleSigninSuccess(signInAccount: GoogleSignInAccount?) {
-        signInAccount ?: return
-
-        val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
-
-        editor.apply {
-            putString("mail", signInAccount.email)
-            putString("name", signInAccount.displayName)
-            putString("avatar", signInAccount.photoUrl.toString())
-        }
-        editor.apply()
-
-        mPresenter.auth(signInAccount.email)
-    }
-
-    override fun onConnectionFailed(connectionResult: ConnectionResult) {}
 
     override fun onAuthCompleted(credential: Credential?) {
         credential ?: return
@@ -144,6 +124,27 @@ class SigninActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedLi
 
     override fun showToast(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun googleSignIn() {
+        val signInIntent = mGoogleSignInClient.signInIntent
+
+        startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST_CODE)
+    }
+
+    private fun onGoogleSignInSuccess(signInAccount: GoogleSignInAccount?) {
+        signInAccount ?: return
+
+        val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+
+        editor.apply {
+            putString("mail", signInAccount.email)
+            putString("name", signInAccount.displayName)
+            putString("avatar", signInAccount.photoUrl.toString())
+        }
+        editor.apply()
+
+        mPresenter.auth(signInAccount.email)
     }
 
     companion object {

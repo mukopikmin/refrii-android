@@ -4,7 +4,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android'
 //apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'realm-android'
-
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
