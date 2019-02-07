@@ -83,6 +83,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 })
     }
 
+
     override fun updateBox(box: Box, callback: ApiRepositoryCallback<Box>) {
         mRetrofit.create(BoxService::class.java)
                 .updateBox(box.id, box.toMultipartBody())
@@ -100,6 +101,27 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                     override fun onError(e: Throwable?) {
                         callback.onError(e)
                     }
+                })
+    }
+
+    override fun getFoodsInBox(id: Int, callback: ApiRepositoryCallback<List<Food>>) {
+        mRetrofit.create(BoxService::class.java)
+                .getFoodsInBox(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Subscriber<List<Food>>() {
+                    override fun onNext(t: List<Food>?) {
+                        callback.onNext(t)
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        callback.onError(e)
+                    }
+
                 })
     }
 

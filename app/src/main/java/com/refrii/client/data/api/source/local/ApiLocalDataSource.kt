@@ -35,6 +35,10 @@ class ApiLocalDataSource(context: Context) : ApiDataSource {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun getFoodsInBox(id: Int, callback: ApiRepositoryCallback<List<Food>>) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun getFood(id: Int, callback: ApiRepositoryCallback<Food>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

@@ -13,6 +13,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     private var mView: FoodListContract.View? = null
     private var mBoxes: List<Box>? = null
     private var mBox: Box? = null
+    private var mFoods: List<Food>? = null
 
     override fun takeView(view: FoodListContract.View) {
         mView = view
@@ -28,7 +29,23 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         val box = mBoxes?.firstOrNull { menuItemId == it.id } ?: return false
 
         mBox = box
-        mView?.setFoods(box, box.foods)
+        mView?.showProgressBar()
+
+        mApiRepository.getFoodsInBox(box.id, object : ApiRepositoryCallback<List<Food>> {
+            override fun onNext(t: List<Food>?) {
+                mFoods = t
+                mView?.setFoods(box, t)
+            }
+
+            override fun onCompleted() {
+                mView?.hideProgressBar()
+            }
+
+            override fun onError(e: Throwable?) {
+                mView?.showToast(e?.message)
+            }
+
+        })
 
         return true
     }
@@ -124,7 +141,21 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
     override fun selectBox(box: Box) {
         mBox = box
-        mView?.setFoods(box, box.foods)
+        mApiRepository.getFoodsInBox(box.id, object : ApiRepositoryCallback<List<Food>> {
+            override fun onNext(t: List<Food>?) {
+                mFoods = t
+                mView?.setFoods(box, t)
+            }
+
+            override fun onCompleted() {
+                mView?.hideProgressBar()
+            }
+
+            override fun onError(e: Throwable?) {
+                mView?.showToast(e?.message)
+            }
+
+        })
     }
 
     override fun addFood() {

@@ -17,10 +17,8 @@ open class Box : RealmObject(), Serializable {
     open var isInvited: Boolean = false
     open var updatedAt: Date? = null
     open var createdAt: Date? = null
-    open var foods: RealmList<Food>? = null
     open var invitedUsers: RealmList<User>? = null
     open var owner: User? = null
-    open var changeSets: RealmList<BoxChangeSet>? = null
 
     override fun equals(other: Any?): Boolean {
         other ?: return false
@@ -39,7 +37,6 @@ open class Box : RealmObject(), Serializable {
         result = 31 * result + isInvited.hashCode()
         result = 31 * result + (updatedAt?.hashCode() ?: 0)
         result = 31 * result + (createdAt?.hashCode() ?: 0)
-        result = 31 * result + (foods?.hashCode() ?: 0)
         result = 31 * result + (invitedUsers?.hashCode() ?: 0)
         result = 31 * result + (owner?.hashCode() ?: 0)
 

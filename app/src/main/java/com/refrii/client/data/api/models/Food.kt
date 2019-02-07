@@ -1,6 +1,5 @@
 package com.refrii.client.data.api.models
 
-import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import java.io.Serializable
@@ -21,7 +20,7 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
     open var unit: Unit? = null
     open var createdUser: User? = null
     open var updatedUser: User? = null
-    open var changeSets: RealmList<FoodChangeSet>? = null
+    open var boxId: Int = 0
 
     override fun equals(other: Any?): Boolean {
         other ?: return false

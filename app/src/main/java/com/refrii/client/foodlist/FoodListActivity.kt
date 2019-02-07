@@ -69,7 +69,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mDrawer.addDrawerListener(toggle)
         toggle.syncState()
 
-
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = LinearLayoutManager(this)
 

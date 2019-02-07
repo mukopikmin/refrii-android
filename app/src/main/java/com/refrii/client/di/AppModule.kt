@@ -5,6 +5,7 @@ import android.content.Context
 import android.preference.PreferenceManager
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import com.refrii.client.BuildConfig
 import com.refrii.client.boxinfo.BoxInfoContract
 import com.refrii.client.boxinfo.BoxInfoPresenter
 import com.refrii.client.data.api.source.ApiRepository
@@ -87,8 +88,7 @@ class AppModule(private var mApplication: Application) {
                 .create()
 
         return Retrofit.Builder()
-                .baseUrl("https://refrii-api.herokuapp.com/")
-                //       .baseUrl("http://192.168.10.102:3000/")
+                .baseUrl(getApiEndpoint())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(provideHttpClient())
@@ -105,12 +105,23 @@ class AppModule(private var mApplication: Application) {
                     val jwt = sharedPreferences.getString("jwt", null)
                     val request = original.newBuilder()
                             .header("Accept", "application/json")
+
                     if (jwt != null) {
-                        request.header("Authorization", "Bearer " + jwt)
+                        request.header("Authorization", "Bearer $jwt")
                     }
+
                     request.method(original.method(), original.body())
                     chain.proceed(request.build())
                 }
                 .build()
+    }
+
+    private fun getApiEndpoint(): String {
+        val version = "v1"
+
+        return when (BuildConfig.FLAVOR) {
+            "debug" -> "https://refrii-api-staging.herokuapp.com/$version/"
+            else -> "https://api.refrii.com/$version/"
+        }
     }
 }

@@ -13,6 +13,7 @@ interface ApiDataSource {
     fun getBoxes(callback: ApiRepositoryCallback<List<Box>>)
     fun getBox(id: Int, callback: ApiRepositoryCallback<Box>)
     fun updateBox(box: Box, callback: ApiRepositoryCallback<Box>)
+    fun getFoodsInBox(id: Int, callback: ApiRepositoryCallback<List<Food>>)
 
     fun getFood(id: Int, callback: ApiRepositoryCallback<Food>)
     fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date, callback: ApiRepositoryCallback<Food>)

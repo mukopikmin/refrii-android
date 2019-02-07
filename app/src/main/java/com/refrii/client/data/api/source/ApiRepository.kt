@@ -25,6 +25,10 @@ class ApiRepository(context: Context, retrofit: Retrofit) : ApiDataSource {
         mApiRemoteDataSource.getBox(id, callback)
     }
 
+    override fun getFoodsInBox(id: Int, callback: ApiRepositoryCallback<List<Food>>) {
+        mApiRemoteDataSource.getFoodsInBox(id, callback)
+    }
+
     override fun updateBox(box: Box, callback: ApiRepositoryCallback<Box>) {
         mApiRemoteDataSource.updateBox(box, callback)
     }
