@@ -22,25 +22,13 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
 
     override fun auth(googleToken: String, callback: ApiRepositoryCallback<Credential>) {
         val params = HashMap<String, String>()
-        params["token"] = googleToken
 
+        params["token"] = googleToken
         mRetrofit.create(AuthService::class.java)
                 .getToken(params)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Credential>() {
-                    override fun onNext(t: Credential) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun getBoxes(callback: ApiRepositoryCallback<List<Box>>) {
@@ -48,19 +36,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .getBoxes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<List<Box>>() {
-                    override fun onNext(t: List<Box>?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun getBox(id: Int, callback: ApiRepositoryCallback<Box>) {
@@ -68,19 +44,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .getBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Box>() {
-                    override fun onNext(t: Box?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
 
@@ -89,19 +53,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .updateBox(box.id, box.toMultipartBody())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Box>() {
-                    override fun onNext(t: Box?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun getFoodsInBox(id: Int, callback: ApiRepositoryCallback<List<Food>>) {
@@ -109,20 +61,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .getFoodsInBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<List<Food>>() {
-                    override fun onNext(t: List<Food>?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun getFood(id: Int, callback: ApiRepositoryCallback<Food>) {
@@ -130,19 +69,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .getFood(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Food>() {
-                    override fun onNext(t: Food?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date, callback: ApiRepositoryCallback<Food>) {
@@ -161,19 +88,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .addFood(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Food>() {
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onNext(t: Food?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun updateFood(food: Food, box: Box, callback: ApiRepositoryCallback<Food>) {
@@ -192,19 +107,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .updateFood(food.id, body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Food>() {
-                    override fun onNext(t: Food?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun removeFood(id: Int, callback: ApiRepositoryCallback<Void>) {
@@ -212,19 +115,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .removeFood(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Void>() {
-                    override fun onNext(t: Void?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun getUnits(userId: Int, callback: ApiRepositoryCallback<List<Unit>>) {
@@ -232,19 +123,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .getUnits()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<MutableList<Unit>>() {
-                    override fun onNext(t: MutableList<Unit>?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun getUnit(id: Int, callback: ApiRepositoryCallback<Unit>) {
@@ -252,19 +131,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .getUnit(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Unit>() {
-                    override fun onNext(t: Unit?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onCompleted()
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun createUnit(label: String, step: Double, callback: ApiRepositoryCallback<Unit>) {
@@ -278,20 +145,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .createUnit(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Unit>() {
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onNext(t: Unit) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        callback.onError(e)
-                    }
-
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun updateUnit(unit: Unit, callback: ApiRepositoryCallback<Unit>) {
@@ -299,19 +153,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .updateUnit(unit.id, unit.toMultipartBody())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Unit>() {
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onNext(t: Unit?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+                .subscribe(getSubscriber(callback))
     }
 
     override fun removeUnit(id: Int, callback: ApiRepositoryCallback<Void>) {
@@ -319,18 +161,22 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .deleteUnit(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Subscriber<Void>() {
-                    override fun onNext(t: Void?) {
-                        callback.onNext(t)
-                    }
+                .subscribe(getSubscriber(callback))
+    }
 
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
+    private fun <T> getSubscriber(callback: ApiRepositoryCallback<T>): Subscriber<T> {
+        return object : Subscriber<T>() {
+            override fun onNext(t: T) {
+                callback.onNext(t)
+            }
 
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+            override fun onCompleted() {
+                callback.onCompleted()
+            }
+
+            override fun onError(e: Throwable?) {
+                callback.onError(e)
+            }
+        }
     }
 }
