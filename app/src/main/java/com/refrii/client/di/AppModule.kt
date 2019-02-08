@@ -119,9 +119,10 @@ class AppModule(private var mApplication: Application) {
     private fun getApiEndpoint(): String {
         val version = "v1"
 
-        return when (BuildConfig.FLAVOR) {
-            "debug" -> "https://refrii-api-staging.herokuapp.com/$version/"
-            else -> "https://api.refrii.com/$version/"
+        return if (BuildConfig.DEBUG) {
+            "https://refrii-api-staging.herokuapp.com/$version/"
+        } else {
+            "https://api.refrii.com/$version/"
         }
     }
 }
