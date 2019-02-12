@@ -15,6 +15,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Credential
@@ -29,6 +32,7 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
 
     private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var mFirebaseAuth: FirebaseAuth
 
     @Inject
     lateinit var mPresenter: SigninPresenter
@@ -46,6 +50,7 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
                 .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        mFirebaseAuth = FirebaseAuth.getInstance()
 
         mSignInButton.setOnClickListener { googleSignIn() }
     }
@@ -60,7 +65,7 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
         mPresenter.takeView(this)
 
         // Auto re-authenticate if token expired
-        mPresenter.auth(mailAddress)
+//        mPresenter.auth(mailAddress)
     }
 
     override fun onResume() {
@@ -91,12 +96,27 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
                 try {
                     val account = task.getResult(ApiException::class.java)
 
-                    onGoogleSignInSuccess(account)
+                    firebaseAuthWithGoogle(account)
                 } catch (e: ApiException) {
                     Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
                 }
             }
         }
+    }
+
+    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount?) {
+        val credential = GoogleAuthProvider.getCredential(acct!!.idToken, null)
+
+        mFirebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        val user = mFirebaseAuth.currentUser
+
+                        onGoogleSignInSuccess(user)
+                    } else {
+                        showToast("Failed to login")
+                    }
+                }
     }
 
     override fun onAuthCompleted(credential: Credential?) {
@@ -132,19 +152,21 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
         startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST_CODE)
     }
 
-    private fun onGoogleSignInSuccess(signInAccount: GoogleSignInAccount?) {
-        signInAccount ?: return
+    private fun onGoogleSignInSuccess(account: FirebaseUser?) {
+        account ?: return
 
-        val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+        val editor = PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
 
-        editor.apply {
-            putString("mail", signInAccount.email)
-            putString("name", signInAccount.displayName)
-            putString("avatar", signInAccount.photoUrl.toString())
+        account.getIdToken(true).addOnCompleteListener {
+            editor.apply {
+                putString("jwt", it.result?.token)
+                putString("mail", account.email)
+                putString("name", account.displayName)
+                putString("avatar", account.photoUrl.toString())
+            }
+            editor.apply()
+            finish()
         }
-        editor.apply()
-
-        mPresenter.auth(signInAccount.email)
     }
 
     companion object {

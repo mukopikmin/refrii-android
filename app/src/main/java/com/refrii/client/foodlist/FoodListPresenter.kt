@@ -4,6 +4,7 @@ import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.source.ApiRepository
 import com.refrii.client.data.api.source.ApiRepositoryCallback
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class FoodListPresenter
@@ -65,6 +66,10 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
             override fun onError(e: Throwable?) {
                 mView?.showToast(e?.message)
+
+                if (e is HttpException && e.code() == 401) {
+                    mView?.signOut()
+                }
             }
         })
     }

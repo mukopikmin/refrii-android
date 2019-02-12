@@ -16,7 +16,6 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -332,7 +331,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         startActivityForResult(intent, ADD_FOOD_REQUEST_CODE)
     }
 
-    private fun signOut() {
+    override fun signOut() {
         val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
         val intent = Intent(this@FoodListActivity, SigninActivity::class.java)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -341,9 +340,9 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         googleSignInClient.revokeAccess()
-                .addOnCompleteListener(this) {
-                    Log.w("AAAAAAAAAAAA", "AAAAAAAAAAAA")
-                }
+//                .addOnCompleteListener(this) {
+//                    Log.w("AAAAAAAAAAAA", "AAAAAAAAAAAA")
+//                }
 
         editor.clear()
         editor.apply()

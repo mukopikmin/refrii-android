@@ -9,7 +9,6 @@ import com.refrii.client.BuildConfig
 import com.refrii.client.boxinfo.BoxInfoContract
 import com.refrii.client.boxinfo.BoxInfoPresenter
 import com.refrii.client.data.api.source.ApiRepository
-import com.refrii.client.data.google.GoogleRepository
 import com.refrii.client.food.FoodContract
 import com.refrii.client.food.FoodPresenter
 import com.refrii.client.foodlist.FoodListContract
@@ -43,8 +42,8 @@ class AppModule(private var mApplication: Application) {
     }
 
     @Provides
-    fun provideSigninPresenter(googleRepository: GoogleRepository, apiRepository: ApiRepository): SigninContract.Presenter {
-        return SigninPresenter(googleRepository, apiRepository)
+    fun provideSigninPresenter(): SigninContract.Presenter {
+        return SigninPresenter()
     }
 
     @Provides

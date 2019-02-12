@@ -13,6 +13,5 @@ interface SigninContract {
 
     interface Presenter {
         fun takeView(view: View)
-        fun auth(accountName: String?)
     }
 }
