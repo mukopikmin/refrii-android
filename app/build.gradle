@@ -25,6 +25,8 @@ android {
         }
         development {
             applicationId "com.refrii.client.development"
+            versionNameSuffix "-dev"
+
         }
     }
 
