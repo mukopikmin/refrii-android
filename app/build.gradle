@@ -26,7 +26,10 @@ android {
         development {
             applicationId "com.refrii.client.development"
             versionNameSuffix "-dev"
-
+        }
+        staging {
+            applicationId "com.refrii.client.staging"
+            versionNameSuffix "-staging"
         }
     }
 
