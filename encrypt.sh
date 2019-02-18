@@ -16,3 +16,4 @@ tar -zcvf $filename $temp_dir/*
 travis encrypt-file $filename
 
 rm -rf temp
+rm -rf $filename
