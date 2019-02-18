@@ -125,6 +125,7 @@ tags
 app/src/main/assets
 app/google-services.json
 
+temp
 *.jks
 
 app/production/release/*

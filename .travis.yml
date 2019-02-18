@@ -18,8 +18,7 @@ branches:
     - development
     - staging
 before_install:
-  - openssl aes-256-cbc -K $encrypted_4bcc15171aaf_key -iv $encrypted_4bcc15171aaf_iv -in google-services.json.enc -out app/google-services.json -d
-  - openssl aes-256-cbc -K $encrypted_4bcc15171aaf_key -iv $encrypted_4bcc15171aaf_iv -in keystore.jks.enc -out keystore.jks -d
+  - openssl aes-256-cbc -K $encrypted_4bcc15171aaf_key -iv $encrypted_4bcc15171aaf_iv -in secretfiles.tar.gz.enc -out secretfiles.tar.gz -d
 script:
   - ./deploy.sh
 env:
