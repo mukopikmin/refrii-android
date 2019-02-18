@@ -8,28 +8,20 @@ apply plugin: 'com.android.application'
 
 deploygate {
     def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
-    def outputDir = "${project.rootDir}/app/build/outputs/apk"
 
     apks {
-        ProductionDebug {
-            def flavor = 'production'
-
-            message = "${flavor} build ${hash}"
-            sourceFile = file("${outputDir}/${flavor}/debug/app-${flavor}-debug.apk")
-        }
-
-        DevelopmentDebug {
+        DevelopmentRelease {
             def flavor = 'development'
 
             message = "${flavor} build ${hash}"
-            sourceFile = file("${outputDir}/${flavor}/debug/app-${flavor}-debug.apk")
+            sourceFile = file("${project.rootDir}/app/${flavor}/release/app-${flavor}-release.apk")
         }
 
-        StagingDebug {
+        StagingRelease {
             def flavor = 'staging'
 
             message = "${flavor} build ${hash}"
-            sourceFile = file("${outputDir}/${flavor}/debug/app-${flavor}-debug.apk")
+            sourceFile = file("${project.rootDir}/app/${flavor}/release/app-${flavor}-release.apk")
         }
     }
 }

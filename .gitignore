@@ -124,3 +124,13 @@ tags
 !gradle-wrapper.jar
 app/src/main/assets
 app/google-services.json
+
+*.jks
+
+app/production/release/*
+app/development/release/*
+app/staging/release/*
+
+!app/production/release/.keep
+!app/development/release/.keep
+!app/staging/release/.keep
