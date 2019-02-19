@@ -26,6 +26,7 @@ import android.widget.Toast
 import com.daimajia.swipe.util.Attributes
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoActivity
@@ -40,6 +41,7 @@ import com.refrii.client.tasks.ImageDownloadTask
 import com.refrii.client.tasks.ImageDownloadTaskCallback
 import com.refrii.client.unitlist.UnitListActivity
 import kotterknife.bindView
+import java.util.*
 import javax.inject.Inject
 
 class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationView.OnNavigationItemSelectedListener {
@@ -50,6 +52,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     private val mNavigationView: NavigationView by bindView(R.id.nav_view)
     private val mRecyclerView: RecyclerView by bindView(R.id.recyclerView)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+
+    private lateinit var mFirebaseAuth: FirebaseAuth
 
     @Inject
     lateinit var mPresenter: FoodListPresenter
@@ -70,6 +74,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = LinearLayoutManager(this)
+        mFirebaseAuth = FirebaseAuth.getInstance()
 
         mFab.setOnClickListener { mPresenter.addFood() }
     }
@@ -77,8 +82,30 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     public override fun onStart() {
         super.onStart()
 
-        mPresenter.takeView(this)
-        mPresenter.getBoxes()
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val expiresAt = sharedPreferences.getLong("expirationTimestamp", 0) * 1000
+        val currentUser = mFirebaseAuth.currentUser
+
+        if (expiresAt < Date().time) {
+            currentUser?.getIdToken(true)?.addOnCompleteListener {
+                val editor = sharedPreferences.edit()
+
+                editor.apply {
+                    putString("jwt", it.result?.token)
+
+                    it.result?.expirationTimestamp?.let {
+                        putLong("expirationTimestamp", it)
+                    }
+                }
+                editor.apply()
+
+                mPresenter.takeView(this)
+                mPresenter.getBoxes()
+            }
+        } else {
+            mPresenter.takeView(this)
+            mPresenter.getBoxes()
+        }
 
         setNavigationHeader()
     }

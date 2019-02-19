@@ -20,11 +20,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.refrii.client.App
 import com.refrii.client.R
-import com.refrii.client.data.api.models.Credential
 import kotterknife.bindView
-import java.util.*
 import javax.inject.Inject
-
 
 class SigninActivity : AppCompatActivity(), SigninContract.View {
 
@@ -58,14 +55,8 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
     override fun onStart() {
         super.onStart()
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val mailAddress = sharedPreferences.getString("mail", null)
-
         onLoaded()
         mPresenter.takeView(this)
-
-        // Auto re-authenticate if token expired
-//        mPresenter.auth(mailAddress)
     }
 
     override fun onResume() {
@@ -119,21 +110,6 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
                 }
     }
 
-    override fun onAuthCompleted(credential: Credential?) {
-        credential ?: return
-
-        val editor = PreferenceManager.getDefaultSharedPreferences(this@SigninActivity).edit()
-
-        editor.apply {
-            putString("jwt", credential.jwt)
-            putLong("expires_at", credential.expiresAt?.time ?: Date().time)
-            putInt("id", credential.user?.id ?: 0)
-            putString("provider", credential.user?.provider)
-        }.apply()
-
-        finish()
-    }
-
     override fun onLoading() {
         mProgressBar.visibility = View.VISIBLE
     }
@@ -163,8 +139,14 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
                 putString("mail", account.email)
                 putString("name", account.displayName)
                 putString("avatar", account.photoUrl.toString())
+                putString("signInProvider", it.result?.signInProvider)
+
+                it.result?.expirationTimestamp?.let {
+                    putLong("expirationTimestamp", it)
+                }
             }
             editor.apply()
+
             finish()
         }
     }
