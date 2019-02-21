@@ -13,7 +13,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
     private var mView: FoodListContract.View? = null
     private var mBoxes: List<Box>? = null
-    private var mBox: Box? = null
+    var mBox: Box? = null
     private var mFoods: List<Food>? = null
 
     override fun takeView(view: FoodListContract.View) {
@@ -146,6 +146,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
     override fun selectBox(box: Box) {
         mBox = box
+
         mApiRepository.getFoodsInBox(box.id, object : ApiRepositoryCallback<List<Food>> {
             override fun onNext(t: List<Food>?) {
                 mFoods = t

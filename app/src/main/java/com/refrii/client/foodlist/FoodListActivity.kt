@@ -2,6 +2,7 @@ package com.refrii.client.foodlist
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -16,6 +17,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -54,6 +56,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
 
     private lateinit var mFirebaseAuth: FirebaseAuth
+    private lateinit var mPreference: SharedPreferences
 
     @Inject
     lateinit var mPresenter: FoodListPresenter
@@ -75,20 +78,20 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mFirebaseAuth = FirebaseAuth.getInstance()
+        mPreference = PreferenceManager.getDefaultSharedPreferences(this)
 
         mFab.setOnClickListener { mPresenter.addFood() }
     }
 
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val expiresAt = sharedPreferences.getLong("expirationTimestamp", 0) * 1000
+        val expiresAt = mPreference.getLong("expirationTimestamp", 0) * 1000
         val currentUser = mFirebaseAuth.currentUser
 
         if (expiresAt < Date().time) {
             currentUser?.getIdToken(true)?.addOnCompleteListener {
-                val editor = sharedPreferences.edit()
+                val editor = mPreference.edit()
 
                 editor.apply {
                     putString("jwt", it.result?.token)
@@ -110,20 +113,27 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         setNavigationHeader()
     }
 
-    public override fun onResume() {
-        super.onResume()
-
-        val editor = PreferenceManager.getDefaultSharedPreferences(this@FoodListActivity).edit()
-
-        editor.remove("selected_box_id")
-        editor.apply()
-    }
-
-    public override fun onPause() {
+    override fun onPause() {
         super.onPause()
+
+        val editor = mPreference.edit()
+
+        mPresenter.mBox?.let {
+            editor.putInt("selected_box_id", it.id)
+            editor.apply()
+        }
     }
 
-    public override fun onRestart() {
+//    override fun onResume() {
+//        super.onResume()
+//
+//        val editor = mPreference.edit()
+//
+//        editor.remove("selected_box_id")
+//        editor.apply()
+//    }
+
+    override fun onRestart() {
         super.onRestart()
 
         mPresenter.getBoxes()
@@ -167,6 +177,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
+        val editor = mPreference.edit()
+
+        editor.putInt("selected_box_id", id)
+        editor.apply()
 
         if (!mPresenter.pickBox(id)) {
             when (id) {
@@ -199,11 +213,14 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         }
 
         if (boxes.isNotEmpty()) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this@FoodListActivity)
-            val boxIndex = sharedPreferences.getInt("selected_box_index", 0)
-            val box = boxes[boxIndex]
+            val boxId = mPreference.getInt("selected_box_id", 0)
+            val box = boxes.singleOrNull { it.id == boxId }
 
-            mPresenter.selectBox(box)
+            if (box == null) {
+                mPresenter.selectBox(boxes[0])
+            } else {
+                mPresenter.selectBox(box)
+            }
         }
     }
 
@@ -367,9 +384,9 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         googleSignInClient.revokeAccess()
-//                .addOnCompleteListener(this) {
-//                    Log.w("AAAAAAAAAAAA", "AAAAAAAAAAAA")
-//                }
+                .addOnCompleteListener(this) {
+                    Log.i(TAG, "Revoke access finished")
+                }
 
         editor.clear()
         editor.apply()
@@ -378,6 +395,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     companion object {
+        private const val TAG = "FoodListActivity"
         private const val ADD_FOOD_REQUEST_CODE = 101
         private const val FOOD_OPTIONS_REQUEST_CODE = 102
         private const val EDIT_FOOD_REQUEST_CODE = 103
