@@ -10,7 +10,7 @@ import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.newfood.NewFoodModule
 import com.refrii.client.newunit.NewUnitActivity
 import com.refrii.client.newunit.NewUnitModule
-import com.refrii.client.signin.SigninActivity
+import com.refrii.client.signin.SignInActivity
 import com.refrii.client.signin.SigninModule
 import com.refrii.client.unit.UnitActivity
 import com.refrii.client.unit.UnitModule
@@ -24,7 +24,7 @@ abstract class ActivityBindingModule {
 
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(SigninModule::class)])
-    abstract fun signinActivity(): SigninActivity
+    abstract fun signinActivity(): SignInActivity
 
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(FoodListModule::class)])

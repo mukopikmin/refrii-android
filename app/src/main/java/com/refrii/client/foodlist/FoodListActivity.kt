@@ -38,7 +38,7 @@ import com.refrii.client.dialogs.OptionsPickerDialogFragment
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.settings.SettingsActivity
-import com.refrii.client.signin.SigninActivity
+import com.refrii.client.signin.SignInActivity
 import com.refrii.client.tasks.ImageDownloadTask
 import com.refrii.client.tasks.ImageDownloadTaskCallback
 import com.refrii.client.unitlist.UnitListActivity
@@ -86,7 +86,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun onStart() {
         super.onStart()
 
-        val expiresAt = mPreference.getLong("expirationTimestamp", 0) * 1000
+        val expiresAt = mPreference.getLong(getString(R.string.preference_expiration_timestamp), 0) * 1000
         val currentUser = mFirebaseAuth.currentUser
 
         if (expiresAt < Date().time) {
@@ -97,7 +97,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                     putString("jwt", it.result?.token)
 
                     it.result?.expirationTimestamp?.let {
-                        putLong("expirationTimestamp", it)
+                        putLong(getString(R.string.preference_expiration_timestamp), it)
                     }
                 }
                 editor.apply()
@@ -377,7 +377,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     override fun signOut() {
         val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
-        val intent = Intent(this@FoodListActivity, SigninActivity::class.java)
+        val intent = Intent(this@FoodListActivity, SignInActivity::class.java)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build()

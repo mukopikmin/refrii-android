@@ -4,10 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -23,7 +21,7 @@ import com.refrii.client.R
 import kotterknife.bindView
 import javax.inject.Inject
 
-class SigninActivity : AppCompatActivity(), SigninContract.View {
+class SignInActivity : AppCompatActivity(), SigninContract.View {
 
     private val mSignInButton: SignInButton by bindView(R.id.googleSignInButton)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
@@ -37,18 +35,16 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (application as App).getComponent().inject(this)
-
-        setContentView(R.layout.activity_signin)
-
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build()
 
+        (application as App).getComponent().inject(this)
+        setContentView(R.layout.activity_signin)
+
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
         mFirebaseAuth = FirebaseAuth.getInstance()
-
         mSignInButton.setOnClickListener { googleSignIn() }
     }
 
@@ -57,20 +53,6 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
 
         onLoaded()
         mPresenter.takeView(this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        // Set sign in button text to center
-        for (i in 0 until mSignInButton.childCount) {
-            val v = mSignInButton.getChildAt(i)
-
-            if (v is TextView) {
-                v.setPadding(0, 0, 20, 0)
-                return
-            }
-        }
     }
 
     override fun onBackPressed() {
@@ -89,14 +71,16 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
 
                     firebaseAuthWithGoogle(account)
                 } catch (e: ApiException) {
-                    Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                    showToast("Login failed with code: " + e.statusCode)
                 }
             }
         }
     }
 
-    private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount?) {
-        val credential = GoogleAuthProvider.getCredential(acct!!.idToken, null)
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
+        account ?: return
+
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
         mFirebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
@@ -142,7 +126,7 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
                 putString("signInProvider", it.result?.signInProvider)
 
                 it.result?.expirationTimestamp?.let {
-                    putLong("expirationTimestamp", it)
+                    putLong(getString(R.string.preference_expiration_timestamp), it)
                 }
             }
             editor.apply()
@@ -152,7 +136,7 @@ class SigninActivity : AppCompatActivity(), SigninContract.View {
     }
 
     companion object {
-        private const val TAG = "SigninActivity"
+        //        private const val TAG = "SignInActivity"
         private const val GOOGLE_SIGN_IN_REQUEST_CODE = 101
     }
 }

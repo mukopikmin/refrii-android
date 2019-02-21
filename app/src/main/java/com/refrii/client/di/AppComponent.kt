@@ -5,7 +5,7 @@ import com.refrii.client.food.FoodActivity
 import com.refrii.client.foodlist.FoodListActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.newunit.NewUnitActivity
-import com.refrii.client.signin.SigninActivity
+import com.refrii.client.signin.SignInActivity
 import com.refrii.client.unit.UnitActivity
 import com.refrii.client.unitlist.UnitListActivity
 import dagger.Component
@@ -19,7 +19,7 @@ import javax.inject.Singleton
     ActivityBindingModule::class,
     AndroidSupportInjectionModule::class])
 interface AppComponent {
-    fun inject(target: SigninActivity)
+    fun inject(target: SignInActivity)
     fun inject(target: FoodListActivity)
     fun inject(target: FoodActivity)
     fun inject(target: NewFoodActivity)
