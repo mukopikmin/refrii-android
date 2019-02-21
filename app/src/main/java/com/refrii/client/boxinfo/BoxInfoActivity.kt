@@ -63,7 +63,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     override fun onStart() {
         super.onStart()
 
-        val boxId = intent.getIntExtra("box_id", 0)
+        val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
         onBeforeEdit()
         mPresenter.takeView(this)

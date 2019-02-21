@@ -70,8 +70,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         super.onStart()
 
         val intent = intent
-        val foodId = intent.getIntExtra("food_id", 0)
-        val boxId = intent.getIntExtra("box_id", 0)
+        val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
+        val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
         mPresenter.takeView(this)
         mPresenter.getFood(foodId)

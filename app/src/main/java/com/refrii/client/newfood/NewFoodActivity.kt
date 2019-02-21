@@ -109,7 +109,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
         val intent = Intent()
 
-        intent.putExtra("food_id", food.id)
+        intent.putExtra(getString(R.string.key_food_id), food.id)
         setResult(Activity.RESULT_OK, intent)
         finish()
     }

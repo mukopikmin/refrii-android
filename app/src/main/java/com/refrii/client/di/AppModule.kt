@@ -6,6 +6,7 @@ import android.preference.PreferenceManager
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.refrii.client.BuildConfig
+import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoContract
 import com.refrii.client.boxinfo.BoxInfoPresenter
 import com.refrii.client.data.api.source.ApiRepository
@@ -101,7 +102,7 @@ class AppModule(private var mApplication: Application) {
                 .addInterceptor { chain ->
                     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(provideApplicationContext())
                     val original = chain.request()
-                    val jwt = sharedPreferences.getString("jwt", null)
+                    val jwt = sharedPreferences.getString(provideApplicationContext().getString(R.string.preference_key_jwt), null)
                     val request = original.newBuilder()
                             .header("Accept", "application/json")
 

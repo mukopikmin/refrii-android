@@ -1,41 +1,43 @@
 <resources>
     <string name="app_name">Refrii</string>
 
+    <string name="key_box_id">key_box_id</string>
+    <string name="key_food_id">key_food_id</string>
+
+    <string name="default_name">Default name</string>
+    <string name="default_mail">default@example.com</string>
+
     <string name="navigation_drawer_open">Open navigation mDrawer</string>
     <string name="navigation_drawer_close">Close navigation mDrawer</string>
 
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="preference_key_expiration_timestamp">preference_expiration_timestamp</string>
+    <string name="preference_key_jwt">preference_key_jwt</string>
+    <string name="preference_key_mail">preference_key_mail</string>
+    <string name="preference_key_name">preference_key_name</string>
+    <string name="preference_key_avatar">preference_key_avatar</string>
+    <string name="preference_key_signin_provider">preference_key_signin_provider</string>
+    <string name="preference_selected_box_id">preference_selected_box_id</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="signin_welcome_message">家族でストックをシェアしましょう！</string>
+    <string name="signin_welcome_title">Refriiへようこそ</string>
+
+    <string name="settings_title">設定</string>
+    <string name="settings_display_name">ユーザー名</string>
+
+    <string name="foodlist_menu_about">カテゴリの詳細</string>
+    <string name="foodlist_menu_sync">同期</string>
+    <string name="foodlist_options_show">詳細を表示</string>
+    <string name="foodlist_options_remove">削除</string>
+    <string name="foodlist_options_cancel">キャンセル</string>
+
+    <string name="nav_categories">カテゴリ</string>
+    <string name="nav_units">単位</string>
+    <string name="nav_settings">設定</string>
+    <string name="nav_signout">ログアウト</string>
+
+
     <string name="title_activity_signin">SigninActivity</string>
     <string name="title_activity_food">FoodActivity</string>
-    <string name="title_activity_settings">Settings</string>
-
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
     <string name="title_activity_new_food">NewFoodActivity</string>
     <string name="title_activity_box_info">BoxInfoActivity</string>
     <string name="title_activity_edit_food">EditFoodActivity</string>
@@ -43,9 +45,5 @@
     <string name="title_activity_units">UnitsActivity</string>
     <string name="title_activity_unit">UnitActivity</string>
     <string name="title_activity_new_unit">NewUnitActivity</string>
-    <string name="key_food_id">food_id</string>
     <string name="message_cancel">Cancel</string>
-    <string name="preference_expiration_timestamp">expirationTimestamp</string>
-    <string name="signin_welcome_message">家族でストックをシェアしましょう！</string>
-    <string name="signin_welcome_title">Refriiへようこそ</string>
 </resources>

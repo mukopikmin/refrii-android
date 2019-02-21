@@ -86,7 +86,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun onStart() {
         super.onStart()
 
-        val expiresAt = mPreference.getLong(getString(R.string.preference_expiration_timestamp), 0) * 1000
+        val expiresAt = mPreference.getLong(getString(R.string.preference_key_expiration_timestamp), 0) * 1000
         val currentUser = mFirebaseAuth.currentUser
 
         if (expiresAt < Date().time) {
@@ -94,10 +94,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 val editor = mPreference.edit()
 
                 editor.apply {
-                    putString("jwt", it.result?.token)
+                    putString(getString(R.string.preference_key_jwt), it.result?.token)
 
                     it.result?.expirationTimestamp?.let {
-                        putLong(getString(R.string.preference_expiration_timestamp), it)
+                        putLong(getString(R.string.preference_key_expiration_timestamp), it)
                     }
                 }
                 editor.apply()
@@ -119,19 +119,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val editor = mPreference.edit()
 
         mPresenter.mBox?.let {
-            editor.putInt("selected_box_id", it.id)
+            editor.putInt(getString(R.string.preference_selected_box_id), it.id)
             editor.apply()
         }
     }
-
-//    override fun onResume() {
-//        super.onResume()
-//
-//        val editor = mPreference.edit()
-//
-//        editor.remove("selected_box_id")
-//        editor.apply()
-//    }
 
     override fun onRestart() {
         super.onRestart()
@@ -157,12 +148,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val id = item.itemId
 
         when (id) {
-            R.id.action_box_info -> {
-                mPresenter.getBoxInfo()
-            }
-            R.id.action_box_sync -> {
-                mPresenter.getBoxes()
-            }
+            R.id.action_box_info -> mPresenter.getBoxInfo()
+            R.id.action_box_sync -> mPresenter.getBoxes()
         }
 
         return super.onOptionsItemSelected(item)
@@ -171,7 +158,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun showBoxInfo(box: Box) {
         val intent = Intent(this, BoxInfoActivity::class.java)
 
-        intent.putExtra("box_id", box.id)
+        intent.putExtra(getString(R.string.key_box_id), box.id)
         startActivity(intent)
     }
 
@@ -179,7 +166,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val id = item.itemId
         val editor = mPreference.edit()
 
-        editor.putInt("selected_box_id", id)
+        editor.putInt(getString(R.string.preference_selected_box_id), id)
         editor.apply()
 
         if (!mPresenter.pickBox(id)) {
@@ -213,7 +200,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         }
 
         if (boxes.isNotEmpty()) {
-            val boxId = mPreference.getInt("selected_box_id", 0)
+            val boxId = mPreference.getInt(getString(R.string.preference_selected_box_id), 0)
             val box = boxes.singleOrNull { it.id == boxId }
 
             if (box == null) {
@@ -230,9 +217,9 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val nameTextView = headerView.findViewById<TextView>(R.id.nameNavHeaderTextView)
         val mailTextView = headerView.findViewById<TextView>(R.id.mailNavHeaderTextView)
         val avatarImageView = headerView.findViewById<ImageView>(R.id.avatarNavHeaderImageView)
-        val name = sharedPreferences.getString("name", "name")
-        val mail = sharedPreferences.getString("mail", "mail")
-        val avatarUrl = sharedPreferences.getString("avatar", null)
+        val name = sharedPreferences.getString(getString(R.string.preference_key_name), getString(R.string.default_name))
+        val mail = sharedPreferences.getString(getString(R.string.preference_key_mail), getString(R.string.default_mail))
+        val avatarUrl = sharedPreferences.getString(getString(R.string.preference_key_avatar), null)
 
         mNavigationView.setNavigationItemSelectedListener(this)
 
@@ -251,8 +238,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun showFood(id: Int, box: Box?) {
         val intent = Intent(this@FoodListActivity, FoodActivity::class.java)
 
-        intent.putExtra("food_id", id)
-        intent.putExtra("box_id", box?.id)
+        intent.putExtra(getString(R.string.key_food_id), id)
+        intent.putExtra(getString(R.string.key_box_id), box?.id)
 
         startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
     }
@@ -261,7 +248,11 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         food ?: return
 
         val name = food.name ?: return
-        val options = arrayOf("Show", "Remove", "Cancel")
+        val options = arrayOf(getString(
+                R.string.foodlist_options_show),
+                getString(R.string.foodlist_options_remove),
+                getString(R.string.foodlist_options_cancel)
+        )
         val fragment = OptionsPickerDialogFragment.newInstance(name, options, food.id)
 
         fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
@@ -274,6 +265,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         val adapter = FoodRecyclerViewAdapter(foods)
 
+        title = box.name
         adapter.apply {
             mClickListener = View.OnClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)
@@ -371,7 +363,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         val intent = Intent(this@FoodListActivity, NewFoodActivity::class.java)
 
-        intent.putExtra("boxId", box.id)
+        intent.putExtra(getString(R.string.key_box_id), box.id)
         startActivityForResult(intent, ADD_FOOD_REQUEST_CODE)
     }
 
@@ -384,9 +376,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         googleSignInClient.revokeAccess()
-                .addOnCompleteListener(this) {
-                    Log.i(TAG, "Revoke access finished")
-                }
+                .addOnCompleteListener(this) { Log.i(TAG, "Revoke access finished") }
 
         editor.clear()
         editor.apply()

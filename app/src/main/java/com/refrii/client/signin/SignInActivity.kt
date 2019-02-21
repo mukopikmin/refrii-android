@@ -119,14 +119,14 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
 
         account.getIdToken(true).addOnCompleteListener {
             editor.apply {
-                putString("jwt", it.result?.token)
-                putString("mail", account.email)
-                putString("name", account.displayName)
-                putString("avatar", account.photoUrl.toString())
-                putString("signInProvider", it.result?.signInProvider)
+                putString(getString(R.string.preference_key_jwt), it.result?.token)
+                putString(getString(R.string.preference_key_mail), account.email)
+                putString(getString(R.string.preference_key_name), account.displayName)
+                putString(getString(R.string.preference_key_avatar), account.photoUrl.toString())
+                putString(getString(R.string.preference_key_signin_provider), it.result?.signInProvider)
 
                 it.result?.expirationTimestamp?.let {
-                    putLong(getString(R.string.preference_expiration_timestamp), it)
+                    putLong(getString(R.string.preference_key_expiration_timestamp), it)
                 }
             }
             editor.apply()
@@ -136,7 +136,8 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
     }
 
     companion object {
-        //        private const val TAG = "SignInActivity"
+        @Suppress("unused")
+        private const val TAG = "SignInActivity"
         private const val GOOGLE_SIGN_IN_REQUEST_CODE = 101
     }
 }
