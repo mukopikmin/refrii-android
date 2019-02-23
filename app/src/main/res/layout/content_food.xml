@@ -64,7 +64,6 @@
             android:textColor="@android:color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView13"
-            app:layout_constraintStart_toStarttOf="@+id/imageView13"
             app:layout_constraintTop_toBottomOf="@+id/textView21" />
 
         <ImageView
