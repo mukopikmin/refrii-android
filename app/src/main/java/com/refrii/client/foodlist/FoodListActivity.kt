@@ -130,10 +130,12 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun onBackPressed() {
-        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
-            mDrawer.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
+        val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
+
+        when {
+            mDrawer.isDrawerOpen(GravityCompat.START) -> mDrawer.closeDrawer(GravityCompat.START)
+            adapter.isItemSelected() -> adapter.deselectItem()
+            else -> super.onBackPressed()
         }
     }
 
@@ -290,8 +292,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
                 mPresenter.decrementFood(food)
             }
-
-//            mode = Attributes.Mode.Single
         }
         mRecyclerView.adapter = adapter
     }

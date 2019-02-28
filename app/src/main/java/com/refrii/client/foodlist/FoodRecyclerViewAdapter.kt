@@ -17,7 +17,7 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
     var mSubmitClickListener: View.OnClickListener? = null
     var mIncrementClickListener: View.OnClickListener? = null
     var mDecrementClickListener: View.OnClickListener? = null
-    var mSelectedPosition: Int = -1
+    var mSelectedPosition: Int = UNSELECTED_INDEX
 
 //    init {
 //        Realm.init(context)
@@ -69,6 +69,15 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
         return mFoods[position]
     }
 
+    fun isItemSelected(): Boolean {
+        return mSelectedPosition != UNSELECTED_INDEX
+    }
+
+    fun deselectItem() {
+        mSelectedPosition = UNSELECTED_INDEX
+        notifyDataSetChanged()
+    }
+
 //    fun add(food: Food) {
 //        mFoods.add(food)
 //    }
@@ -76,4 +85,8 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
 //    fun removeFood(food: Food) {
 //        mFoods.removeFood(food)
 //    }
+
+    companion object {
+        private const val UNSELECTED_INDEX = -1
+    }
 }
