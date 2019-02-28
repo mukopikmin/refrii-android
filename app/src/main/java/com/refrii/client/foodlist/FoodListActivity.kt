@@ -25,7 +25,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import com.daimajia.swipe.util.Attributes
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -267,20 +266,15 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         title = box.name
         adapter.apply {
-            mClickListener = View.OnClickListener {
+            mEditClickListener = View.OnClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
 
                 mPresenter.showFood(food.id)
             }
 
-            mLongClickListener = View.OnLongClickListener {
-                val position = mRecyclerView.getChildAdapterPosition(it)
-                val food = adapter.getItemAtPosition(position)
-
-                showOptionsDialog(food)
-
-                true
+            mSubmitClickListener = View.OnClickListener {
+                showToast("Not implemented yet.")
             }
 
             mIncrementClickListener = View.OnClickListener {
@@ -297,7 +291,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 mPresenter.decrementFood(food)
             }
 
-            mode = Attributes.Mode.Single
+//            mode = Attributes.Mode.Single
         }
         mRecyclerView.adapter = adapter
     }

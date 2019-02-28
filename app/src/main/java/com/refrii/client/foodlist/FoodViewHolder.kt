@@ -1,17 +1,21 @@
 package com.refrii.client.foodlist
 
+import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.ImageView
+import android.widget.ImageButton
 import android.widget.TextView
-import com.daimajia.swipe.SwipeLayout
 import com.refrii.client.R
 
 class FoodViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    val swipeLayout: SwipeLayout = view.findViewById(R.id.swipeLayout)
+    val constraintLayout: ConstraintLayout = view.findViewById(R.id.constraintLayout)
     val name: TextView = view.findViewById(R.id.nameFoodListTextView)
     val expirationDate: TextView = view.findViewById(R.id.expirationDateFoodListTextView)
     val amount: TextView = view.findViewById(R.id.amountFoodListTextView)
-    val increment: ImageView = view.findViewById(R.id.incrementImageView)
-    val decrement: ImageView = view.findViewById(R.id.decrementImageView)
+    val menu: ConstraintLayout = view.findViewById(R.id.menu)
+    val editAmountTextView: TextView = view.findViewById(R.id.editAmountTextView)
+    val incrementButton: ImageButton = view.findViewById(R.id.incrementButton)
+    val decrementButton: ImageButton = view.findViewById(R.id.decrementButton)
+    val submitButton: ImageButton = view.findViewById(R.id.submitButton)
+    val editButton: ImageButton = view.findViewById(R.id.editButton)
 }
