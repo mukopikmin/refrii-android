@@ -43,7 +43,7 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
                 menu.visibility = View.GONE
             }
 
-            holder.constraintLayout.setOnClickListener {
+            constraintLayout.setOnClickListener {
                 mSelectedPosition = position
                 notifyDataSetChanged()
             }
