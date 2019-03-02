@@ -1,9 +1,9 @@
 package com.refrii.client.di
 
-import android.content.Context
 import com.refrii.client.data.api.source.ApiRepository
 import dagger.Module
 import dagger.Provides
+import io.realm.Realm
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -12,7 +12,7 @@ class ApiRepositoryModule {
 
     @Singleton
     @Provides
-    fun provideApiRepository(context: Context, retrofit: Retrofit): ApiRepository {
-        return ApiRepository(context, retrofit)
+    fun provideApiRepository(realm: Realm, retrofit: Retrofit): ApiRepository {
+        return ApiRepository(realm, retrofit)
     }
 }

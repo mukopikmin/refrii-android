@@ -12,6 +12,7 @@ import com.refrii.client.data.api.source.remote.services.FoodService
 import com.refrii.client.data.api.source.remote.services.UnitService
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
+import rx.Observable
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -31,12 +32,12 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .subscribe(getSubscriber(callback))
     }
 
-    override fun getBoxes(callback: ApiRepositoryCallback<List<Box>>) {
-        mRetrofit.create(BoxService::class.java)
+    override fun getBoxes(callback: ApiRepositoryCallback<List<Box>>): Observable<List<Box>> {
+        return mRetrofit.create(BoxService::class.java)
                 .getBoxes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
+//                .subscribe(getSubscriber(callback))
     }
 
     override fun getBox(id: Int, callback: ApiRepositoryCallback<Box>) {
@@ -56,12 +57,12 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) : ApiDataSource {
                 .subscribe(getSubscriber(callback))
     }
 
-    override fun getFoodsInBox(id: Int, callback: ApiRepositoryCallback<List<Food>>) {
-        mRetrofit.create(BoxService::class.java)
+    override fun getFoodsInBox(id: Int, callback: ApiRepositoryCallback<List<Food>>): Observable<List<Food>> {
+        return mRetrofit.create(BoxService::class.java)
                 .getFoodsInBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
+//                .subscribe(getSubscriber(callback))
     }
 
     override fun getFood(id: Int, callback: ApiRepositoryCallback<Food>) {

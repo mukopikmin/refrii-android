@@ -54,7 +54,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     override fun getBoxes() {
         mView?.showProgressBar()
 
-        mApiRepository.getBoxes(object : ApiRepositoryCallback<List<Box>> {
+        mBoxes = mApiRepository.getBoxes(object : ApiRepositoryCallback<List<Box>> {
             override fun onNext(t: List<Box>?) {
                 mBoxes = t
                 mView?.setBoxes(t)
@@ -72,6 +72,8 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
                 }
             }
         })
+        mView?.setBoxes(mBoxes)
+
     }
 
     override fun incrementFood(food: Food) {
@@ -82,7 +84,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         mBox?.let {
             mApiRepository.updateFood(food, it, object : ApiRepositoryCallback<Food> {
                 override fun onNext(t: Food?) {
-                    mView?.showSnackbar("Amount of ${t?.name} is incremented")
+                    mView?.showSnackbar("${t?.name} の数量が更新されました")
                 }
 
                 override fun onCompleted() {
@@ -105,7 +107,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         mBox?.let {
             mApiRepository.updateFood(food, it, object : ApiRepositoryCallback<Food> {
                 override fun onNext(t: Food?) {
-                    mView?.showSnackbar("Amount of ${t?.name} is decremented")
+                    mView?.showSnackbar("${t?.name} の数量が更新されました")
                 }
 
                 override fun onCompleted() {
@@ -147,7 +149,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     override fun selectBox(box: Box) {
         mBox = box
 
-        mApiRepository.getFoodsInBox(box.id, object : ApiRepositoryCallback<List<Food>> {
+        mFoods = mApiRepository.getFoodsInBox(box.id, object : ApiRepositoryCallback<List<Food>> {
             override fun onNext(t: List<Food>?) {
                 mFoods = t
                 mView?.setFoods(box, t)
@@ -162,6 +164,8 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
             }
 
         })
+
+        mView?.setFoods(box, mFoods)
     }
 
     override fun addFood() {
