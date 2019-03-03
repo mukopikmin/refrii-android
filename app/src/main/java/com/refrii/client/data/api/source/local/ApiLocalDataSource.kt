@@ -42,10 +42,6 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                     .oneOf("id", foods.map { it.id }.toTypedArray())
                     .findAll()
             onlyLocal.deleteAllFromRealm()
-            foods.forEach {
-                it.boxId = boxId
-                realm.copyToRealmOrUpdate(it)
-            }
         }
     }
 
@@ -61,7 +57,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
 
     fun getFoodsInBox(id: Int): List<Food> {
         return mRealm.where<Food>()
-                .equalTo("boxId", id)
+                .equalTo("box.id", id)
                 .findAll()
     }
 

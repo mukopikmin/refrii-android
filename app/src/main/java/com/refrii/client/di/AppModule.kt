@@ -27,6 +27,7 @@ import com.refrii.client.unitlist.UnitListPresenter
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
+import io.realm.RealmConfiguration
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
@@ -100,6 +101,9 @@ class AppModule(private var mApplication: Application) {
     @Provides
     fun provideRealm(): Realm {
         Realm.init(provideApplicationContext())
+        Realm.setDefaultConfiguration(RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build())
 
         return Realm.getDefaultInstance()
     }
