@@ -41,7 +41,9 @@ class ApiLocalDataSource(private val mRealm: Realm) {
             val onlyLocal = realm.where<Food>()
                     .oneOf("id", foods.map { it.id }.toTypedArray())
                     .findAll()
+
             onlyLocal.deleteAllFromRealm()
+            realm.copyToRealmOrUpdate(foods)
         }
     }
 
@@ -92,6 +94,24 @@ class ApiLocalDataSource(private val mRealm: Realm) {
         return mRealm.where<Unit>()
                 .equalTo("id", id)
                 .findFirst()
+    }
+
+    fun saveUnits(units: List<Unit>, userId: Int) {
+        mRealm.executeTransaction { realm ->
+            val onlyLocal = realm.where<Unit>()
+                    .equalTo("user.id", userId)
+                    .not().oneOf("id", units.map { it.id }.toTypedArray())
+                    .findAll()
+
+            onlyLocal.deleteAllFromRealm()
+            realm.copyToRealmOrUpdate(units)
+        }
+    }
+
+    fun saveUnit(unit: Unit) {
+        mRealm.executeTransaction {
+            it.copyToRealmOrUpdate(unit)
+        }
     }
 
     fun createUnit(label: String, step: Double, callback: ApiRepositoryCallback<Unit>) {

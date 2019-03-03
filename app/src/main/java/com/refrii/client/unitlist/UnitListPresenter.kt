@@ -19,7 +19,7 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
     override fun getUnits(userId: Int) {
         mView?.showProgressBar()
 
-        mApiRepository.getUnits(userId, object : ApiRepositoryCallback<List<Unit>> {
+        mUnits = mApiRepository.getUnits(userId, object : ApiRepositoryCallback<List<Unit>> {
             override fun onNext(t: List<Unit>?) {
                 mUnits = t
                 mView?.setUnits(t)
@@ -33,6 +33,8 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
                 mView?.showToast(e?.message)
             }
         })
+
+        mView?.setUnits(mUnits)
     }
 
     override fun removeUnit(id: Int, userId: Int) {

@@ -21,8 +21,8 @@ interface ApiDataSource {
     fun updateFood(food: Food, box: Box, callback: ApiRepositoryCallback<Food>)
     fun removeFood(id: Int, callback: ApiRepositoryCallback<Void>)
 
-    fun getUnits(userId: Int, callback: ApiRepositoryCallback<List<Unit>>)
-    fun getUnit(id: Int, callback: ApiRepositoryCallback<Unit>)
+    fun getUnits(userId: Int, callback: ApiRepositoryCallback<List<Unit>>): List<Unit>
+    fun getUnit(id: Int, callback: ApiRepositoryCallback<Unit>): Unit
     fun createUnit(label: String, step: Double, callback: ApiRepositoryCallback<Unit>)
     fun updateUnit(unit: Unit, callback: ApiRepositoryCallback<Unit>)
     fun removeUnit(id: Int, callback: ApiRepositoryCallback<Void>)

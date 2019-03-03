@@ -84,12 +84,44 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         mApiRemoteDataSource.removeFood(id, callback)
     }
 
-    fun getUnits(userId: Int, callback: ApiRepositoryCallback<List<Unit>>) {
-        mApiRemoteDataSource.getUnits(userId, callback)
+    fun getUnits(userId: Int, callback: ApiRepositoryCallback<List<Unit>>): List<Unit> {
+        mApiRemoteDataSource.getUnits()
+                .subscribe(object : Subscriber<List<Unit>>() {
+                    override fun onNext(t: List<Unit>) {
+                        mApiLocalDataSource.saveUnits(t, userId)
+                        callback.onNext(t)
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        callback.onError(e)
+                    }
+                })
+
+        return mApiLocalDataSource.getUnits(userId)
     }
 
-    fun getUnit(id: Int, callback: ApiRepositoryCallback<Unit>) {
-        mApiRemoteDataSource.getUnit(id, callback)
+    fun getUnit(id: Int, callback: ApiRepositoryCallback<Unit>): Unit? {
+        mApiRemoteDataSource.getUnit(id)
+                .subscribe(object : Subscriber<Unit>() {
+                    override fun onNext(t: Unit) {
+                        mApiLocalDataSource.saveUnit(t)
+                        callback.onNext(t)
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        callback.onError(e)
+                    }
+                })
+
+        return mApiLocalDataSource.getUnit(id)
     }
 
     fun createUnit(label: String, step: Double, callback: ApiRepositoryCallback<Unit>) {
