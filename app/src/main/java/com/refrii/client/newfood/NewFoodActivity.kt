@@ -42,7 +42,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_new_food)
-        mToolbar.title = "Add food"
+        mToolbar.title = getString(R.string.title_add_food)
         setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
@@ -61,7 +61,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         val preference = PreferenceManager.getDefaultSharedPreferences(this)
         val userId = preference.getInt("id", 0)
         val intent = intent
-        val boxId = intent.getIntExtra("boxId", 0)
+        val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
         mPresenter.takeView(this)
         mPresenter.getUnits(userId)
