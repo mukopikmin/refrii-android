@@ -33,6 +33,7 @@ import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoActivity
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
+import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.OptionsPickerDialogFragment
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.newfood.NewFoodActivity
@@ -275,8 +276,16 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 mPresenter.showFood(food.id)
             }
 
-            mSubmitClickListener = View.OnClickListener {
-                showToast("Not implemented yet.")
+            mDeleteClickListener = View.OnClickListener {
+                val position = mRecyclerView.getChildAdapterPosition(it)
+                val food = adapter.getItemAtPosition(position)
+
+//                mPresenter.removeFood(food.id)
+
+                val fragment = ConfirmDialogFragment.newInstance(food.name!!, "削除していいですか？", food.id)
+
+                fragment.setTargetFragment(null, REMOVE_FOOD_REQUEST_CODE)
+                fragment.show(supportFragmentManager, "delete_food")
             }
 
             mIncrementClickListener = View.OnClickListener {
@@ -325,28 +334,15 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         when (requestCode) {
             ADD_FOOD_REQUEST_CODE -> {
-                showSnackbar("Food added successfully")
+                showSnackbar(getString(R.string.message_add_food_completed))
                 mPresenter.getBoxes()
             }
             EDIT_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
-            FOOD_OPTIONS_REQUEST_CODE -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    val option = data.getIntExtra("option", -1)
+            REMOVE_FOOD_REQUEST_CODE -> {
+                val foodId = data.getIntExtra("target_id", 0)
 
-                    when(option) {
-                    // Show
-                        0 -> {
-                            val foodId = data.getIntExtra("target_id", 0)
-                            mPresenter.showFood(foodId)
-                        }
-                    // Remove
-                        1 -> {
-                            val foodId = data.getIntExtra("target_id", 0)
-                            mPresenter.removeFood(foodId)
-                        }
-                    // Cancel or other
-                        else -> return
-                    }
+                if (foodId != 0) {
+                    mPresenter.removeFood(foodId)
                 }
             }
         }
@@ -383,5 +379,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         private const val ADD_FOOD_REQUEST_CODE = 101
         private const val FOOD_OPTIONS_REQUEST_CODE = 102
         private const val EDIT_FOOD_REQUEST_CODE = 103
+        private const val REMOVE_FOOD_REQUEST_CODE = 104
     }
 }

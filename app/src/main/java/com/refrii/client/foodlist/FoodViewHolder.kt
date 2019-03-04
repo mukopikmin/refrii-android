@@ -16,6 +16,6 @@ class FoodViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val editAmountTextView: TextView = view.findViewById(R.id.editAmountTextView)
     val incrementButton: ImageButton = view.findViewById(R.id.incrementButton)
     val decrementButton: ImageButton = view.findViewById(R.id.decrementButton)
-    val submitButton: ImageButton = view.findViewById(R.id.submitButton)
+    val deleteButton: ImageButton = view.findViewById(R.id.deleteButton)
     val editButton: ImageButton = view.findViewById(R.id.editButton)
 }
