@@ -1,89 +1,128 @@
 package com.refrii.client.data.api.source.local
 
-import android.content.Context
 import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.Credential
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
-import com.refrii.client.data.api.source.ApiDataSource
 import com.refrii.client.data.api.source.ApiRepositoryCallback
 import io.realm.Realm
+import io.realm.kotlin.oneOf
+import io.realm.kotlin.where
 import java.util.*
 
-class ApiLocalDataSource(context: Context) : ApiDataSource {
+class ApiLocalDataSource(private val mRealm: Realm) {
 
-    private var mRealm: Realm
+//    private var mRealm: Realm
 
-    init {
-        Realm.init(context)
-        mRealm = RealmUtil.getInstance()
+//    init {
+//        Realm.init(context)
+//        mRealm = RealmUtil.getInstance()
+//    }
+
+    fun getBoxes(): List<Box> {
+        return mRealm.where(Box::class.java).findAll()
     }
 
-    override fun auth(googleToken: String, callback: ApiRepositoryCallback<Credential>) {
+    fun saveBoxes(boxes: List<Box>) {
+        mRealm.executeTransaction { realm ->
+            //            val success = realm.where<Box>()
+////                    .oneOf("id", boxes.map { it.id }.toTypedArray())
+//                    .findAll()
+//
+//            Log.e("AAAAAAAAAAAAAAAAAAA", success.toString())
+//            val result=success.deleteAllFromRealm()
+//            Log.e("AAAAAAAAAAAAAAAAAAA", result.toString())
+
+            realm.copyToRealmOrUpdate(boxes)
+        }
+    }
+
+    fun saveFoods(foods: List<Food>, boxId: Int) {
+        mRealm.executeTransaction { realm ->
+            val onlyLocal = realm.where<Food>()
+                    .oneOf("id", foods.map { it.id }.toTypedArray())
+                    .findAll()
+
+            onlyLocal.deleteAllFromRealm()
+            realm.copyToRealmOrUpdate(foods)
+        }
+    }
+
+    fun getBox(id: Int): Box? {
+        return mRealm.where<Box>()
+                .equalTo("id", id)
+                .findFirst()
+    }
+
+    fun updateBox(box: Box, callback: ApiRepositoryCallback<Box>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getBoxes(callback: ApiRepositoryCallback<List<Box>>) {
+    fun getFoodsInBox(id: Int): List<Food> {
+        return mRealm.where<Food>()
+                .equalTo("box.id", id)
+                .findAll()
+    }
+
+    fun getFood(id: Int): Food? {
+        return mRealm.where<Food>()
+                .equalTo("id", id)
+                .findFirst()
+    }
+
+    fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date, callback: ApiRepositoryCallback<Food>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getBox(id: Int, callback: ApiRepositoryCallback<Box>) {
+    fun updateFood(food: Food, box: Box, callback: ApiRepositoryCallback<Food>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun updateBox(box: Box, callback: ApiRepositoryCallback<Box>) {
+    fun removeFood(id: Int, callback: ApiRepositoryCallback<Void>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getFoodsInBox(id: Int, callback: ApiRepositoryCallback<List<Food>>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getFood(id: Int, callback: ApiRepositoryCallback<Food>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date, callback: ApiRepositoryCallback<Food>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun updateFood(food: Food, box: Box, callback: ApiRepositoryCallback<Food>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun removeFood(id: Int, callback: ApiRepositoryCallback<Void>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getUnits(userId: Int, callback: ApiRepositoryCallback<List<Unit>>) {
-        val units = mRealm.where(Unit::class.java)
+    fun getUnits(userId: Int): List<Unit> {
+        return mRealm.where(Unit::class.java)
                 .equalTo("user.id", userId)
                 .or()
                 .isNull("user")
                 .findAll()
                 .sort("id")
+    }
 
-        if (units == null) {
-            callback.onError(Exception("No units"))
-        } else {
-            callback.onNext(units)
-            callback.onCompleted()
+    fun getUnit(id: Int): Unit? {
+        return mRealm.where<Unit>()
+                .equalTo("id", id)
+                .findFirst()
+    }
+
+    fun saveUnits(units: List<Unit>, userId: Int) {
+        mRealm.executeTransaction { realm ->
+            val onlyLocal = realm.where<Unit>()
+                    .equalTo("user.id", userId)
+                    .not().oneOf("id", units.map { it.id }.toTypedArray())
+                    .findAll()
+
+            onlyLocal.deleteAllFromRealm()
+            realm.copyToRealmOrUpdate(units)
         }
     }
 
-    override fun getUnit(id: Int, callback: ApiRepositoryCallback<Unit>) {
+    fun saveUnit(unit: Unit) {
+        mRealm.executeTransaction {
+            it.copyToRealmOrUpdate(unit)
+        }
+    }
+
+    fun createUnit(label: String, step: Double, callback: ApiRepositoryCallback<Unit>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun createUnit(label: String, step: Double, callback: ApiRepositoryCallback<Unit>) {
+    fun updateUnit(unit: Unit, callback: ApiRepositoryCallback<Unit>) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun updateUnit(unit: Unit, callback: ApiRepositoryCallback<Unit>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun removeUnit(id: Int, callback: ApiRepositoryCallback<Void>) {
+    fun removeUnit(id: Int, callback: ApiRepositoryCallback<Void>) {
         mRealm.executeTransaction {
             it.where(Unit::class.java)
                     .equalTo("id", id)
@@ -91,4 +130,20 @@ class ApiLocalDataSource(context: Context) : ApiDataSource {
                     ?.deleteFromRealm()
         }
     }
+
+//    private fun <T> getSubscriber(callback: ApiRepositoryCallback<T>): Subscriber<T> {
+//        return object : Subscriber<T>() {
+//            fun onNext(t: T) {
+//                callback.onNext(t)
+//            }
+//
+//            fun onCompleted() {
+//                callback.onCompleted()
+//            }
+//
+//            fun onError(e: Throwable?) {
+//                callback.onError(e)
+//            }
+//        }
+//    }
 }

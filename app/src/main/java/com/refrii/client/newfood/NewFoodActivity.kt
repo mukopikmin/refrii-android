@@ -42,7 +42,8 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_new_food)
-        mToolbar.title = "新規作成"
+        mToolbar.title = getString(R.string.title_add_food)
+        mToolbar.title = getString(R.string.title_add_food)
         setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
@@ -50,8 +51,9 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         }
 
         mExpirationDateEditText.setText(formatter.format(Date()))
-        mExpirationDateEditText.setOnClickListener { showEditDateDialog() }
+
         mFab.setOnClickListener { createFood() }
+        mExpirationDateEditText.setOnClickListener { showEditDateDialog() }
     }
 
     override fun onStart() {

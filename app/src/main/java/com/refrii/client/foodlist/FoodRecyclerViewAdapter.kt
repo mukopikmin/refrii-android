@@ -14,7 +14,7 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
 //    private var mRealm: Realm
 
     var mEditClickListener: View.OnClickListener? = null
-    var mSubmitClickListener: View.OnClickListener? = null
+    var mDeleteClickListener: View.OnClickListener? = null
     var mIncrementClickListener: View.OnClickListener? = null
     var mDecrementClickListener: View.OnClickListener? = null
     var mSelectedPosition: Int = UNSELECTED_INDEX
@@ -50,7 +50,7 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
 
             incrementButton.setOnClickListener { mIncrementClickListener?.onClick(it.parent.parent.parent as View) }
             decrementButton.setOnClickListener { mDecrementClickListener?.onClick(it.parent.parent.parent as View) }
-            submitButton.setOnClickListener { mSubmitClickListener?.onClick(it) }
+            deleteButton.setOnClickListener { mDeleteClickListener?.onClick(it.parent.parent as View) }
             editButton.setOnClickListener { mEditClickListener?.onClick(it.parent.parent as View) }
         }
     }

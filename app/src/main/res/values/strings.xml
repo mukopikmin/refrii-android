@@ -46,4 +46,8 @@
     <string name="title_activity_unit">UnitActivity</string>
     <string name="title_activity_new_unit">NewUnitActivity</string>
     <string name="message_cancel">Cancel</string>
+    <string name="message_yes">はい</string>
+    <string name="message_no">いいえ</string>
+    <string name="message_add_food_completed">食材が追加されました</string>
+    <string name="title_add_food">食材の追加</string>
 </resources>

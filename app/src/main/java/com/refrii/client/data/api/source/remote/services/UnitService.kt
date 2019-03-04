@@ -7,7 +7,7 @@ import rx.Observable
 
 interface UnitService {
     @GET("/units")
-    fun getUnits(): Observable<MutableList<Unit>>
+    fun getUnits(): Observable<List<Unit>>
 
     @GET("/units/{id}")
     fun getUnit(@Path("id") id: Int): Observable<Unit>
