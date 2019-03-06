@@ -43,7 +43,6 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
         setContentView(R.layout.activity_new_food)
         mToolbar.title = getString(R.string.title_add_food)
-        mToolbar.title = getString(R.string.title_add_food)
         setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)

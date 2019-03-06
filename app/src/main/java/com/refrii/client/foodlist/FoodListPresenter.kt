@@ -32,7 +32,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         mBox = box
         mView?.showProgressBar()
 
-        mApiRepository.getFoodsInBox(box.id, object : ApiRepositoryCallback<List<Food>> {
+        mApiRepository.getFoodsInBox(box, object : ApiRepositoryCallback<List<Food>> {
             override fun onNext(t: List<Food>?) {
                 mFoods = t
                 mView?.setFoods(box, t)
@@ -72,6 +72,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
                 }
             }
         })
+
         mView?.setBoxes(mBoxes)
 
     }
@@ -149,7 +150,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     override fun selectBox(box: Box) {
         mBox = box
 
-        mFoods = mApiRepository.getFoodsInBox(box.id, object : ApiRepositoryCallback<List<Food>> {
+        mFoods = mApiRepository.getFoodsInBox(box, object : ApiRepositoryCallback<List<Food>> {
             override fun onNext(t: List<Food>?) {
                 mFoods = t
                 mView?.setFoods(box, t)

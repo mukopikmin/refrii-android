@@ -44,11 +44,30 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         mApiRemoteDataSource.getBox(id, callback)
     }
 
-    fun getFoodsInBox(id: Int, callback: ApiRepositoryCallback<List<Food>>): List<Food> {
-        mApiRemoteDataSource.getFoodsInBox(id, callback)
+//    fun getFoods(callback: ApiRepositoryCallback<List<Food>>): List<Food> {
+//        mApiRemoteDataSource.getFoods()
+//                .subscribe(object: Subscriber<List<Food>>() {
+//                    override fun onNext(t: List<Food>) {
+//                        mApiLocalDataSource.saveFoods(t, box)
+//                    }
+//
+//                    override fun onCompleted() {
+//                        callback.onCompleted()
+//                    }
+//
+//                    override fun onError(e: Throwable?) {
+//                        callback.onError(e)
+//                    }
+//                })
+//
+//        return mApiLocalDataSource.getFoods()
+//    }
+
+    fun getFoodsInBox(box: Box, callback: ApiRepositoryCallback<List<Food>>): List<Food> {
+        mApiRemoteDataSource.getFoodsInBox(box.id)
                 .subscribe(object : Subscriber<List<Food>>() {
                     override fun onNext(t: List<Food>) {
-                        mApiLocalDataSource.saveFoods(t, id)
+                        mApiLocalDataSource.saveFoods(t, box)
                         callback.onNext(t)
                     }
 
@@ -61,7 +80,7 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                     }
                 })
 
-        return mApiLocalDataSource.getFoodsInBox(id)
+        return mApiLocalDataSource.getFoodsInBox(box.id)
     }
 
     fun updateBox(box: Box, callback: ApiRepositoryCallback<Box>) {

@@ -6,6 +6,9 @@ import retrofit2.http.*
 import rx.Observable
 
 interface FoodService {
+    @GET("/foods")
+    fun getFodos(): Observable<List<Food>>
+
     @GET("/foods/{id}")
     fun getFood(@Path("id") id: Int): Observable<Food>
 
