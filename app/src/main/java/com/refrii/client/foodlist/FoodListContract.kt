@@ -11,7 +11,6 @@ interface FoodListContract {
         fun showBoxInfo(box: Box)
         fun addFood(box: Box?)
         fun showFood(id: Int, box: Box?)
-        fun showOptionsDialog(food: Food?)
         fun onFoodUpdated()
         fun showProgressBar()
         fun hideProgressBar()

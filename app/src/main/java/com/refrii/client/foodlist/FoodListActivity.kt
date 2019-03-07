@@ -34,7 +34,6 @@ import com.refrii.client.boxinfo.BoxInfoActivity
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.dialogs.ConfirmDialogFragment
-import com.refrii.client.dialogs.OptionsPickerDialogFragment
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.settings.SettingsActivity
@@ -86,6 +85,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun onStart() {
         super.onStart()
 
+        reauthorize()
+    }
+
+    private fun reauthorize() {
         val expiresAt = mPreference.getLong(getString(R.string.preference_key_expiration_timestamp), 0) * 1000
         val currentUser = mFirebaseAuth.currentUser
 
@@ -104,13 +107,13 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
                 mPresenter.takeView(this)
                 mPresenter.getBoxes()
+                setNavigationHeader()
             }
         } else {
             mPresenter.takeView(this)
             mPresenter.getBoxes()
+            setNavigationHeader()
         }
-
-        setNavigationHeader()
     }
 
     override fun onPause() {
@@ -246,21 +249,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
     }
 
-    override fun showOptionsDialog(food: Food?) {
-        food ?: return
-
-        val name = food.name ?: return
-        val options = arrayOf(getString(
-                R.string.foodlist_options_show),
-                getString(R.string.foodlist_options_remove),
-                getString(R.string.foodlist_options_cancel)
-        )
-        val fragment = OptionsPickerDialogFragment.newInstance(name, options, food.id)
-
-        fragment.setTargetFragment(null, FOOD_OPTIONS_REQUEST_CODE)
-        fragment.show(fragmentManager, "food_option")
-    }
-
     override fun setFoods(box: Box?, foods: List<Food>?) {
         box ?: return
         foods ?: return
@@ -279,9 +267,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             mDeleteClickListener = View.OnClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
-
-//                mPresenter.removeFood(food.id)
-
                 val fragment = ConfirmDialogFragment.newInstance(food.name!!, "削除していいですか？", food.id)
 
                 fragment.setTargetFragment(null, REMOVE_FOOD_REQUEST_CODE)
@@ -377,7 +362,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     companion object {
         private const val TAG = "FoodListActivity"
         private const val ADD_FOOD_REQUEST_CODE = 101
-        private const val FOOD_OPTIONS_REQUEST_CODE = 102
         private const val EDIT_FOOD_REQUEST_CODE = 103
         private const val REMOVE_FOOD_REQUEST_CODE = 104
     }

@@ -52,7 +52,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     }
 
     override fun getBoxes() {
-        mView?.showProgressBar()
+//        mView?.showProgressBar()
 
         mBoxes = mApiRepository.getBoxes(object : ApiRepositoryCallback<List<Box>> {
             override fun onNext(t: List<Box>?) {
@@ -62,6 +62,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
             override fun onCompleted() {
                 mView?.hideProgressBar()
+                mView?.showToast("同期が完了しました")
             }
 
             override fun onError(e: Throwable?) {
@@ -80,7 +81,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     override fun incrementFood(food: Food) {
         food.increase(1.0)
 
-        mView?.showProgressBar()
+//        mView?.showProgressBar()
 
         mBox?.let {
             mApiRepository.updateFood(food, it, object : ApiRepositoryCallback<Food> {
@@ -90,7 +91,8 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
                 override fun onCompleted() {
                     mView?.onFoodUpdated()
-                    mView?.hideProgressBar()
+                    mView?.showToast("同期が完了しました")
+//                    mView?.hideProgressBar()
                 }
 
                 override fun onError(e: Throwable?) {
@@ -103,7 +105,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     override fun decrementFood(food: Food) {
         food.decrease(1.0)
 
-        mView?.showProgressBar()
+//        mView?.showProgressBar()
 
         mBox?.let {
             mApiRepository.updateFood(food, it, object : ApiRepositoryCallback<Food> {
@@ -113,7 +115,8 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
                 override fun onCompleted() {
                     mView?.onFoodUpdated()
-                    mView?.hideProgressBar()
+                    mView?.showToast("同期が完了しました")
+//                    mView?.hideProgressBar()
                 }
 
                 override fun onError(e: Throwable?) {
@@ -128,17 +131,19 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
         mApiRepository.removeFood(id, object : ApiRepositoryCallback<Void> {
             override fun onNext(t: Void?) {
-                mView?.showSnackbar("Food is removed successfully")
+//                mView?.showSnackbar("削除が完了しました")
             }
 
             override fun onCompleted() {
                 mView?.onFoodUpdated()
                 mView?.hideProgressBar()
+                mView?.showSnackbar("削除が完了しました")
                 getBoxes()
             }
 
             override fun onError(e: Throwable?) {
                 mView?.showToast(e?.message)
+                mView?.hideProgressBar()
             }
         })
     }

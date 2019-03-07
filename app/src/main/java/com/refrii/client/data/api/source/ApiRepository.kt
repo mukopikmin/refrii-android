@@ -1,7 +1,6 @@
 package com.refrii.client.data.api.source
 
 import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.Credential
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.data.api.source.local.ApiLocalDataSource
@@ -15,10 +14,6 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
 
     private val mApiRemoteDataSource = ApiRemoteDataSource(retrofit)
     private val mApiLocalDataSource = ApiLocalDataSource(realm)
-
-    fun auth(googleToken: String, callback: ApiRepositoryCallback<Credential>) {
-        mApiRemoteDataSource.auth(googleToken, callback)
-    }
 
     fun getBoxes(callback: ApiRepositoryCallback<List<Box>>): List<Box> {
         mApiRemoteDataSource.getBoxes(callback)
