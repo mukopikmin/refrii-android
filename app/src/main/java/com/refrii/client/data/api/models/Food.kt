@@ -40,23 +40,23 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
         return 0
     }
 
-    fun decrease(diff: Double) {
-        this.amount -= diff
+    fun decrease(): Food {
+        this.unit?.let {
+            this.amount -= it.step
+        }
+
         if (this.amount < 0) {
             this.amount = 0.0
         }
+
+        return this
     }
 
-    fun increase(diff: Double) {
-        this.amount += diff
-    }
-
-    private fun sync(other: Food): Food {
-        updatedAt?.let {
-            if (it < other.updatedAt) {
-                return other
-            }
+    fun increase(): Food {
+        this.unit?.let {
+            this.amount += it.step
         }
+
         return this
     }
 
@@ -73,11 +73,11 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
         result = 31 * result + (unit?.hashCode() ?: 0)
         result = 31 * result + (createdUser?.hashCode() ?: 0)
         result = 31 * result + (updatedUser?.hashCode() ?: 0)
-//        result = 31 * result + (box?.hashCode() ?: 0)
         return result
     }
 
     companion object {
+        @Suppress("unused")
         private const val TAG = "Food"
     }
 }
