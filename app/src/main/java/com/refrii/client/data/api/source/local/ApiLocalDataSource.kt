@@ -19,7 +19,9 @@ class ApiLocalDataSource(private val mRealm: Realm) {
 //    }
 
     fun getBoxes(): List<Box> {
-        return mRealm.where(Box::class.java).findAll()
+        return mRealm.where(Box::class.java)
+                .findAll()
+                .sort("id")
     }
 
     fun saveBoxes(boxes: List<Box>) {
@@ -70,6 +72,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
         return mRealm.where<Food>()
                 .equalTo("box.id", id)
                 .findAll()
+                .sort("id")
     }
 
     fun getFood(id: Int): Food? {

@@ -20,7 +20,7 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 .subscribe(object : Subscriber<List<Box>>() {
                     override fun onNext(t: List<Box>) {
                         mApiLocalDataSource.saveBoxes(t)
-                        callback.onNext(t)
+                        callback.onNext(mApiLocalDataSource.getBoxes())
                     }
 
                     override fun onCompleted() {
@@ -63,7 +63,7 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 .subscribe(object : Subscriber<List<Food>>() {
                     override fun onNext(t: List<Food>) {
                         mApiLocalDataSource.saveFoods(t, box)
-                        callback.onNext(t)
+                        callback.onNext(mApiLocalDataSource.getFoodsInBox(box.id))
                     }
 
                     override fun onCompleted() {
@@ -103,7 +103,7 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 .subscribe(object : Subscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>) {
                         mApiLocalDataSource.saveUnits(t, userId)
-                        callback.onNext(t)
+                        callback.onNext(mApiLocalDataSource.getUnits(userId))
                     }
 
                     override fun onCompleted() {
