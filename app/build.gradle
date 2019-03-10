@@ -68,11 +68,9 @@ android {
 }
 
 dependencies {
-    def daggerVer = 2.12
+    def daggerVer = 2.21
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.firebase:firebase-core:16.0.7'
-    implementation 'com.google.firebase:firebase-auth:16.1.0'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -86,24 +84,25 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-    implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'com.android.support:support-compat:28.0.0'
-    implementation 'de.hdodenhof:circleimageview:2.1.0'
-    implementation 'com.anupcowkur:reservoir:3.1.0'
-    implementation 'com.jakewharton:kotterknife:0.1.0-SNAPSHOT'
-    implementation 'io.reactivex:rxjava:1.3.0'
-    implementation 'io.reactivex:rxandroid:1.2.1'
-    implementation 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.google.dagger:dagger:2.12'
-    implementation 'org.yaml:snakeyaml:1.19'
+    implementation 'com.google.firebase:firebase-core:16.0.7'
+    implementation 'com.google.firebase:firebase-auth:16.1.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation "com.google.dagger:dagger:$daggerVer"
     implementation "com.google.dagger:dagger-android-support:$daggerVer"
-    implementation 'com.google.errorprone:error_prone_annotations:2.2.0'
+    implementation 'com.google.errorprone:error_prone_annotations:2.3.3'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava:2.5.0'
+    implementation 'com.anupcowkur:reservoir:3.1.0'
+    implementation 'com.jakewharton:kotterknife:0.1.0-SNAPSHOT'
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
+    implementation 'io.reactivex:rxjava:1.3.8'
+    implementation 'io.reactivex:rxandroid:1.2.1'
+    implementation 'org.yaml:snakeyaml:1.24'
 
     kapt "com.google.dagger:dagger-android-processor:$daggerVer"
     kapt "com.google.dagger:dagger-compiler:$daggerVer"
