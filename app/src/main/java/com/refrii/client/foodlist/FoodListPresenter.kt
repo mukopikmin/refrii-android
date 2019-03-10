@@ -35,6 +35,9 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     }
 
     override fun getBoxes() {
+        // Temporally clear boxes shown in drawer, for updating cache
+        mView?.clearBoxes()
+
         mBoxes = mApiRepository.getBoxes(object : ApiRepositoryCallback<List<Box>> {
             override fun onNext(t: List<Box>?) {
                 mBoxes = t
@@ -144,5 +147,11 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
     override fun addFood() {
         mView?.addFood(mBox)
+    }
+
+    override fun deleteLocalData() {
+        mBox = null
+        mView?.clearBoxes()
+        mApiRepository.deleteLocalData()
     }
 }

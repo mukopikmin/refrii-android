@@ -184,4 +184,8 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
     fun removeUnit(id: Int, callback: ApiRepositoryCallback<Void>) {
         mApiRemoteDataSource.removeUnit(id, callback)
     }
+
+    fun deleteLocalData() {
+        mApiLocalDataSource.deleteAll()
+    }
 }

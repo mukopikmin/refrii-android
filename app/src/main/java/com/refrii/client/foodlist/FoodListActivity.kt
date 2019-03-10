@@ -193,15 +193,22 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         return true
     }
 
+    override fun clearBoxes() {
+        mNavigationView.menu.findItem(R.id.menu_boxes).subMenu.clear()
+    }
+
     override fun setBoxes(boxes: List<Box>?) {
         boxes ?: return
 
         mNavigationView.setNavigationItemSelectedListener(this@FoodListActivity)
-        val menu = mNavigationView.menu.findItem(R.id.menu_boxes)
-        menu.subMenu.clear()
+//        val menu = mNavigationView.menu.findItem(R.id.menu_boxes)
+//        menu.subMenu.clear()
+        clearBoxes()
 
         boxes.forEach {
-            menu.subMenu.add(Menu.NONE, it.id, Menu.NONE, it.name)
+            mNavigationView.menu
+                    .findItem(R.id.menu_boxes)
+                    .subMenu.add(Menu.NONE, it.id, Menu.NONE, it.name)
         }
 
         if (boxes.isNotEmpty()) {
@@ -355,6 +362,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         editor.clear()
         editor.apply()
+//        clearBoxes()
+        mPresenter.deleteLocalData()
 
         startActivity(intent)
     }

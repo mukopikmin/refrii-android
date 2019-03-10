@@ -6,6 +6,7 @@ import com.refrii.client.data.api.models.Food
 interface FoodListContract {
 
     interface View {
+        fun clearBoxes()
         fun setBoxes(boxes: List<Box>?)
         fun setFoods(box: Box?, foods: List<Food>?)
         fun showBoxInfo(box: Box)
@@ -30,5 +31,6 @@ interface FoodListContract {
         fun showFood(id: Int)
         fun addFood()
         fun selectBox(box: Box)
+        fun deleteLocalData()
     }
 }

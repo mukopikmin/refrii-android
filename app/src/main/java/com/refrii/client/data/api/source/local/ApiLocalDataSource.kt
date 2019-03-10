@@ -19,11 +19,11 @@ class ApiLocalDataSource(private val mRealm: Realm) {
 
     fun saveBoxes(boxes: List<Box>) {
         mRealm.executeTransaction { realm ->
-            //            val onlyLocal = realm.where<Box>()
-//                    .oneOf("id", boxes.map { it.id }.toTypedArray())
-//                    .findAll()
-//
-//            onlyLocal.deleteAllFromRealm()
+            val onlyLocal = realm.where<Box>()
+                    .not().oneOf("id", boxes.map { it.id }.toTypedArray())
+                    .findAll()
+
+            onlyLocal.deleteAllFromRealm()
             realm.copyToRealmOrUpdate(boxes)
         }
     }
@@ -141,6 +141,12 @@ class ApiLocalDataSource(private val mRealm: Realm) {
     fun saveUser(user: User) {
         mRealm.executeTransaction {
             it.copyToRealmOrUpdate(user)
+        }
+    }
+
+    fun deleteAll() {
+        mRealm.executeTransaction {
+            it.deleteAll()
         }
     }
 }
