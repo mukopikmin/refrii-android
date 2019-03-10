@@ -3,6 +3,7 @@ package com.refrii.client.data.api.source
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
+import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.local.ApiLocalDataSource
 import com.refrii.client.data.api.source.remote.ApiRemoteDataSource
 import io.realm.Realm
@@ -14,6 +15,25 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
 
     private val mApiRemoteDataSource = ApiRemoteDataSource(retrofit)
     private val mApiLocalDataSource = ApiLocalDataSource(realm)
+
+    fun verify(callback: ApiRepositoryCallback<User>) {
+        mApiRemoteDataSource.verify()
+                .subscribe(object : Subscriber<User>() {
+                    override fun onNext(t: User) {
+                        mApiLocalDataSource.saveUser(t)
+                        callback.onNext(t)
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable) {
+                        callback.onError(e)
+                    }
+
+                })
+    }
 
     fun getBoxes(callback: ApiRepositoryCallback<List<Box>>): List<Box> {
         mApiRemoteDataSource.getBoxes(callback)
@@ -103,6 +123,7 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 .subscribe(object : Subscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>) {
                         mApiLocalDataSource.saveUnits(t, userId)
+                        val u = mApiLocalDataSource.getUnits(userId)
                         callback.onNext(mApiLocalDataSource.getUnits(userId))
                     }
 

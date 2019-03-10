@@ -50,4 +50,8 @@
     <string name="message_no">いいえ</string>
     <string name="message_add_food_completed">食材が追加されました</string>
     <string name="title_add_food">食材の追加</string>
+    <string name="preference_key_id">preference_key_id</string>
+    <string name="title_unit_list">単位の一覧</string>
+    <string name="message_show_detail">詳細を表示する</string>
+    <string name="message_delete">削除する</string>
 </resources>

@@ -1,14 +1,14 @@
 package com.refrii.client.data.api.source.remote
 
 import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.Credential
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
+import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.ApiRepositoryCallback
-import com.refrii.client.data.api.source.remote.services.AuthService
 import com.refrii.client.data.api.source.remote.services.BoxService
 import com.refrii.client.data.api.source.remote.services.FoodService
 import com.refrii.client.data.api.source.remote.services.UnitService
+import com.refrii.client.data.api.source.remote.services.UserService
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import rx.Observable
@@ -20,15 +20,11 @@ import java.util.*
 
 class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
 
-    fun auth(googleToken: String, callback: ApiRepositoryCallback<Credential>) {
-        val params = HashMap<String, String>()
-
-        params["token"] = googleToken
-        mRetrofit.create(AuthService::class.java)
-                .getToken(params)
+    fun verify(): Observable<User> {
+        return mRetrofit.create(UserService::class.java)
+                .verify()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
     }
 
     fun getBoxes(callback: ApiRepositoryCallback<List<Box>>): Observable<List<Box>> {

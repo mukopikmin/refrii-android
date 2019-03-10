@@ -3,6 +3,7 @@ package com.refrii.client.data.api.source.local
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
+import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.ApiRepositoryCallback
 import io.realm.Realm
 import io.realm.kotlin.oneOf
@@ -94,12 +95,13 @@ class ApiLocalDataSource(private val mRealm: Realm) {
     }
 
     fun getUnits(userId: Int): List<Unit> {
-        return mRealm.where(Unit::class.java)
+        return mRealm.where<Unit>()
                 .equalTo("user.id", userId)
-                .or()
-                .isNull("user")
+//                .or()
+//                .isNull("user")
                 .findAll()
                 .sort("id")
+                .filter { it.user?.id == userId }
     }
 
     fun getUnit(id: Int): Unit? {
@@ -140,6 +142,12 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                     .equalTo("id", id)
                     .findFirst()
                     ?.deleteFromRealm()
+        }
+    }
+
+    fun saveUser(user: User) {
+        mRealm.executeTransaction {
+            it.copyToRealmOrUpdate(user)
         }
     }
 

@@ -45,8 +45,8 @@ class AppModule(private var mApplication: Application) {
     }
 
     @Provides
-    fun provideSigninPresenter(): SigninContract.Presenter {
-        return SigninPresenter()
+    fun provideSigninPresenter(apiRepository: ApiRepository): SigninContract.Presenter {
+        return SigninPresenter(apiRepository)
     }
 
     @Provides

@@ -42,7 +42,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
 
         setSupportActionBar(toolbar)
         supportActionBar?.let {
-            it.title = "Unit list"
+            it.title = getString(R.string.title_unit_list)
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
@@ -62,7 +62,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
 
         listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { adapterView, _, i, _ ->
             val unit = adapterView.getItemAtPosition(i) as Unit
-            val options = arrayOf("Show", "Remove", "Cancel")
+            val options = arrayOf(getString(R.string.message_show_detail), getString(R.string.message_delete), getString(R.string.message_cancel))
             val fragment = OptionsPickerDialogFragment.newInstance(unit.label!!, options, unit.id)
 
             fragment.setTargetFragment(null, UNIT_OPTIONS_REQUEST_CODE)
@@ -82,7 +82,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
         super.onResume()
 
         val preference = PreferenceManager.getDefaultSharedPreferences(this)
-        val userId = preference.getInt("id", 0)
+        val userId = preference.getInt(getString(R.string.preference_key_id), -1)
 
         mPresenter.getUnits(userId)
     }
