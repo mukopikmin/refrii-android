@@ -27,20 +27,18 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun getBoxes(callback: ApiRepositoryCallback<List<Box>>): Observable<List<Box>> {
+    fun getBoxes(): Observable<List<Box>> {
         return mRetrofit.create(BoxService::class.java)
                 .getBoxes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(getSubscriber(callback))
     }
 
-    fun getBox(id: Int, callback: ApiRepositoryCallback<Box>) {
-        mRetrofit.create(BoxService::class.java)
+    fun getBox(id: Int): Observable<Box> {
+        return mRetrofit.create(BoxService::class.java)
                 .getBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
     }
 
 
@@ -57,7 +55,6 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .getFoodsInBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(getSubscriber(callback))
     }
 
     fun getFoods(): Observable<List<Food>> {
@@ -126,7 +123,6 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .getUnits()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(getSubscriber(callback))
     }
 
     fun getUnit(id: Int): Observable<Unit> {
@@ -134,7 +130,6 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .getUnit(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(getSubscriber(callback))
     }
 
     fun createUnit(label: String, step: Double, callback: ApiRepositoryCallback<Unit>) {
