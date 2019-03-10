@@ -9,15 +9,15 @@ apply plugin: 'com.android.application'
 deploygate {
     def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
 
-    apks {
-        DevelopmentRelease {
+    deployments {
+        developmentRelease {
             def flavor = 'development'
 
             message = "${flavor} build ${hash}"
             sourceFile = file("${project.rootDir}/app/${flavor}/release/app-${flavor}-release.apk")
         }
 
-        StagingRelease {
+        stagingRelease {
             def flavor = 'staging'
 
             message = "${flavor} build ${hash}"
