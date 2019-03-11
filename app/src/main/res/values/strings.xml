@@ -54,4 +54,6 @@
     <string name="title_unit_list">単位の一覧</string>
     <string name="message_show_detail">詳細を表示する</string>
     <string name="message_delete">削除する</string>
+    <string name="nav_filter">フィルター</string>
+    <string name="nav_expiring">期限が1週間以内</string>
 </resources>

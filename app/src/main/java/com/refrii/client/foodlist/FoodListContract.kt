@@ -8,7 +8,7 @@ interface FoodListContract {
     interface View {
         fun clearBoxes()
         fun setBoxes(boxes: List<Box>?)
-        fun setFoods(box: Box?, foods: List<Food>?)
+        fun setFoods(boxName: String?, foods: List<Food>?)
         fun showBoxInfo(box: Box)
         fun addFood(box: Box?)
         fun showFood(id: Int, box: Box?)
@@ -31,6 +31,7 @@ interface FoodListContract {
         fun showFood(id: Int)
         fun addFood()
         fun selectBox(box: Box)
+        fun getExpiringFoods()
         fun deleteLocalData()
     }
 }

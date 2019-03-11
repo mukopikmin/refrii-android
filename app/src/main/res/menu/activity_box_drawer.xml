@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/menu_boxes"
-        android:title="@string/nav_categories">
-        <menu />
-    </item>
+
+    <group>
+        <item
+            android:id="@+id/menu_boxes"
+            android:title="@string/nav_categories">
+            <menu />
+        </item>
+    </group>
+    <group>
+        <item android:title="@string/nav_filter">
+            <menu>
+                <item
+                    android:id="@+id/nav_expiring"
+                    android:title="@string/nav_expiring" />
+            </menu>
+        </item>
+
+    </group>
     <group>
         <item
             android:id="@+id/nav_units"

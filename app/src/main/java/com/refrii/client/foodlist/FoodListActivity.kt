@@ -176,6 +176,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         if (!mPresenter.pickBox(id)) {
             when (id) {
+                R.id.nav_expiring -> mPresenter.getExpiringFoods()
                 R.id.nav_settings -> {
                     val intent = Intent(this, SettingsActivity::class.java)
                     startActivity(intent)
@@ -194,15 +195,15 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun clearBoxes() {
-        mNavigationView.menu.findItem(R.id.menu_boxes).subMenu.clear()
+        mNavigationView.menu
+                .findItem(R.id.menu_boxes)
+                .subMenu.clear()
     }
 
     override fun setBoxes(boxes: List<Box>?) {
         boxes ?: return
 
         mNavigationView.setNavigationItemSelectedListener(this@FoodListActivity)
-//        val menu = mNavigationView.menu.findItem(R.id.menu_boxes)
-//        menu.subMenu.clear()
         clearBoxes()
 
         boxes.forEach {
@@ -256,13 +257,13 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
     }
 
-    override fun setFoods(box: Box?, foods: List<Food>?) {
-        box ?: return
+    override fun setFoods(boxName: String?, foods: List<Food>?) {
+        boxName ?: return
         foods ?: return
 
         val adapter = FoodRecyclerViewAdapter(foods)
 
-        title = box.name
+        title = boxName
         adapter.apply {
             mEditClickListener = View.OnClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)

@@ -129,7 +129,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         mFoods = mApiRepository.getFoodsInBox(box, object : ApiRepositoryCallback<List<Food>> {
             override fun onNext(t: List<Food>?) {
                 mFoods = t
-                mView?.setFoods(box, t)
+                mView?.setFoods(box.name, t)
             }
 
             override fun onCompleted() {
@@ -139,14 +139,31 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
             override fun onError(e: Throwable?) {
                 mView?.showToast(e?.message)
             }
-
         })
 
-        mView?.setFoods(box, mFoods)
+        mView?.setFoods(box.name, mFoods)
     }
 
     override fun addFood() {
         mView?.addFood(mBox)
+    }
+
+    override fun getExpiringFoods() {
+        mFoods = mApiRepository.getExpiringFoods(object : ApiRepositoryCallback<List<Food>> {
+            override fun onNext(t: List<Food>?) {
+                mFoods = t
+                mView?.setFoods("期限が1週間以内", mFoods)
+            }
+
+            override fun onCompleted() {}
+
+            override fun onError(e: Throwable?) {
+                mView?.showToast(e?.message)
+            }
+        })
+
+        mBox = null
+        mView?.setFoods("期限が1週間以内", mFoods)
     }
 
     override fun deleteLocalData() {

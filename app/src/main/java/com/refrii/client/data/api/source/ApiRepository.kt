@@ -120,6 +120,26 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         mApiRemoteDataSource.getFood(id, callback)
     }
 
+    fun getExpiringFoods(callback: ApiRepositoryCallback<List<Food>>): List<Food> {
+        mApiRemoteDataSource.getFoods()
+                .subscribe(object : Subscriber<List<Food>>() {
+                    override fun onNext(t: List<Food>) {
+                        mApiLocalDataSource.saveFoods(t)
+                        callback.onNext(mApiLocalDataSource.getExpiringFoods())
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable) {
+                        callback.onError(e)
+                    }
+                })
+
+        return mApiLocalDataSource.getExpiringFoods()
+    }
+
     fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date, callback: ApiRepositoryCallback<Food>) {
         mApiRemoteDataSource.createFood(name, notice, amount, box, unit, expirationDate, callback)
     }
