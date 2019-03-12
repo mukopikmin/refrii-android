@@ -65,7 +65,11 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         val step: Double = food.unit?.step ?: 0.toDouble()
         val amount = food.amount + step
 
-        updateFood(food, amount)
+        if (amount < 0) {
+            updateFood(food, 0.toDouble())
+        } else {
+            updateFood(food, amount)
+        }
     }
 
     override fun decrementFood(food: Food) {
