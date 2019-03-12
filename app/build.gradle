@@ -34,8 +34,8 @@ android {
         applicationId "com.refrii.client"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 9
-        versionName "0.6.3"
+        versionCode 10
+        versionName "0.7.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
