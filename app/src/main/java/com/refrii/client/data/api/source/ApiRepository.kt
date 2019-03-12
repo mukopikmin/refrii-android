@@ -148,6 +148,24 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         mApiRemoteDataSource.updateFood(food, box, callback)
     }
 
+    fun updateFood(callback: ApiRepositoryCallback<Food>, id: Int, boxId: Int, name: String? = null, notice: String? = null, amount: Double? = null, expirationDate: Date? = null) {
+        mApiRemoteDataSource.updateFood(id, name, notice, amount, expirationDate)
+                .subscribe(object : Subscriber<Food>() {
+                    override fun onNext(t: Food) {
+                        mApiLocalDataSource.updateFood(id, name = name, notice = notice, amount = amount, expirationDate = expirationDate)
+                        callback.onNext(t)
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable) {
+                        callback.onError(e)
+                    }
+                })
+    }
+
     fun removeFood(id: Int, callback: ApiRepositoryCallback<Void>) {
         mApiRemoteDataSource.removeFood(id, callback)
     }
@@ -157,7 +175,6 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 .subscribe(object : Subscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>) {
                         mApiLocalDataSource.saveUnits(t, userId)
-                        val u = mApiLocalDataSource.getUnits(userId)
                         callback.onNext(mApiLocalDataSource.getUnits(userId))
                     }
 

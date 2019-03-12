@@ -75,6 +75,25 @@ class ApiLocalDataSource(private val mRealm: Realm) {
         }
     }
 
+    fun updateFood(id: Int, name: String? = null, notice: String? = null, amount: Double? = null, expirationDate: Date? = null) {
+        val food = mRealm.where<Food>()
+                .equalTo("id", id)
+                .findFirst() ?: return
+
+        mRealm.executeTransaction {
+            name?.let { food.name = it }
+            notice?.let { food.notice = it }
+            amount?.let { food.amount = it }
+            expirationDate?.let { food.expirationDate = it }
+        }
+    }
+
+    fun saveFood(food: Food) {
+        mRealm.executeTransaction {
+            it.copyToRealmOrUpdate(food)
+        }
+    }
+
     fun getBox(id: Int): Box? {
         return mRealm.where<Box>()
                 .equalTo("id", id)

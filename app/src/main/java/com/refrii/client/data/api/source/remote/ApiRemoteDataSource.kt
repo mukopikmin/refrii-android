@@ -110,6 +110,22 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .subscribe(getSubscriber(callback))
     }
 
+    fun updateFood(id: Int, name: String? = null, notice: String? = null, amount: Double? = null, expirationDate: Date? = null): Observable<Food> {
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val bodyBuilder = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+        name?.let { bodyBuilder.addFormDataPart("name", it) }
+        notice?.let { bodyBuilder.addFormDataPart("notice", it) }
+        amount?.let { bodyBuilder.addFormDataPart("amount", it.toString()) }
+        expirationDate?.let { bodyBuilder.addFormDataPart("expiration_date", simpleDateFormat.format(it)) }
+
+        return mRetrofit.create(FoodService::class.java)
+                .updateFood(id, bodyBuilder.build())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun removeFood(id: Int, callback: ApiRepositoryCallback<Void>) {
         mRetrofit.create(FoodService::class.java)
                 .removeFood(id)

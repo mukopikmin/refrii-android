@@ -62,40 +62,38 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     }
 
     override fun incrementFood(food: Food) {
-        mBox?.let {
-            mApiRepository.updateFood(food.increase(), it, object : ApiRepositoryCallback<Food> {
-                override fun onNext(t: Food?) {
-                    mView?.showSnackbar("${t?.name} の数量が更新されました")
-                }
+        val step: Double = food.unit?.step ?: 0.toDouble()
+        val amount = food.amount + step
 
-                override fun onCompleted() {
-                    mView?.onFoodUpdated()
-                    mView?.showToast("同期が完了しました")
-                }
-
-                override fun onError(e: Throwable?) {
-                    mView?.showToast(e?.message)
-                }
-            })
-        }
+        updateFood(food, amount)
     }
 
     override fun decrementFood(food: Food) {
+        val step: Double = food.unit?.step ?: 0.toDouble()
+        val amount = food.amount - step
+
+        updateFood(food, amount)
+    }
+
+    private fun updateFood(food: Food, amount: Double = 0.toDouble()) {
+        mView?.showProgressBar()
+
         mBox?.let {
-            mApiRepository.updateFood(food.decrease(), it, object : ApiRepositoryCallback<Food> {
+            mApiRepository.updateFood(object : ApiRepositoryCallback<Food> {
                 override fun onNext(t: Food?) {
                     mView?.showSnackbar("${t?.name} の数量が更新されました")
                 }
 
                 override fun onCompleted() {
                     mView?.onFoodUpdated()
-                    mView?.showToast("同期が完了しました")
+                    mView?.hideProgressBar()
                 }
 
                 override fun onError(e: Throwable?) {
                     mView?.showToast(e?.message)
+                    mView?.hideProgressBar()
                 }
-            })
+            }, food.id, it.id, amount = amount)
         }
     }
 
