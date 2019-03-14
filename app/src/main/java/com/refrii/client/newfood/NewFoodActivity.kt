@@ -59,7 +59,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         super.onStart()
 
         val preference = PreferenceManager.getDefaultSharedPreferences(this)
-        val userId = preference.getInt("id", 0)
+        val userId = preference.getInt(getString(R.string.preference_key_id), 0)
         val intent = intent
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
