@@ -65,18 +65,18 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         val step: Double = food.unit?.step ?: 0.toDouble()
         val amount = food.amount + step
 
+        updateFood(food, amount)
+    }
+
+    override fun decrementFood(food: Food) {
+        val step = food.unit?.step ?: 0.toDouble()
+        val amount = food.amount - step
+
         if (amount < 0) {
             updateFood(food, 0.toDouble())
         } else {
             updateFood(food, amount)
         }
-    }
-
-    override fun decrementFood(food: Food) {
-        val step: Double = food.unit?.step ?: 0.toDouble()
-        val amount = food.amount - step
-
-        updateFood(food, amount)
     }
 
     private fun updateFood(food: Food, amount: Double = 0.toDouble()) {
@@ -128,7 +128,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     override fun selectBox(box: Box) {
         mBox = box
 
-        mFoods = mApiRepository.getFoodsInBox(box, object : ApiRepositoryCallback<List<Food>> {
+        mFoods = mApiRepository.getFoods(box, object : ApiRepositoryCallback<List<Food>> {
             override fun onNext(t: List<Food>?) {
                 mFoods = t
                 mView?.setFoods(box.name, t)

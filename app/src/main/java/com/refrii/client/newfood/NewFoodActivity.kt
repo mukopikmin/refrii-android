@@ -142,7 +142,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
     private fun createFood() {
         if (!validate()) {
-            showToast("Forms are not filled")
+            showToast(getString(R.string.message_unfilled_form))
             return
         }
 
@@ -160,7 +160,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         val fragment = CalendarPickerDialogFragment.newInstance(expirationDate)
 
         fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
-        fragment.show(fragmentManager, "edit_expiration_date")
+        fragment.show(supportFragmentManager, "edit_expiration_date")
     }
 
     companion object {

@@ -48,29 +48,28 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .sortedBy { it.expirationDate }
     }
 
-    fun saveFoods(foods: List<Food>, box: Box) {
-        mRealm.executeTransaction { realm ->
-            val onlyLocal = realm.where<Food>()
-                    .equalTo("box.id", box.id)
-                    .and()
-                    .not().oneOf("id", foods.map { it.id }.toTypedArray())
-                    .findAll()
-
-            onlyLocal.deleteAllFromRealm()
-            foods.forEach {
-                it.box = box
-                realm.copyToRealmOrUpdate(foods)
-            }
-        }
-    }
+//    fun saveFoods(foods: List<Food>, box: Box) {
+//        mRealm.executeTransaction { realm ->
+//            realm.where<Food>()
+//                    .equalTo("box.id", box.id)
+//                    .and()
+//                    .not().oneOf("id", foods.map { it.id }.toTypedArray())
+//                    .findAll()
+//                    .deleteAllFromRealm()
+//
+//            foods.forEach {
+//                it.box = box
+//                realm.copyToRealmOrUpdate(foods)
+//            }
+//        }
+//    }
 
     fun saveFoods(foods: List<Food>) {
         mRealm.executeTransaction { realm ->
-            val onlyLocal = realm.where<Food>()
+            realm.where<Food>()
                     .not().oneOf("id", foods.map { it.id }.toTypedArray())
                     .findAll()
-
-            onlyLocal.deleteAllFromRealm()
+                    .deleteAllFromRealm()
             realm.copyToRealmOrUpdate(foods)
         }
     }

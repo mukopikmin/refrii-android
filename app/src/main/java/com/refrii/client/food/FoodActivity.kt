@@ -167,7 +167,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val fragment = CalendarPickerDialogFragment.newInstance(date)
 
         fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
-        fragment.show(fragmentManager, "edit_expiration_date")
+        fragment.show(supportFragmentManager, "edit_expiration_date")
     }
 
     override fun onBeforeEdit() {

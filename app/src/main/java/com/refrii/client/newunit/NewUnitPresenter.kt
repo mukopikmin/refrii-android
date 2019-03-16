@@ -10,6 +10,7 @@ class NewUnitPresenter
 constructor(private val mApiRepository: ApiRepository) : NewUnitContract.Presenter {
 
     private var mView: NewUnitContract.View? = null
+    private var mUnit: Unit? = null
 
     override fun takeView(view: NewUnitContract.View) {
         mView = view
@@ -19,7 +20,9 @@ constructor(private val mApiRepository: ApiRepository) : NewUnitContract.Present
         mView?.showProgressBar()
 
         mApiRepository.createUnit(label, amount, object : ApiRepositoryCallback<Unit> {
-            override fun onNext(t: Unit?) {}
+            override fun onNext(t: Unit?) {
+                mUnit = t
+            }
 
             override fun onCompleted() {
                 mView?.hideProgressBar()
@@ -30,7 +33,6 @@ constructor(private val mApiRepository: ApiRepository) : NewUnitContract.Present
                     mView?.showToast(it)
                 }
             }
-
         })
     }
 }

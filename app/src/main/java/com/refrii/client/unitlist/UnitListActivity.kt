@@ -66,7 +66,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
             val fragment = OptionsPickerDialogFragment.newInstance(unit.label!!, options, unit.id)
 
             fragment.setTargetFragment(null, UNIT_OPTIONS_REQUEST_CODE)
-            fragment.show(fragmentManager, "unit_option")
+            fragment.show(supportFragmentManager, "unit_option")
 
             true
         }
@@ -96,31 +96,34 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
         when (requestCode) {
             NEW_UNIT_REQUEST_CODE -> {
                 val preference = PreferenceManager.getDefaultSharedPreferences(this)
-                val userId = preference.getInt("id", 0)
+                val userId = preference.getInt(getString(R.string.preference_key_id), 0)
+                val unitId = data.getIntExtra(getString(R.string.key_unit_id), 0)
+                val unit = mPresenter.getUnit(unitId)
+                val label = unit?.label ?: ""
 
                 mPresenter.getUnits(userId)
-                showSnackbar("Unit added successfully")
+                showSnackbar("単位 \"$label\" が追加されました")
             }
             UNIT_OPTIONS_REQUEST_CODE -> {
                 val option = data.getIntExtra("option", -1)
                 val unitId = data.getIntExtra("target_id", 0)
 
                 when (option) {
-                // Show
+                    // Show
                     0 -> {
                         val intent = Intent(this@UnitListActivity, UnitActivity::class.java)
 
                         intent.putExtra("unit_id", unitId)
                         startActivity(intent)
                     }
-                // Remove
+                    // Remove
                     1 -> {
                         val preference = PreferenceManager.getDefaultSharedPreferences(this)
-                        val userId = preference.getInt("id", 0)
+                        val userId = preference.getInt(getString(R.string.preference_key_id), 0)
 
                         mPresenter.removeUnit(unitId, userId)
                     }
-                // Cancel
+                    // Cancel
                     else -> return
                 }
             }

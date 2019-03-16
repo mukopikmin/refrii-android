@@ -56,4 +56,6 @@
     <string name="message_delete">削除する</string>
     <string name="nav_filter">フィルター</string>
     <string name="nav_expiring">期限が1週間以内</string>
+    <string name="message_unfilled_form">未入力の項目があります</string>
+    <string name="key_unit_id">key_unit_id</string>
 </resources>

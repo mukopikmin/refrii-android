@@ -4,7 +4,6 @@ import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.data.api.models.User
-import com.refrii.client.data.api.source.ApiRepositoryCallback
 import com.refrii.client.data.api.source.remote.services.BoxService
 import com.refrii.client.data.api.source.remote.services.FoodService
 import com.refrii.client.data.api.source.remote.services.UnitService
@@ -12,7 +11,6 @@ import com.refrii.client.data.api.source.remote.services.UserService
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import rx.Observable
-import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.text.SimpleDateFormat
@@ -42,12 +40,11 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
     }
 
 
-    fun updateBox(box: Box, callback: ApiRepositoryCallback<Box>) {
-        mRetrofit.create(BoxService::class.java)
+    fun updateBox(box: Box): Observable<Box> {
+        return mRetrofit.create(BoxService::class.java)
                 .updateBox(box.id, box.toMultipartBody())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
     }
 
     fun getFoodsInBox(id: Int): Observable<List<Food>> {
@@ -64,15 +61,14 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun getFood(id: Int, callback: ApiRepositoryCallback<Food>) {
-        mRetrofit.create(FoodService::class.java)
+    fun getFood(id: Int): Observable<Food> {
+        return mRetrofit.create(FoodService::class.java)
                 .getFood(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
     }
 
-    fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date, callback: ApiRepositoryCallback<Food>) {
+    fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Observable<Food> {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -84,14 +80,13 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .addFormDataPart("expiration_date", simpleDateFormat.format(expirationDate))
                 .build()
 
-        mRetrofit.create(FoodService::class.java)
+        return mRetrofit.create(FoodService::class.java)
                 .addFood(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
     }
 
-    fun updateFood(food: Food, box: Box, callback: ApiRepositoryCallback<Food>) {
+    fun updateFood(food: Food, box: Box): Observable<Food> {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -103,11 +98,10 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .addFormDataPart("expiration_date", simpleDateFormat.format(food.expirationDate))
                 .build()
 
-        mRetrofit.create(FoodService::class.java)
+        return mRetrofit.create(FoodService::class.java)
                 .updateFood(food.id, body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
     }
 
     fun updateFood(id: Int, name: String? = null, notice: String? = null, amount: Double? = null, expirationDate: Date? = null): Observable<Food> {
@@ -126,12 +120,11 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun removeFood(id: Int, callback: ApiRepositoryCallback<Void>) {
-        mRetrofit.create(FoodService::class.java)
+    fun removeFood(id: Int): Observable<Void> {
+        return mRetrofit.create(FoodService::class.java)
                 .removeFood(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
     }
 
     fun getUnits(): Observable<List<Unit>> {
@@ -148,49 +141,30 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun createUnit(label: String, step: Double, callback: ApiRepositoryCallback<Unit>) {
+    fun createUnit(label: String, step: Double): Observable<Unit> {
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("label", label)
                 .addFormDataPart("step", step.toString())
                 .build()
 
-        mRetrofit.create(UnitService::class.java)
+        return mRetrofit.create(UnitService::class.java)
                 .createUnit(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
     }
 
-    fun updateUnit(unit: Unit, callback: ApiRepositoryCallback<Unit>) {
-        mRetrofit.create(UnitService::class.java)
+    fun updateUnit(unit: Unit): Observable<Unit> {
+        return mRetrofit.create(UnitService::class.java)
                 .updateUnit(unit.id, unit.toMultipartBody())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
     }
 
-    fun removeUnit(id: Int, callback: ApiRepositoryCallback<Void>) {
-        mRetrofit.create(UnitService::class.java)
+    fun removeUnit(id: Int): Observable<Void> {
+        return mRetrofit.create(UnitService::class.java)
                 .deleteUnit(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getSubscriber(callback))
-    }
-
-    private fun <T> getSubscriber(callback: ApiRepositoryCallback<T>): Subscriber<T> {
-        return object : Subscriber<T>() {
-            override fun onNext(t: T) {
-                callback.onNext(t)
-            }
-
-            override fun onCompleted() {
-                callback.onCompleted()
-            }
-
-            override fun onError(e: Throwable?) {
-                callback.onError(e)
-            }
-        }
     }
 }

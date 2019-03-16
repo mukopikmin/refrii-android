@@ -16,5 +16,6 @@ interface UnitListContract {
         fun takeView(view: UnitListContract.View)
         fun getUnits(userId: Int)
         fun removeUnit(id: Int, userId: Int)
+        fun getUnit(id: Int): Unit?
     }
 }

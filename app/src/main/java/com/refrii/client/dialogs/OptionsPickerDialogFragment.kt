@@ -2,29 +2,29 @@ package com.refrii.client.dialogs
 
 import android.app.Activity
 import android.app.Dialog
-import android.app.DialogFragment
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
 
 class OptionsPickerDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bundle = arguments
-        val title = bundle.getString("title")
-        val options = bundle.getStringArray("options")
-        val targetId = bundle.getInt("target_id", 0)
+        val title = bundle?.getString("title")
+        val options = bundle?.getStringArray("options")
+        val targetId = bundle?.getInt("target_id", 0)
 
-        return AlertDialog.Builder(activity)
+        return AlertDialog.Builder(activity!!)
                 .setTitle(title)
                 .setItems(options) { _, which ->
                     val intent = Intent()
                     intent.putExtra("option", which)
                     intent.putExtra("target_id", targetId)
 
-                    val pendingIntent = activity.createPendingResult(targetRequestCode, intent, PendingIntent.FLAG_ONE_SHOT)
-                    pendingIntent.send(Activity.RESULT_OK)
+                    val pendingIntent = activity?.createPendingResult(targetRequestCode, intent, PendingIntent.FLAG_ONE_SHOT)
+                    pendingIntent?.send(Activity.RESULT_OK)
                 }
                 .create()
     }

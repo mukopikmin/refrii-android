@@ -1,11 +1,14 @@
 package com.refrii.client.newunit
 
+import com.refrii.client.data.api.models.Unit
+
 interface NewUnitContract {
 
     interface View {
         fun showProgressBar()
         fun hideProgressBar()
         fun showToast(message: String)
+        fun onCreateCompleted(unit: Unit?)
     }
 
     interface Presenter {

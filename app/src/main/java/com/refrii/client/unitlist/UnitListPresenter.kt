@@ -44,8 +44,9 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
             override fun onNext(t: Void?) {}
 
             override fun onCompleted() {
+                mView?.onUnitUpdateCompleted()
                 mView?.hideProgressBar()
-                mView?.showSnackbar("Unit is removed successfully")
+                mView?.showSnackbar("単位を削除しました")
 
                 getUnits(userId)
             }
@@ -53,7 +54,14 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
             override fun onError(e: Throwable?) {
                 mView?.showToast(e?.message)
             }
+        })
+    }
 
+    override fun getUnit(id: Int): Unit? {
+        return mApiRepository.getUnit(id, object : ApiRepositoryCallback<Unit> {
+            override fun onNext(t: Unit?) {}
+            override fun onCompleted() {}
+            override fun onError(e: Throwable?) {}
         })
     }
 }

@@ -1,5 +1,7 @@
 package com.refrii.client.newunit
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
@@ -11,6 +13,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import com.refrii.client.App
 import com.refrii.client.R
+import com.refrii.client.data.api.models.Unit
 import kotterknife.bindView
 import javax.inject.Inject
 
@@ -63,6 +66,16 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
         }
 
         return result
+    }
+
+    override fun onCreateCompleted(unit: Unit?) {
+        unit ?: return
+
+        val intent = Intent()
+
+        intent.putExtra(getString(R.string.key_unit_id), unit.id)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 
     override fun showProgressBar() {
