@@ -26,6 +26,7 @@ constructor(private val mApiRepository: ApiRepository) : NewUnitContract.Present
 
             override fun onCompleted() {
                 mView?.hideProgressBar()
+                mView?.onCreateCompleted(mUnit)
             }
 
             override fun onError(e: Throwable?) {

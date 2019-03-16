@@ -44,7 +44,6 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
             override fun onNext(t: Void?) {}
 
             override fun onCompleted() {
-                mView?.onUnitUpdateCompleted()
                 mView?.hideProgressBar()
                 mView?.showSnackbar("単位を削除しました")
 

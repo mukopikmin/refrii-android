@@ -19,11 +19,11 @@ import javax.inject.Inject
 
 class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
 
-    private val toolbar: Toolbar by bindView(R.id.toolbar)
-    private val labelEditText: EditText by bindView(R.id.labelEditText)
-    private val stepEditText: EditText by bindView(R.id.stepEditText)
-    private val fab: FloatingActionButton by bindView(R.id.fab)
-    private val progressBar: ProgressBar by bindView(R.id.progressBar)
+    private val mToolbar: Toolbar by bindView(R.id.toolbar)
+    private val mLabelEditText: EditText by bindView(R.id.labelEditText)
+    private val mStepEditText: EditText by bindView(R.id.stepEditText)
+    private val mFab: FloatingActionButton by bindView(R.id.fab)
+    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
 
     @Inject
     lateinit var mPresenter: NewUnitContract.Presenter
@@ -34,17 +34,18 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_new_unit)
-        setSupportActionBar(toolbar)
-        toolbar.title = "Add unit"
-        setSupportActionBar(toolbar)
+        hideProgressBar()
+        setSupportActionBar(mToolbar)
+        mToolbar.title = "Add unit"
+        setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
-        fab.setOnClickListener {
-            val label = labelEditText.text.toString()
-            val step = stepEditText.text.toString().toDouble()
+        mFab.setOnClickListener {
+            val label = mLabelEditText.text.toString()
+            val step = mStepEditText.text.toString().toDouble()
 
             mPresenter.createUnit(label, step)
         }
@@ -79,11 +80,11 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
     }
 
     override fun showProgressBar() {
-        progressBar.visibility = View.VISIBLE
+        mProgressBar.visibility = View.VISIBLE
     }
 
     override fun hideProgressBar() {
-        progressBar.visibility = View.GONE
+        mProgressBar.visibility = View.GONE
     }
 
     override fun showToast(message: String) {
