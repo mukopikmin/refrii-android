@@ -188,7 +188,7 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 })
     }
 
-    fun updateFood(callback: ApiRepositoryCallback<Food>, id: Int, boxId: Int, name: String? = null, notice: String? = null, amount: Double? = null, expirationDate: Date? = null) {
+    fun updateFood(callback: ApiRepositoryCallback<Food>, id: Int, name: String? = null, notice: String? = null, amount: Double? = null, expirationDate: Date? = null, boxId: Int? = null) {
         mApiRemoteDataSource.updateFood(id, name, notice, amount, expirationDate)
                 .subscribe(object : Subscriber<Food>() {
                     override fun onNext(t: Food) {

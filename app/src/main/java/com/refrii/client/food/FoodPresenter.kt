@@ -1,8 +1,7 @@
 package com.refrii.client.food
 
-import android.util.Log
-import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
+import com.refrii.client.data.api.models.Unit
 import com.refrii.client.data.api.source.ApiRepository
 import com.refrii.client.data.api.source.ApiRepositoryCallback
 import java.util.*
@@ -14,85 +13,81 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
 
     private var mView: FoodContract.View? = null
     private var mFood: Food? = null
-    private var mBox: Box? = null
+    private var mUnits: List<Unit>? = null
+    private var mId: Int? = null
+    private var mName: String? = null
+    private var mAmount: Double? = null
+    private var mNotice: String? = null
+    private var mExpirationDate: Date? = null
+    private var mBoxId: Int? = null
+    private var mUnitId: Int? = null
 
     override fun takeView(view: FoodContract.View) {
         mView = view
     }
 
     override fun getFood(id: Int) {
-        mView?.showProgressBar()
-
-        mApiRepository.getFood(id, object : ApiRepositoryCallback<Food> {
+        mFood = mApiRepository.getFood(id, object : ApiRepositoryCallback<Food> {
             override fun onNext(t: Food?) {
                 mFood = t
-                mView?.setFood(t, mBox)
+                mId = t?.id
+                mName = t?.name
+                mAmount = t?.amount
+                mNotice = t?.notice
+                mExpirationDate = t?.expirationDate
+                mBoxId = t?.box?.id
+                mUnitId = t?.unit?.id
+
+                mView?.setFood(t)
             }
 
-            override fun onCompleted() {
-                mView?.hideProgressBar()
-            }
+            override fun onCompleted() {}
 
             override fun onError(e: Throwable?) {
                 mView?.showToast(e?.message)
-                Log.e("AAAAA", e?.message)
             }
         })
+
+        mView?.setFood(mFood)
     }
 
-    override fun getBox(id: Int) {
-        mView?.showProgressBar()
-
-        mApiRepository.getBox(id, object : ApiRepositoryCallback<Box> {
-            override fun onNext(t: Box?) {
-                mBox = t
-                mView?.setFood(mFood, t)
+    override fun getUnits(userId: Int) {
+        mUnits = mApiRepository.getUnits(userId, object : ApiRepositoryCallback<List<Unit>> {
+            override fun onNext(t: List<Unit>?) {
+                mUnits = t
+                mView?.setUnits(t)
             }
 
-            override fun onCompleted() {
-                mView?.hideProgressBar()
-            }
+            override fun onCompleted() {}
 
             override fun onError(e: Throwable?) {
                 mView?.showToast(e?.message)
             }
         })
+
+        mView?.setUnits(mUnits)
     }
 
     override fun updateFood() {
-        mView?.showProgressBar()
 
-        mFood?.let { food ->
-            mBox?.let { box ->
-                mApiRepository.updateFood(food, box, object : ApiRepositoryCallback<Food> {
-                    override fun onNext(t: Food?) {
-                        mFood = t
-                    }
+        mId?.let {
+            mView?.showProgressBar()
 
-                    override fun onCompleted() {
-                        mView?.hideProgressBar()
-                        mView?.onBeforeEdit()
-                        mView?.showSnackbar("Update completed")
-                    }
+            mApiRepository.updateFood(object : ApiRepositoryCallback<Food> {
+                override fun onNext(t: Food?) {
+                    mFood = t
+                }
 
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
-            }
+                override fun onCompleted() {
+                    mView?.hideProgressBar()
+                    mView?.onUpdateCompleted()
+                }
+
+                override fun onError(e: Throwable?) {
+                    mView?.showToast(e?.message)
+                }
+            }, it, name = mName, amount = mAmount, notice = mNotice, expirationDate = mExpirationDate, boxId = mBoxId)
         }
-    }
-
-    override fun editName() {
-        mView?.showEditNameDialog(mFood?.name)
-    }
-
-    override fun editAmount() {
-        mView?.showEditAmountDialog(mFood?.amount)
-    }
-
-    override fun editNotice() {
-        mView?.showEditNoticeDialog(mFood?.notice)
     }
 
     override fun editExpirationDate() {
@@ -100,26 +95,19 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun updateName(name: String) {
-        mFood?.name = name
-        mView?.setFood(mFood, mBox)
-        mView?.onEdited()
+        this.mName = name
     }
 
     override fun updateAmount(amount: Double) {
-        mFood?.amount = amount
-        mView?.setFood(mFood, mBox)
-        mView?.onEdited()
+        this.mAmount = amount
     }
 
     override fun updateNotice(notice: String) {
-        mFood?.notice = notice
-        mView?.setFood(mFood, mBox)
-        mView?.onEdited()
+        this.mNotice = notice
     }
 
     override fun updateExpirationDate(date: Date) {
-        mFood?.expirationDate = date
-        mView?.setFood(mFood, mBox)
-        mView?.onEdited()
+        this.mExpirationDate = date
+        mView?.setExpirationDate(date)
     }
 }

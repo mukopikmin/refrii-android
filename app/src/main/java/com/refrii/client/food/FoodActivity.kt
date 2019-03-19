@@ -2,25 +2,24 @@ package com.refrii.client.food
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.refrii.client.App
 import com.refrii.client.R
-import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
+import com.refrii.client.data.api.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
-import com.refrii.client.dialogs.EditDoubleDialogFragment
-import com.refrii.client.dialogs.EditTextDialogFragment
 import kotterknife.bindView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,23 +28,21 @@ import javax.inject.Inject
 class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     private val mProgressBar: ProgressBar by bindView(R.id.foodProgressBar)
-    private val mEditedMessage: TextView by bindView(R.id.editedMessageTextView)
-    private val mEditName: ImageView by bindView(R.id.editNameImageView)
-    private val mEditAmount: ImageView by bindView(R.id.editAmountImageView)
-    private val mEditNotice: ImageView by bindView(R.id.editNoticeImageView)
-    private val mEditExpirationDate: ImageView by bindView(R.id.editExpirationDateImageView)
     private val mToolbar: Toolbar by bindView(R.id.toolbar)
-    private val mName: TextView by bindView(R.id.foodNameTextView)
-    private val mAmount: TextView by bindView(R.id.amountTextView)
-    private val mNotice: TextView by bindView(R.id.noticeTextView)
+    private val mName: EditText by bindView(R.id.nameEditText)
+    private val mAmount: EditText by bindView(R.id.amountEditText)
+    private val mNotice: EditText by bindView(R.id.noticeEditText)
     private val mExpirationDate: TextView by bindView(R.id.expirationDateTextView)
-    private val mCreated: TextView by bindView(R.id.createdUserTextView)
-    private val mUpdate: TextView by bindView(R.id.updatedUserTextView)
-    private val mBoxName: TextView by bindView(R.id.foodBoxTextView)
+    private val mCreated: TextView by bindView(R.id.createdTextView)
+    private val mUpdate: TextView by bindView(R.id.updatedTextView)
+    private val mBoxName: TextView by bindView(R.id.boxTextView)
     private val mFab: FloatingActionButton by bindView(R.id.fab)
+    private val mUnitsSpinner: Spinner by bindView(R.id.unitsSpinner)
 
     @Inject
     lateinit var mPresenter: FoodPresenter
+
+    lateinit var mPreference: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,16 +51,43 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         setContentView(R.layout.activity_food)
         setSupportActionBar(mToolbar)
+
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
+        mPreference = PreferenceManager.getDefaultSharedPreferences(this)
+
         mFab.setOnClickListener { mPresenter.updateFood() }
-        mEditName.setOnClickListener { mPresenter.editName() }
-        mEditAmount.setOnClickListener { mPresenter.editAmount() }
-        mEditNotice.setOnClickListener { mPresenter.editNotice() }
-        mEditExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
+        mName.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                mPresenter.updateName(s.toString())
+            }
+        })
+        mNotice.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                mPresenter.updateNotice(s.toString())
+            }
+        })
+        mAmount.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                mPresenter.updateAmount(s.toString().toDouble())
+            }
+        })
+        mExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
     }
 
     override fun onStart() {
@@ -72,12 +96,12 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val intent = intent
         val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
+        val userId = mPreference.getInt(getString(R.string.preference_key_id), 0)
 
         mPresenter.takeView(this)
         mPresenter.getFood(foodId)
-        mPresenter.getBox(boxId)
-
-        onBeforeEdit()
+        mPresenter.getUnits(userId)
+        hideProgressBar()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -108,57 +132,46 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         }
     }
 
-    override fun setFood(food: Food?, box: Box?) {
+    override fun setFood(food: Food?) {
         val timeFormatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
-        val dateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-        val daysLeft = food?.daysLeft()
 
         mToolbar.title = food?.name
         setSupportActionBar(mToolbar)
 
-        mName.text = food?.name
-        mBoxName.text = box?.name
-        mAmount.text = "${food?.amount} ${food?.unit?.label}"
-        mNotice.text = food?.notice
-        mCreated.text = "${timeFormatter.format(food?.createdAt)} by ${food?.createdUser?.name}"
-        mUpdate.text = "${timeFormatter.format(food?.updatedAt)} by ${food?.updatedUser?.name}"
-        mExpirationDate.text = dateFormatter.format(food?.expirationDate)
+        mName.setText(food?.name)
+        mBoxName.text = food?.box?.name
+        mAmount.setText(food?.amount.toString())
+        mNotice.setText(food?.notice)
+        mCreated.text = "${timeFormatter.format(food?.createdAt)} (${food?.createdUser?.name})"
+        mUpdate.text = "${timeFormatter.format(food?.updatedAt)} (${food?.updatedUser?.name})"
 
-        daysLeft?.let {
-            if (daysLeft < 0) {
-                mExpirationDate.append(" (${Math.abs(daysLeft)} days over)")
-                mExpirationDate.setTextColor(Color.RED)
-            } else {
-                mExpirationDate.append(" (${Math.abs(daysLeft)} days left)")
-            }
+        setExpirationDate(food?.expirationDate)
+    }
+
+    override fun setExpirationDate(date: Date?) {
+        val today = Date()
+        val oneDayMilliSec = 24 * 60 * 60 * 1000
+        val daysLeft = ((date?.time ?: today.time) - today.time) / oneDayMilliSec
+        val dateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+
+        mExpirationDate.text = dateFormatter.format(date)
+
+        if (daysLeft < 0) {
+            mExpirationDate.append(" (${Math.abs(daysLeft)} 日過ぎています)")
+            mExpirationDate.setTextColor(Color.RED)
+        } else {
+            mExpirationDate.append(" (残り ${Math.abs(daysLeft)} 日)")
+            mExpirationDate.setTextColor(Color.BLACK)
         }
     }
 
-    override fun showEditNameDialog(name: String?) {
-        name ?: return
+    override fun setUnits(units: List<Unit>?) {
+        units ?: return
 
-        val fragment = EditTextDialogFragment.newInstance("Name", name)
+        val unitLabels = units.map { it.label }
+        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, unitLabels)
 
-        fragment.setTargetFragment(null, EDIT_NAME_REQUEST_CODE)
-        fragment.show(fragmentManager, "edit_name")
-    }
-
-    override fun showEditAmountDialog(amount: Double?) {
-        amount ?: return
-
-        val fragment = EditDoubleDialogFragment.newInstance("Amount", amount)
-
-        fragment.setTargetFragment(null, EDIT_AMOUNT_REQUEST_CODE)
-        fragment.show(fragmentManager, "edit_amount")
-    }
-
-    override fun showEditNoticeDialog(notice: String?) {
-        notice ?: return
-
-        val fragment = EditTextDialogFragment.newInstance("Notice", notice, true)
-
-        fragment.setTargetFragment(null, EDIT_NOTICE_REQUEST_CODE)
-        fragment.show(fragmentManager, "edit_notice")
+        mUnitsSpinner.adapter = adapter
     }
 
     override fun showEditDateDialog(date: Date?) {
@@ -170,22 +183,18 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         fragment.show(supportFragmentManager, "edit_expiration_date")
     }
 
-    override fun onBeforeEdit() {
-        mEditedMessage.visibility = View.GONE
-        mFab.hide()
-    }
-
-    override fun onEdited() {
-        mEditedMessage.visibility = View.VISIBLE
-        mFab.show()
+    override fun onUpdateCompleted() {
+        finish()
     }
 
     override fun showProgressBar() {
         mProgressBar.visibility = View.VISIBLE
+        mFab.hide()
     }
 
     override fun hideProgressBar() {
         mProgressBar.visibility = View.GONE
+        mFab.show()
     }
 
     override fun showSnackbar(message: String?) {
