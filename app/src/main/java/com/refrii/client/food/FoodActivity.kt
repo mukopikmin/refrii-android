@@ -140,7 +140,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         mName.setText(food?.name)
         mBoxName.text = food?.box?.name
-        mAmount.setText(food?.amount.toString())
+        mAmount.setText(String.format("%.2f", food?.amount))
         mNotice.setText(food?.notice)
         mCreated.text = "${timeFormatter.format(food?.createdAt)} (${food?.createdUser?.name})"
         mUpdate.text = "${timeFormatter.format(food?.updatedAt)} (${food?.updatedUser?.name})"
