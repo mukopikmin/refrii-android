@@ -34,6 +34,19 @@ class ApiLocalDataSource(private val mRealm: Realm) {
         }
     }
 
+    fun getUnitsForBox(id: Int): List<Unit> {
+        val box = mRealm.where<Box>()
+                .equalTo("id", id)
+                .findFirst()
+        val user = mRealm.where<User>()
+                .equalTo("id", box?.owner?.id)
+                .findFirst()
+
+        return mRealm.where<Unit>()
+                .equalTo("user.id", user?.id)
+                .findAll()
+    }
+
     fun getFoods(): List<Food> {
         return mRealm.where<Food>().findAll()
     }
@@ -74,16 +87,25 @@ class ApiLocalDataSource(private val mRealm: Realm) {
         }
     }
 
-    fun updateFood(id: Int, name: String? = null, notice: String? = null, amount: Double? = null, expirationDate: Date? = null) {
+    fun updateFood(id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?) {
         val food = mRealm.where<Food>()
                 .equalTo("id", id)
                 .findFirst() ?: return
 
-        mRealm.executeTransaction {
+        mRealm.executeTransaction { realm ->
+            val box = realm.where<Box>()
+                    .equalTo("id", boxId)
+                    .findFirst()
+            val unit = realm.where<Unit>()
+                    .equalTo("id", unitId)
+                    .findFirst()
+
             name?.let { food.name = it }
             notice?.let { food.notice = it }
             amount?.let { food.amount = it }
             expirationDate?.let { food.expirationDate = it }
+            box?.let { food.box = box }
+            unit?.let { food.unit = unit }
         }
     }
 
@@ -120,10 +142,6 @@ class ApiLocalDataSource(private val mRealm: Realm) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun updateFood(food: Food, box: Box) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     fun removeFood(id: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -142,8 +160,9 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .findFirst()
     }
 
-    fun saveUnits(units: List<Unit>, userId: Int) {
+    fun saveUnits(units: List<Unit>) {
         mRealm.executeTransaction { realm ->
+            val userId = units.first().user?.id
             val onlyLocal = realm.where<Unit>()
                     .equalTo("user.id", userId)
                     .not().oneOf("id", units.map { it.id }.toTypedArray())

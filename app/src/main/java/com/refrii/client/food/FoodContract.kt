@@ -28,5 +28,6 @@ interface FoodContract {
         fun updateAmount(amount: Double)
         fun updateNotice(notice: String)
         fun updateExpirationDate(date: Date)
+        fun selectUnit(id: Int)
     }
 }

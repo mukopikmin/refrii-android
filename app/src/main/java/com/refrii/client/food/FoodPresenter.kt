@@ -1,5 +1,6 @@
 package com.refrii.client.food
 
+import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.data.api.source.ApiRepository
@@ -13,6 +14,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
 
     private var mView: FoodContract.View? = null
     private var mFood: Food? = null
+    private var mBox: Box? = null
     private var mUnits: List<Unit>? = null
     private var mId: Int? = null
     private var mName: String? = null
@@ -41,7 +43,11 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                 mView?.setFood(t)
             }
 
-            override fun onCompleted() {}
+            override fun onCompleted() {
+//                mBoxId?.let {
+//                    getBox(id)
+//                }
+            }
 
             override fun onError(e: Throwable?) {
                 mView?.showToast(e?.message)
@@ -51,8 +57,8 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
         mView?.setFood(mFood)
     }
 
-    override fun getUnits(userId: Int) {
-        mUnits = mApiRepository.getUnits(userId, object : ApiRepositoryCallback<List<Unit>> {
+    override fun getUnits(boxId: Int) {
+        mUnits = mApiRepository.getUnitsForBox(boxId, object : ApiRepositoryCallback<List<Unit>> {
             override fun onNext(t: List<Unit>?) {
                 mUnits = t
                 mView?.setUnits(t)
@@ -86,8 +92,12 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                 override fun onError(e: Throwable?) {
                     mView?.showToast(e?.message)
                 }
-            }, it, name = mName, amount = mAmount, notice = mNotice, expirationDate = mExpirationDate, boxId = mBoxId)
+            }, it, mName, mNotice, mAmount, mExpirationDate, mBoxId, mUnitId)
         }
+    }
+
+    override fun selectUnit(id: Int) {
+        mUnitId = id
     }
 
     override fun editExpirationDate() {

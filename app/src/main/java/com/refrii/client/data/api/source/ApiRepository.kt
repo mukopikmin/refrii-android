@@ -74,6 +74,26 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         return mApiLocalDataSource.getBox(id)
     }
 
+    fun getUnitsForBox(id: Int, callback: ApiRepositoryCallback<List<Unit>>): List<Unit> {
+        mApiRemoteDataSource.getUnitsForBox(id)
+                .subscribe(object : Subscriber<List<Unit>>() {
+                    override fun onNext(t: List<Unit>) {
+                        mApiLocalDataSource.saveUnits(t)
+                        callback.onNext(mApiLocalDataSource.getUnitsForBox(id))
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        callback.onError(e)
+                    }
+                })
+
+        return mApiLocalDataSource.getUnitsForBox(id)
+    }
+
     fun getFoods(box: Box, callback: ApiRepositoryCallback<List<Food>>): List<Food> {
         mApiRemoteDataSource.getFoods()
                 .subscribe(object : Subscriber<List<Food>>() {
@@ -170,29 +190,11 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 })
     }
 
-    fun updateFood(food: Food, box: Box, callback: ApiRepositoryCallback<Food>) {
-        mApiRemoteDataSource.updateFood(food, box)
+    fun updateFood(callback: ApiRepositoryCallback<Food>, id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?) {
+        mApiRemoteDataSource.updateFood(id, name, notice, amount, expirationDate, boxId, unitId)
                 .subscribe(object : Subscriber<Food>() {
                     override fun onNext(t: Food) {
-                        mApiLocalDataSource.saveFood(t)
-                        callback.onNext(mApiLocalDataSource.getFood(food.id))
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
-    }
-
-    fun updateFood(callback: ApiRepositoryCallback<Food>, id: Int, name: String? = null, notice: String? = null, amount: Double? = null, expirationDate: Date? = null, boxId: Int? = null) {
-        mApiRemoteDataSource.updateFood(id, name, notice, amount, expirationDate)
-                .subscribe(object : Subscriber<Food>() {
-                    override fun onNext(t: Food) {
-                        mApiLocalDataSource.updateFood(id, name = name, notice = notice, amount = amount, expirationDate = expirationDate)
+                        mApiLocalDataSource.updateFood(id, name, notice, amount, expirationDate, boxId, unitId)
                         callback.onNext(t)
                     }
 
@@ -227,7 +229,7 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         mApiRemoteDataSource.getUnits()
                 .subscribe(object : Subscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>) {
-                        mApiLocalDataSource.saveUnits(t, userId)
+                        mApiLocalDataSource.saveUnits(t)
                         callback.onNext(mApiLocalDataSource.getUnits(userId))
                     }
 

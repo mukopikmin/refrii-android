@@ -54,6 +54,13 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    fun getUnitsForBox(id: Int): Observable<List<Unit>> {
+        return mRetrofit.create(BoxService::class.java)
+                .getUnitsForBox(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun getFoods(): Observable<List<Food>> {
         return mRetrofit.create(FoodService::class.java)
                 .getFodos()
@@ -86,25 +93,7 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun updateFood(food: Food, box: Box): Observable<Food> {
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val body = MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("name", food.name)
-                .addFormDataPart("notice", food.notice)
-                .addFormDataPart("amount", food.amount.toString())
-                .addFormDataPart("box_id", box.id.toString())
-                .addFormDataPart("unit_id", food.unit?.id.toString())
-                .addFormDataPart("expiration_date", simpleDateFormat.format(food.expirationDate))
-                .build()
-
-        return mRetrofit.create(FoodService::class.java)
-                .updateFood(food.id, body)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
-
-    fun updateFood(id: Int, name: String? = null, notice: String? = null, amount: Double? = null, expirationDate: Date? = null): Observable<Food> {
+    fun updateFood(id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val bodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -113,6 +102,8 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
         notice?.let { bodyBuilder.addFormDataPart("notice", it) }
         amount?.let { bodyBuilder.addFormDataPart("amount", it.toString()) }
         expirationDate?.let { bodyBuilder.addFormDataPart("expiration_date", simpleDateFormat.format(it)) }
+        boxId?.let { bodyBuilder.addFormDataPart("box_id", it.toString()) }
+        unitId?.let { bodyBuilder.addFormDataPart("unit_id", it.toString()) }
 
         return mRetrofit.create(FoodService::class.java)
                 .updateFood(id, bodyBuilder.build())

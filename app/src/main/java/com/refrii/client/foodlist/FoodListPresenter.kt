@@ -97,7 +97,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
                     mView?.showToast(e?.message)
                     mView?.hideProgressBar()
                 }
-            }, food.id, boxId = it.id, amount = amount)
+            }, food.id, null, null, amount, null, null, null)
         }
     }
 

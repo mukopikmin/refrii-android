@@ -39,6 +39,9 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     private val mFab: FloatingActionButton by bindView(R.id.fab)
     private val mUnitsSpinner: Spinner by bindView(R.id.unitsSpinner)
 
+    private var mUnitIds: List<Int>? = null
+    private var mUnitLabels: MutableList<String?>? = null
+
     @Inject
     lateinit var mPresenter: FoodPresenter
 
@@ -87,6 +90,20 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
                 mPresenter.updateAmount(s.toString().toDouble())
             }
         })
+        mUnitsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val spinnerParent = parent as Spinner
+                val item = spinnerParent.selectedItem as String
+
+                mUnitIds?.let { ids ->
+                    mUnitLabels?.indexOf(item)?.let {
+                        mPresenter.selectUnit(ids[it])
+                    }
+                }
+            }
+        }
         mExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
     }
 
@@ -96,11 +113,11 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val intent = intent
         val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
-        val userId = mPreference.getInt(getString(R.string.preference_key_id), 0)
+//        val userId = mPreference.getInt(getString(R.string.preference_key_id), 0)
 
         mPresenter.takeView(this)
         mPresenter.getFood(foodId)
-        mPresenter.getUnits(userId)
+        mPresenter.getUnits(boxId)
         hideProgressBar()
     }
 
@@ -168,10 +185,12 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     override fun setUnits(units: List<Unit>?) {
         units ?: return
 
-        val unitLabels = units.map { it.label }
-        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, unitLabels)
+        mUnitLabels = units.map { it.label }.toMutableList()
+        mUnitIds = units.map { it.id }
 
-        mUnitsSpinner.adapter = adapter
+        mUnitLabels?.let {
+            mUnitsSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
+        }
     }
 
     override fun showEditDateDialog(date: Date?) {
