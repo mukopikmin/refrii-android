@@ -13,11 +13,15 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
     private var mView: FoodListContract.View? = null
     private var mBoxes: List<Box>? = null
-    var mBox: Box? = null
+    private var mBox: Box? = null
     private var mFoods: List<Food>? = null
 
     override fun takeView(view: FoodListContract.View) {
         mView = view
+    }
+
+    override fun getBox(): Box? {
+        return mBox
     }
 
     override fun getBoxInfo() {

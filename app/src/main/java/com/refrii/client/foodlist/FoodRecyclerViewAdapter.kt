@@ -10,23 +10,20 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-//    private var mItemManager = SwipeItemRecyclerMangerImpl(this)
-//    private var mRealm: Realm
 
     var mEditClickListener: View.OnClickListener? = null
     var mDeleteClickListener: View.OnClickListener? = null
     var mIncrementClickListener: View.OnClickListener? = null
     var mDecrementClickListener: View.OnClickListener? = null
-    var mSelectedPosition: Int = UNSELECTED_INDEX
 
-//    init {
-//        Realm.init(context)
-//        mRealm = RealmUtil.getInstance()
-//    }
+    private var mSelectedPosition: Int = UNSELECTED_INDEX
+
+    fun setFoods(foods: List<Food>) {
+        mFoods = foods
+        notifyDataSetChanged()
+    }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-//        val id = mFoods[position].id
-//        val food = mRealm.where(Food::class.java).equalTo("id", id).findFirst()
         val food = mFoods[position]
         val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
         val amountWithUnit = "${food.amount} ${food.unit?.label}"
@@ -77,14 +74,6 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
         mSelectedPosition = UNSELECTED_INDEX
         notifyDataSetChanged()
     }
-
-//    fun add(food: Food) {
-//        mFoods.add(food)
-//    }
-//
-//    fun removeFood(food: Food) {
-//        mFoods.removeFood(food)
-//    }
 
     companion object {
         private const val UNSELECTED_INDEX = -1

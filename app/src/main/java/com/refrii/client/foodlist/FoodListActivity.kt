@@ -121,7 +121,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         val editor = mPreference.edit()
 
-        mPresenter.mBox?.let {
+        mPresenter.getBox()?.let {
             editor.putInt(getString(R.string.preference_selected_box_id), it.id)
             editor.apply()
         }
@@ -257,45 +257,55 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
     }
 
+    fun updateFoods(foods: List<Food>) {
+        val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
+
+        adapter.setFoods(foods)
+    }
+
     override fun setFoods(boxName: String?, foods: List<Food>?) {
         boxName ?: return
         foods ?: return
 
-        val adapter = FoodRecyclerViewAdapter(foods)
+        if (mRecyclerView.adapter == null) {
+            val adapter = FoodRecyclerViewAdapter(foods)
 
-        title = boxName
-        adapter.apply {
-            mEditClickListener = View.OnClickListener {
-                val position = mRecyclerView.getChildAdapterPosition(it)
-                val food = adapter.getItemAtPosition(position)
+            title = boxName
+            adapter.apply {
+                mEditClickListener = View.OnClickListener {
+                    val position = mRecyclerView.getChildAdapterPosition(it)
+                    val food = adapter.getItemAtPosition(position)
 
-                mPresenter.showFood(food.id)
+                    mPresenter.showFood(food.id)
+                }
+
+                mDeleteClickListener = View.OnClickListener {
+                    val position = mRecyclerView.getChildAdapterPosition(it)
+                    val food = adapter.getItemAtPosition(position)
+                    val fragment = ConfirmDialogFragment.newInstance(food.name!!, "削除していいですか？", food.id)
+
+                    fragment.setTargetFragment(null, REMOVE_FOOD_REQUEST_CODE)
+                    fragment.show(supportFragmentManager, "delete_food")
+                }
+
+                mIncrementClickListener = View.OnClickListener {
+                    val position = mRecyclerView.getChildAdapterPosition(it)
+                    val food = adapter.getItemAtPosition(position)
+
+                    mPresenter.incrementFood(food)
+                }
+
+                mDecrementClickListener = View.OnClickListener {
+                    val position = mRecyclerView.getChildAdapterPosition(it)
+                    val food = adapter.getItemAtPosition(position)
+
+                    mPresenter.decrementFood(food)
+                }
             }
-
-            mDeleteClickListener = View.OnClickListener {
-                val position = mRecyclerView.getChildAdapterPosition(it)
-                val food = adapter.getItemAtPosition(position)
-                val fragment = ConfirmDialogFragment.newInstance(food.name!!, "削除していいですか？", food.id)
-
-                fragment.setTargetFragment(null, REMOVE_FOOD_REQUEST_CODE)
-                fragment.show(supportFragmentManager, "delete_food")
-            }
-
-            mIncrementClickListener = View.OnClickListener {
-                val position = mRecyclerView.getChildAdapterPosition(it)
-                val food = adapter.getItemAtPosition(position)
-
-                mPresenter.incrementFood(food)
-            }
-
-            mDecrementClickListener = View.OnClickListener {
-                val position = mRecyclerView.getChildAdapterPosition(it)
-                val food = adapter.getItemAtPosition(position)
-
-                mPresenter.decrementFood(food)
-            }
+            mRecyclerView.adapter = adapter
+        } else {
+            updateFoods(foods)
         }
-        mRecyclerView.adapter = adapter
     }
 
     override fun onFoodUpdated() {
@@ -363,7 +373,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         editor.clear()
         editor.apply()
-//        clearBoxes()
         mPresenter.deleteLocalData()
 
         startActivity(intent)
