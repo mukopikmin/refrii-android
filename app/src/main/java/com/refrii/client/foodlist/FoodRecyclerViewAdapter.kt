@@ -16,7 +16,7 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
     var mIncrementClickListener: View.OnClickListener? = null
     var mDecrementClickListener: View.OnClickListener? = null
 
-    private var mSelectedPosition: Int = UNSELECTED_INDEX
+    private var mSelectedPosition: Int? = null
 
     fun setFoods(foods: List<Food>) {
         mFoods = foods
@@ -41,7 +41,12 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
             }
 
             constraintLayout.setOnClickListener {
-                mSelectedPosition = position
+                if (mSelectedPosition == position) {
+                    mSelectedPosition = null
+                } else {
+                    mSelectedPosition = position
+                }
+
                 notifyDataSetChanged()
             }
 
@@ -67,15 +72,11 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
     }
 
     fun isItemSelected(): Boolean {
-        return mSelectedPosition != UNSELECTED_INDEX
+        return mSelectedPosition != null
     }
 
     fun deselectItem() {
-        mSelectedPosition = UNSELECTED_INDEX
+        mSelectedPosition = null
         notifyDataSetChanged()
-    }
-
-    companion object {
-        private const val UNSELECTED_INDEX = -1
     }
 }

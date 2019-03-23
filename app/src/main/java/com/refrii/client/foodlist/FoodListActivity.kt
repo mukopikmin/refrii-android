@@ -170,9 +170,12 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         val editor = mPreference.edit()
+        val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
 
         editor.putInt(getString(R.string.preference_selected_box_id), id)
         editor.apply()
+
+        adapter.deselectItem()
 
         if (!mPresenter.pickBox(id)) {
             when (id) {
@@ -257,7 +260,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
     }
 
-    fun updateFoods(foods: List<Food>) {
+    private fun updateFoods(foods: List<Food>) {
         val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
 
         adapter.setFoods(foods)
