@@ -43,15 +43,6 @@ open class Box : RealmObject(), Serializable {
         return result
     }
 
-    private fun sync(other: Box): Box {
-        updatedAt?.let {
-            if (it < other.updatedAt) {
-                return other
-            }
-        }
-        return this
-    }
-
     fun toMultipartBody(): MultipartBody {
         val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
 
@@ -62,9 +53,5 @@ open class Box : RealmObject(), Serializable {
         imageUrl?.let { builder.addFormDataPart("imageUrl", it) }
 
         return builder.build()
-    }
-
-    companion object {
-        val TAG = "Box"
     }
 }

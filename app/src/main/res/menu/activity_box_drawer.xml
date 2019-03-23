@@ -9,6 +9,13 @@
         </item>
     </group>
     <group>
+        <item
+            android:id="@+id/menu_invited_boxes"
+            android:title="@string/nav_shared_categories">
+            <menu />
+        </item>
+    </group>
+    <group>
         <item android:title="@string/nav_filter">
             <menu>
                 <item

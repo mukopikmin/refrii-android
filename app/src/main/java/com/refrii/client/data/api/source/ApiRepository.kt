@@ -194,7 +194,7 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         mApiRemoteDataSource.updateFood(id, name, notice, amount, expirationDate, boxId, unitId)
                 .subscribe(object : Subscriber<Food>() {
                     override fun onNext(t: Food) {
-                        mApiLocalDataSource.updateFood(id, name, notice, amount, expirationDate, boxId, unitId)
+                        mApiLocalDataSource.updateFood(t.id, t.name, t.notice, t.amount, t.expirationDate, t.box?.id, t.unit?.id)
                         callback.onNext(t)
                     }
 

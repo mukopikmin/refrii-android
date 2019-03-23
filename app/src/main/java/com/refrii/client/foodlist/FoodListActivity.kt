@@ -73,6 +73,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
         toggle.syncState()
+        mNavigationView.setNavigationItemSelectedListener(this@FoodListActivity)
 
         mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -201,18 +202,22 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mNavigationView.menu
                 .findItem(R.id.menu_boxes)
                 .subMenu.clear()
+        mNavigationView.menu
+                .findItem(R.id.menu_invited_boxes)
+                .subMenu.clear()
     }
 
     override fun setBoxes(boxes: List<Box>?) {
         boxes ?: return
 
-        mNavigationView.setNavigationItemSelectedListener(this@FoodListActivity)
         clearBoxes()
 
-        boxes.forEach {
-            mNavigationView.menu
-                    .findItem(R.id.menu_boxes)
-                    .subMenu.add(Menu.NONE, it.id, Menu.NONE, it.name)
+        boxes.filter { !it.isInvited }.forEach {
+            setBoxesToNavigation(R.id.menu_boxes, it)
+        }
+
+        boxes.filter { it.isInvited }.forEach {
+            setBoxesToNavigation(R.id.menu_invited_boxes, it)
         }
 
         if (boxes.isNotEmpty()) {
@@ -220,11 +225,17 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             val box = boxes.singleOrNull { it.id == boxId }
 
             if (box == null) {
-                mPresenter.selectBox(boxes[0])
+                mPresenter.selectBox(boxes.first())
             } else {
                 mPresenter.selectBox(box)
             }
         }
+    }
+
+    private fun setBoxesToNavigation(navId: Int, box: Box) {
+        mNavigationView.menu
+                .findItem(navId)
+                .subMenu.add(Menu.NONE, box.id, Menu.NONE, box.name)
     }
 
     private fun setNavigationHeader() {
@@ -260,9 +271,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
     }
 
-    private fun updateFoods(foods: List<Food>) {
+    private fun updateFoods(boxName: String, foods: List<Food>) {
         val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
 
+        title = boxName
         adapter.setFoods(foods)
     }
 
@@ -307,7 +319,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             }
             mRecyclerView.adapter = adapter
         } else {
-            updateFoods(foods)
+            updateFoods(boxName, foods)
         }
     }
 

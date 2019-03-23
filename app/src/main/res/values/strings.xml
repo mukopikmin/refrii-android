@@ -1,61 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <string name="app_name">Refrii</string>
 
+    <string name="default_mail">default@example.com</string>
+    <string name="default_name">Default name</string>
+
+    <string name="foodlist_menu_about">カテゴリの詳細</string>
+    <string name="foodlist_menu_sync">同期</string>
+    <string name="foodlist_options_cancel">キャンセル</string>
+    <string name="foodlist_options_remove">削除</string>
+    <string name="foodlist_options_show">詳細を表示</string>
+
     <string name="key_box_id">key_box_id</string>
     <string name="key_food_id">key_food_id</string>
+    <string name="key_unit_id">key_unit_id</string>
 
-    <string name="default_name">Default name</string>
-    <string name="default_mail">default@example.com</string>
+    <string name="message_add_food_completed">食材が追加されました</string>
+    <string name="message_cancel">Cancel</string>
+    <string name="message_delete">削除する</string>
+    <string name="message_no">いいえ</string>
+    <string name="message_show_detail">詳細を表示する</string>
+    <string name="message_unfilled_form">未入力の項目があります</string>
+    <string name="message_yes">はい</string>
 
-    <string name="navigation_drawer_open">Open navigation mDrawer</string>
+    <string name="nav_categories">カテゴリ</string>
+    <string name="nav_expiring">期限が1週間以内</string>
+    <string name="nav_filter">フィルター</string>
+    <string name="nav_settings">設定</string>
+    <string name="nav_shared_categories">共有</string>
+    <string name="nav_signout">ログアウト</string>
+    <string name="nav_units">単位</string>
+
     <string name="navigation_drawer_close">Close navigation mDrawer</string>
+    <string name="navigation_drawer_open">Open navigation mDrawer</string>
 
+    <string name="preference_key_avatar">preference_key_avatar</string>
     <string name="preference_key_expiration_timestamp">preference_expiration_timestamp</string>
+    <string name="preference_key_id">preference_key_id</string>
     <string name="preference_key_jwt">preference_key_jwt</string>
     <string name="preference_key_mail">preference_key_mail</string>
     <string name="preference_key_name">preference_key_name</string>
-    <string name="preference_key_avatar">preference_key_avatar</string>
     <string name="preference_key_signin_provider">preference_key_signin_provider</string>
     <string name="preference_selected_box_id">preference_selected_box_id</string>
+
+    <string name="settings_display_name">ユーザー名</string>
+    <string name="settings_title">設定</string>
 
     <string name="signin_welcome_message">家族でストックをシェアしましょう！</string>
     <string name="signin_welcome_title">Refriiへようこそ</string>
 
-    <string name="settings_title">設定</string>
-    <string name="settings_display_name">ユーザー名</string>
-
-    <string name="foodlist_menu_about">カテゴリの詳細</string>
-    <string name="foodlist_menu_sync">同期</string>
-    <string name="foodlist_options_show">詳細を表示</string>
-    <string name="foodlist_options_remove">削除</string>
-    <string name="foodlist_options_cancel">キャンセル</string>
-
-    <string name="nav_categories">カテゴリ</string>
-    <string name="nav_units">単位</string>
-    <string name="nav_settings">設定</string>
-    <string name="nav_signout">ログアウト</string>
-
-
-    <string name="title_activity_signin">SigninActivity</string>
-    <string name="title_activity_food">FoodActivity</string>
-    <string name="title_activity_new_food">NewFoodActivity</string>
     <string name="title_activity_box_info">BoxInfoActivity</string>
     <string name="title_activity_edit_food">EditFoodActivity</string>
     <string name="title_activity_error">ErrorActivity</string>
-    <string name="title_activity_units">UnitsActivity</string>
-    <string name="title_activity_unit">UnitActivity</string>
+    <string name="title_activity_food">FoodActivity</string>
+    <string name="title_activity_new_food">NewFoodActivity</string>
     <string name="title_activity_new_unit">NewUnitActivity</string>
-    <string name="message_cancel">Cancel</string>
-    <string name="message_yes">はい</string>
-    <string name="message_no">いいえ</string>
-    <string name="message_add_food_completed">食材が追加されました</string>
+    <string name="title_activity_signin">SigninActivity</string>
+    <string name="title_activity_unit">UnitActivity</string>
+    <string name="title_activity_units">UnitsActivity</string>
     <string name="title_add_food">食材の追加</string>
-    <string name="preference_key_id">preference_key_id</string>
     <string name="title_unit_list">単位の一覧</string>
-    <string name="message_show_detail">詳細を表示する</string>
-    <string name="message_delete">削除する</string>
-    <string name="nav_filter">フィルター</string>
-    <string name="nav_expiring">期限が1週間以内</string>
-    <string name="message_unfilled_form">未入力の項目があります</string>
-    <string name="key_unit_id">key_unit_id</string>
 </resources>
