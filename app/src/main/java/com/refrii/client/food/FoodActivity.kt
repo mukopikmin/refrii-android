@@ -41,6 +41,20 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     private var mUnitIds: List<Int>? = null
     private var mUnitLabels: MutableList<String?>? = null
+    private val mOnUnitSelectedListener = object : AdapterView.OnItemSelectedListener {
+        override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            val spinnerParent = parent as Spinner
+            val item = spinnerParent.selectedItem as String
+
+            mUnitIds?.let { ids ->
+                mUnitLabels?.indexOf(item)?.let {
+                    mPresenter.selectUnit(ids[it])
+                }
+            }
+        }
+    }
 
     @Inject
     lateinit var mPresenter: FoodPresenter
@@ -90,20 +104,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
                 mPresenter.updateAmount(s.toString().toDouble())
             }
         })
-        mUnitsSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val spinnerParent = parent as Spinner
-                val item = spinnerParent.selectedItem as String
-
-                mUnitIds?.let { ids ->
-                    mUnitLabels?.indexOf(item)?.let {
-                        mPresenter.selectUnit(ids[it])
-                    }
-                }
-            }
-        }
+        mUnitsSpinner.onItemSelectedListener = mOnUnitSelectedListener
         mExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
     }
 
@@ -191,6 +192,12 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mUnitLabels?.let {
             mUnitsSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
         }
+    }
+
+    override fun setSelectedUnit(id: Int?) {
+        val index = mUnitIds?.indexOf(id) ?: 0
+
+        mUnitsSpinner.setSelection(index)
     }
 
     override fun showEditDateDialog(date: Date?) {

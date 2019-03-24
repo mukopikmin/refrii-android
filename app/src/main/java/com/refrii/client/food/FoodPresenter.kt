@@ -41,6 +41,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                 mUnitId = t?.unit?.id
 
                 mView?.setFood(t)
+                mView?.setSelectedUnit(mUnitId)
             }
 
             override fun onCompleted() {
@@ -54,7 +55,16 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
             }
         })
 
+        mId = mFood?.id
+        mName = mFood?.name
+        mAmount = mFood?.amount
+        mNotice = mFood?.notice
+        mExpirationDate = mFood?.expirationDate
+        mBoxId = mFood?.box?.id
+        mUnitId = mFood?.unit?.id
+
         mView?.setFood(mFood)
+        mView?.setSelectedUnit(mUnitId)
     }
 
     override fun getUnits(boxId: Int) {
@@ -62,6 +72,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
             override fun onNext(t: List<Unit>?) {
                 mUnits = t
                 mView?.setUnits(t)
+                mView?.setSelectedUnit(mUnitId)
             }
 
             override fun onCompleted() {}
@@ -72,6 +83,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
         })
 
         mView?.setUnits(mUnits)
+        mView?.setSelectedUnit(mUnitId)
     }
 
     override fun updateFood() {
@@ -98,6 +110,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
 
     override fun selectUnit(id: Int) {
         mUnitId = id
+        mView?.setSelectedUnit(id)
     }
 
     override fun editExpirationDate() {

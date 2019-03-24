@@ -16,12 +16,13 @@ interface FoodContract {
         fun setUnits(units: List<Unit>?)
         fun setExpirationDate(date: Date?)
         fun onUpdateCompleted()
+        fun setSelectedUnit(id: Int?)
     }
 
     interface Presenter {
         fun takeView(view: View)
         fun getFood(id: Int)
-        fun getUnits(userId: Int)
+        fun getUnits(boxId: Int)
         fun updateFood()
         fun editExpirationDate()
         fun updateName(name: String)
