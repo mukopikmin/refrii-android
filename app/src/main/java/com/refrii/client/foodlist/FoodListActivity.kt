@@ -35,6 +35,7 @@ import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.food.FoodActivity
+import com.refrii.client.newbox.NewBoxActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.settings.SettingsActivity
 import com.refrii.client.signin.SignInActivity
@@ -181,15 +182,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         if (!mPresenter.pickBox(id)) {
             when (id) {
                 R.id.nav_expiring -> mPresenter.getExpiringFoods()
-                R.id.nav_settings -> {
-                    val intent = Intent(this, SettingsActivity::class.java)
-                    startActivity(intent)
-                }
+                R.id.nav_add_box -> addBox()
+                R.id.nav_settings -> startActivity(Intent(this, SettingsActivity::class.java))
                 R.id.nav_signout -> signOut()
-                R.id.nav_units -> {
-                    val intent = Intent(this, UnitListActivity::class.java)
-                    startActivity(intent)
-                }
+                R.id.nav_units -> startActivity(Intent(this, UnitListActivity::class.java))
             }
         }
 
@@ -355,6 +351,9 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 showSnackbar(getString(R.string.message_add_food_completed))
                 mPresenter.getBoxes()
             }
+            ADD_BOX_REQUEST_CODE -> {
+                showSnackbar(getString(R.string.message_add_box_completed))
+            }
             EDIT_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
             REMOVE_FOOD_REQUEST_CODE -> {
                 val foodId = data.getIntExtra("target_id", 0)
@@ -364,6 +363,12 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 }
             }
         }
+    }
+
+    fun addBox() {
+        val intent = Intent(this@FoodListActivity, NewBoxActivity::class.java)
+
+        startActivityForResult(intent, ADD_BOX_REQUEST_CODE)
     }
 
     override fun addFood(box: Box?) {
@@ -395,7 +400,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     companion object {
         private const val TAG = "FoodListActivity"
-        private const val ADD_FOOD_REQUEST_CODE = 101
+        private const val ADD_BOX_REQUEST_CODE = 101
+        private const val ADD_FOOD_REQUEST_CODE = 102
         private const val EDIT_FOOD_REQUEST_CODE = 103
         private const val REMOVE_FOOD_REQUEST_CODE = 104
     }

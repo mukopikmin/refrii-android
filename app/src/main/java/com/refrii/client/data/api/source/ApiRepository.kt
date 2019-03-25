@@ -74,6 +74,24 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         return mApiLocalDataSource.getBox(id)
     }
 
+    fun createBox(callback: ApiRepositoryCallback<Box>, name: String, notice: String?) {
+        mApiRemoteDataSource.createBox(name, notice)
+                .subscribe(object : Subscriber<Box>() {
+                    override fun onNext(t: Box) {
+                        mApiLocalDataSource.saveBox(t)
+                        callback.onNext(mApiLocalDataSource.getBox(t.id))
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        callback.onError(e)
+                    }
+                })
+    }
+
     fun getUnitsForBox(id: Int, callback: ApiRepositoryCallback<List<Unit>>): List<Unit> {
         mApiRemoteDataSource.getUnitsForBox(id)
                 .subscribe(object : Subscriber<List<Unit>>() {

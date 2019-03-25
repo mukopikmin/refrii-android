@@ -4,10 +4,7 @@ import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import okhttp3.RequestBody
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.PUT
-import retrofit2.http.Path
+import retrofit2.http.*
 import rx.Observable
 
 interface BoxService {
@@ -16,6 +13,9 @@ interface BoxService {
 
     @GET("/boxes/{id}")
     fun getBox(@Path("id") id: Int): Observable<Box>
+
+    @POST("/boxes")
+    fun createBox(@Body body: RequestBody): Observable<Box>
 
     @PUT("/boxes/{id}")
     fun updateBox(

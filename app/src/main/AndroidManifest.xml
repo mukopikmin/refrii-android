@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.refrii.client">
-
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -18,6 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".newbox.NewBoxActivity"
+            android:label="@string/title_activity_new_box"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".foodlist.FoodListActivity"
             android:label="@string/app_name"

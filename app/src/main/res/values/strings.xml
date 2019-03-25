@@ -60,4 +60,7 @@
     <string name="title_activity_units">UnitsActivity</string>
     <string name="title_add_food">食材の追加</string>
     <string name="title_unit_list">単位の一覧</string>
+    <string name="nav_add_box">カテゴリの追加</string>
+    <string name="title_activity_new_box">NewBoxActivity</string>
+    <string name="message_add_box_completed">カテゴリが追加されました</string>
 </resources>

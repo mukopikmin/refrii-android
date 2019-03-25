@@ -39,6 +39,19 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    fun createBox(name: String, notice: String?): Observable<Box> {
+        val builder = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("name", name)
+
+        notice?.let { builder.addFormDataPart("notice", notice) }
+
+        return mRetrofit.create(BoxService::class.java)
+                .createBox(builder.build())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
 
     fun updateBox(box: Box): Observable<Box> {
         return mRetrofit.create(BoxService::class.java)

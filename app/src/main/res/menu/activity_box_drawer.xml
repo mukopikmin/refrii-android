@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <group>
         <item
             android:id="@+id/menu_boxes"
             android:title="@string/nav_categories">
             <menu />
         </item>
-    </group>
-    <group>
         <item
             android:id="@+id/menu_invited_boxes"
             android:title="@string/nav_shared_categories">
             <menu />
         </item>
     </group>
+
     <group>
         <item android:title="@string/nav_filter">
             <menu>
@@ -23,9 +21,13 @@
                     android:title="@string/nav_expiring" />
             </menu>
         </item>
-
     </group>
+
     <group>
+        <item
+            android:id="@+id/nav_add_box"
+            android:icon="@drawable/ic_baseline_add"
+            android:title="@string/nav_add_box" />
         <item
             android:id="@+id/nav_units"
             android:icon="@drawable/ic_exposure_black"
