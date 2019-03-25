@@ -150,6 +150,24 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 })
     }
 
+    fun removeBox(callback: ApiRepositoryCallback<Void>, id: Int) {
+        mApiRemoteDataSource.removeBox(id)
+                .subscribe(object : Subscriber<Void>() {
+                    override fun onNext(t: Void?) {
+                        mApiLocalDataSource.removeBox(id)
+                        callback.onNext(t)
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        callback.onError(e)
+                    }
+                })
+    }
+
     fun getFood(id: Int, callback: ApiRepositoryCallback<Food>): Food? {
         mApiRemoteDataSource.getFood(id)
                 .subscribe(object : Subscriber<Food>() {

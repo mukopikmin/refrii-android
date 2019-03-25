@@ -61,17 +61,17 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .sortedBy { it.expirationDate }
     }
 
-//    fun saveFoods(foods: List<Food>, box: Box) {
+//    fun saveFoods(foods: List<Food>, foodlist_menu: Box) {
 //        mRealm.executeTransaction { realm ->
 //            realm.where<Food>()
-//                    .equalTo("box.id", box.id)
+//                    .equalTo("foodlist_menu.id", foodlist_menu.id)
 //                    .and()
 //                    .not().oneOf("id", foods.map { it.id }.toTypedArray())
 //                    .findAll()
 //                    .deleteAllFromRealm()
 //
 //            foods.forEach {
-//                it.box = box
+//                it.foodlist_menu = foodlist_menu
 //                realm.copyToRealmOrUpdate(foods)
 //            }
 //        }
@@ -123,6 +123,15 @@ class ApiLocalDataSource(private val mRealm: Realm) {
 
     fun updateBox(box: Box) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    fun removeBox(id: Int) {
+        mRealm.executeTransaction { realm ->
+            realm.where<Box>()
+                    .equalTo("id", id)
+                    .findAll()
+                    .deleteAllFromRealm()
+        }
     }
 
     fun getFoodsInBox(id: Int): List<Food> {

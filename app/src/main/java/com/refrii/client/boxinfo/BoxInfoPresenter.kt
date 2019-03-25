@@ -48,9 +48,9 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
     }
 
     override fun updateBox() {
-        mView?.onLoading()
-
         mId?.let {
+            mView?.onLoading()
+
             mApiRepository.updateBox(object : ApiRepositoryCallback<Box> {
                 override fun onNext(t: Box?) {
                     mBox = t
@@ -70,6 +70,26 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
         }
     }
 
+    override fun removeBox() {
+        mId?.let {
+            mView?.onLoading()
+
+            mApiRepository.removeBox(object : ApiRepositoryCallback<Void> {
+                override fun onNext(t: Void?) {}
+
+                override fun onCompleted() {
+                    mView?.onLoaded()
+                    mView?.onDeleteCompleted(mName)
+                }
+
+                override fun onError(e: Throwable?) {
+                    mView?.onLoaded()
+                    mView?.showToast(e?.message)
+                }
+            }, it)
+        }
+    }
+
     override fun editSharedUsers() {
         mView?.showEditSharedUsersDialog(mBox?.invitedUsers)
     }
@@ -85,5 +105,9 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
     override fun updateSharedUsers(users: List<User>) {
 //        mBox?.invitedUsers = users
 //        mView?.setBox(mBox)
+    }
+
+    override fun confirmRemovingBox() {
+        mView?.removeBox(mId, mName)
     }
 }

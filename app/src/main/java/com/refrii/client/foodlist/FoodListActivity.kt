@@ -146,7 +146,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.box, menu)
+        menuInflater.inflate(R.menu.foodlist_menu, menu)
 
         return true
     }
@@ -166,7 +166,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val intent = Intent(this, BoxInfoActivity::class.java)
 
         intent.putExtra(getString(R.string.key_box_id), box.id)
-        startActivity(intent)
+        startActivityForResult(intent, REMOVE_BOX_REQUEST_CODE)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -347,25 +347,38 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         if (resultCode != Activity.RESULT_OK || data == null) return
 
         when (requestCode) {
-            ADD_FOOD_REQUEST_CODE -> {
-                showSnackbar(getString(R.string.message_add_food_completed))
-                mPresenter.getBoxes()
-            }
-            ADD_BOX_REQUEST_CODE -> {
-                showSnackbar(getString(R.string.message_add_box_completed))
-            }
+            ADD_FOOD_REQUEST_CODE -> onAddFoodCompleted()
+            ADD_BOX_REQUEST_CODE -> onAddBoxCompleted()
             EDIT_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
-            REMOVE_FOOD_REQUEST_CODE -> {
-                val foodId = data.getIntExtra("target_id", 0)
-
-                if (foodId != 0) {
-                    mPresenter.removeFood(foodId)
-                }
-            }
+            REMOVE_FOOD_REQUEST_CODE -> onRemoveFoodCompleted(data)
+            REMOVE_BOX_REQUEST_CODE -> onRemoveBoxCompleted(data)
         }
     }
 
-    fun addBox() {
+    private fun onAddFoodCompleted() {
+        showSnackbar(getString(R.string.message_add_food_completed))
+        mPresenter.getBoxes()
+    }
+
+    private fun onAddBoxCompleted() {
+        showSnackbar(getString(R.string.message_add_box_completed))
+    }
+
+    private fun onRemoveFoodCompleted(data: Intent?) {
+        val id = data?.getIntExtra("target_id", 0) ?: return
+
+        if (id != 0) {
+            mPresenter.removeFood(id)
+        }
+    }
+
+    private fun onRemoveBoxCompleted(data: Intent?) {
+        val name = data?.getStringExtra("key_box_name") ?: return
+
+        showSnackbar("$name が削除されました")
+    }
+
+    private fun addBox() {
         val intent = Intent(this@FoodListActivity, NewBoxActivity::class.java)
 
         startActivityForResult(intent, ADD_BOX_REQUEST_CODE)
@@ -404,5 +417,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         private const val ADD_FOOD_REQUEST_CODE = 102
         private const val EDIT_FOOD_REQUEST_CODE = 103
         private const val REMOVE_FOOD_REQUEST_CODE = 104
+        private const val REMOVE_BOX_REQUEST_CODE = 105
     }
 }

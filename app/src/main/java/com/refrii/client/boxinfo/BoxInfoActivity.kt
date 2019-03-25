@@ -1,5 +1,6 @@
 package com.refrii.client.boxinfo
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
@@ -18,6 +20,7 @@ import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.User
+import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.UserPickerDialogFragment
 import kotterknife.bindView
 import java.text.SimpleDateFormat
@@ -82,16 +85,33 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         onLoaded()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.box_info_menu, menu)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         var result = true
 
         when (id) {
             android.R.id.home -> finish()
+            R.id.menu_remove_box -> mPresenter.confirmRemovingBox()
             else -> result = super.onOptionsItemSelected(item)
         }
 
         return result
+    }
+
+    override fun removeBox(id: Int?, name: String?) {
+        id ?: return
+        name ?: return
+
+        val fragment = ConfirmDialogFragment.newInstance(name, "削除していいですか？", id)
+
+        fragment.setTargetFragment(null, REMOVE_BOX_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "delete_box")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -100,8 +120,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         data ?: return
 
         when(requestCode) {
-            EDIT_NAME_REQUEST_CODE -> mPresenter.updateName(data.getStringExtra("text"))
-            EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
+            REMOVE_BOX_REQUEST_CODE -> mPresenter.removeBox()
         }
     }
 
@@ -118,7 +137,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         box.owner?.let { mOwnerText.text = it.name }
         mCreatedText.text = formatter.format(box.createdAt)
         mUpdatedText.text = formatter.format(box.updatedAt)
-//        mSharedUsers.text = box.invitedUsers
+//        mSharedUsers.text = foodlist_menu.invitedUsers
 //                ?.map { it.name }
 //                ?.joinToString(System.getProperty("line.separator"))
     }
@@ -152,13 +171,16 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         mProgressBar.visibility = View.VISIBLE
     }
 
-    override fun onDeleteCompleted() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onDeleteCompleted(name: String?) {
+        val intent = Intent()
+
+        intent.putExtra("key_box_name", name)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 
     companion object {
-        private const val EDIT_NAME_REQUEST_CODE = 101
-        private const val EDIT_NOTICE_REQUEST_CODE = 102
         private const val EDIT_SHARED_USERS_REQUEST_CODE = 103
+        private const val REMOVE_BOX_REQUEST_CODE = 104
     }
 }

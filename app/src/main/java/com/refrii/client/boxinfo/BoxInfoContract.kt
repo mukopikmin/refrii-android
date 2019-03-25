@@ -12,12 +12,15 @@ interface BoxInfoContract {
         fun onLoaded()
         fun showSnackbar(message: String?)
         fun showToast(message: String?)
-        fun onDeleteCompleted()
+        fun onDeleteCompleted(name: String?)
+        fun removeBox(id: Int?, name: String?)
     }
 
     interface Presenter {
         fun takeView(view: View)
         fun getBox(id: Int)
+        fun confirmRemovingBox()
+        fun removeBox()
         fun updateBox()
         fun editSharedUsers()
         fun updateName(name: String)

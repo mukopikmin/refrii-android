@@ -66,6 +66,13 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    fun removeBox(id: Int): Observable<Void> {
+        return mRetrofit.create(BoxService::class.java)
+                .removeBox(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun getFoodsInBox(id: Int): Observable<List<Food>> {
         return mRetrofit.create(BoxService::class.java)
                 .getFoodsInBox(id)

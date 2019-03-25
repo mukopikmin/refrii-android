@@ -27,4 +27,7 @@ interface BoxService {
 
     @GET("/boxes/{id}/units")
     fun getUnitsForBox(@Path("id") id: Int): Observable<List<Unit>>
+
+    @DELETE("/boxes/{id}")
+    fun removeBox(@Path("id") id: Int): Observable<Void>
 }
