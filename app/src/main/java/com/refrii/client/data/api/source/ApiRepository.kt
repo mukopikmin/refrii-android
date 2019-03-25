@@ -132,12 +132,12 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         return mApiLocalDataSource.getFoodsInBox(box.id)
     }
 
-    fun updateBox(box: Box, callback: ApiRepositoryCallback<Box>) {
-        mApiRemoteDataSource.updateBox(box)
+    fun updateBox(callback: ApiRepositoryCallback<Box>, id: Int, name: String?, notice: String?) {
+        mApiRemoteDataSource.updateBox(id, name, notice)
                 .subscribe(object : Subscriber<Box>() {
                     override fun onNext(t: Box) {
                         mApiLocalDataSource.saveBox(t)
-                        callback.onNext(mApiLocalDataSource.getBox(box.id))
+                        callback.onNext(mApiLocalDataSource.getBox(t.id))
                     }
 
                     override fun onCompleted() {

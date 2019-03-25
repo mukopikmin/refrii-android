@@ -13,189 +13,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <include
-            android:id="@+id/include"
-            layout="@layout/edited_message"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <ImageView
-            android:id="@+id/nameIcon"
+            android:id="@+id/imageView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:tint="@android:color/darker_gray"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/include"
-            app:srcCompat="@drawable/ic_folder_open_black" />
-
-        <ImageView
-            android:id="@+id/editNameImageView"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintLeft_toRightOf="@+id/nameLabel"
-            app:layout_constraintTop_toBottomOf="@+id/include"
-            app:srcCompat="@drawable/ic_edit_black" />
-
-        <TextView
-            android:id="@+id/nameLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Name"
-            app:layout_constraintLeft_toRightOf="@+id/nameIcon"
-            app:layout_constraintTop_toBottomOf="@+id/include" />
-
-        <TextView
-            android:id="@+id/nameTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="Name"
-            android:textColor="@android:color/black"
-            app:layout_constraintLeft_toRightOf="@+id/nameIcon"
-            app:layout_constraintTop_toBottomOf="@+id/nameLabel" />
-
-        <ImageView
-            android:id="@+id/noticeIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:tint="@android:color/darker_gray"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nameTextView"
-            app:srcCompat="@drawable/ic_format_align_left_black" />
-
-        <ImageView
-            android:id="@+id/editNoticeImageView"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintLeft_toRightOf="@+id/noticeLabel"
-            app:layout_constraintTop_toBottomOf="@+id/nameTextView"
-            app:srcCompat="@drawable/ic_edit_black" />
-
-        <TextView
-            android:id="@+id/noticeLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Notice"
-            app:layout_constraintLeft_toRightOf="@+id/noticeIcon"
-            app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
-
-        <TextView
-            android:id="@+id/noticeTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="TextView"
-            android:textColor="@android:color/black"
-            app:layout_constraintLeft_toRightOf="@+id/noticeIcon"
-            app:layout_constraintTop_toBottomOf="@+id/noticeLabel" />
-
-        <ImageView
-            android:id="@+id/ownerIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:tint="@android:color/darker_gray"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/noticeTextView"
-            app:srcCompat="@drawable/ic_account_box_black" />
-
-        <TextView
-            android:id="@+id/ownerTextView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="TextView"
-            android:textColor="@android:color/black"
-            app:layout_constraintLeft_toRightOf="@+id/ownerIcon"
-            app:layout_constraintTop_toBottomOf="@+id/ownerLabel" />
-
-        <TextView
-            android:id="@+id/ownerLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Owner"
-            app:layout_constraintLeft_toRightOf="@+id/ownerIcon"
-            app:layout_constraintTop_toBottomOf="@+id/noticeTextView" />
-
-        <ImageView
-            android:id="@+id/sharedUsersIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:tint="@android:color/darker_gray"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ownerTextView"
-            app:srcCompat="@drawable/ic_supervisor_account_black" />
-
-        <ImageView
-            android:id="@+id/shareImageView"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintLeft_toRightOf="@+id/sharedUsersLabel"
-            app:layout_constraintTop_toBottomOf="@+id/ownerTextView"
-            app:srcCompat="@drawable/ic_edit_black" />
-
-        <TextView
-            android:id="@+id/sharedUsersLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Shared users"
-            app:layout_constraintLeft_toRightOf="@+id/sharedUsersIcon"
-            app:layout_constraintTop_toBottomOf="@+id/ownerTextView" />
-
-        <TextView
-            android:id="@+id/sharedUsersTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="TextView"
-            android:textColor="@android:color/black"
-            app:layout_constraintLeft_toRightOf="@+id/sharedUsersIcon"
-            app:layout_constraintTop_toBottomOf="@+id/sharedUsersLabel" />
-
-        <ImageView
-            android:id="@+id/createdIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:tint="@android:color/darker_gray"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sharedUsersTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/include5"
             app:srcCompat="@drawable/ic_history_black" />
 
         <TextView
-            android:id="@+id/createdLabel"
+            android:id="@+id/textView6"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text="Created"
-            app:layout_constraintLeft_toRightOf="@+id/createdIcon"
-            app:layout_constraintTop_toBottomOf="@+id/sharedUsersTextView" />
+            android:layout_marginEnd="16dp"
+            android:text="作成日時"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintTop_toBottomOf="@+id/include5" />
 
         <TextView
             android:id="@+id/createdTextView"
@@ -203,44 +42,146 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="TextView"
-            android:textColor="@android:color/black"
-            app:layout_constraintLeft_toRightOf="@+id/createdIcon"
-            app:layout_constraintTop_toBottomOf="@+id/createdLabel" />
-
-        <ImageView
-            android:id="@+id/updaedIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:tint="@android:color/darker_gray"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/createdTextView"
-            app:srcCompat="@drawable/ic_history_black" />
+            android:layout_marginEnd="16dp"
+            android:text="YYYY/MM/DD"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
         <TextView
-            android:id="@+id/updatedLabel"
+            android:id="@+id/textView8"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="15dp"
-            android:text="Updated"
-            app:layout_constraintLeft_toRightOf="@+id/updaedIcon"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="更新日時"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView6"
             app:layout_constraintTop_toBottomOf="@+id/createdTextView" />
 
         <TextView
             android:id="@+id/updatedTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="TextView"
-            android:textColor="@android:color/black"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="64dp"
+            android:text="YYYY/MM/DD"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/updaedIcon"
-            app:layout_constraintTop_toBottomOf="@+id/updatedLabel" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+        <ImageView
+            android:id="@+id/noticeIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:tint="@android:color/darker_gray"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/include3"
+            app:srcCompat="@drawable/ic_format_align_left_black" />
+
+        <ImageView
+            android:id="@+id/ownerIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:tint="@android:color/darker_gray"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/include4"
+            app:srcCompat="@drawable/ic_account_box_black" />
+
+        <EditText
+            android:id="@+id/nameEditText"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="#00000000"
+            android:ems="10"
+            android:hint="名前"
+            android:inputType="textPersonName"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/noticeIcon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/include3"
+            layout="@layout/devider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/nameEditText"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <EditText
+            android:id="@+id/noticeEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="#00000000"
+            android:ems="10"
+            android:hint="メモ"
+            android:inputType="textMultiLine"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/noticeIcon"
+            app:layout_constraintTop_toBottomOf="@+id/include3" />
+
+        <include
+            android:id="@+id/include4"
+            layout="@layout/devider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/noticeEditText"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <TextView
+            android:id="@+id/ownerTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ownerIcon"
+            app:layout_constraintTop_toBottomOf="@+id/include4" />
+
+        <include
+            android:id="@+id/include5"
+            layout="@layout/devider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/sharedUsersLayout"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <LinearLayout
+            android:id="@+id/sharedUsersLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ownerIcon"
+            app:layout_constraintTop_toBottomOf="@+id/ownerTextView"></LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

@@ -12,6 +12,9 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
 
     private var mView: BoxInfoContract.View? = null
     private var mBox: Box? = null
+    private var mId: Int? = null
+    private var mName: String? = null
+    private var mNotice: String? = null
 
     override fun takeView(view: BoxInfoContract.View) {
         mView = view
@@ -20,9 +23,11 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
     override fun getBox(id: Int) {
         mView?.onLoading()
 
-        mApiRepository.getBox(id, object : ApiRepositoryCallback<Box> {
+        mBox = mApiRepository.getBox(id, object : ApiRepositoryCallback<Box> {
             override fun onNext(t: Box?) {
-                mBox = t
+                mId = t?.id
+                mName = t?.name
+                mNotice = t?.notice
                 mView?.setBox(t)
             }
 
@@ -31,16 +36,22 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
             }
 
             override fun onError(e: Throwable?) {
+                mView?.onLoaded()
                 mView?.showToast(e?.message)
             }
         })
+
+        mId = mBox?.id
+        mName = mBox?.name
+        mNotice = mBox?.notice
+        mView?.setBox(mBox)
     }
 
     override fun updateBox() {
         mView?.onLoading()
 
-        mBox?.let {
-            mApiRepository.updateBox(it, object : ApiRepositoryCallback<Box> {
+        mId?.let {
+            mApiRepository.updateBox(object : ApiRepositoryCallback<Box> {
                 override fun onNext(t: Box?) {
                     mBox = t
                     mView?.setBox(t)
@@ -49,22 +60,14 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
 
                 override fun onCompleted() {
                     mView?.onLoaded()
-                    mView?.onBeforeEdit()
                 }
 
                 override fun onError(e: Throwable?) {
+                    mView?.onLoaded()
                     mView?.showToast(e?.message)
                 }
-            })
+            }, it, mName, mNotice)
         }
-    }
-
-    override fun editName() {
-        mView?.showEditNameDialog(mBox?.name)
-    }
-
-    override fun editNotice() {
-        mView?.showEditNoticeDialog(mBox?.notice)
     }
 
     override fun editSharedUsers() {
@@ -72,15 +75,11 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
     }
 
     override fun updateName(name: String) {
-        mBox?.name = name
-        mView?.onEdited()
-        mView?.setBox(mBox)
+        mName = name
     }
 
     override fun updateNotice(notice: String) {
-        mBox?.notice = notice
-        mView?.onEdited()
-        mView?.setBox(mBox)
+        mNotice = notice
     }
 
     override fun updateSharedUsers(users: List<User>) {

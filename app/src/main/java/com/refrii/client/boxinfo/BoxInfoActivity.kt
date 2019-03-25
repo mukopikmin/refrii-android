@@ -6,9 +6,11 @@ import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
+import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -16,7 +18,6 @@ import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.User
-import com.refrii.client.dialogs.EditTextDialogFragment
 import com.refrii.client.dialogs.UserPickerDialogFragment
 import kotterknife.bindView
 import java.text.SimpleDateFormat
@@ -25,19 +26,30 @@ import javax.inject.Inject
 
 class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
-    private val mName: TextView by bindView(R.id.nameTextView)
-    private val mNotice: TextView by bindView(R.id.noticeTextView)
-    private val mOwner: TextView by bindView(R.id.ownerTextView)
-    private val mSharedUsers: TextView by bindView(R.id.sharedUsersTextView)
-    private val mCreated: TextView by bindView(R.id.createdTextView)
-    private val mUpdated: TextView by bindView(R.id.updatedTextView)
-    private val mEditName: ImageView by bindView(R.id.editNameImageView)
-    private val mEditNotice: ImageView by bindView(R.id.editNoticeImageView)
-    private val mShare: ImageView by bindView(R.id.shareImageView)
+    private val mNameEditText: EditText by bindView(R.id.nameEditText)
+    private val mNoticeEditText: EditText by bindView(R.id.noticeEditText)
+    private val mOwnerText: TextView by bindView(R.id.ownerTextView)
+    //    private val mSharedUsers: TextView by bindView(R.id.sharedUsersTextView)
+    private val mCreatedText: TextView by bindView(R.id.createdTextView)
+    private val mUpdatedText: TextView by bindView(R.id.updatedTextView)
     private val mFab: FloatingActionButton by bindView(R.id.floatingActionButton)
     private val mToolbar: Toolbar by bindView(R.id.toolbar)
-    private val mEditedMessage: TextView by bindView(R.id.editedMessageTextView)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+
+    private val mNameTextWatcher = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {}
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            mPresenter.updateName(s.toString())
+        }
+    }
+    private val mNoticeTextWatcher = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {}
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            mPresenter.updateNotice(s.toString())
+        }
+    }
 
     @Inject
     lateinit var mPresenter: BoxInfoPresenter
@@ -54,9 +66,9 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        mEditName.setOnClickListener { mPresenter.editName() }
-        mEditNotice.setOnClickListener { mPresenter.editNotice() }
-        mShare.setOnClickListener { mPresenter.editSharedUsers() }
+        mNameEditText.addTextChangedListener(mNameTextWatcher)
+        mNoticeEditText.addTextChangedListener(mNoticeTextWatcher)
+//        mShare.setOnClickListener { mPresenter.editSharedUsers() }
         mFab.setOnClickListener { mPresenter.updateBox() }
     }
 
@@ -65,9 +77,9 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
-        onBeforeEdit()
         mPresenter.takeView(this)
         mPresenter.getBox(boxId)
+        onLoaded()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -101,31 +113,14 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
 
-        mName.text = box.name
-        mNotice.text = box.notice
-        box.owner?.let { mOwner.text = it.name }
-        mCreated.text = formatter.format(box.createdAt)
-        mUpdated.text = formatter.format(box.updatedAt)
-        mSharedUsers.text = box.invitedUsers
-                ?.map { it.name }
-                ?.joinToString(System.getProperty("line.separator"))
-    }
-
-    override fun showEditNameDialog(name: String?) {
-        name ?: return
-
-        val fragment = EditTextDialogFragment.newInstance("Name", name)
-        fragment.setTargetFragment(null, EDIT_NAME_REQUEST_CODE)
-        fragment.show(fragmentManager, "edit_name")
-    }
-
-    override fun showEditNoticeDialog(notice: String?) {
-        notice ?: return
-
-        val fragment = EditTextDialogFragment.newInstance("Notice", notice, true)
-
-        fragment.setTargetFragment(null, EDIT_NOTICE_REQUEST_CODE)
-        fragment.show(fragmentManager, "edit_notice")
+        mNameEditText.setText(box.name)
+        mNoticeEditText.setText(box.notice)
+        box.owner?.let { mOwnerText.text = it.name }
+        mCreatedText.text = formatter.format(box.createdAt)
+        mUpdatedText.text = formatter.format(box.updatedAt)
+//        mSharedUsers.text = box.invitedUsers
+//                ?.map { it.name }
+//                ?.joinToString(System.getProperty("line.separator"))
     }
 
     override fun showEditSharedUsersDialog(users: List<User>?) {
@@ -140,10 +135,12 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     override fun showSnackbar(message: String?) {
         message ?: return
 
-        Snackbar.make(mName, message, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(mNameEditText, message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun showToast(message: String?) {
+        message ?: return
+
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
@@ -155,14 +152,8 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         mProgressBar.visibility = View.VISIBLE
     }
 
-    override fun onBeforeEdit() {
-        mFab.visibility = View.GONE
-        mEditedMessage.visibility = View.GONE
-    }
-
-    override fun onEdited() {
-        mFab.visibility = View.VISIBLE
-        mEditedMessage.visibility = View.VISIBLE
+    override fun onDeleteCompleted() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     companion object {
