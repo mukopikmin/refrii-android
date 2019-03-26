@@ -1,7 +1,7 @@
 package com.refrii.client.boxinfo
 
 import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.User
+import com.refrii.client.data.api.models.Invitation
 import com.refrii.client.data.api.source.ApiRepository
 import com.refrii.client.data.api.source.ApiRepositoryCallback
 import javax.inject.Inject
@@ -90,8 +90,32 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
         }
     }
 
-    override fun editSharedUsers() {
-        mView?.showEditSharedUsersDialog(mBox?.invitedUsers)
+    override fun invite(email: String) {
+        mId?.let {
+            mView?.onLoading()
+
+            mApiRepository.invite(object : ApiRepositoryCallback<Invitation> {
+                override fun onNext(t: Invitation?) {
+                    val name = t?.user?.name
+
+                    mView?.setSharedUsers(t?.box?.invitedUsers)
+                    mView?.showSnackbar("$name と共有しました")
+                }
+
+                override fun onCompleted() {
+                    mView?.onLoaded()
+                }
+
+                override fun onError(e: Throwable?) {
+                    mView?.onLoaded()
+                    mView?.showToast(e?.message)
+                }
+            }, it, email)
+        }
+    }
+
+    override fun showInviteUserDialog() {
+        mView?.showInviteUserDialog(mBox?.invitedUsers)
     }
 
     override fun updateName(name: String) {
@@ -100,11 +124,6 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
 
     override fun updateNotice(notice: String) {
         mNotice = notice
-    }
-
-    override fun updateSharedUsers(users: List<User>) {
-//        mBox?.invitedUsers = users
-//        mView?.setBox(mBox)
     }
 
     override fun confirmRemovingBox() {

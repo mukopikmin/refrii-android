@@ -3,9 +3,12 @@ package com.refrii.client.boxinfo
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
@@ -21,7 +24,7 @@ import com.refrii.client.R
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.User
 import com.refrii.client.dialogs.ConfirmDialogFragment
-import com.refrii.client.dialogs.UserPickerDialogFragment
+import com.refrii.client.dialogs.InviteUserDialogFragment
 import kotterknife.bindView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,12 +35,13 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     private val mNameEditText: EditText by bindView(R.id.nameEditText)
     private val mNoticeEditText: EditText by bindView(R.id.noticeEditText)
     private val mOwnerText: TextView by bindView(R.id.ownerTextView)
-    //    private val mSharedUsers: TextView by bindView(R.id.sharedUsersTextView)
+    private val mSharedUsersRecycler: RecyclerView by bindView(R.id.sharedUsersLayout)
     private val mCreatedText: TextView by bindView(R.id.createdTextView)
     private val mUpdatedText: TextView by bindView(R.id.updatedTextView)
     private val mFab: FloatingActionButton by bindView(R.id.floatingActionButton)
     private val mToolbar: Toolbar by bindView(R.id.toolbar)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+    private val mInviteLayout: ConstraintLayout by bindView(R.id.addSharedUserLayout)
 
     private val mNameTextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {}
@@ -69,10 +73,11 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
             it.setHomeButtonEnabled(true)
         }
 
+        mSharedUsersRecycler.layoutManager = LinearLayoutManager(this)
         mNameEditText.addTextChangedListener(mNameTextWatcher)
         mNoticeEditText.addTextChangedListener(mNoticeTextWatcher)
-//        mShare.setOnClickListener { mPresenter.editSharedUsers() }
         mFab.setOnClickListener { mPresenter.updateBox() }
+        mInviteLayout.setOnClickListener { mPresenter.showInviteUserDialog() }
     }
 
     override fun onStart() {
@@ -121,34 +126,52 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         when(requestCode) {
             REMOVE_BOX_REQUEST_CODE -> mPresenter.removeBox()
+            EDIT_SHARED_USERS_REQUEST_CODE -> onInviteRequested(data)
         }
+    }
+
+    private fun onInviteRequested(data: Intent?) {
+        data ?: return
+
+        val email = data.getStringExtra("email")
+
+        mPresenter.invite(email)
     }
 
     override fun setBox(box: Box?) {
         box ?: return
 
+        val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
+
         mToolbar.title = box.name
         setSupportActionBar(mToolbar)
 
-        val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
-
         mNameEditText.setText(box.name)
         mNoticeEditText.setText(box.notice)
-        box.owner?.let { mOwnerText.text = it.name }
         mCreatedText.text = formatter.format(box.createdAt)
         mUpdatedText.text = formatter.format(box.updatedAt)
-//        mSharedUsers.text = foodlist_menu.invitedUsers
-//                ?.map { it.name }
-//                ?.joinToString(System.getProperty("line.separator"))
+
+        box.owner?.let { mOwnerText.text = it.name }
+        setSharedUsers(box.invitedUsers)
     }
 
-    override fun showEditSharedUsersDialog(users: List<User>?) {
+    override fun setSharedUsers(users: List<User>?) {
         users ?: return
 
-        val fragment = UserPickerDialogFragment.newInstance("Shared users", users)
+        if (mSharedUsersRecycler.adapter == null) {
+            mSharedUsersRecycler.adapter = SharedUserRecyclerViewAdapter(users)
+        } else {
+            (mSharedUsersRecycler.adapter as SharedUserRecyclerViewAdapter).setUsers(users)
+        }
+    }
+
+    override fun showInviteUserDialog(users: List<User>?) {
+        users ?: return
+
+        val fragment = InviteUserDialogFragment.newInstance(users)
 
         fragment.setTargetFragment(null, EDIT_SHARED_USERS_REQUEST_CODE)
-        fragment.show(fragmentManager, "contact_us")
+        fragment.show(supportFragmentManager, "invite")
     }
 
     override fun showSnackbar(message: String?) {

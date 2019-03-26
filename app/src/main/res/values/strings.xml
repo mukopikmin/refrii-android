@@ -16,7 +16,7 @@
     <string name="key_unit_id">key_unit_id</string>
 
     <string name="message_add_food_completed">食材が追加されました</string>
-    <string name="message_cancel">Cancel</string>
+    <string name="message_cancel">キャンセル</string>
     <string name="message_delete">削除する</string>
     <string name="message_no">いいえ</string>
     <string name="message_show_detail">詳細を表示する</string>
@@ -63,4 +63,5 @@
     <string name="nav_add_box">カテゴリの追加</string>
     <string name="title_activity_new_box">NewBoxActivity</string>
     <string name="message_add_box_completed">カテゴリが追加されました</string>
+    <string name="message_share_box">共有する</string>
 </resources>

@@ -1,9 +1,7 @@
 package com.refrii.client.data.api.source.remote
 
-import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.Food
+import com.refrii.client.data.api.models.*
 import com.refrii.client.data.api.models.Unit
-import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.remote.services.BoxService
 import com.refrii.client.data.api.source.remote.services.FoodService
 import com.refrii.client.data.api.source.remote.services.UnitService
@@ -83,6 +81,18 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
     fun getUnitsForBox(id: Int): Observable<List<Unit>> {
         return mRetrofit.create(BoxService::class.java)
                 .getUnitsForBox(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun invite(boxId: Int, email: String): Observable<Invitation> {
+        val body = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("email", email)
+                .build()
+
+        return mRetrofit.create(BoxService::class.java)
+                .invite(boxId, body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

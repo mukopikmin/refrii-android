@@ -2,6 +2,7 @@ package com.refrii.client.data.api.source.remote.services
 
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
+import com.refrii.client.data.api.models.Invitation
 import com.refrii.client.data.api.models.Unit
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -21,6 +22,11 @@ interface BoxService {
     fun updateBox(
             @Path("id") id: Int,
             @Body body: RequestBody): Observable<Box>
+
+    @POST("/boxes/{id}/invite")
+    fun invite(
+            @Path("id") id: Int,
+            @Body body: RequestBody): Observable<Invitation>
 
     @GET("/boxes/{id}/foods")
     fun getFoodsInBox(@Path("id") id: Int): Observable<List<Food>>

@@ -1,9 +1,7 @@
 package com.refrii.client.data.api.source
 
-import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.Food
+import com.refrii.client.data.api.models.*
 import com.refrii.client.data.api.models.Unit
-import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.local.ApiLocalDataSource
 import com.refrii.client.data.api.source.remote.ApiRemoteDataSource
 import io.realm.Realm
@@ -155,6 +153,23 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 .subscribe(object : Subscriber<Void>() {
                     override fun onNext(t: Void?) {
                         mApiLocalDataSource.removeBox(id)
+                        callback.onNext(t)
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        callback.onError(e)
+                    }
+                })
+    }
+
+    fun invite(callback: ApiRepositoryCallback<Invitation>, boxId: Int, email: String) {
+        mApiRemoteDataSource.invite(boxId, email)
+                .subscribe(object : Subscriber<Invitation>() {
+                    override fun onNext(t: Invitation?) {
                         callback.onNext(t)
                     }
 
