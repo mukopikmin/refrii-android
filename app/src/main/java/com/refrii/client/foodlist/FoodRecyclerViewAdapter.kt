@@ -1,5 +1,6 @@
 package com.refrii.client.foodlist
 
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -11,16 +12,32 @@ import java.util.*
 
 class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var mEditClickListener: View.OnClickListener? = null
-    var mDeleteClickListener: View.OnClickListener? = null
-    var mIncrementClickListener: View.OnClickListener? = null
-    var mDecrementClickListener: View.OnClickListener? = null
-
+    private var mOnClickListener: View.OnClickListener? = null
     private var mSelectedPosition: Int? = null
 
     fun setFoods(foods: List<Food>) {
         mFoods = foods
         notifyDataSetChanged()
+    }
+
+    fun select(position: Int) {
+        if (mSelectedPosition == null) {
+            mSelectedPosition = position
+        } else {
+            mSelectedPosition?.let {
+                if (it == position) {
+                    mSelectedPosition = null
+                } else {
+                    mSelectedPosition = position
+                }
+            }
+        }
+
+        notifyDataSetChanged()
+    }
+
+    fun setOnClickListener(listener: View.OnClickListener) {
+        mOnClickListener = listener
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -32,28 +49,15 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
             name.text = food.name
             expirationDate.text = formatter.format(food.expirationDate)
             amount.text = amountWithUnit
-            editAmountTextView.text = amountWithUnit
 
-            if (position == mSelectedPosition) {
-                menu.visibility = View.VISIBLE
-            } else {
-                menu.visibility = View.GONE
-            }
-
-            constraintLayout.setOnClickListener {
-                if (mSelectedPosition == position) {
-                    mSelectedPosition = null
-                } else {
-                    mSelectedPosition = position
+            constraintLayout.setBackgroundColor(Color.parseColor("#00000000"))
+            mSelectedPosition?.let {
+                if (it == position) {
+                    constraintLayout.setBackgroundColor(Color.parseColor("#F5D0A9"))
                 }
-
-                notifyDataSetChanged()
             }
 
-            incrementButton.setOnClickListener { mIncrementClickListener?.onClick(it.parent.parent.parent as View) }
-            decrementButton.setOnClickListener { mDecrementClickListener?.onClick(it.parent.parent.parent as View) }
-            deleteButton.setOnClickListener { mDeleteClickListener?.onClick(it.parent.parent as View) }
-            editButton.setOnClickListener { mEditClickListener?.onClick(it.parent.parent as View) }
+            constraintLayout.setOnClickListener { mOnClickListener?.onClick(it as View) }
         }
     }
 

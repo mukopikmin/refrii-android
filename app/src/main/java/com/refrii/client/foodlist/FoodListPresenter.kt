@@ -15,6 +15,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     private var mBoxes: List<Box>? = null
     private var mBox: Box? = null
     private var mFoods: List<Food>? = null
+    private var mFood: Food? = null
 
     override fun takeView(view: FoodListContract.View) {
         mView = view
@@ -65,21 +66,25 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
     }
 
-    override fun incrementFood(food: Food) {
-        val step: Double = food.unit?.step ?: 0.toDouble()
-        val amount = food.amount + step
+    override fun incrementFood() {
+        mFood?.let {
+            val step: Double = it.unit?.step ?: 0.toDouble()
+            val amount = it.amount + step
 
-        updateFood(food, amount)
+            updateFood(it, amount)
+        }
     }
 
-    override fun decrementFood(food: Food) {
-        val step = food.unit?.step ?: 0.toDouble()
-        val amount = food.amount - step
+    override fun decrementFood() {
+        mFood?.let {
+            val step = it.unit?.step ?: 0.toDouble()
+            val amount = it.amount - step
 
-        if (amount < 0) {
-            updateFood(food, 0.toDouble())
-        } else {
-            updateFood(food, amount)
+            if (amount < 0) {
+                updateFood(it, 0.toDouble())
+            } else {
+                updateFood(it, amount)
+            }
         }
     }
 
@@ -89,11 +94,11 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         mBox?.let {
             mApiRepository.updateFood(object : ApiRepositoryCallback<Food> {
                 override fun onNext(t: Food?) {
+                    mView?.onFoodUpdated(t)
                     mView?.showSnackbar("${t?.name} の数量が更新されました")
                 }
 
                 override fun onCompleted() {
-                    mView?.onFoodUpdated()
                     mView?.hideProgressBar()
                 }
 
@@ -105,28 +110,38 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         }
     }
 
-    override fun removeFood(id: Int) {
-        mView?.showProgressBar()
-
-        mApiRepository.removeFood(id, object : ApiRepositoryCallback<Void> {
-            override fun onNext(t: Void?) {}
-
-            override fun onCompleted() {
-                mView?.onFoodUpdated()
-                mView?.hideProgressBar()
-                mView?.showSnackbar("削除が完了しました")
-                getBoxes()
-            }
-
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
-                mView?.hideProgressBar()
-            }
-        })
+    override fun confirmRemovingFood() {
+        mView?.showConfirmDialog(mFood)
     }
 
-    override fun showFood(id: Int) {
-        mView?.showFood(id, mBox)
+    override fun removeFood() {
+        mFood?.let {
+            mView?.showProgressBar()
+
+            mApiRepository.removeFood(it.id, object : ApiRepositoryCallback<Void> {
+                override fun onNext(t: Void?) {
+                    mFood = null
+                    mView?.onFoodUpdated(mFood)
+                }
+
+                override fun onCompleted() {
+                    mView?.hideProgressBar()
+                    mView?.showSnackbar("削除が完了しました")
+                    getBoxes()
+                }
+
+                override fun onError(e: Throwable?) {
+                    mView?.showToast(e?.message)
+                    mView?.hideProgressBar()
+                }
+            })
+        }
+    }
+
+    override fun showFood() {
+        mFood?.let {
+            mView?.showFood(it.id, mBox)
+        }
     }
 
     override fun selectBox(box: Box) {
@@ -148,6 +163,23 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         })
 
         mView?.setFoods(box.name, mFoods)
+    }
+
+    override fun selectFood(food: Food) {
+        if (mFood == null) {
+            mFood = food
+            mView?.showBottomNavigation(food)
+        } else {
+            mFood?.let {
+                if (it.id == food.id) {
+                    mFood = null
+                    mView?.hideBottomNavigation()
+                } else {
+                    mFood = food
+                    mView?.showBottomNavigation(food)
+                }
+            }
+        }
     }
 
     override fun addFood() {

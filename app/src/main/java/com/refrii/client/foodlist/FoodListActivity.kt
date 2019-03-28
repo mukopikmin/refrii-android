@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.constraint.ConstraintLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
@@ -55,6 +56,14 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     private val mRecyclerView: RecyclerView by bindView(R.id.recyclerView)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
 
+    private val mBottomMenu: ConstraintLayout by bindView(R.id.bottomMenu)
+    private val mIncrementButton: ImageView by bindView(R.id.incrementButton)
+    private val mDecrementButton: ImageView by bindView(R.id.decrementButton)
+    private val mAmountText: TextView by bindView(R.id.amountTextView)
+    private val mNoticeText: TextView by bindView(R.id.noticeTextView)
+    private val mEditButton: ImageView by bindView(R.id.editButton)
+    private val mDeleteButton: ImageView by bindView(R.id.deleteButton)
+
     private lateinit var mFirebaseAuth: FirebaseAuth
     private lateinit var mPreference: SharedPreferences
 
@@ -70,6 +79,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         setSupportActionBar(mToolbar)
 
         hideProgressBar()
+        mBottomMenu.visibility = View.GONE
 
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
@@ -82,12 +92,17 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mPreference = PreferenceManager.getDefaultSharedPreferences(this)
 
         mFab.setOnClickListener { mPresenter.addFood() }
+        mIncrementButton.setOnClickListener { mPresenter.incrementFood() }
+        mDecrementButton.setOnClickListener { mPresenter.decrementFood() }
+        mEditButton.setOnClickListener { mPresenter.showFood() }
+        mDeleteButton.setOnClickListener { mPresenter.confirmRemovingFood() }
     }
 
     override fun onStart() {
         super.onStart()
 
         reauthorize()
+        hideBottomNavigation()
     }
 
     private fun reauthorize() {
@@ -282,45 +297,45 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             val adapter = FoodRecyclerViewAdapter(foods)
 
             title = boxName
-            adapter.apply {
-                mEditClickListener = View.OnClickListener {
-                    val position = mRecyclerView.getChildAdapterPosition(it)
-                    val food = adapter.getItemAtPosition(position)
+            adapter.setOnClickListener(View.OnClickListener {
+                val position = mRecyclerView.getChildAdapterPosition(it)
+                val food = adapter.getItemAtPosition(position)
 
-                    mPresenter.showFood(food.id)
-                }
-
-                mDeleteClickListener = View.OnClickListener {
-                    val position = mRecyclerView.getChildAdapterPosition(it)
-                    val food = adapter.getItemAtPosition(position)
-                    val fragment = ConfirmDialogFragment.newInstance(food.name!!, "削除していいですか？", food.id)
-
-                    fragment.setTargetFragment(null, REMOVE_FOOD_REQUEST_CODE)
-                    fragment.show(supportFragmentManager, "delete_food")
-                }
-
-                mIncrementClickListener = View.OnClickListener {
-                    val position = mRecyclerView.getChildAdapterPosition(it)
-                    val food = adapter.getItemAtPosition(position)
-
-                    mPresenter.incrementFood(food)
-                }
-
-                mDecrementClickListener = View.OnClickListener {
-                    val position = mRecyclerView.getChildAdapterPosition(it)
-                    val food = adapter.getItemAtPosition(position)
-
-                    mPresenter.decrementFood(food)
-                }
-            }
+                mPresenter.selectFood(food)
+                adapter.select(position)
+            })
             mRecyclerView.adapter = adapter
         } else {
             updateFoods(boxName, foods)
         }
     }
 
-    override fun onFoodUpdated() {
+    override fun showConfirmDialog(food: Food?) {
+        food ?: return
+
+        val fragment = ConfirmDialogFragment.newInstance(food.name!!, "削除していいですか？", food.id)
+
+        fragment.setTargetFragment(null, REMOVE_FOOD_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "delete_food")
+    }
+
+    override fun showBottomNavigation(food: Food) {
+        mAmountText.text = "${food.amount} ${food.unit?.label}"
+        mNoticeText.text = food.notice
+
+        mBottomMenu.visibility = View.VISIBLE
+    }
+
+    override fun hideBottomNavigation() {
+        mBottomMenu.visibility = View.GONE
+    }
+
+    override fun onFoodUpdated(food: Food?) {
         mRecyclerView.adapter?.notifyDataSetChanged()
+
+        food?.let {
+            showBottomNavigation(food)
+        }
     }
 
     override fun showProgressBar() {
@@ -350,7 +365,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             ADD_FOOD_REQUEST_CODE -> onAddFoodCompleted()
             ADD_BOX_REQUEST_CODE -> onAddBoxCompleted()
             EDIT_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
-            REMOVE_FOOD_REQUEST_CODE -> onRemoveFoodCompleted(data)
+            REMOVE_FOOD_REQUEST_CODE -> onRemoveFoodCompleted()
             REMOVE_BOX_REQUEST_CODE -> onRemoveBoxCompleted(data)
         }
     }
@@ -364,12 +379,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         showSnackbar(getString(R.string.message_add_box_completed))
     }
 
-    private fun onRemoveFoodCompleted(data: Intent?) {
-        val id = data?.getIntExtra("target_id", 0) ?: return
-
-        if (id != 0) {
-            mPresenter.removeFood(id)
-        }
+    private fun onRemoveFoodCompleted() {
+        mPresenter.removeFood()
     }
 
     private fun onRemoveBoxCompleted(data: Intent?) {
