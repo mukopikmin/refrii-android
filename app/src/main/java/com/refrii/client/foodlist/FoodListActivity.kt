@@ -326,14 +326,16 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mAmountText.text = "${food.amount} ${food.unit?.label}"
         mNoticeText.text = food.notice
 
+
         mBottomMenu.animate()
                 .translationY(0.toFloat())
                 .withStartAction { mBottomMenu.visibility = View.VISIBLE }
-                .duration = 300
+                .duration = 200
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
 
+            mRecyclerView.scrollToPosition(adapter.getItemPosition(food))
             adapter.selectItem(adapter.getItemPosition(food))
         }
     }
@@ -342,7 +344,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mBottomMenu.animate()
                 .translationY(mBottomMenu.height.toFloat())
                 .withEndAction { mBottomMenu.visibility = View.GONE }
-                .duration = 300
+                .duration = 200
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
