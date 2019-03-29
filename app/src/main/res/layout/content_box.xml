@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.refrii.client.foodlist.FoodListActivity"
     tools:showIn="@layout/app_bar_box">
@@ -21,8 +22,8 @@
     <include layout="@layout/progressbar" />
 
     <include
-        android:id="@+id/bottomMenu"
         layout="@layout/bottom_food_menu"
+        android:id="@+id/bottomMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
