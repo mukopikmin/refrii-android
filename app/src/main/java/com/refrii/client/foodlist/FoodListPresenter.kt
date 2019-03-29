@@ -163,6 +163,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         })
 
         mView?.setFoods(box.name, mFoods)
+        mView?.hideBottomNavigation()
     }
 
     override fun selectFood(food: Food) {

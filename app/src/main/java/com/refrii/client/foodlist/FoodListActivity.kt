@@ -79,7 +79,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         setSupportActionBar(mToolbar)
 
         hideProgressBar()
-        mBottomMenu.visibility = View.GONE
+        hideBottomNavigation()
 
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
@@ -136,6 +136,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun onPause() {
         super.onPause()
 
+        storeSelectedBoxState()
+    }
+
+    private fun storeSelectedBoxState() {
         val editor = mPreference.edit()
 
         mPresenter.getBox()?.let {
@@ -302,7 +306,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 val food = adapter.getItemAtPosition(position)
 
                 mPresenter.selectFood(food)
-                adapter.select(position)
             })
             mRecyclerView.adapter = adapter
         } else {
@@ -324,10 +327,22 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mNoticeText.text = food.notice
 
         mBottomMenu.visibility = View.VISIBLE
+
+        if (mRecyclerView.adapter != null) {
+            val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
+
+            adapter.selectItem(adapter.getItemPosition(food))
+        }
     }
 
     override fun hideBottomNavigation() {
         mBottomMenu.visibility = View.GONE
+
+        if (mRecyclerView.adapter != null) {
+            val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
+
+            adapter.deselectItem()
+        }
     }
 
     override fun onFoodUpdated(food: Food?) {

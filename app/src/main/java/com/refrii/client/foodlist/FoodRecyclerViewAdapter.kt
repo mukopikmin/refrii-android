@@ -15,31 +15,6 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
     private var mOnClickListener: View.OnClickListener? = null
     private var mSelectedPosition: Int? = null
 
-    fun setFoods(foods: List<Food>) {
-        mFoods = foods
-        notifyDataSetChanged()
-    }
-
-    fun select(position: Int) {
-        if (mSelectedPosition == null) {
-            mSelectedPosition = position
-        } else {
-            mSelectedPosition?.let {
-                if (it == position) {
-                    mSelectedPosition = null
-                } else {
-                    mSelectedPosition = position
-                }
-            }
-        }
-
-        notifyDataSetChanged()
-    }
-
-    fun setOnClickListener(listener: View.OnClickListener) {
-        mOnClickListener = listener
-    }
-
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val food = mFoods[position]
         val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
@@ -67,6 +42,31 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
         return FoodViewHolder(view)
     }
 
+    fun setFoods(foods: List<Food>) {
+        mFoods = foods
+        notifyDataSetChanged()
+    }
+
+    fun selectItem(position: Int) {
+        if (isItemSelected()) {
+            mSelectedPosition?.let {
+                if (it == position) {
+                    mSelectedPosition = null
+                } else {
+                    mSelectedPosition = position
+                }
+            }
+        } else {
+            mSelectedPosition = position
+        }
+
+        notifyDataSetChanged()
+    }
+
+    fun setOnClickListener(listener: View.OnClickListener) {
+        mOnClickListener = listener
+    }
+
     override fun getItemCount(): Int {
         return mFoods.size
     }
@@ -81,6 +81,11 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
 
     fun deselectItem() {
         mSelectedPosition = null
+
         notifyDataSetChanged()
+    }
+
+    fun getItemPosition(food: Food): Int {
+        return mFoods.indexOfFirst { it.id == food.id }
     }
 }
