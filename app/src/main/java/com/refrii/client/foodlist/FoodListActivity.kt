@@ -110,21 +110,25 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val currentUser = mFirebaseAuth.currentUser
 
         if (expiresAt < Date().time) {
-            currentUser?.getIdToken(true)?.addOnCompleteListener {
-                val editor = mPreference.edit()
+            if (currentUser == null) {
+                signOut()
+            } else {
+                currentUser.getIdToken(true).addOnCompleteListener {
+                    val editor = mPreference.edit()
 
-                editor.apply {
-                    putString(getString(R.string.preference_key_jwt), it.result?.token)
+                    editor.apply {
+                        putString(getString(R.string.preference_key_jwt), it.result?.token)
 
-                    it.result?.expirationTimestamp?.let {
-                        putLong(getString(R.string.preference_key_expiration_timestamp), it)
+                        it.result?.expirationTimestamp?.let {
+                            putLong(getString(R.string.preference_key_expiration_timestamp), it)
+                        }
                     }
-                }
-                editor.apply()
+                    editor.apply()
 
-                mPresenter.takeView(this)
-                mPresenter.getBoxes()
-                setNavigationHeader()
+                    mPresenter.takeView(this)
+                    mPresenter.getBoxes()
+                    setNavigationHeader()
+                }
             }
         } else {
             mPresenter.takeView(this)
@@ -191,12 +195,11 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         val editor = mPreference.edit()
-        val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
 
         editor.putInt(getString(R.string.preference_selected_box_id), id)
         editor.apply()
 
-        adapter.deselectItem()
+        hideBottomNavigation()
 
         if (!mPresenter.pickBox(id)) {
             when (id) {
