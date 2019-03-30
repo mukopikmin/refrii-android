@@ -102,7 +102,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         super.onStart()
 
         reauthorize()
-        hideBottomNavigation()
+        hideBottomBavigationWithoutAnimation()
     }
 
     private fun reauthorize() {
@@ -337,6 +337,16 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
             mRecyclerView.scrollToPosition(adapter.getItemPosition(food))
             adapter.selectItem(adapter.getItemPosition(food))
+        }
+    }
+
+    private fun hideBottomBavigationWithoutAnimation() {
+        mBottomMenu.visibility = View.GONE
+
+        if (mRecyclerView.adapter != null) {
+            val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
+
+            adapter.deselectItem()
         }
     }
 
