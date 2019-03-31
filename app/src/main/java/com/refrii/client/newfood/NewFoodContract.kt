@@ -1,5 +1,6 @@
 package com.refrii.client.newfood
 
+import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import java.util.*
@@ -8,6 +9,7 @@ interface NewFoodContract {
 
     interface View {
         fun setUnits(units: List<Unit>?)
+        fun setBox(box: Box?)
         fun createCompleted(food: Food?)
         fun showProgressBar()
         fun hideProgressBar()

@@ -68,6 +68,7 @@ constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Present
         mApiRepository.getBox(id, object : ApiRepositoryCallback<Box> {
             override fun onNext(t: Box?) {
                 mBox = t
+                mView?.setBox(t)
             }
 
             override fun onCompleted() {

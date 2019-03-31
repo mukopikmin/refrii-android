@@ -3,6 +3,7 @@ package com.refrii.client.newfood
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -11,6 +12,7 @@ import android.view.View
 import android.widget.*
 import com.refrii.client.App
 import com.refrii.client.R
+import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
@@ -22,13 +24,15 @@ import javax.inject.Inject
 class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
     private val mToolbar: Toolbar by bindView(R.id.toolbar)
-    private val mNameEditText: EditText by bindView(R.id.newFoodNameEditText)
-    private val mNoticeEditText: EditText by bindView(R.id.newFoodNoticeEditText)
-    private val mAmountEditText: EditText by bindView(R.id.newFoodAmountEditText)
-    private val mSpinner: Spinner by bindView(R.id.newFoodUnitSpinner)
+    private val mNameEditText: EditText by bindView(R.id.nameEditText)
+    private val mBoxNameText: TextView by bindView(R.id.boxTextView)
+    private val mNoticeEditText: EditText by bindView(R.id.noticeEditText)
+    private val mAmountEditText: EditText by bindView(R.id.amountEditText)
+    private val mSpinner: Spinner by bindView(R.id.unitsSpinner)
     private val mFab: FloatingActionButton by bindView(R.id.fab)
-    private val mExpirationDateEditText: EditText by bindView(R.id.newFoodExpirationDateEditText)
+    private val mExpirationDateEditText: TextView by bindView(R.id.expirationDateTextView)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+    private val mHistoryContainer: ConstraintLayout by bindView(R.id.historyContainer)
 
     @Inject
     lateinit var mPresenter: NewFoodPresenter
@@ -48,10 +52,11 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        mExpirationDateEditText.setText(formatter.format(Date()))
-
+        mExpirationDateEditText.text = formatter.format(Date())
         mFab.setOnClickListener { createFood() }
         mExpirationDateEditText.setOnClickListener { showEditDateDialog() }
+
+        mHistoryContainer.visibility = View.GONE
     }
 
     override fun onStart() {
@@ -90,6 +95,12 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         }
 
         return result
+    }
+
+    override fun setBox(box: Box?) {
+        box ?: return
+
+        mBoxNameText.text = box.name
     }
 
     override fun setUnits(units: List<Unit>?) {

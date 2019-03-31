@@ -21,7 +21,8 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/progressbar" />
-    <include layout="@layout/content_new_food" />
+
+    <include layout="@layout/edit_food" />
     <include layout="@layout/fab_check" />
 
 </android.support.design.widget.CoordinatorLayout>
