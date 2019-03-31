@@ -35,8 +35,8 @@ import com.refrii.client.boxinfo.BoxInfoActivity
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.dialogs.ConfirmDialogFragment
+import com.refrii.client.dialogs.CreateBoxDialogFragment
 import com.refrii.client.food.FoodActivity
-import com.refrii.client.newbox.NewBoxActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.settings.SettingsActivity
 import com.refrii.client.signin.SignInActivity
@@ -102,7 +102,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         super.onStart()
 
         reauthorize()
-        hideBottomBavigationWithoutAnimation()
+        hideBottomNavigationWithoutAnimation()
     }
 
     private fun reauthorize() {
@@ -343,7 +343,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         }
     }
 
-    private fun hideBottomBavigationWithoutAnimation() {
+    private fun hideBottomNavigationWithoutAnimation() {
         mBottomMenu.visibility = View.GONE
 
         if (mRecyclerView.adapter != null) {
@@ -403,7 +403,15 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             EDIT_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
             REMOVE_FOOD_REQUEST_CODE -> onRemoveFoodCompleted()
             REMOVE_BOX_REQUEST_CODE -> onRemoveBoxCompleted(data)
+            CREATE_BOX_REQUEST_CODE -> createBox(data)
         }
+    }
+
+    private fun createBox(data: Intent?) {
+        val name = data?.getStringExtra("name") ?: return
+        val notice = "" ?: return
+
+        mPresenter.createBox(name, notice)
     }
 
     private fun onAddFoodCompleted() {
@@ -426,9 +434,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     private fun addBox() {
-        val intent = Intent(this@FoodListActivity, NewBoxActivity::class.java)
+        val fragment = CreateBoxDialogFragment.newInstance()
 
-        startActivityForResult(intent, ADD_BOX_REQUEST_CODE)
+        fragment.setTargetFragment(null, CREATE_BOX_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "create_box")
     }
 
     override fun addFood(box: Box?) {
@@ -465,5 +474,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         private const val EDIT_FOOD_REQUEST_CODE = 103
         private const val REMOVE_FOOD_REQUEST_CODE = 104
         private const val REMOVE_BOX_REQUEST_CODE = 105
+        private const val CREATE_BOX_REQUEST_CODE = 106
     }
 }

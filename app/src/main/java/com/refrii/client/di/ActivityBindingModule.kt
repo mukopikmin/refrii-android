@@ -6,8 +6,6 @@ import com.refrii.client.food.FoodActivity
 import com.refrii.client.food.FoodModule
 import com.refrii.client.foodlist.FoodListActivity
 import com.refrii.client.foodlist.FoodListModule
-import com.refrii.client.newbox.NewBoxActivity
-import com.refrii.client.newbox.NewBoxModule
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.newfood.NewFoodModule
 import com.refrii.client.newunit.NewUnitActivity
@@ -31,10 +29,6 @@ abstract class ActivityBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(FoodListModule::class)])
     abstract fun foodListActivity(): FoodListActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector(modules = [(NewBoxModule::class)])
-    abstract fun newBoxActivity(): NewBoxActivity
 
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(FoodModule::class)])

@@ -12,28 +12,22 @@ import android.support.v7.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.EditText
-import android.widget.TextView
 import com.refrii.client.R
-import com.refrii.client.data.api.models.User
 
-class InviteUserDialogFragment : DialogFragment() {
+class CreateBoxDialogFragment : DialogFragment() {
 
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val content = inflater.inflate(R.layout.invite_user_dialog, null)
+        val content = inflater.inflate(R.layout.create_box_dialog, null)
         val editText = content.findViewById<EditText>(R.id.editText)
-        val message = content.findViewById<TextView>(R.id.messageTextView)
-        val bundle = arguments
-        val sharedUsersEmail = bundle?.getStringArrayList("shared_users_email")
         val dialog = AlertDialog.Builder(activity!!)
-                .setTitle("カテゴリの共有")
+                .setTitle("カテゴリの作成")
                 .setView(content)
-                .setPositiveButton(getString(R.string.message_share_box)) { dialog, which ->
+                .setPositiveButton("作成") { dialog, which ->
                     val intent = Intent()
-                            .putExtra("email", editText.text.toString())
+                            .putExtra("name", editText.text.toString())
                     val pendingIntent = activity?.createPendingResult(targetRequestCode, intent, PendingIntent.FLAG_ONE_SHOT)
 
                     pendingIntent?.send(Activity.RESULT_OK)
@@ -46,34 +40,25 @@ class InviteUserDialogFragment : DialogFragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
 
-                if (sharedUsersEmail != null && sharedUsersEmail.contains(s.toString())) {
-                    button.isEnabled = false
-                    message.visibility = View.VISIBLE
-                    message.text = "すでに共有されています"
-                } else {
-                    button.isEnabled = true
-                    message.visibility = View.GONE
-                    message.text = ""
+                s?.let {
+                    button.isEnabled = it.isNotBlank()
                 }
             }
         }
 
-        message.visibility = View.GONE
         editText.addTextChangedListener(textWatcher)
+        dialog.setOnShowListener {
+            val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+
+            button.isEnabled = false
+        }
 
         return dialog
     }
 
     companion object {
-        fun newInstance(sharedUsers: List<User>): InviteUserDialogFragment {
-            val instance = InviteUserDialogFragment()
-            val bundle = Bundle()
-            val emails = sharedUsers.map { it.email } as ArrayList
-
-            bundle.putStringArrayList("shared_users_email", emails)
-            instance.arguments = bundle
-
-            return instance
+        fun newInstance(): CreateBoxDialogFragment {
+            return CreateBoxDialogFragment()
         }
     }
 }

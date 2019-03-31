@@ -3,7 +3,6 @@ package com.refrii.client.di
 import com.refrii.client.boxinfo.BoxInfoActivity
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.foodlist.FoodListActivity
-import com.refrii.client.newbox.NewBoxActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.newunit.NewUnitActivity
 import com.refrii.client.signin.SignInActivity
@@ -22,7 +21,6 @@ import javax.inject.Singleton
 interface AppComponent {
     fun inject(target: SignInActivity)
     fun inject(target: FoodListActivity)
-    fun inject(target: NewBoxActivity)
     fun inject(target: FoodActivity)
     fun inject(target: NewFoodActivity)
     fun inject(target: BoxInfoActivity)

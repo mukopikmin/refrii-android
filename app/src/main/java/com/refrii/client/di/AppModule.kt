@@ -14,8 +14,6 @@ import com.refrii.client.food.FoodContract
 import com.refrii.client.food.FoodPresenter
 import com.refrii.client.foodlist.FoodListContract
 import com.refrii.client.foodlist.FoodListPresenter
-import com.refrii.client.newbox.NewBoxContract
-import com.refrii.client.newbox.NewBoxPresenter
 import com.refrii.client.newfood.NewFoodContract
 import com.refrii.client.newfood.NewFoodPresenter
 import com.refrii.client.newunit.NewUnitContract
@@ -54,11 +52,6 @@ class AppModule(private var mApplication: Application) {
     @Provides
     fun provideFoodListPresenter(apiRepository: ApiRepository): FoodListContract.Presenter {
         return FoodListPresenter(apiRepository)
-    }
-
-    @Provides
-    fun provideNewBoxPresenter(apiRepository: ApiRepository): NewBoxContract.Presenter {
-        return NewBoxPresenter(apiRepository)
     }
 
     fun provideFoodPresenter(apiRepository: ApiRepository): FoodContract.Presenter {

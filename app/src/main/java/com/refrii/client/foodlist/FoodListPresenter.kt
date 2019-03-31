@@ -138,6 +138,32 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         }
     }
 
+    override fun createBox(name: String, notice: String) {
+        mView?.showProgressBar()
+
+        mApiRepository.createBox(object : ApiRepositoryCallback<Box> {
+            override fun onNext(t: Box?) {
+                mBoxes = mApiRepository.getBoxes(object : ApiRepositoryCallback<List<Box>> {
+                    override fun onNext(t: List<Box>?) {}
+                    override fun onCompleted() {}
+                    override fun onError(e: Throwable?) {}
+                })
+
+                t?.let {
+                    selectBox(it)
+                }
+            }
+
+            override fun onCompleted() {
+                mView?.hideProgressBar()
+            }
+
+            override fun onError(e: Throwable?) {
+                mView?.hideProgressBar()
+            }
+        }, name, notice)
+    }
+
     override fun showFood() {
         mFood?.let {
             mView?.showFood(it.id, mBox)

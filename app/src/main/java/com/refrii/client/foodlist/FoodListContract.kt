@@ -27,6 +27,7 @@ interface FoodListContract {
         fun takeView(view: View)
         fun getBox(): Box?
         fun getBoxInfo()
+        fun createBox(name: String, notice: String)
         fun pickBox(menuItemId: Int): Boolean
         fun getBoxes()
         fun incrementFood()
