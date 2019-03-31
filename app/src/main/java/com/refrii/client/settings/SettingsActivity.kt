@@ -81,7 +81,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             //            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("name"))
+            bindPreferenceSummaryToValue(findPreference("preference_key_name"))
 
             val termsOfServicePreference = findPreference("terms_of_service")
             termsOfServicePreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {

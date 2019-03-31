@@ -33,7 +33,7 @@
     <EditTextPreference
         android:capitalize="words"
         android:inputType="textCapWords"
-        android:key="name"
+        android:key="preference_key_name"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
