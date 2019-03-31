@@ -18,8 +18,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <include layout="@layout/progressbar" />
+
+    <include layout="@layout/empty_box_message" />
 
     <include
         layout="@layout/bottom_food_menu"

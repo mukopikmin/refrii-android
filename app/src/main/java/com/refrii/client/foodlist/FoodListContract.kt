@@ -21,6 +21,7 @@ interface FoodListContract {
         fun showBottomNavigation(food: Food)
         fun hideBottomNavigation()
         fun showConfirmDialog(food: Food?)
+        fun setEmptyMessage(foods: List<Food>?)
     }
 
     interface Presenter {

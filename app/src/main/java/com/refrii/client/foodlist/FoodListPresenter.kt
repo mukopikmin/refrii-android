@@ -177,6 +177,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
             override fun onNext(t: List<Food>?) {
                 mFoods = t
                 mView?.setFoods(box.name, t)
+                mView?.setEmptyMessage(t)
             }
 
             override fun onCompleted() {
@@ -190,6 +191,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
         mView?.setFoods(box.name, mFoods)
         mView?.hideBottomNavigation()
+        mView?.setEmptyMessage(mFoods)
     }
 
     override fun selectFood(food: Food) {

@@ -14,18 +14,13 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.*
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -55,6 +50,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     private val mNavigationView: NavigationView by bindView(R.id.nav_view)
     private val mRecyclerView: RecyclerView by bindView(R.id.recyclerView)
     private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+    private val mEmptyMessageContainer: FrameLayout by bindView(R.id.emptyBoxMessageContainer)
+    private val mAddFoodButton: AppCompatButton by bindView(R.id.addFoodButton)
 
     private val mBottomMenu: ConstraintLayout by bindView(R.id.bottomMenu)
     private val mIncrementButton: ImageView by bindView(R.id.incrementButton)
@@ -96,6 +93,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mDecrementButton.setOnClickListener { mPresenter.decrementFood() }
         mEditButton.setOnClickListener { mPresenter.showFood() }
         mDeleteButton.setOnClickListener { mPresenter.confirmRemovingFood() }
+        mAddFoodButton.setOnClickListener { mPresenter.addFood() }
     }
 
     override fun onStart() {
@@ -465,6 +463,16 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mPresenter.deleteLocalData()
 
         startActivity(intent)
+    }
+
+    override fun setEmptyMessage(foods: List<Food>?) {
+        foods ?: return
+
+        if (foods.isEmpty()) {
+            mEmptyMessageContainer.visibility = View.VISIBLE
+        } else {
+            mEmptyMessageContainer.visibility = View.GONE
+        }
     }
 
     companion object {
