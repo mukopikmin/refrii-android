@@ -33,18 +33,20 @@ constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Present
                 }
 
                 override fun onCompleted() {
+                    mView?.hideProgressBar()
                     mView?.createCompleted(mFood)
                 }
 
                 override fun onError(e: Throwable?) {
+                    mView?.hideProgressBar()
                     mView?.showToast(e?.message)
                 }
             })
         }
     }
 
-    override fun getUnits(userId: Int) {
-        mUnits = mApiRepository.getUnits(userId, object : ApiRepositoryCallback<List<Unit>> {
+    override fun getUnits(boxId: Int) {
+        mUnits = mApiRepository.getUnitsForBox(boxId, object : ApiRepositoryCallback<List<Unit>> {
             override fun onNext(t: List<Unit>?) {
                 mUnits = t
                 mView?.setUnits(t)

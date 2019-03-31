@@ -3,7 +3,6 @@ package com.refrii.client.newfood
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -58,13 +57,11 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
     override fun onStart() {
         super.onStart()
 
-        val preference = PreferenceManager.getDefaultSharedPreferences(this)
-        val userId = preference.getInt(getString(R.string.preference_key_id), 0)
         val intent = intent
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
         mPresenter.takeView(this)
-        mPresenter.getUnits(userId)
+        mPresenter.getUnits(boxId)
         mPresenter.getBox(boxId)
     }
 
