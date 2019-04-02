@@ -183,6 +183,23 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 })
     }
 
+    fun uninvite(callback: ApiRepositoryCallback<Void>, boxId: Int, email: String) {
+        mApiRemoteDataSource.uninvite(boxId, email)
+                .subscribe(object : Subscriber<Void>() {
+                    override fun onNext(t: Void?) {
+                        callback.onNext(t)
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        callback.onError(e)
+                    }
+                })
+    }
+
     fun getFood(id: Int, callback: ApiRepositoryCallback<Food>): Food? {
         mApiRemoteDataSource.getFood(id)
                 .subscribe(object : Subscriber<Food>() {

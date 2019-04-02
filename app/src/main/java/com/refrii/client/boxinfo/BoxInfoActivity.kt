@@ -159,7 +159,17 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         users ?: return
 
         if (mSharedUsersRecycler.adapter == null) {
-            mSharedUsersRecycler.adapter = SharedUserRecyclerViewAdapter(users)
+            val adapter = SharedUserRecyclerViewAdapter(users)
+
+            adapter.setDeinviteClickListener(View.OnClickListener {
+                val position = mSharedUsersRecycler.getChildAdapterPosition(it)
+                val user = adapter.getItemAtPosition(position)
+
+                user.email?.let {
+                    mPresenter.uninvite(it)
+                }
+            })
+            mSharedUsersRecycler.adapter = adapter
         } else {
             (mSharedUsersRecycler.adapter as SharedUserRecyclerViewAdapter).setUsers(users)
         }

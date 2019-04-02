@@ -114,6 +114,28 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
         }
     }
 
+    override fun uninvite(email: String) {
+        mId?.let {
+            mView?.onLoading()
+
+            mApiRepository.uninvite(object : ApiRepositoryCallback<Void> {
+                override fun onNext(t: Void?) {
+                    getBox(it)
+                    mView?.showSnackbar("共有を解除しました")
+                }
+
+                override fun onCompleted() {
+                    mView?.onLoaded()
+                }
+
+                override fun onError(e: Throwable?) {
+                    mView?.onLoaded()
+                    mView?.showToast(e?.message)
+                }
+            }, it, email)
+        }
+    }
+
     override fun showInviteUserDialog() {
         mView?.showInviteUserDialog(mBox?.invitedUsers)
     }

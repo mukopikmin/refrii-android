@@ -21,6 +21,7 @@ interface BoxInfoContract {
         fun takeView(view: View)
         fun getBox(id: Int)
         fun invite(email: String)
+        fun uninvite(email: String)
         fun showInviteUserDialog()
         fun confirmRemovingBox()
         fun removeBox()

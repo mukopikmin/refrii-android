@@ -150,17 +150,27 @@
             app:layout_constraintTop_toBottomOf="@+id/noticeEditText"
             tools:layout_editor_absoluteX="0dp" />
 
+        <include
+            android:id="@+id/include8"
+            layout="@layout/devider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/ownerTextView"
+            tools:layout_editor_absoluteX="0dp" />
+
         <TextView
             android:id="@+id/ownerTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:text="TextView"
+            android:text="ユーザー"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/ownerIcon"
-            app:layout_constraintTop_toBottomOf="@+id/include4" />
+            app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
         <include
             android:id="@+id/include5"
@@ -180,8 +190,9 @@
             android:layout_marginEnd="16dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/ownerIcon"
-            app:layout_constraintTop_toBottomOf="@+id/ownerTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/addSharedUserLayout"
@@ -222,6 +233,42 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         </android.support.constraint.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:text="所有者"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/ownerIcon"
+            app:layout_constraintTop_toBottomOf="@+id/include4" />
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="共有しているユーザー"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView8"
+            app:layout_constraintTop_toBottomOf="@+id/include8" />
+
+        <ImageView
+            android:id="@+id/imageView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:tint="@android:color/darker_gray"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/include8"
+            app:srcCompat="@drawable/ic_supervisor_account_black" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
