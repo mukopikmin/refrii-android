@@ -126,8 +126,19 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         when(requestCode) {
             REMOVE_BOX_REQUEST_CODE -> mPresenter.removeBox()
+            REMOVE_INVITATION_REQUEST_CODE -> mPresenter.uninvite()
             EDIT_SHARED_USERS_REQUEST_CODE -> onInviteRequested(data)
         }
+    }
+
+    override fun uninvite(boxName: String?, user: User?) {
+        boxName ?: return
+        user ?: return
+
+        val fragment = ConfirmDialogFragment.newInstance(boxName, "削除していいですか？", user.id)
+
+        fragment.setTargetFragment(null, REMOVE_INVITATION_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "delete_invitation")
     }
 
     private fun onInviteRequested(data: Intent?) {
@@ -165,9 +176,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
                 val position = mSharedUsersRecycler.getChildAdapterPosition(it)
                 val user = adapter.getItemAtPosition(position)
 
-                user.email?.let {
-                    mPresenter.uninvite(it)
-                }
+                mPresenter.confirmUninviting(user)
             })
             mSharedUsersRecycler.adapter = adapter
         } else {
@@ -215,5 +224,6 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     companion object {
         private const val EDIT_SHARED_USERS_REQUEST_CODE = 103
         private const val REMOVE_BOX_REQUEST_CODE = 104
+        private const val REMOVE_INVITATION_REQUEST_CODE = 105
     }
 }

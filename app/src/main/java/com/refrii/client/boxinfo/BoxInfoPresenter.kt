@@ -2,6 +2,7 @@ package com.refrii.client.boxinfo
 
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Invitation
+import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.ApiRepository
 import com.refrii.client.data.api.source.ApiRepositoryCallback
 import javax.inject.Inject
@@ -15,6 +16,7 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
     private var mId: Int? = null
     private var mName: String? = null
     private var mNotice: String? = null
+    private var mUser: User? = null
 
     override fun takeView(view: BoxInfoContract.View) {
         mView = view
@@ -114,7 +116,9 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
         }
     }
 
-    override fun uninvite(email: String) {
+    override fun uninvite() {
+        val email = mUser?.email ?: return
+
         mId?.let {
             mView?.onLoading()
 
@@ -150,5 +154,10 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
 
     override fun confirmRemovingBox() {
         mView?.removeBox(mId, mName)
+    }
+
+    override fun confirmUninviting(user: User?) {
+        mUser = user
+        mView?.uninvite(mBox?.name, user)
     }
 }
