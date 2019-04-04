@@ -57,6 +57,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         mExpirationDateEditText.setOnClickListener { showEditDateDialog() }
 
         mHistoryContainer.visibility = View.GONE
+        hideProgressBar()
     }
 
     override fun onStart() {
