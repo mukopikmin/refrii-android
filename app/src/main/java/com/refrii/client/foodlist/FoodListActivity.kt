@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.constraint.ConstraintLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
@@ -53,7 +52,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     private val mEmptyMessageContainer: FrameLayout by bindView(R.id.emptyBoxMessageContainer)
     private val mAddFoodButton: AppCompatButton by bindView(R.id.addFoodButton)
 
-    private val mBottomMenu: ConstraintLayout by bindView(R.id.bottomMenu)
+    private val mBottomMenu: View by bindView(R.id.bottomMenu)
     private val mIncrementButton: ImageView by bindView(R.id.incrementButton)
     private val mDecrementButton: ImageView by bindView(R.id.decrementButton)
     private val mAmountText: TextView by bindView(R.id.amountTextView)
@@ -76,7 +75,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         setSupportActionBar(mToolbar)
 
         hideProgressBar()
-        hideBottomNavigation()
+        hideBottomNavigationWithoutAnimation()
 
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
@@ -161,9 +160,16 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         when {
             mDrawer.isDrawerOpen(GravityCompat.START) -> mDrawer.closeDrawer(GravityCompat.START)
-            adapter.isItemSelected() -> adapter.deselectItem()
+            adapter.isItemSelected() -> deselectFood()
             else -> super.onBackPressed()
         }
+    }
+
+    private fun deselectFood() {
+        val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
+
+        adapter.deselectItem()
+        hideBottomNavigation()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -326,7 +332,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun showBottomNavigation(food: Food) {
         mAmountText.text = "${food.amount} ${food.unit?.label}"
         mNoticeText.text = food.notice
-
 
         mBottomMenu.animate()
                 .translationY(0.toFloat())

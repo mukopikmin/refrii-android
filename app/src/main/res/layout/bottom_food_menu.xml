@@ -3,16 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <View
-        android:id="@+id/view_shadow"
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:background="@drawable/shadow"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:layout_height="wrap_content"
+    android:background="#FFFFFFFF">
 
     <ImageButton
         android:id="@+id/editButton"
@@ -24,7 +16,6 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toTopOf="@+id/scrollView2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_shadow"
         app:srcCompat="@drawable/ic_edit_black" />
 
     <ImageButton
@@ -38,7 +29,6 @@
         android:tint="@android:color/holo_red_dark"
         app:layout_constraintBottom_toTopOf="@+id/scrollView2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_shadow"
         app:srcCompat="@drawable/ic_baseline_delete" />
 
     <ScrollView
@@ -124,3 +114,4 @@
             app:srcCompat="@drawable/ic_add_circle_outline_black" />
     </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>
+
