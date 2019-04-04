@@ -135,7 +135,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         boxName ?: return
         user ?: return
 
-        val fragment = ConfirmDialogFragment.newInstance(boxName, "削除していいですか？", user.id)
+        val fragment = ConfirmDialogFragment.newInstance("共有の解除", "${user?.name} への $boxName の共有を解除していいですか？", user.id)
 
         fragment.setTargetFragment(null, REMOVE_INVITATION_REQUEST_CODE)
         fragment.show(supportFragmentManager, "delete_invitation")
