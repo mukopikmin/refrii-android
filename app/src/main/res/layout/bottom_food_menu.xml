@@ -65,7 +65,7 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toStartOf="@+id/deleteButton"
         app:layout_constraintStart_toEndOf="@+id/editButton"
-        app:layout_constraintTop_toBottomOf="@+id/view_shadow">
+        app:layout_constraintTop_toBottomOf="@+id/shadow">
 
         <TextView
             android:id="@+id/amountTextView"

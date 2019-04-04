@@ -22,13 +22,14 @@
     <include layout="@layout/empty_box_message" />
 
     <View
-        android:id="@+id/view_shadow"
+        android:id="@+id/shadow"
         android:layout_width="match_parent"
         android:layout_height="10dp"
         android:background="@drawable/shadow"
         app:layout_constraintBottom_toTopOf="@+id/bottomMenu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
     <include
         layout="@layout/bottom_food_menu"
         android:id="@+id/bottomMenu"

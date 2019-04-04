@@ -53,6 +53,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     private val mAddFoodButton: AppCompatButton by bindView(R.id.addFoodButton)
 
     private val mBottomMenu: View by bindView(R.id.bottomMenu)
+    private val mBottomNavigationShadow: View by bindView(R.id.shadow)
     private val mIncrementButton: ImageView by bindView(R.id.incrementButton)
     private val mDecrementButton: ImageView by bindView(R.id.decrementButton)
     private val mAmountText: TextView by bindView(R.id.amountTextView)
@@ -332,6 +333,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun showBottomNavigation(food: Food) {
         mAmountText.text = "${food.amount} ${food.unit?.label}"
         mNoticeText.text = food.notice
+        mBottomNavigationShadow.visibility = View.VISIBLE
 
         mBottomMenu.animate()
                 .translationY(0.toFloat())
@@ -348,6 +350,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     private fun hideBottomNavigationWithoutAnimation() {
         mBottomMenu.visibility = View.GONE
+        mBottomNavigationShadow.visibility = View.GONE
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
@@ -357,6 +360,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun hideBottomNavigation() {
+        mBottomNavigationShadow.visibility = View.GONE
         mBottomMenu.animate()
                 .translationY(mBottomMenu.height.toFloat())
                 .withEndAction { mBottomMenu.visibility = View.GONE }
