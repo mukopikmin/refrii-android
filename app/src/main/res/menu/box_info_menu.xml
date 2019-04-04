@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/menu_remove_box"
-        android:icon="@drawable/ic_remove_circle_outline_white"
+        android:icon="@drawable/ic_outline_delete"
         android:title="削除"
         app:showAsAction="always" />
 </menu>
