@@ -359,6 +359,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 .translationY(0.toFloat())
                 .withStartAction { mBottomMenu.visibility = View.VISIBLE }
                 .duration = 200
+        mFab.hide()
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
@@ -371,6 +372,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     private fun hideBottomNavigationWithoutAnimation() {
         mBottomMenu.visibility = View.GONE
         mBottomNavigationShadow.visibility = View.GONE
+        mFab.show()
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
@@ -385,6 +387,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 .translationY(mBottomMenu.height.toFloat())
                 .withEndAction { mBottomMenu.visibility = View.GONE }
                 .duration = 200
+        mFab.show()
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter

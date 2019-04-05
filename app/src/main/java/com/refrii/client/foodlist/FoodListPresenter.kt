@@ -180,9 +180,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
                 mView?.setEmptyMessage(t)
             }
 
-            override fun onCompleted() {
-                mView?.hideProgressBar()
-            }
+            override fun onCompleted() {}
 
             override fun onError(e: Throwable?) {
                 mView?.showToast(e?.message)
