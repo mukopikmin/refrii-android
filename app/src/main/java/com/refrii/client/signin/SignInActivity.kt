@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -20,13 +22,14 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.User
-import kotterknife.bindView
 import javax.inject.Inject
 
 class SignInActivity : AppCompatActivity(), SigninContract.View {
 
-    private val mSignInButton: SignInButton by bindView(R.id.googleSignInButton)
-    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+    @BindView(R.id.googleSignInButton)
+    lateinit var mSignInButton: SignInButton
+    @BindView(R.id.progressBar)
+    lateinit var mProgressBar: ProgressBar
 
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var mFirebaseAuth: FirebaseAuth
@@ -45,6 +48,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
 
         (application as App).getComponent().inject(this)
         setContentView(R.layout.activity_signin)
+        ButterKnife.bind(this)
 
         mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)

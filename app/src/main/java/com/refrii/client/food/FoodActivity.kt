@@ -15,29 +15,41 @@ import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
-import kotterknife.bindView
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 class FoodActivity : AppCompatActivity(), FoodContract.View {
 
-    private val mProgressBar: ProgressBar by bindView(R.id.foodProgressBar)
-    private val mToolbar: Toolbar by bindView(R.id.toolbar)
-    private val mName: EditText by bindView(R.id.nameEditText)
-    private val mAmount: EditText by bindView(R.id.amountEditText)
-    private val mNotice: EditText by bindView(R.id.noticeEditText)
-    private val mExpirationDate: TextView by bindView(R.id.expirationDateTextView)
-    private val mCreated: TextView by bindView(R.id.createdTextView)
-    private val mUpdate: TextView by bindView(R.id.updatedTextView)
-    private val mBoxName: TextView by bindView(R.id.boxTextView)
-    private val mFab: FloatingActionButton by bindView(R.id.fab)
-    private val mUnitsSpinner: Spinner by bindView(R.id.unitsSpinner)
+    @BindView(R.id.foodProgressBar)
+    lateinit var mProgressBar: ProgressBar
+    @BindView(R.id.toolbar)
+    lateinit var mToolbar: Toolbar
+    @BindView(R.id.nameEditText)
+    lateinit var mName: EditText
+    @BindView(R.id.amountEditText)
+    lateinit var mAmount: EditText
+    @BindView(R.id.noticeEditText)
+    lateinit var mNotice: EditText
+    @BindView(R.id.expirationDateTextView)
+    lateinit var mExpirationDate: TextView
+    @BindView(R.id.createdTextView)
+    lateinit var mCreated: TextView
+    @BindView(R.id.updatedTextView)
+    lateinit var mUpdate: TextView
+    @BindView(R.id.boxTextView)
+    lateinit var mBoxName: TextView
+    @BindView(R.id.fab)
+    lateinit var mFab: FloatingActionButton
+    @BindView(R.id.unitsSpinner)
+    lateinit var mUnitsSpinner: Spinner
 
     private var mUnitIds: List<Int>? = null
     private var mUnitLabels: MutableList<String?>? = null
@@ -59,7 +71,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     @Inject
     lateinit var mPresenter: FoodPresenter
 
-    lateinit var mPreference: SharedPreferences
+    private lateinit var mPreference: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +79,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_food)
+        ButterKnife.bind(this)
         setSupportActionBar(mToolbar)
 
         supportActionBar?.let {

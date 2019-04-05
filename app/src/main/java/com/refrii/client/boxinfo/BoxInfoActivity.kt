@@ -19,29 +19,40 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.User
 import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.InviteUserDialogFragment
-import kotterknife.bindView
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
-    private val mNameEditText: EditText by bindView(R.id.nameEditText)
-    private val mNoticeEditText: EditText by bindView(R.id.noticeEditText)
-    private val mOwnerText: TextView by bindView(R.id.ownerTextView)
-    private val mSharedUsersRecycler: RecyclerView by bindView(R.id.sharedUsersLayout)
-    private val mCreatedText: TextView by bindView(R.id.createdTextView)
-    private val mUpdatedText: TextView by bindView(R.id.updatedTextView)
-    private val mFab: FloatingActionButton by bindView(R.id.floatingActionButton)
-    private val mToolbar: Toolbar by bindView(R.id.toolbar)
-    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
-    private val mInviteLayout: ConstraintLayout by bindView(R.id.addSharedUserLayout)
+    @BindView(R.id.nameEditText)
+    lateinit var mNameEditText: EditText
+    @BindView(R.id.noticeEditText)
+    lateinit var mNoticeEditText: EditText
+    @BindView(R.id.ownerTextView)
+    lateinit var mOwnerText: TextView
+    @BindView(R.id.sharedUsersLayout)
+    lateinit var mSharedUsersRecycler: RecyclerView
+    @BindView(R.id.createdTextView)
+    lateinit var mCreatedText: TextView
+    @BindView(R.id.updatedTextView)
+    lateinit var mUpdatedText: TextView
+    @BindView(R.id.floatingActionButton)
+    lateinit var mFab: FloatingActionButton
+    @BindView(R.id.toolbar)
+    lateinit var mToolbar: Toolbar
+    @BindView(R.id.progressBar)
+    lateinit var mProgressBar: ProgressBar
+    @BindView(R.id.addSharedUserLayout)
+    lateinit var mInviteLayout: ConstraintLayout
 
     private val mNameTextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {}
@@ -67,6 +78,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_box_info)
+        ButterKnife.bind(this)
         setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)

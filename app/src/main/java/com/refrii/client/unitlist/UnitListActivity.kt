@@ -14,21 +14,26 @@ import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.Toast
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.dialogs.OptionsPickerDialogFragment
 import com.refrii.client.newunit.NewUnitActivity
 import com.refrii.client.unit.UnitActivity
-import kotterknife.bindView
 import javax.inject.Inject
 
 class UnitListActivity : AppCompatActivity(), UnitListContract.View {
 
-    private val toolbar: Toolbar by bindView(R.id.toolbar)
-    private val listView: ListView by bindView(R.id.listView)
-    private val fab: FloatingActionButton by bindView(R.id.fab)
-    private val progressBar: ProgressBar by bindView(R.id.progressBar)
+    @BindView(R.id.toolbar)
+    lateinit var toolbar: Toolbar
+    @BindView(R.id.listView)
+    lateinit var listView: ListView
+    @BindView(R.id.fab)
+    lateinit var fab: FloatingActionButton
+    @BindView(R.id.progressBar)
+    lateinit var progressBar: ProgressBar
 
     @Inject
     lateinit var mPresenter: UnitListPresenter
@@ -39,6 +44,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_units)
+        ButterKnife.bind(this)
 
         setSupportActionBar(toolbar)
         supportActionBar?.let {

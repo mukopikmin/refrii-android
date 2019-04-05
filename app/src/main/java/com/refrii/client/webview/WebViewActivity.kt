@@ -6,17 +6,20 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.refrii.client.R
-import kotterknife.bindView
 
 class WebViewActivity : AppCompatActivity() {
 
-    private val mWebView: WebView by bindView(R.id.webView)
+    @BindView(R.id.webView)
+    lateinit var mWebView: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_web_view)
+        ButterKnife.bind(this)
 
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)

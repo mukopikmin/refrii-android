@@ -20,5 +20,6 @@
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_box" />
-    <include layout="@layout/fab_add" />
+    <!--<include layout="@layout/fab_add"-->
+    <!--app:layout_anchor="@layout/bottom_food_menu"/>-->
 </android.support.design.widget.CoordinatorLayout>

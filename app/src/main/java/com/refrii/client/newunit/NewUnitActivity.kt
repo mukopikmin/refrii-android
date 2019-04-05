@@ -11,19 +11,25 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Unit
-import kotterknife.bindView
 import javax.inject.Inject
 
 class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
 
-    private val mToolbar: Toolbar by bindView(R.id.toolbar)
-    private val mLabelEditText: EditText by bindView(R.id.labelEditText)
-    private val mStepEditText: EditText by bindView(R.id.stepEditText)
-    private val mFab: FloatingActionButton by bindView(R.id.fab)
-    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+    @BindView(R.id.toolbar)
+    lateinit var mToolbar: Toolbar
+    @BindView(R.id.labelEditText)
+    lateinit var mLabelEditText: EditText
+    @BindView(R.id.stepEditText)
+    lateinit var mStepEditText: EditText
+    @BindView(R.id.fab)
+    lateinit var mFab: FloatingActionButton
+    @BindView(R.id.progressBar)
+    lateinit var mProgressBar: ProgressBar
 
     @Inject
     lateinit var mPresenter: NewUnitContract.Presenter
@@ -34,6 +40,7 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_new_unit)
+        ButterKnife.bind(this)
         hideProgressBar()
         setSupportActionBar(mToolbar)
         mToolbar.title = "Add unit"

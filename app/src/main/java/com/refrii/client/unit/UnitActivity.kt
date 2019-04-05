@@ -13,28 +13,39 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.dialogs.EditDoubleDialogFragment
 import com.refrii.client.dialogs.EditTextDialogFragment
-import kotterknife.bindView
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 class UnitActivity : AppCompatActivity(), UnitContract.View {
 
-    private val mToolbar: Toolbar by bindView(R.id.toolbar)
-    private val mLabel: TextView by bindView(R.id.labelTextView)
-    private val mStep: TextView by bindView(R.id.stepTextView)
-    private val mCreated: TextView by bindView(R.id.createdTextView)
-    private val mUpdated: TextView by bindView(R.id.updatedTextView)
-    private val mEditLabel: ImageView by bindView(R.id.labelImageView)
-    private val mEditStep: ImageView by bindView(R.id.stepImageView)
-    private val mFab: FloatingActionButton by bindView(R.id.fab)
-    private val mEditedMessage: TextView by bindView(R.id.editedMessageTextView)
-    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
+    @BindView(R.id.toolbar)
+    lateinit var mToolbar: Toolbar
+    @BindView(R.id.labelTextView)
+    lateinit var mLabel: TextView
+    @BindView(R.id.stepTextView)
+    lateinit var mStep: TextView
+    @BindView(R.id.createdTextView)
+    lateinit var mCreated: TextView
+    @BindView(R.id.updatedTextView)
+    lateinit var mUpdated: TextView
+    @BindView(R.id.labelImageView)
+    lateinit var mEditLabel: ImageView
+    @BindView(R.id.stepImageView)
+    lateinit var mEditStep: ImageView
+    @BindView(R.id.fab)
+    lateinit var mFab: FloatingActionButton
+    @BindView(R.id.editedMessageTextView)
+    lateinit var mEditedMessage: TextView
+    @BindView(R.id.progressBar)
+    lateinit var mProgressBar: ProgressBar
 
     @Inject
     lateinit var mPresenter: UnitPresenter
@@ -45,6 +56,7 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_unit)
+        ButterKnife.bind(this)
         setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)

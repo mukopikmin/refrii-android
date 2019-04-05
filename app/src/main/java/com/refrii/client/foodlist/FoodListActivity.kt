@@ -14,12 +14,16 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.*
-import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -37,29 +41,44 @@ import com.refrii.client.signin.SignInActivity
 import com.refrii.client.tasks.ImageDownloadTask
 import com.refrii.client.tasks.ImageDownloadTaskCallback
 import com.refrii.client.unitlist.UnitListActivity
-import kotterknife.bindView
 import java.util.*
 import javax.inject.Inject
 
 class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationView.OnNavigationItemSelectedListener {
 
-    private val mToolbar: Toolbar by bindView(R.id.toolbar)
-    private val mFab: FloatingActionButton by bindView(R.id.fab)
-    private val mDrawer: DrawerLayout by bindView(R.id.drawer_layout)
-    private val mNavigationView: NavigationView by bindView(R.id.nav_view)
-    private val mRecyclerView: RecyclerView by bindView(R.id.recyclerView)
-    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
-    private val mEmptyMessageContainer: FrameLayout by bindView(R.id.emptyBoxMessageContainer)
-    private val mAddFoodButton: AppCompatButton by bindView(R.id.addFoodButton)
+    @BindView(R.id.toolbar)
+    lateinit var mToolbar: Toolbar
+    @BindView(R.id.fab)
+    lateinit var mFab: FloatingActionButton
+    @BindView(R.id.drawer_layout)
+    lateinit var mDrawer: DrawerLayout
+    @BindView(R.id.nav_view)
+    lateinit var mNavigationView: NavigationView
+    @BindView(R.id.recyclerView)
+    lateinit var mRecyclerView: RecyclerView
+    @BindView(R.id.progressBar)
+    lateinit var mProgressBar: ProgressBar
+    @BindView(R.id.emptyBoxMessageContainer)
+    lateinit var mEmptyMessageContainer: View
+    @BindView(R.id.addFoodButton)
+    lateinit var mAddFoodButton: AppCompatButton
 
-    private val mBottomMenu: View by bindView(R.id.bottomMenu)
-    private val mBottomNavigationShadow: View by bindView(R.id.shadow)
-    private val mIncrementButton: ImageView by bindView(R.id.incrementButton)
-    private val mDecrementButton: ImageView by bindView(R.id.decrementButton)
-    private val mAmountText: TextView by bindView(R.id.amountTextView)
-    private val mNoticeText: TextView by bindView(R.id.noticeTextView)
-    private val mEditButton: ImageView by bindView(R.id.editButton)
-    private val mDeleteButton: ImageView by bindView(R.id.deleteButton)
+    @BindView(R.id.bottomMenu)
+    lateinit var mBottomMenu: View
+    @BindView(R.id.shadow)
+    lateinit var mBottomNavigationShadow: View
+    @BindView(R.id.incrementButton)
+    lateinit var mIncrementButton: ImageView
+    @BindView(R.id.decrementButton)
+    lateinit var mDecrementButton: ImageView
+    @BindView(R.id.amountTextView)
+    lateinit var mAmountText: TextView
+    @BindView(R.id.noticeTextView)
+    lateinit var mNoticeText: TextView
+    @BindView(R.id.editButton)
+    lateinit var mEditButton: ImageView
+    @BindView(R.id.deleteButton)
+    lateinit var mDeleteButton: ImageView
 
     private lateinit var mFirebaseAuth: FirebaseAuth
     private lateinit var mPreference: SharedPreferences
@@ -71,8 +90,9 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         super.onCreate(savedInstanceState)
 
         (application as App).getComponent().inject(this)
-
         setContentView(R.layout.activity_box)
+        ButterKnife.bind(this)
+
         setSupportActionBar(mToolbar)
 
         hideProgressBar()

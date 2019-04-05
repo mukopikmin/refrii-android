@@ -10,29 +10,40 @@ import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
-import kotterknife.bindView
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
-    private val mToolbar: Toolbar by bindView(R.id.toolbar)
-    private val mNameEditText: EditText by bindView(R.id.nameEditText)
-    private val mBoxNameText: TextView by bindView(R.id.boxTextView)
-    private val mNoticeEditText: EditText by bindView(R.id.noticeEditText)
-    private val mAmountEditText: EditText by bindView(R.id.amountEditText)
-    private val mSpinner: Spinner by bindView(R.id.unitsSpinner)
-    private val mFab: FloatingActionButton by bindView(R.id.fab)
-    private val mExpirationDateEditText: TextView by bindView(R.id.expirationDateTextView)
-    private val mProgressBar: ProgressBar by bindView(R.id.progressBar)
-    private val mHistoryContainer: ConstraintLayout by bindView(R.id.historyContainer)
+    @BindView(R.id.toolbar)
+    lateinit var mToolbar: Toolbar
+    @BindView(R.id.nameEditText)
+    lateinit var mNameEditText: EditText
+    @BindView(R.id.boxTextView)
+    lateinit var mBoxNameText: TextView
+    @BindView(R.id.noticeEditText)
+    lateinit var mNoticeEditText: EditText
+    @BindView(R.id.amountEditText)
+    lateinit var mAmountEditText: EditText
+    @BindView(R.id.unitsSpinner)
+    lateinit var mSpinner: Spinner
+    @BindView(R.id.fab)
+    lateinit var mFab: FloatingActionButton
+    @BindView(R.id.expirationDateTextView)
+    lateinit var mExpirationDateEditText: TextView
+    @BindView(R.id.progressBar)
+    lateinit var mProgressBar: ProgressBar
+    @BindView(R.id.historyContainer)
+    lateinit var mHistoryContainer: ConstraintLayout
 
     @Inject
     lateinit var mPresenter: NewFoodPresenter
@@ -45,6 +56,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_new_food)
+        ButterKnife.bind(this)
         mToolbar.title = getString(R.string.title_add_food)
         setSupportActionBar(mToolbar)
         supportActionBar?.let {
