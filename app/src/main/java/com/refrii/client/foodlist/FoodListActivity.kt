@@ -1,9 +1,15 @@
 package com.refrii.client.foodlist
 
 import android.app.Activity
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
@@ -27,6 +33,7 @@ import butterknife.ButterKnife
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoActivity
@@ -98,6 +105,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         hideProgressBar()
         hideBottomNavigationWithoutAnimation()
 
+        initPushNotification()
+
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
         toggle.syncState()
@@ -114,6 +123,24 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mEditButton.setOnClickListener { mPresenter.showFood() }
         mDeleteButton.setOnClickListener { mPresenter.confirmRemovingFood() }
         mAddFoodButton.setOnClickListener { mPresenter.addFood() }
+    }
+
+    private fun initPushNotification() {
+        FirebaseMessaging.getInstance().subscribeToTopic(getString(R.string.notification_topic_push))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channel = NotificationChannel(
+                    getString(R.string.notification_channel_id_push),
+                    getString(R.string.notification_channel_name_push),
+                    NotificationManager.IMPORTANCE_DEFAULT
+            )
+
+            channel.enableLights(true)
+            channel.lightColor = Color.WHITE;
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC;
+            manager.createNotificationChannel(channel);
+        }
     }
 
     override fun onStart() {
