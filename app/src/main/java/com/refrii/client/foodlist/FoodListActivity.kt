@@ -32,7 +32,9 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
 import com.refrii.client.App
 import com.refrii.client.R
@@ -105,7 +107,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         hideProgressBar()
         hideBottomNavigationWithoutAnimation()
 
-        initPushNotification()
 
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
@@ -123,6 +124,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mEditButton.setOnClickListener { mPresenter.showFood() }
         mDeleteButton.setOnClickListener { mPresenter.confirmRemovingFood() }
         mAddFoodButton.setOnClickListener { mPresenter.addFood() }
+
+        initPushNotification()
     }
 
     private fun initPushNotification() {
@@ -141,6 +144,31 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC;
             manager.createNotificationChannel(channel);
         }
+
+        val token = mPreference.getString(getString(R.string.preference_key_push_token), "")
+
+        if (token == "") {
+            FirebaseInstanceId.getInstance().instanceId
+                    .addOnCompleteListener(OnCompleteListener { task ->
+                        val userId = mPreference.getInt(application.getString(R.string.preference_key_id), 0)
+
+                        if (!task.isSuccessful) {
+//                            Log.w(PushNotificationService.TAG, "getInstanceId failed", task.exception)
+                            return@OnCompleteListener
+                        }
+
+                        task.result?.token?.let {
+                            mPresenter.registerPushToken(userId, it)
+                        }
+                    })
+        }
+    }
+
+    override fun savePushToken(token: String) {
+        val editor = mPreference.edit()
+
+        editor.putString(application.getString(R.string.preference_key_push_token), token)
+        editor.apply()
     }
 
     override fun onStart() {

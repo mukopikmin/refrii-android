@@ -2,6 +2,7 @@ package com.refrii.client.foodlist
 
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
+import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.ApiRepository
 import com.refrii.client.data.api.source.ApiRepositoryCallback
 import retrofit2.HttpException
@@ -229,6 +230,21 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
         mBox = null
         mView?.setFoods("期限が1週間以内", mFoods)
+    }
+
+    override fun registerPushToken(userId: Int, token: String) {
+        mApiRepository.registerPushToken(userId, token, object : ApiRepositoryCallback<User> {
+            override fun onNext(t: User?) {}
+
+            override fun onCompleted() {
+                mView?.savePushToken(token)
+                mView?.showToast(token)
+            }
+
+            override fun onError(e: Throwable?) {
+                mView?.showToast(e?.message)
+            }
+        })
     }
 
     override fun deleteLocalData() {

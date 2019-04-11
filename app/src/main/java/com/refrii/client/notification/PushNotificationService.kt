@@ -9,10 +9,7 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
-import android.util.Log
 import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.refrii.client.App
@@ -37,20 +34,6 @@ class PushNotificationService : FirebaseMessagingService() {
         (application as App).getComponent().inject(this)
 
         mPreference = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val token = mPreference.getString(getString(R.string.preference_key_push_token), "")
-
-        if (token == "") {
-            FirebaseInstanceId.getInstance().instanceId
-                    .addOnCompleteListener(OnCompleteListener { task ->
-                        if (!task.isSuccessful) {
-                            Log.w(TAG, "getInstanceId failed", task.exception)
-                            return@OnCompleteListener
-                        }
-
-                        register(task.result?.token)
-                    })
-        }
     }
 
     override fun onNewToken(newToken: String?) {
