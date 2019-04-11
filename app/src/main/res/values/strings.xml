@@ -67,4 +67,5 @@
     <string name="notification_channel_id_push">com.refrii.client.notification.push</string>
     <string name="notification_channel_name_push">Push Notification</string>
     <string name="notification_topic_push">mytopic</string>
+    <string name="preference_key_push_token">preference_key_push_token</string>
 </resources>

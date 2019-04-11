@@ -4,36 +4,59 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.os.Build
+import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import android.util.Log
+import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.refrii.client.App
 import com.refrii.client.R
+import com.refrii.client.data.api.models.User
+import com.refrii.client.data.api.source.ApiRepository
+import com.refrii.client.data.api.source.ApiRepositoryCallback
 import com.refrii.client.foodlist.FoodListActivity
+import javax.inject.Inject
 
 
 class PushNotificationService : FirebaseMessagingService() {
 
+    private lateinit var mPreference: SharedPreferences
+
+    @Inject
+    lateinit var mApiRepository: ApiRepository
+
+    override fun onCreate() {
+        super.onCreate()
+
+        (application as App).getComponent().inject(this)
+
+        mPreference = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val token = mPreference.getString(getString(R.string.preference_key_push_token), "")
+
+        if (token == "") {
+            FirebaseInstanceId.getInstance().instanceId
+                    .addOnCompleteListener(OnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            Log.w(TAG, "getInstanceId failed", task.exception)
+                            return@OnCompleteListener
+                        }
+
+                        register(task.result?.token)
+                    })
+        }
+    }
+
     override fun onNewToken(newToken: String?) {
         super.onNewToken(newToken)
 
-        FirebaseInstanceId.getInstance().instanceId
-                .addOnCompleteListener(OnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        Log.w(TAG, "getInstanceId failed", task.exception)
-                        return@OnCompleteListener
-                    }
-
-                    val token = task.result?.token
-
-                    Log.d(TAG, token)
-                })
-
-        Log.d(TAG, newToken)
+        register(newToken)
     }
 
     override fun onMessageReceived(message: RemoteMessage?) {
@@ -43,6 +66,27 @@ class PushNotificationService : FirebaseMessagingService() {
         val body = message?.notification?.body
 
         sendNotification(title, body)
+    }
+
+    private fun register(token: String?) {
+        token ?: return
+
+        val userId = mPreference.getInt(application.getString(R.string.preference_key_id), 0)
+
+        mApiRepository.registerPushToken(userId, token, object : ApiRepositoryCallback<User> {
+            override fun onNext(t: User?) {}
+
+            override fun onCompleted() {
+                val editor = mPreference.edit()
+
+                editor.putString(application.getString(R.string.preference_key_push_token), token)
+                editor.apply()
+            }
+
+            override fun onError(e: Throwable?) {
+                Toast.makeText(applicationContext, e?.message, Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     private fun sendNotification(title: String?, message: String?) {

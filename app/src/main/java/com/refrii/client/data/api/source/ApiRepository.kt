@@ -386,6 +386,23 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
                 })
     }
 
+    fun registerPushToken(id: Int, token: String?, callback: ApiRepositoryCallback<User>) {
+        mApiRemoteDataSource.registerPushToken(id, token)
+                .subscribe(object : Subscriber<User>() {
+                    override fun onNext(t: User?) {
+                        callback.onNext(t)
+                    }
+
+                    override fun onCompleted() {
+                        callback.onCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        callback.onError(e)
+                    }
+                })
+    }
+
     fun deleteLocalData() {
         mApiLocalDataSource.deleteAll()
     }
