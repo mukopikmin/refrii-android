@@ -14,9 +14,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.refrii.client.App
 import com.refrii.client.R
-import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.ApiRepository
-import com.refrii.client.data.api.source.ApiRepositoryCallback
 import com.refrii.client.foodlist.FoodListActivity
 import javax.inject.Inject
 
@@ -56,20 +54,15 @@ class PushNotificationService : FirebaseMessagingService() {
 
         val userId = mPreference.getInt(application.getString(R.string.preference_key_id), 0)
 
-        mApiRepository.registerPushToken(userId, token, object : ApiRepositoryCallback<User> {
-            override fun onNext(t: User?) {}
+        mApiRepository.registerPushToken(userId, token)
+                .subscribe({
+                    val editor = mPreference.edit()
 
-            override fun onCompleted() {
-                val editor = mPreference.edit()
-
-                editor.putString(application.getString(R.string.preference_key_push_token), token)
-                editor.apply()
-            }
-
-            override fun onError(e: Throwable?) {
-                Toast.makeText(applicationContext, e?.message, Toast.LENGTH_LONG).show()
-            }
-        })
+                    editor.putString(application.getString(R.string.preference_key_push_token), token)
+                    editor.apply()
+                }, {
+                    Toast.makeText(applicationContext, it.message, Toast.LENGTH_LONG).show()
+                })
     }
 
     private fun sendNotification(title: String?, message: String?) {

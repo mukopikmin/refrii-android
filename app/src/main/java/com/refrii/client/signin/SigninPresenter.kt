@@ -1,8 +1,6 @@
 package com.refrii.client.signin
 
-import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.ApiRepository
-import com.refrii.client.data.api.source.ApiRepositoryCallback
 import javax.inject.Inject
 
 class SigninPresenter
@@ -16,18 +14,12 @@ constructor(private val mApiRepository: ApiRepository) : SigninContract.Presente
     }
 
     override fun verifyAccount() {
-        mApiRepository.verify(object : ApiRepositoryCallback<User> {
-            override fun onNext(t: User?) {
-                mView?.saveAccount(t)
-            }
-
-            override fun onCompleted() {
-                mView?.onLoginCompleted()
-            }
-
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
-            }
-        })
+        mApiRepository.verify()
+                .subscribe({
+                    mView?.saveAccount(it)
+                    mView?.onLoginCompleted()
+                }, {
+                    mView?.showToast(it.message)
+                })
     }
 }

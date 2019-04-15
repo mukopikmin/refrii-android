@@ -7,17 +7,20 @@ import com.refrii.client.data.api.models.User
 import io.realm.Realm
 import io.realm.kotlin.oneOf
 import io.realm.kotlin.where
+import rx.Observable
 import java.util.*
 
 class ApiLocalDataSource(private val mRealm: Realm) {
 
-    fun getBoxes(): List<Box> {
-        return mRealm.where(Box::class.java)
+    fun getBoxes(): Observable<List<Box>> {
+        val boxes = mRealm.where(Box::class.java)
                 .findAll()
                 .sort("id")
+
+        return Observable.just(boxes)
     }
 
-    fun saveBoxes(boxes: List<Box>) {
+    fun saveBoxes(boxes: List<Box>): Observable<List<Box>> {
         mRealm.executeTransaction { realm ->
             val onlyLocal = realm.where<Box>()
                     .not().oneOf("id", boxes.map { it.id }.toTypedArray())
@@ -26,58 +29,53 @@ class ApiLocalDataSource(private val mRealm: Realm) {
             onlyLocal.deleteAllFromRealm()
             realm.copyToRealmOrUpdate(boxes)
         }
+
+        return getBoxes()
     }
 
-    fun saveBox(box: Box) {
+    fun saveBox(box: Box): Observable<Box?> {
         mRealm.executeTransaction {
             it.copyToRealmOrUpdate(box)
         }
+
+        return getBox(box.id)
     }
 
-    fun getUnitsForBox(id: Int): List<Unit> {
+    fun getUnitsForBox(id: Int): Observable<List<Unit>> {
         val box = mRealm.where<Box>()
                 .equalTo("id", id)
                 .findFirst()
         val user = mRealm.where<User>()
                 .equalTo("id", box?.owner?.id)
                 .findFirst()
-
-        return mRealm.where<Unit>()
+        val units = mRealm.where<Unit>()
                 .equalTo("user.id", user?.id)
                 .findAll()
+                .sort("id")
+
+        return Observable.just(units)
     }
 
-    fun getFoods(): List<Food> {
-        return mRealm.where<Food>().findAll()
+    fun getFoods(): Observable<List<Food>> {
+        val foods = mRealm.where<Food>()
+                .findAll()
+                .sort("id")
+
+        return Observable.just(foods)
     }
 
-    fun getExpiringFoods(): List<Food> {
+    fun getExpiringFoods(): Observable<List<Food>> {
         val week = 7 * 24 * 60 * 60 * 1000 // 7 days
         val now = Date().time
-
-        return mRealm.where<Food>()
+        val foods = mRealm.where<Food>()
                 .findAll()
                 .filter { it.expirationDate!!.time - now < week }
                 .sortedBy { it.expirationDate }
+
+        return Observable.just(foods)
     }
 
-//    fun saveFoods(foods: List<Food>, foodlist_menu: Box) {
-//        mRealm.executeTransaction { realm ->
-//            realm.where<Food>()
-//                    .equalTo("foodlist_menu.id", foodlist_menu.id)
-//                    .and()
-//                    .not().oneOf("id", foods.map { it.id }.toTypedArray())
-//                    .findAll()
-//                    .deleteAllFromRealm()
-//
-//            foods.forEach {
-//                it.foodlist_menu = foodlist_menu
-//                realm.copyToRealmOrUpdate(foods)
-//            }
-//        }
-//    }
-
-    fun saveFoods(foods: List<Food>) {
+    fun saveFoods(foods: List<Food>): Observable<List<Food>> {
         mRealm.executeTransaction { realm ->
             realm.where<Food>()
                     .not().oneOf("id", foods.map { it.id }.toTypedArray())
@@ -85,12 +83,14 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                     .deleteAllFromRealm()
             realm.copyToRealmOrUpdate(foods)
         }
+
+        return getFoods()
     }
 
-    fun updateFood(id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?) {
+    fun updateFood(id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
         val food = mRealm.where<Food>()
                 .equalTo("id", id)
-                .findFirst() ?: return
+                .findFirst() ?: return Observable.error(Throwable("見つかりませんでした"))
 
         mRealm.executeTransaction { realm ->
             val box = realm.where<Box>()
@@ -107,44 +107,56 @@ class ApiLocalDataSource(private val mRealm: Realm) {
             box?.let { food.box = box }
             unit?.let { food.unit = unit }
         }
+
+        return Observable.just(food)
     }
 
-    fun saveFood(food: Food) {
+    fun saveFood(food: Food): Observable<Food?> {
         mRealm.executeTransaction {
             it.copyToRealmOrUpdate(food)
         }
+
+        return getFood(food.id)
     }
 
-    fun getBox(id: Int): Box? {
-        return mRealm.where<Box>()
+    fun getBox(id: Int): Observable<Box?> {
+        val box = mRealm.where<Box>()
                 .equalTo("id", id)
                 .findFirst()
+
+        return Observable.just(box)
     }
 
     fun updateBox(box: Box) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun removeBox(id: Int) {
+    fun removeBox(id: Int): Observable<Void> {
         mRealm.executeTransaction { realm ->
             realm.where<Box>()
                     .equalTo("id", id)
                     .findAll()
                     .deleteAllFromRealm()
         }
+
+        return Observable.empty()
     }
 
-    fun getFoodsInBox(id: Int): List<Food> {
-        return mRealm.where<Food>()
+    fun getFoodsInBox(id: Int): Observable<List<Food>> {
+        val foods = mRealm.where<Food>()
                 .equalTo("box.id", id)
                 .findAll()
                 .sort("id")
+
+        return Observable.just(foods)
     }
 
-    fun getFood(id: Int): Food? {
-        return mRealm.where<Food>()
+    fun getFood(id: Int): Observable<Food?> {
+        val food = mRealm.where<Food>()
                 .equalTo("id", id)
                 .findFirst()
+
+        return Observable.just(food)
     }
 
     fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date) {
@@ -155,23 +167,28 @@ class ApiLocalDataSource(private val mRealm: Realm) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun getUnits(userId: Int): List<Unit> {
-        return mRealm.where<Unit>()
+    fun getUnits(userId: Int): Observable<List<Unit>> {
+        val units = mRealm.where<Unit>()
                 .equalTo("user.id", userId)
                 .findAll()
                 .sort("id")
                 .filter { it.user?.id == userId }
+
+        return Observable.just(units)
     }
 
-    fun getUnit(id: Int): Unit? {
-        return mRealm.where<Unit>()
+    fun getUnit(id: Int): Observable<Unit?> {
+        val unit = mRealm.where<Unit>()
                 .equalTo("id", id)
                 .findFirst()
+
+        return Observable.just(unit)
     }
 
-    fun saveUnits(units: List<Unit>) {
+    fun saveUnits(units: List<Unit>): Observable<List<Unit>> {
+        val userId = units.first().user?.id ?: return Observable.empty()
+
         mRealm.executeTransaction { realm ->
-            val userId = units.first().user?.id
             val onlyLocal = realm.where<Unit>()
                     .equalTo("user.id", userId)
                     .not().oneOf("id", units.map { it.id }.toTypedArray())
@@ -180,12 +197,16 @@ class ApiLocalDataSource(private val mRealm: Realm) {
             onlyLocal.deleteAllFromRealm()
             realm.copyToRealmOrUpdate(units)
         }
+
+        return getUnits(userId)
     }
 
-    fun saveUnit(unit: Unit) {
+    fun saveUnit(unit: Unit): Observable<Unit?> {
         mRealm.executeTransaction {
             it.copyToRealmOrUpdate(unit)
         }
+
+        return getUnit(unit.id)
     }
 
     fun createUnit(label: String, step: Double) {
@@ -196,19 +217,31 @@ class ApiLocalDataSource(private val mRealm: Realm) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    fun removeUnit(id: Int) {
+    fun removeUnit(id: Int): Observable<Void> {
         mRealm.executeTransaction {
             it.where(Unit::class.java)
                     .equalTo("id", id)
                     .findFirst()
                     ?.deleteFromRealm()
         }
+
+        return Observable.empty()
     }
 
-    fun saveUser(user: User) {
+    fun getUser(id: Int): Observable<User?> {
+        val user = mRealm.where<User>()
+                .equalTo("id", id)
+                .findFirst()
+
+        return Observable.just(user)
+    }
+
+    fun saveUser(user: User): Observable<User?> {
         mRealm.executeTransaction {
             it.copyToRealmOrUpdate(user)
         }
+
+        return getUser(user.id)
     }
 
     fun deleteAll() {

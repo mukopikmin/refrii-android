@@ -2,7 +2,6 @@ package com.refrii.client.newunit
 
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.data.api.source.ApiRepository
-import com.refrii.client.data.api.source.ApiRepositoryCallback
 import javax.inject.Inject
 
 class NewUnitPresenter
@@ -17,23 +16,14 @@ constructor(private val mApiRepository: ApiRepository) : NewUnitContract.Present
     }
 
     override fun createUnit(label: String, amount: Double) {
-        mView?.showProgressBar()
-
-        mApiRepository.createUnit(label, amount, object : ApiRepositoryCallback<Unit> {
-            override fun onNext(t: Unit?) {
-                mUnit = t
-            }
-
-            override fun onCompleted() {
-                mView?.hideProgressBar()
-                mView?.onCreateCompleted(mUnit)
-            }
-
-            override fun onError(e: Throwable?) {
-                e?.message?.let {
-                    mView?.showToast(it)
-                }
-            }
-        })
+        mApiRepository.createUnit(label, amount)
+                .doOnSubscribe { mView?.showProgressBar() }
+                .doOnUnsubscribe { mView?.hideProgressBar() }
+                .subscribe({
+                    mUnit = it
+                    mView?.onCreateCompleted(mUnit)
+                }, {
+                    mView?.showToast(it.message)
+                })
     }
 }

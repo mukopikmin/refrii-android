@@ -4,7 +4,6 @@ import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.data.api.source.ApiRepository
-import com.refrii.client.data.api.source.ApiRepositoryCallback
 import java.util.*
 import javax.inject.Inject
 
@@ -29,82 +28,55 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun getFood(id: Int) {
-        mFood = mApiRepository.getFood(id, object : ApiRepositoryCallback<Food> {
-            override fun onNext(t: Food?) {
-                mFood = t
-                mId = t?.id
-                mName = t?.name
-                mAmount = t?.amount
-                mNotice = t?.notice
-                mExpirationDate = t?.expirationDate
-                mBoxId = t?.box?.id
-                mUnitId = t?.unit?.id
+        mApiRepository.getFood(id)
+                .subscribe({
+                    mFood = it
+                    mId = it?.id
+                    mName = it?.name
+                    mAmount = it?.amount
+                    mNotice = it?.notice
+                    mExpirationDate = it?.expirationDate
+                    mBoxId = it?.box?.id
+                    mUnitId = it?.unit?.id
 
-                mView?.setFood(t)
-                mView?.setSelectedUnit(mUnitId)
-            }
-
-            override fun onCompleted() {
-//                mBoxId?.let {
-//                    getBox(id)
-//                }
-            }
-
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
-            }
-        })
-
-        mId = mFood?.id
-        mName = mFood?.name
-        mAmount = mFood?.amount
-        mNotice = mFood?.notice
-        mExpirationDate = mFood?.expirationDate
-        mBoxId = mFood?.box?.id
-        mUnitId = mFood?.unit?.id
-
-        mView?.setFood(mFood)
-        mView?.setSelectedUnit(mUnitId)
+                    mView?.setFood(it)
+                    mView?.setSelectedUnit(mUnitId)
+                }, {
+                    mView?.showToast(it.message)
+                })
     }
 
     override fun getUnits(boxId: Int) {
-        mUnits = mApiRepository.getUnitsForBox(boxId, object : ApiRepositoryCallback<List<Unit>> {
-            override fun onNext(t: List<Unit>?) {
-                mUnits = t
-                mView?.setUnits(t)
-                mView?.setSelectedUnit(mUnitId)
-            }
+        mApiRepository.getUnitsForBoxFromCache(boxId)
+                .subscribe({
+                    mUnits = it
+                    mView?.setUnits(it)
+                    mView?.setSelectedUnit(mUnitId)
+                }, {
+                    mView?.showToast(it.message)
+                })
 
-            override fun onCompleted() {}
-
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
-            }
-        })
-
-        mView?.setUnits(mUnits)
-        mView?.setSelectedUnit(mUnitId)
+        mApiRepository.getUnitsForBox(boxId)
+                .subscribe({
+                    mUnits = it
+                    mView?.setUnits(it)
+                    mView?.setSelectedUnit(mUnitId)
+                }, {
+                    mView?.showToast(it.message)
+                })
     }
 
     override fun updateFood() {
-
-        mId?.let {
-            mView?.showProgressBar()
-
-            mApiRepository.updateFood(object : ApiRepositoryCallback<Food> {
-                override fun onNext(t: Food?) {
-                    mFood = t
-                }
-
-                override fun onCompleted() {
-                    mView?.hideProgressBar()
-                    mView?.onUpdateCompleted()
-                }
-
-                override fun onError(e: Throwable?) {
-                    mView?.showToast(e?.message)
-                }
-            }, it, mName, mNotice, mAmount, mExpirationDate, mBoxId, mUnitId)
+        mId?.let { id ->
+            mApiRepository.updateFood(id, mName, mNotice, mAmount, mExpirationDate, mBoxId, mUnitId)
+                    .doOnSubscribe { mView?.showProgressBar() }
+                    .doOnUnsubscribe { mView?.hideProgressBar() }
+                    .subscribe({
+                        mFood = it
+                        mView?.onUpdateCompleted()
+                    }, {
+                        mView?.showToast(it.message)
+                    })
         }
     }
 

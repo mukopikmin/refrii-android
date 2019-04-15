@@ -2,6 +2,7 @@ package com.refrii.client.unitlist
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
@@ -38,6 +39,8 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
     @Inject
     lateinit var mPresenter: UnitListPresenter
 
+    private lateinit var mPreference: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -52,6 +55,8 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
+
+        mPreference = PreferenceManager.getDefaultSharedPreferences(this)
 
         fab.setOnClickListener {
             val intent = Intent(this@UnitListActivity, NewUnitActivity::class.java)
@@ -101,14 +106,9 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
 
         when (requestCode) {
             NEW_UNIT_REQUEST_CODE -> {
-                val preference = PreferenceManager.getDefaultSharedPreferences(this)
-                val userId = preference.getInt(getString(R.string.preference_key_id), 0)
                 val unitId = data.getIntExtra(getString(R.string.key_unit_id), 0)
-                val unit = mPresenter.getUnit(unitId)
-                val label = unit?.label ?: ""
 
-                mPresenter.getUnits(userId)
-                showSnackbar("単位 \"$label\" が追加されました")
+                mPresenter.getUnit(unitId)
             }
             UNIT_OPTIONS_REQUEST_CODE -> {
                 val option = data.getIntExtra("option", -1)
@@ -134,6 +134,14 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
                 }
             }
         }
+    }
+
+    override fun onUnitCreateCompleted(unit: Unit?) {
+        val userId = mPreference.getInt(getString(R.string.preference_key_id), 0)
+        val label = unit?.label ?: ""
+
+        showSnackbar("単位 \"$label\" が追加されました")
+        mPresenter.getUnits(userId)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

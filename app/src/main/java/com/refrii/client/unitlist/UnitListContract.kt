@@ -6,6 +6,7 @@ interface UnitListContract {
 
     interface View {
         fun setUnits(units: List<Unit>?)
+        fun onUnitCreateCompleted(unit: Unit?)
         fun showProgressBar()
         fun hideProgressBar()
         fun showToast(message: String?)
@@ -13,9 +14,9 @@ interface UnitListContract {
     }
 
     interface Presenter {
-        fun takeView(view: UnitListContract.View)
+        fun takeView(view: View)
         fun getUnits(userId: Int)
         fun removeUnit(id: Int, userId: Int)
-        fun getUnit(id: Int): Unit?
+        fun getUnit(id: Int)
     }
 }
