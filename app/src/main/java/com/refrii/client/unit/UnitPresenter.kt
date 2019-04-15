@@ -2,7 +2,6 @@ package com.refrii.client.unit
 
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.data.api.source.ApiRepository
-import com.refrii.client.data.api.source.ApiRepositoryCallback
 import javax.inject.Inject
 
 class UnitPresenter
@@ -17,45 +16,32 @@ constructor(private val mApiRepository: ApiRepository) : UnitContract.Presenter 
     }
 
     override fun getUnit(id: Int) {
-        mView?.onLoading()
-
-        mApiRepository.getUnit(id, object : ApiRepositoryCallback<Unit> {
-            override fun onNext(t: Unit?) {
-                mUnit = t
-                mView?.setUnit(t)
-            }
-
-            override fun onCompleted() {
-                mView?.onBeforeEdit()
-                mView?.onLoaded()
-            }
-
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
-            }
-        })
+        mApiRepository.getUnit(id)
+                .doOnSubscribe { mView?.onLoading() }
+                .doOnUnsubscribe { mView?.onLoaded() }
+                .subscribe({
+                    mUnit = it
+                    mView?.setUnit(it)
+                    mView?.onBeforeEdit()
+                }, {
+                    mView?.showToast(it.message)
+                })
     }
 
     override fun updateUnit() {
-        mView?.onLoading()
+        mUnit?.let { unit ->
+            mApiRepository.updateUnit(unit)
+                    .doOnSubscribe { mView?.onLoading() }
+                    .doOnUnsubscribe { mView?.onLoaded() }
+                    .subscribe({
+                        mUnit = it
+                        mView?.setUnit(it)
+                        mView?.showSnackbar("Unit ${it.label} is updated successfully")
 
-        mUnit?.let {
-            mApiRepository.updateUnit(it, object : ApiRepositoryCallback<Unit> {
-                override fun onNext(t: Unit?) {
-                    mUnit = t
-                    mView?.setUnit(t)
-                    mView?.showSnackbar("Unit ${t?.label} is updated successfully")
-                }
-
-                override fun onCompleted() {
-                    mView?.onBeforeEdit()
-                    mView?.onLoaded()
-                }
-
-                override fun onError(e: Throwable?) {
-                    mView?.showToast(e?.message)
-                }
-            })
+                        mView?.onBeforeEdit()
+                    }, {
+                        mView?.showToast(it.message)
+                    })
         }
     }
 

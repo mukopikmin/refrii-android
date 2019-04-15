@@ -22,6 +22,7 @@ interface FoodListContract {
         fun hideBottomNavigation()
         fun showConfirmDialog(food: Food?)
         fun setEmptyMessage(foods: List<Food>?)
+        fun savePushToken(token: String)
     }
 
     interface Presenter {
@@ -41,5 +42,6 @@ interface FoodListContract {
         fun deleteLocalData()
         fun selectFood(food: Food)
         fun confirmRemovingFood()
+        fun registerPushToken(userId: Int, token: String)
     }
 }

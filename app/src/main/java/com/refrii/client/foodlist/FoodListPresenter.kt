@@ -3,7 +3,6 @@ package com.refrii.client.foodlist
 import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.source.ApiRepository
-import com.refrii.client.data.api.source.ApiRepositoryCallback
 import retrofit2.HttpException
 import javax.inject.Inject
 
@@ -40,30 +39,35 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     }
 
     override fun getBoxes() {
-        // Temporally clear boxes shown in drawer, for updating cache
+        // Temporally clear boxes set in drawer, for updating cache
         mView?.clearBoxes()
 
-        mBoxes = mApiRepository.getBoxes(object : ApiRepositoryCallback<List<Box>> {
-            override fun onNext(t: List<Box>?) {
-                mBoxes = t
-                mView?.setBoxes(t)
-            }
+        mApiRepository.getBoxesFromCache()
+                .subscribe({
+                    mBoxes = it
+                    mView?.setBoxes(mBoxes)
+                }, {
+                    mView?.showToast(it.message)
 
-            override fun onCompleted() {
-                mView?.showToast("同期が完了しました")
-            }
+                    if (it is HttpException && it.code() == 401) {
+                        mView?.signOut()
+                    }
+                })
 
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
+        mApiRepository.getBoxes()
+                .doOnSubscribe { mView?.showProgressBar() }
+                .doOnUnsubscribe { mView?.hideProgressBar() }
+                .subscribe({
+                    mBoxes = it
+                    mView?.setBoxes(it)
+                    mView?.showToast("同期が完了しました")
+                }, {
+                    mView?.showToast(it.message)
 
-                if (e is HttpException && e.code() == 401) {
-                    mView?.signOut()
-                }
-            }
-        })
-
-        mView?.setBoxes(mBoxes)
-
+                    if (it is HttpException && it.code() == 401) {
+                        mView?.signOut()
+                    }
+                })
     }
 
     override fun incrementFood() {
@@ -89,24 +93,16 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     }
 
     private fun updateFood(food: Food, amount: Double = 0.toDouble()) {
-        mView?.showProgressBar()
-
         mBox?.let {
-            mApiRepository.updateFood(object : ApiRepositoryCallback<Food> {
-                override fun onNext(t: Food?) {
-                    mView?.onFoodUpdated(t)
-                    mView?.showSnackbar("${t?.name} の数量が更新されました")
-                }
-
-                override fun onCompleted() {
-                    mView?.hideProgressBar()
-                }
-
-                override fun onError(e: Throwable?) {
-                    mView?.showToast(e?.message)
-                    mView?.hideProgressBar()
-                }
-            }, food.id, null, null, amount, null, null, null)
+            mApiRepository.updateFood(food.id, null, null, amount, null, null, null)
+                    .doOnSubscribe { mView?.showProgressBar() }
+                    .doOnUnsubscribe { mView?.hideProgressBar() }
+                    .subscribe({
+                        mView?.onFoodUpdated(it)
+                        mView?.showSnackbar("${it.name} の数量が更新されました")
+                    }, {
+                        mView?.showToast(it.message)
+                    })
         }
     }
 
@@ -116,52 +112,30 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
     override fun removeFood() {
         mFood?.let {
-            mView?.showProgressBar()
-
-            mApiRepository.removeFood(it.id, object : ApiRepositoryCallback<Void> {
-                override fun onNext(t: Void?) {
-                    mFood = null
-                    mView?.onFoodUpdated(mFood)
-                }
-
-                override fun onCompleted() {
-                    mView?.hideProgressBar()
-                    mView?.showSnackbar("削除が完了しました")
-                    getBoxes()
-                }
-
-                override fun onError(e: Throwable?) {
-                    mView?.showToast(e?.message)
-                    mView?.hideProgressBar()
-                }
-            })
+            mApiRepository.removeFood(it.id)
+                    .doOnSubscribe { mView?.showProgressBar() }
+                    .doOnUnsubscribe { mView?.hideProgressBar() }
+                    .subscribe({
+                        mFood = null
+                        mView?.onFoodUpdated(mFood)
+                        mView?.showSnackbar("削除が完了しました")
+                        getBoxes()
+                    }, {
+                        mView?.showToast(it.message)
+                    })
         }
     }
 
     override fun createBox(name: String, notice: String) {
-        mView?.showProgressBar()
-
-        mApiRepository.createBox(object : ApiRepositoryCallback<Box> {
-            override fun onNext(t: Box?) {
-                mBoxes = mApiRepository.getBoxes(object : ApiRepositoryCallback<List<Box>> {
-                    override fun onNext(t: List<Box>?) {}
-                    override fun onCompleted() {}
-                    override fun onError(e: Throwable?) {}
+        mApiRepository.createBox(name, notice)
+                .doOnSubscribe { mView?.showProgressBar() }
+                .doOnUnsubscribe { mView?.hideProgressBar() }
+                .subscribe({
+                    mView?.showSnackbar("${it.name} が作成されました")
+                    getBoxes()
+                }, {
+                    mView?.showToast(it.message)
                 })
-
-                t?.let {
-                    selectBox(it)
-                }
-            }
-
-            override fun onCompleted() {
-                mView?.hideProgressBar()
-            }
-
-            override fun onError(e: Throwable?) {
-                mView?.hideProgressBar()
-            }
-        }, name, notice)
     }
 
     override fun showFood() {
@@ -173,23 +147,23 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     override fun selectBox(box: Box) {
         mBox = box
 
-        mFoods = mApiRepository.getFoods(box, object : ApiRepositoryCallback<List<Food>> {
-            override fun onNext(t: List<Food>?) {
-                mFoods = t
-                mView?.setFoods(box.name, t)
-                mView?.setEmptyMessage(t)
-            }
+        mApiRepository.getFoodsInBoxFromCache(box.id)
+                .subscribe({
+                    mFoods = it
+                    mView?.setFoods(box.name, it)
+                    mView?.setEmptyMessage(it)
+                }, {
+                    mView?.showToast(it.message)
+                })
 
-            override fun onCompleted() {}
-
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
-            }
-        })
-
-        mView?.setFoods(box.name, mFoods)
-        mView?.hideBottomNavigation()
-        mView?.setEmptyMessage(mFoods)
+        mApiRepository.getFoodsInBox(box.id)
+                .subscribe({
+                    mFoods = it
+                    mView?.setFoods(box.name, it)
+                    mView?.setEmptyMessage(it)
+                }, {
+                    mView?.showToast(it.message)
+                })
     }
 
     override fun selectFood(food: Food) {
@@ -214,21 +188,35 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     }
 
     override fun getExpiringFoods() {
-        mFoods = mApiRepository.getExpiringFoods(object : ApiRepositoryCallback<List<Food>> {
-            override fun onNext(t: List<Food>?) {
-                mFoods = t
-                mView?.setFoods("期限が1週間以内", mFoods)
-            }
-
-            override fun onCompleted() {}
-
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
-            }
-        })
-
         mBox = null
-        mView?.setFoods("期限が1週間以内", mFoods)
+
+        mApiRepository.getExpiringFoodsFromCache()
+                .subscribe({
+                    mFoods = it
+                    mView?.setFoods("期限が1週間以内", it)
+                }, {
+                    mView?.showToast(it.message)
+                })
+
+        mApiRepository.getExpiringFoods()
+                .subscribe({
+                    mFoods = it
+                    mView?.setFoods("期限が1週間以内", it)
+                }, {
+                    mView?.showToast(it.message)
+                })
+    }
+
+    override fun registerPushToken(userId: Int, token: String) {
+        mApiRepository.registerPushToken(userId, token)
+                .subscribe({
+                    mView?.savePushToken(token)
+                    mView?.showToast(token)
+                }, {
+                    if (it is HttpException && it.code() == 401) {
+                        mView?.signOut()
+                    }
+                })
     }
 
     override fun deleteLocalData() {

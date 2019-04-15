@@ -4,7 +4,6 @@ import com.refrii.client.data.api.models.Box
 import com.refrii.client.data.api.models.Food
 import com.refrii.client.data.api.models.Unit
 import com.refrii.client.data.api.source.ApiRepository
-import com.refrii.client.data.api.source.ApiRepositoryCallback
 import java.util.*
 import javax.inject.Inject
 
@@ -24,59 +23,53 @@ constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Present
     override fun createFood(name: String, notice: String, amount: Double, unit: Unit?, expirationDate: Date) {
         unit ?: return
 
-        mBox?.let {
-            mView?.showProgressBar()
-
-            mApiRepository.createFood(name, notice, amount, it, unit, expirationDate, object : ApiRepositoryCallback<Food> {
-                override fun onNext(t: Food?) {
-                    mFood = t
-                }
-
-                override fun onCompleted() {
-                    mView?.hideProgressBar()
-                    mView?.createCompleted(mFood)
-                }
-
-                override fun onError(e: Throwable?) {
-                    mView?.hideProgressBar()
-                    mView?.showToast(e?.message)
-                }
-            })
+        mBox?.let { box ->
+            mApiRepository.createFood(name, notice, amount, box, unit, expirationDate)
+                    .doOnSubscribe { mView?.showProgressBar() }
+                    .doOnUnsubscribe { mView?.hideProgressBar() }
+                    .subscribe({
+                        mFood = it
+                        mView?.createCompleted(mFood)
+                    }, {
+                        mView?.showToast(it.message)
+                    })
         }
     }
 
     override fun getUnits(boxId: Int) {
-        mUnits = mApiRepository.getUnitsForBox(boxId, object : ApiRepositoryCallback<List<Unit>> {
-            override fun onNext(t: List<Unit>?) {
-                mUnits = t
-                mView?.setUnits(t)
-            }
+        mApiRepository.getUnitsForBoxFromCache(boxId)
+                .subscribe({
+                    mUnits = it
+                    mView?.setUnits(it)
+                }, {
+                    mView?.showToast(it.message)
+                })
 
-            override fun onCompleted() {}
-
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
-            }
-        })
-
-        mView?.setUnits(mUnits)
+        mApiRepository.getUnitsForBox(boxId)
+                .subscribe({
+                    mUnits = it
+                    mView?.setUnits(it)
+                }, {
+                    mView?.showToast(it.message)
+                })
     }
 
     override fun getBox(id: Int) {
-        mBox = mApiRepository.getBox(id, object : ApiRepositoryCallback<Box> {
-            override fun onNext(t: Box?) {
-                mBox = t
-                mView?.setBox(t)
-            }
+        mApiRepository.getBoxFromCache(id)
+                .subscribe({
+                    mBox = it
+                    mView?.setBox(it)
+                }, {
+                    mView?.showToast(it.message)
+                })
 
-            override fun onCompleted() {}
-
-            override fun onError(e: Throwable?) {
-                mView?.showToast(e?.message)
-            }
-        })
-
-        mView?.setBox(mBox)
+        mApiRepository.getBox(id)
+                .subscribe({
+                    mBox = it
+                    mView?.setBox(it)
+                }, {
+                    mView?.showToast(it.message)
+                })
     }
 
     override fun pickUnit(label: String): Unit? {

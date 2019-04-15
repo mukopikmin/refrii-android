@@ -94,7 +94,8 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
         mProgressBar.visibility = View.GONE
     }
 
-    override fun showToast(message: String) {
+    override fun showToast(message: String?) {
+        message ?: return
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 }

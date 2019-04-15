@@ -6,7 +6,7 @@ import com.refrii.client.data.api.source.local.ApiLocalDataSource
 import com.refrii.client.data.api.source.remote.ApiRemoteDataSource
 import io.realm.Realm
 import retrofit2.Retrofit
-import rx.Subscriber
+import rx.Observable
 import java.util.*
 
 class ApiRepository(realm: Realm, retrofit: Retrofit) {
@@ -14,376 +14,133 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
     private val mApiRemoteDataSource = ApiRemoteDataSource(retrofit)
     private val mApiLocalDataSource = ApiLocalDataSource(realm)
 
-    fun verify(callback: ApiRepositoryCallback<User>) {
-        mApiRemoteDataSource.verify()
-                .subscribe(object : Subscriber<User>() {
-                    override fun onNext(t: User) {
-                        mApiLocalDataSource.saveUser(t)
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        callback.onError(e)
-                    }
-                })
+    fun verify(): Observable<User> {
+        return mApiRemoteDataSource.verify()
+                .flatMap { mApiLocalDataSource.saveUser(it) }
     }
 
-    fun getBoxes(callback: ApiRepositoryCallback<List<Box>>): List<Box> {
-        mApiRemoteDataSource.getBoxes()
-                .subscribe(object : Subscriber<List<Box>>() {
-                    override fun onNext(t: List<Box>) {
-                        mApiLocalDataSource.saveBoxes(t)
-                        callback.onNext(mApiLocalDataSource.getBoxes())
-                    }
+    fun getBoxes(): Observable<List<Box>> {
+        return mApiRemoteDataSource.getBoxes()
+                .flatMap { mApiLocalDataSource.saveBoxes(it) }
+    }
 
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        callback.onError(e)
-                    }
-                })
-
+    fun getBoxesFromCache(): Observable<List<Box>> {
         return mApiLocalDataSource.getBoxes()
     }
 
-    fun getBox(id: Int, callback: ApiRepositoryCallback<Box>): Box? {
-        mApiRemoteDataSource.getBox(id)
-                .subscribe(object : Subscriber<Box>() {
-                    override fun onNext(t: Box) {
-                        mApiLocalDataSource.saveBox(t)
-                        callback.onNext(mApiLocalDataSource.getBox(id))
-                    }
+    fun getBox(id: Int): Observable<Box?> {
+        return mApiRemoteDataSource.getBox(id)
+                .flatMap { mApiLocalDataSource.saveBox(it) }
+    }
 
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        callback.onError(e)
-                    }
-                })
-
+    fun getBoxFromCache(id: Int): Observable<Box?> {
         return mApiLocalDataSource.getBox(id)
     }
 
-    fun createBox(callback: ApiRepositoryCallback<Box>, name: String, notice: String?) {
-        mApiRemoteDataSource.createBox(name, notice)
-                .subscribe(object : Subscriber<Box>() {
-                    override fun onNext(t: Box) {
-                        mApiLocalDataSource.saveBox(t)
-                        callback.onNext(mApiLocalDataSource.getBox(t.id))
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun createBox(name: String, notice: String?): Observable<Box> {
+        return mApiRemoteDataSource.createBox(name, notice)
+                .flatMap { mApiLocalDataSource.saveBox(it) }
     }
 
-    fun getUnitsForBox(id: Int, callback: ApiRepositoryCallback<List<Unit>>): List<Unit> {
-        mApiRemoteDataSource.getUnitsForBox(id)
-                .subscribe(object : Subscriber<List<Unit>>() {
-                    override fun onNext(t: List<Unit>) {
-                        mApiLocalDataSource.saveUnits(t)
-                        callback.onNext(mApiLocalDataSource.getUnitsForBox(id))
-                    }
+    fun getUnitsForBox(id: Int): Observable<List<Unit>> {
+        return mApiRemoteDataSource.getUnitsForBox(id)
+                .flatMap { mApiLocalDataSource.saveUnits(it) }
+    }
 
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
-
+    fun getUnitsForBoxFromCache(id: Int): Observable<List<Unit>> {
         return mApiLocalDataSource.getUnitsForBox(id)
     }
 
-    fun getFoods(box: Box, callback: ApiRepositoryCallback<List<Food>>): List<Food> {
-        mApiRemoteDataSource.getFoods()
-                .subscribe(object : Subscriber<List<Food>>() {
-                    override fun onNext(t: List<Food>) {
-                        mApiLocalDataSource.saveFoods(t)
-                        callback.onNext(mApiLocalDataSource.getFoodsInBox(box.id))
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
-
-        return mApiLocalDataSource.getFoodsInBox(box.id)
+    fun getFoods(): Observable<List<Food>> {
+        return mApiRemoteDataSource.getFoods()
+                .flatMap { mApiLocalDataSource.saveFoods(it) }
     }
 
-    fun updateBox(callback: ApiRepositoryCallback<Box>, id: Int, name: String?, notice: String?) {
-        mApiRemoteDataSource.updateBox(id, name, notice)
-                .subscribe(object : Subscriber<Box>() {
-                    override fun onNext(t: Box) {
-                        mApiLocalDataSource.saveBox(t)
-                        callback.onNext(mApiLocalDataSource.getBox(t.id))
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun getFoodsInBox(id: Int): Observable<List<Food>> {
+        return mApiRemoteDataSource.getFoodsInBox(id)
+                .flatMap { mApiLocalDataSource.saveFoods(it) }
     }
 
-    fun removeBox(callback: ApiRepositoryCallback<Void>, id: Int) {
-        mApiRemoteDataSource.removeBox(id)
-                .subscribe(object : Subscriber<Void>() {
-                    override fun onNext(t: Void?) {
-                        mApiLocalDataSource.removeBox(id)
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun getFoodsInBoxFromCache(id: Int): Observable<List<Food>> {
+        return mApiLocalDataSource.getFoodsInBox(id)
     }
 
-    fun invite(callback: ApiRepositoryCallback<Invitation>, boxId: Int, email: String) {
-        mApiRemoteDataSource.invite(boxId, email)
-                .subscribe(object : Subscriber<Invitation>() {
-                    override fun onNext(t: Invitation?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun getFoodsFromCache(): Observable<List<Food>> {
+        return mApiLocalDataSource.getFoods()
     }
 
-    fun uninvite(callback: ApiRepositoryCallback<Void>, boxId: Int, email: String) {
-        mApiRemoteDataSource.uninvite(boxId, email)
-                .subscribe(object : Subscriber<Void>() {
-                    override fun onNext(t: Void?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun updateBox(id: Int, name: String?, notice: String?): Observable<Box> {
+        return mApiRemoteDataSource.updateBox(id, name, notice)
+                .flatMap { mApiLocalDataSource.saveBox(it) }
     }
 
-    fun getFood(id: Int, callback: ApiRepositoryCallback<Food>): Food? {
-        mApiRemoteDataSource.getFood(id)
-                .subscribe(object : Subscriber<Food>() {
-                    override fun onNext(t: Food) {
-                        mApiLocalDataSource.saveFood(t)
-                        callback.onNext(mApiLocalDataSource.getFood(id))
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
-
-        return mApiLocalDataSource.getFood(id)
+    fun removeBox(id: Int): Observable<Void> {
+        return mApiRemoteDataSource.removeBox(id)
+                .flatMap { mApiLocalDataSource.removeBox(id) }
     }
 
-    fun getExpiringFoods(callback: ApiRepositoryCallback<List<Food>>): List<Food> {
-        mApiRemoteDataSource.getFoods()
-                .subscribe(object : Subscriber<List<Food>>() {
-                    override fun onNext(t: List<Food>) {
-                        mApiLocalDataSource.saveFoods(t)
-                        callback.onNext(mApiLocalDataSource.getExpiringFoods())
-                    }
+    fun invite(boxId: Int, email: String): Observable<Invitation> {
+        return mApiRemoteDataSource.invite(boxId, email)
+    }
 
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
+    fun uninvite(boxId: Int, email: String): Observable<Void> {
+        return mApiRemoteDataSource.uninvite(boxId, email)
+    }
 
-                    override fun onError(e: Throwable) {
-                        callback.onError(e)
-                    }
-                })
+    fun getFood(id: Int): Observable<Food?> {
+        return mApiRemoteDataSource.getFood(id)
+                .flatMap { mApiLocalDataSource.saveFood(it) }
+    }
 
+    fun getExpiringFoods(): Observable<List<Food>> {
+        return mApiRemoteDataSource.getFoods()
+                .flatMap { mApiLocalDataSource.saveFoods(it) }
+    }
+
+    fun getExpiringFoodsFromCache(): Observable<List<Food>> {
         return mApiLocalDataSource.getExpiringFoods()
     }
 
-    fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date, callback: ApiRepositoryCallback<Food>) {
-        mApiRemoteDataSource.createFood(name, notice, amount, box, unit, expirationDate)
-                .subscribe(object : Subscriber<Food>() {
-                    override fun onNext(t: Food) {
-                        mApiLocalDataSource.saveFood(t)
-                        callback.onNext(mApiLocalDataSource.getFood(t.id))
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Observable<Food> {
+        return mApiRemoteDataSource.createFood(name, notice, amount, box, unit, expirationDate)
+                .flatMap { mApiLocalDataSource.saveFood(it) }
     }
 
-    fun updateFood(callback: ApiRepositoryCallback<Food>, id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?) {
-        mApiRemoteDataSource.updateFood(id, name, notice, amount, expirationDate, boxId, unitId)
-                .subscribe(object : Subscriber<Food>() {
-                    override fun onNext(t: Food) {
-                        mApiLocalDataSource.updateFood(t.id, t.name, t.notice, t.amount, t.expirationDate, t.box?.id, t.unit?.id)
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        callback.onError(e)
-                    }
-                })
+    fun updateFood(id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
+        return mApiRemoteDataSource.updateFood(id, name, notice, amount, expirationDate, boxId, unitId)
+                .flatMap { mApiLocalDataSource.updateFood(it.id, it.name, it.notice, it.amount, it.expirationDate, it.box?.id, it.unit?.id) }
     }
 
-    fun removeFood(id: Int, callback: ApiRepositoryCallback<Void>) {
-        mApiRemoteDataSource.removeFood(id)
-                .subscribe(object : Subscriber<Void>() {
-                    override fun onNext(t: Void?) {
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun removeFood(id: Int): Observable<Void> {
+        return mApiRemoteDataSource.removeFood(id)
     }
 
-    fun getUnits(userId: Int, callback: ApiRepositoryCallback<List<Unit>>): List<Unit> {
-        mApiRemoteDataSource.getUnits()
-                .subscribe(object : Subscriber<List<Unit>>() {
-                    override fun onNext(t: List<Unit>) {
-                        mApiLocalDataSource.saveUnits(t)
-                        callback.onNext(mApiLocalDataSource.getUnits(userId))
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
-
-        return mApiLocalDataSource.getUnits(userId)
+    fun getUnits(userId: Int): Observable<List<Unit>> {
+        return mApiRemoteDataSource.getUnits()
+                .flatMap { mApiLocalDataSource.saveUnits(it) }
     }
 
-    fun getUnit(id: Int, callback: ApiRepositoryCallback<Unit>): Unit? {
-        mApiRemoteDataSource.getUnit(id)
-                .subscribe(object : Subscriber<Unit>() {
-                    override fun onNext(t: Unit) {
-                        mApiLocalDataSource.saveUnit(t)
-                        callback.onNext(t)
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
-
-        return mApiLocalDataSource.getUnit(id)
+    fun getUnit(id: Int): Observable<Unit?> {
+        return mApiRemoteDataSource.getUnit(id)
+                .flatMap { mApiLocalDataSource.saveUnit(it) }
     }
 
-    fun createUnit(label: String, step: Double, callback: ApiRepositoryCallback<Unit>) {
-        mApiRemoteDataSource.createUnit(label, step)
-                .subscribe(object : Subscriber<Unit>() {
-                    override fun onNext(t: Unit) {
-                        mApiLocalDataSource.saveUnit(t)
-                        callback.onNext(mApiLocalDataSource.getUnit(t.id))
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun createUnit(label: String, step: Double): Observable<Unit> {
+        return mApiRemoteDataSource.createUnit(label, step)
+                .flatMap { mApiLocalDataSource.saveUnit(it) }
     }
 
-    fun updateUnit(unit: Unit, callback: ApiRepositoryCallback<Unit>) {
-        mApiRemoteDataSource.updateUnit(unit)
-                .subscribe(object : Subscriber<Unit>() {
-                    override fun onNext(t: Unit) {
-                        mApiLocalDataSource.saveUnit(t)
-                        callback.onNext(mApiLocalDataSource.getUnit(unit.id))
-                    }
-
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun updateUnit(unit: Unit): Observable<Unit> {
+        return mApiRemoteDataSource.updateUnit(unit)
+                .flatMap { mApiLocalDataSource.saveUnit(it) }
     }
 
-    fun removeUnit(id: Int, callback: ApiRepositoryCallback<Void>) {
-        mApiRemoteDataSource.removeUnit(id)
-                .subscribe(object : Subscriber<Void>() {
-                    override fun onNext(t: Void?) {
-                        callback.onNext(t)
-                    }
+    fun removeUnit(id: Int): Observable<Void> {
+        return mApiRemoteDataSource.removeUnit(id)
+    }
 
-                    override fun onCompleted() {
-                        callback.onCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        callback.onError(e)
-                    }
-                })
+    fun registerPushToken(id: Int, token: String?): Observable<User> {
+        return mApiRemoteDataSource.registerPushToken(id, token)
     }
 
     fun deleteLocalData() {

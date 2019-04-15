@@ -64,4 +64,8 @@
     <string name="title_activity_new_box">NewBoxActivity</string>
     <string name="message_add_box_completed">カテゴリが追加されました</string>
     <string name="message_share_box">共有する</string>
+    <string name="notification_channel_id_push">com.refrii.client.notification.push</string>
+    <string name="notification_channel_name_push">Push Notification</string>
+    <string name="notification_topic_push">mytopic</string>
+    <string name="preference_key_push_token">preference_key_push_token</string>
 </resources>

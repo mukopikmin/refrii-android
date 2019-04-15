@@ -201,4 +201,16 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+    fun registerPushToken(id: Int, token: String?): Observable<User> {
+        val builder = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+        token?.let { builder.addFormDataPart("token", token) }
+
+        return mRetrofit.create(UserService::class.java)
+                .registerPushToken(id, builder.build())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }

@@ -54,14 +54,17 @@ class AppModule(private var mApplication: Application) {
         return FoodListPresenter(apiRepository)
     }
 
+    @Provides
     fun provideFoodPresenter(apiRepository: ApiRepository): FoodContract.Presenter {
         return FoodPresenter(apiRepository)
     }
 
+    @Provides
     fun provideNewFoodPresenter(apiRepository: ApiRepository): NewFoodContract.Presenter {
         return NewFoodPresenter(apiRepository)
     }
 
+    @Provides
     fun provideBoxInfoPresenter(apiRepository: ApiRepository): BoxInfoContract.Presenter {
         return BoxInfoPresenter(apiRepository)
     }

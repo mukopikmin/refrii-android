@@ -7,7 +7,7 @@ interface NewUnitContract {
     interface View {
         fun showProgressBar()
         fun hideProgressBar()
-        fun showToast(message: String)
+        fun showToast(message: String?)
         fun onCreateCompleted(unit: Unit?)
     }
 
