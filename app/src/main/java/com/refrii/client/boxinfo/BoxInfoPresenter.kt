@@ -1,8 +1,10 @@
 package com.refrii.client.boxinfo
 
 import com.refrii.client.data.api.models.Box
+import com.refrii.client.data.api.models.Invitation
 import com.refrii.client.data.api.models.User
 import com.refrii.client.data.api.source.ApiRepository
+import rx.Subscriber
 import javax.inject.Inject
 
 class BoxInfoPresenter
@@ -20,15 +22,23 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
         mView = view
     }
 
+    fun setBox(box: Box?) {
+        mBox = box
+        mId = box?.id
+        mName = box?.name
+        mNotice = box?.notice
+
+        mView?.setBox(box)
+    }
+
+    fun setUser(user: User?) {
+        mUser = user
+    }
+
     override fun getBox(id: Int) {
         mApiRepository.getBoxFromCache(id)
-                .doOnSubscribe { mView?.onLoading() }
-                .doOnUnsubscribe { mView?.onLoaded() }
                 .subscribe({
-                    mId = it?.id
-                    mName = it?.name
-                    mNotice = it?.notice
-                    mView?.setBox(it)
+                    setBox(it)
                 }, {
                     mView?.showToast(it.message)
                 })
@@ -37,10 +47,7 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
                 .doOnSubscribe { mView?.onLoading() }
                 .doOnUnsubscribe { mView?.onLoaded() }
                 .subscribe({
-                    mId = it?.id
-                    mName = it?.name
-                    mNotice = it?.notice
-                    mView?.setBox(it)
+                    setBox(it)
                 }, {
                     mView?.showToast(it.message)
                 })
@@ -66,10 +73,16 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
             mApiRepository.removeBox(id)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe({
-                        mView?.onDeleteCompleted(mName)
-                    }, {
-                        mView?.showToast(it.message)
+                    .subscribe(object : Subscriber<Void>() {
+                        override fun onNext(t: Void?) {}
+
+                        override fun onCompleted() {
+                            mView?.onDeleteCompleted(mName)
+                        }
+
+                        override fun onError(e: Throwable?) {
+                            mView?.showToast(e?.message)
+                        }
                     })
         }
     }
@@ -79,13 +92,19 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
             mApiRepository.invite(id, email)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe({
-                        val name = it.user?.name
+                    .subscribe(object : Subscriber<Invitation>() {
+                        override fun onNext(t: Invitation?) {
+                            val name = t?.user?.name
 
-                        mView?.setSharedUsers(it.box?.invitedUsers)
-                        mView?.showSnackbar("$name と共有しました")
-                    }, {
-                        mView?.showToast(it.message)
+                            mView?.setSharedUsers(t?.box?.invitedUsers)
+                            mView?.showSnackbar("$name と共有しました")
+                        }
+
+                        override fun onCompleted() {}
+
+                        override fun onError(e: Throwable?) {
+                            mView?.showToast(e?.message)
+                        }
                     })
         }
     }
@@ -94,14 +113,20 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
         val email = mUser?.email ?: return
 
         mId?.let { id ->
-            mApiRepository.invite(id, email)
+            mApiRepository.uninvite(id, email)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe({
-                        mView?.showSnackbar("共有を解除しました")
-                        getBox(id)
-                    }, {
-                        mView?.showToast(it.message)
+                    .subscribe(object : Subscriber<Void>() {
+                        override fun onNext(t: Void?) {}
+
+                        override fun onCompleted() {
+                            mView?.showSnackbar("共有を解除しました")
+                            getBox(id)
+                        }
+
+                        override fun onError(e: Throwable?) {
+                            mView?.showToast(e?.message)
+                        }
                     })
         }
     }
