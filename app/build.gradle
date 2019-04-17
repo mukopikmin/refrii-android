@@ -105,6 +105,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0'
     testImplementation 'org.mockito:mockito-inline:2.13.0'
+//    testImplementation 'org.mockito:mockito-core:2.13.0'
 //    testImplementation 'org.mockito:mockito-android:2.22.0'
 
 //    testImplementation "org.powermock:powermock-module-junit4:$powerMockVersion"

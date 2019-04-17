@@ -1,80 +1,135 @@
 package com.refrii.client
 
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.*
 import com.refrii.client.boxinfo.BoxInfoContract
 import com.refrii.client.boxinfo.BoxInfoPresenter
 import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.User
+import com.refrii.client.data.api.models.Invitation
 import com.refrii.client.data.api.source.ApiRepository
-import com.refrii.client.data.api.source.ApiRepositoryCallback
-import com.refrii.client.di.DaggerAppComponent
-import com.refrii.client.di.TestAppModule
-import com.refrii.client.di.DaggerTestAppComponent
-import com.refrii.client.foodlist.FoodListPresenter
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-
-import org.junit.Assert.*
 import org.mockito.junit.MockitoJUnit
 import org.mockito.junit.MockitoRule
-import org.junit.Rule
-import org.junit.Before
-import org.mockito.*
-import javax.inject.Inject
+import rx.Observable
 
 class BoxInfoPresenterTest {
 
     @Rule
     @JvmField
-    val mockito = MockitoJUnit.rule()
+    val mockito: MockitoRule = MockitoJUnit.rule()
 
-//    @InjectMocks
-//    lateinit var apiRepository: ApiRepository
+    private val viewMock = mock<BoxInfoContract.View> {
+        on { onLoading() } doAnswer {}
+        on { onLoaded() } doAnswer {}
+        on { setBox(any()) } doAnswer {}
+        on { setSharedUsers(any()) } doAnswer {}
+    }
+    private val apiRepositoryMock = mock<ApiRepository> {
+        on { getBoxFromCache(any()) } doReturn Observable.just(Box())
+        on { getBox(any()) } doReturn Observable.just(Box())
+        on { updateBox(any(), any(), any()) } doReturn Observable.just(Box())
+        on { removeBox(any()) } doReturn Observable.empty()
+        on { invite(any(), any()) } doReturn Observable.just(Invitation())
+        on { uninvite(any(), any()) } doReturn Observable.empty()
+    }
 
-    @Mock
-    lateinit var view: BoxInfoContract.View
-
-//    @Mock
-//    lateinit var mBox: Box
-
-    @Captor
-    lateinit var callbackCaptor: ArgumentCaptor<ApiRepositoryCallback<Box>>
-
-    @Inject
-    lateinit var presenter: BoxInfoPresenter
-
-    @Inject
-    lateinit var apiRepository: ApiRepository
+    private lateinit var presenter: BoxInfoPresenter
 
     @Before
     fun setUp() {
-//        MockitoAnnotations.initMocks(this)
-//        presenter = BoxInfoPresenter(apiRepository)
-        presenter.takeView(view)
-//        mBox = Box()
-
-        val appComponent = DaggerTestComponent.builder()
-                .appModule(TestAppModule())
-                .build()
+        presenter = BoxInfoPresenter(apiRepositoryMock)
+        presenter.takeView(viewMock)
     }
 
     @Test
-    @Throws(Exception::class)
+    fun takeView() {
+
+    }
+
+    @Test
     fun getBox_withCache() {
-        val dummyBox = Box()
+        presenter.getBox(any())
 
-        presenter.getBox(1)
+        verify(viewMock, times(1)).onLoading()
+        verify(viewMock, times(1)).onLoaded()
+        verify(viewMock, times(2)).setBox(any())
+    }
 
-        verify(view, times(1)).setBox(dummyBox)
+    @Test
+    fun updateBox() {
+        val box = Box()
+
+        box.id = 1
+        box.name = "name"
+        box.notice = "notice"
+
+        presenter.setBox(box)
+        presenter.updateBox()
+
+        verify(viewMock, times(1)).onLoading()
+        verify(viewMock, times(1)).onLoaded()
+        verify(viewMock, times(2)).setBox(any())
+        verify(viewMock, times(1)).showSnackbar(any())
+    }
+
+    @Test
+    fun removeBox() {
+        val box = Box()
+
+        box.id = 1
+        box.name = "name"
+        box.notice = "notice"
+
+        presenter.setBox(box)
+        presenter.removeBox()
+
+        verify(viewMock, times(1)).onLoading()
+        verify(viewMock, times(1)).onLoaded()
+//        verify(viewMock, times(1)).onDeleteCompleted(any())
+    }
+
+    @Test
+    fun invite() {
+        val box = Box()
+        val email = "test@test.com"
+
+        box.id = 1
+        box.name = "name"
+        box.notice = "notice"
+
+        presenter.setBox(box)
+        presenter.invite(email)
+
+        verify(viewMock, times(1)).onLoading()
+        verify(viewMock, times(1)).onLoaded()
+        verify(viewMock, times(1)).showSnackbar(any())
+//        verify(viewMock, times(1)).setSharedUsers(any())
     }
 
 //    @Test
-//    @Throws(Exception::class)
-//    fun showInvitationDialog() {
-//        val users = emptyList<User>()
+//    fun uninvite() {
+//        val box = Box()
+//        val user = User()
 //
-//        presenter.showInviteUserDialog()
+//        user.email = "test@test.com"
+//        box.id = 1
+//        box.name = "name"
+//        box.notice = "notice"
 //
-//        verify(view, times(1)).showInviteUserDialog()
+//        presenter.setBox(box)
+//        presenter.uninvite()
+//
+//        verify(viewMock, times(1)).onLoading()
+//        verify(viewMock, times(1)).onLoaded()
+//        verify(viewMock, times(1)).showSnackbar(any())
+////        verify(viewMock, times(1)).setSharedUsers(any())
 //    }
+
+    @Test
+    fun showInviteUserDialog() {
+        presenter.showInviteUserDialog()
+
+        verify(viewMock, times(1)).showInviteUserDialog(any())
+    }
 }

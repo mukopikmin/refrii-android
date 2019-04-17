@@ -20,15 +20,17 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
         mView = view
     }
 
+    fun setBox(box: Box?) {
+        mId = box?.id
+        mName = box?.name
+        mNotice = box?.notice
+        mView?.setBox(box)
+    }
+
     override fun getBox(id: Int) {
         mApiRepository.getBoxFromCache(id)
-                .doOnSubscribe { mView?.onLoading() }
-                .doOnUnsubscribe { mView?.onLoaded() }
                 .subscribe({
-                    mId = it?.id
-                    mName = it?.name
-                    mNotice = it?.notice
-                    mView?.setBox(it)
+                    setBox(it)
                 }, {
                     mView?.showToast(it.message)
                 })
@@ -37,10 +39,7 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
                 .doOnSubscribe { mView?.onLoading() }
                 .doOnUnsubscribe { mView?.onLoaded() }
                 .subscribe({
-                    mId = it?.id
-                    mName = it?.name
-                    mNotice = it?.notice
-                    mView?.setBox(it)
+                    setBox(it)
                 }, {
                     mView?.showToast(it.message)
                 })
@@ -94,7 +93,7 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
         val email = mUser?.email ?: return
 
         mId?.let { id ->
-            mApiRepository.invite(id, email)
+            mApiRepository.uninvite(id, email)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
                     .subscribe({
