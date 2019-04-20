@@ -19,7 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.refrii.client.App
 import com.refrii.client.R
-import com.refrii.client.data.api.models.Unit
+import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.OptionsPickerDialogFragment
 import com.refrii.client.newunit.NewUnitActivity
 import com.refrii.client.unit.UnitActivity

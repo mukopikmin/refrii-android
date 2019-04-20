@@ -1,6 +1,6 @@
 package com.refrii.client.newunit
 
-import com.refrii.client.data.api.models.Unit
+import com.refrii.client.data.models.Unit
 
 interface NewUnitContract {
 

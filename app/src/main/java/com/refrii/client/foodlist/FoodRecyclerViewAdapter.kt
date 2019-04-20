@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.refrii.client.R
-import com.refrii.client.data.api.models.Food
+import com.refrii.client.data.models.Food
 import java.text.SimpleDateFormat
 import java.util.*
 

@@ -3,10 +3,10 @@ package com.refrii.client
 import com.nhaarman.mockitokotlin2.*
 import com.refrii.client.boxinfo.BoxInfoContract
 import com.refrii.client.boxinfo.BoxInfoPresenter
-import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.Invitation
-import com.refrii.client.data.api.models.User
-import com.refrii.client.data.api.source.ApiRepository
+import com.refrii.client.data.models.Box
+import com.refrii.client.data.models.Invitation
+import com.refrii.client.data.models.User
+import com.refrii.client.data.source.ApiRepository
 import com.refrii.client.helpers.MockitoHelper
 import org.junit.Before
 import org.junit.Rule

@@ -1,6 +1,6 @@
 package com.refrii.client.signin
 
-import com.refrii.client.data.api.source.ApiRepository
+import com.refrii.client.data.source.ApiRepository
 import javax.inject.Inject
 
 class SigninPresenter

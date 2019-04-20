@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.refrii.client.App
 import com.refrii.client.R
-import com.refrii.client.data.api.models.User
+import com.refrii.client.data.models.User
 import javax.inject.Inject
 
 class SignInActivity : AppCompatActivity(), SigninContract.View {

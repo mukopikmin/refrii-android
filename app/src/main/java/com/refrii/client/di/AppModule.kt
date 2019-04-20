@@ -9,7 +9,7 @@ import com.refrii.client.BuildConfig
 import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoContract
 import com.refrii.client.boxinfo.BoxInfoPresenter
-import com.refrii.client.data.api.source.ApiRepository
+import com.refrii.client.data.source.ApiRepository
 import com.refrii.client.food.FoodContract
 import com.refrii.client.food.FoodPresenter
 import com.refrii.client.foodlist.FoodListContract

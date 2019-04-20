@@ -1,7 +1,7 @@
 package com.refrii.client.food
 
-import com.refrii.client.data.api.models.Food
-import com.refrii.client.data.api.models.Unit
+import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.Unit
 import java.util.*
 
 interface FoodContract {

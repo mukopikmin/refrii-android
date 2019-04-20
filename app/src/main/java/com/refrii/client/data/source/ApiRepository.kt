@@ -1,9 +1,9 @@
-package com.refrii.client.data.api.source
+package com.refrii.client.data.source
 
-import com.refrii.client.data.api.models.*
-import com.refrii.client.data.api.models.Unit
-import com.refrii.client.data.api.source.local.ApiLocalDataSource
-import com.refrii.client.data.api.source.remote.ApiRemoteDataSource
+import com.refrii.client.data.models.*
+import com.refrii.client.data.models.Unit
+import com.refrii.client.data.source.local.ApiLocalDataSource
+import com.refrii.client.data.source.remote.ApiRemoteDataSource
 import io.realm.Realm
 import retrofit2.Retrofit
 import rx.Observable

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.refrii.client.R
-import com.refrii.client.data.api.models.User
+import com.refrii.client.data.models.User
 
 class SharedUserRecyclerViewAdapter(private var mUsers: List<User>) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
 

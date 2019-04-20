@@ -1,4 +1,4 @@
-package com.refrii.client.data.api.source
+package com.refrii.client.data.source
 
 interface ApiRepositoryCallback<in T> {
     fun onNext(t: T?)

@@ -1,6 +1,6 @@
-package com.refrii.client.data.api.source.remote.services
+package com.refrii.client.data.source.remote.services
 
-import com.refrii.client.data.api.models.User
+import com.refrii.client.data.models.User
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET

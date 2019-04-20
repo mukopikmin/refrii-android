@@ -1,4 +1,4 @@
-package com.refrii.client.data.api.source.local
+package com.refrii.client.data.source.local
 
 interface LocalCallback {
     fun <T> onSuccess(t: T)

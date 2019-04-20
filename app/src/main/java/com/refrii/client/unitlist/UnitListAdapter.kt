@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.refrii.client.R
-import com.refrii.client.data.api.models.Unit
+import com.refrii.client.data.models.Unit
 
 class UnitListAdapter(
         context: Context,

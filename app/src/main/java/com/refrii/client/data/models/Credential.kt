@@ -1,4 +1,4 @@
-package com.refrii.client.data.api.models
+package com.refrii.client.data.models
 
 import java.util.*
 

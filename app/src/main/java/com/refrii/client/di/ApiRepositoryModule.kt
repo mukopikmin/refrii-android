@@ -1,6 +1,6 @@
 package com.refrii.client.di
 
-import com.refrii.client.data.api.source.ApiRepository
+import com.refrii.client.data.source.ApiRepository
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm

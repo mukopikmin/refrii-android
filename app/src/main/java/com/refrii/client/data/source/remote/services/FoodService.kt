@@ -1,6 +1,6 @@
-package com.refrii.client.data.api.source.remote.services
+package com.refrii.client.data.source.remote.services
 
-import com.refrii.client.data.api.models.Food
+import com.refrii.client.data.models.Food
 import okhttp3.RequestBody
 import retrofit2.http.*
 import rx.Observable

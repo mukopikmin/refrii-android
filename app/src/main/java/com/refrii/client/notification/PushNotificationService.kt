@@ -14,7 +14,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.refrii.client.App
 import com.refrii.client.R
-import com.refrii.client.data.api.source.ApiRepository
+import com.refrii.client.data.source.ApiRepository
 import com.refrii.client.foodlist.FoodListActivity
 import javax.inject.Inject
 

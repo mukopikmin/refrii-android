@@ -11,7 +11,7 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.refrii.client.R
-import com.refrii.client.data.api.models.User
+import com.refrii.client.data.models.User
 import com.refrii.client.dialogs.adapters.UserListAdapter
 
 class UserPickerDialogFragment : DialogFragment() {

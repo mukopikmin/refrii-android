@@ -1,6 +1,6 @@
 package com.refrii.client.signin
 
-import com.refrii.client.data.api.models.User
+import com.refrii.client.data.models.User
 
 interface SigninContract {
 

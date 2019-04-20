@@ -21,8 +21,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.refrii.client.App
 import com.refrii.client.R
-import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.User
+import com.refrii.client.data.models.Box
+import com.refrii.client.data.models.User
 import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.InviteUserDialogFragment
 import java.text.SimpleDateFormat

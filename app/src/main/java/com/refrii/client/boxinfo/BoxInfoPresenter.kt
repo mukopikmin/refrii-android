@@ -1,9 +1,9 @@
 package com.refrii.client.boxinfo
 
-import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.Invitation
-import com.refrii.client.data.api.models.User
-import com.refrii.client.data.api.source.ApiRepository
+import com.refrii.client.data.models.Box
+import com.refrii.client.data.models.Invitation
+import com.refrii.client.data.models.User
+import com.refrii.client.data.source.ApiRepository
 import rx.Subscriber
 import javax.inject.Inject
 

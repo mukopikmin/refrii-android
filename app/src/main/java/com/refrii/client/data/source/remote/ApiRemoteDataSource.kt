@@ -1,11 +1,11 @@
-package com.refrii.client.data.api.source.remote
+package com.refrii.client.data.source.remote
 
-import com.refrii.client.data.api.models.*
-import com.refrii.client.data.api.models.Unit
-import com.refrii.client.data.api.source.remote.services.BoxService
-import com.refrii.client.data.api.source.remote.services.FoodService
-import com.refrii.client.data.api.source.remote.services.UnitService
-import com.refrii.client.data.api.source.remote.services.UserService
+import com.refrii.client.data.models.*
+import com.refrii.client.data.models.Unit
+import com.refrii.client.data.source.remote.services.BoxService
+import com.refrii.client.data.source.remote.services.FoodService
+import com.refrii.client.data.source.remote.services.UnitService
+import com.refrii.client.data.source.remote.services.UserService
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import rx.Observable

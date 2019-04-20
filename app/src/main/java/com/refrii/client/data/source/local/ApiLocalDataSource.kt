@@ -1,9 +1,9 @@
-package com.refrii.client.data.api.source.local
+package com.refrii.client.data.source.local
 
-import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.Food
-import com.refrii.client.data.api.models.Unit
-import com.refrii.client.data.api.models.User
+import com.refrii.client.data.models.Box
+import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.Unit
+import com.refrii.client.data.models.User
 import io.realm.Realm
 import io.realm.kotlin.oneOf
 import io.realm.kotlin.where

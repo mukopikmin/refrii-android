@@ -14,9 +14,9 @@ import butterknife.ButterKnife
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.refrii.client.App
 import com.refrii.client.R
-import com.refrii.client.data.api.models.Box
-import com.refrii.client.data.api.models.Food
-import com.refrii.client.data.api.models.Unit
+import com.refrii.client.data.models.Box
+import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
 import java.text.SimpleDateFormat
 import java.util.*

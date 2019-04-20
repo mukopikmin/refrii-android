@@ -1,4 +1,4 @@
-package com.refrii.client.data.api.models
+package com.refrii.client.data.models
 
 import io.realm.RealmList
 import io.realm.RealmObject

@@ -1,4 +1,4 @@
-package com.refrii.client.data.api.source.remote
+package com.refrii.client.data.source.remote
 
 interface RemoteCallback<in T> {
     fun onNext(t: T?)

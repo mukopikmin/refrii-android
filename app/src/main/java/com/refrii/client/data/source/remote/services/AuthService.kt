@@ -1,6 +1,6 @@
-package com.refrii.client.data.api.source.remote.services
+package com.refrii.client.data.source.remote.services
 
-import com.refrii.client.data.api.models.Credential
+import com.refrii.client.data.models.Credential
 import retrofit2.http.GET
 import retrofit2.http.QueryMap
 import rx.Observable
