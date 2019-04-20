@@ -6,6 +6,8 @@ tar -zxvf secretfiles.tar.gz
 mv temp/google-services.json app/
 mv temp/keystore.jks .
 
+./gradlew test
+
 if [ "$TRAVIS_BRANCH" = "master" ]; then
   echo "Do nothing on master branch."
   exit 0;
