@@ -6,13 +6,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import com.refrii.client.R
 
-class ConfirmDialogFragment : DialogFragment() {
+class ConfirmDialogFragment : androidx.fragment.app.DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bundle = arguments

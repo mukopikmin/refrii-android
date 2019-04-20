@@ -8,7 +8,7 @@
     tools:context="com.refrii.client.boxinfo.BoxInfoActivity"
     tools:showIn="@layout/activity_box_info">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -181,7 +181,7 @@
             app:layout_constraintTop_toBottomOf="@+id/addSharedUserLayout"
             tools:layout_editor_absoluteX="0dp" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/sharedUsersLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -194,7 +194,7 @@
             app:layout_constraintStart_toEndOf="@+id/ownerIcon"
             app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/addSharedUserLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -232,7 +232,7 @@
                 app:layout_constraintStart_toEndOf="@+id/imageView11"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/textView11"
@@ -270,5 +270,5 @@
             app:layout_constraintTop_toBottomOf="@+id/include8"
             app:srcCompat="@drawable/ic_supervisor_account_black" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

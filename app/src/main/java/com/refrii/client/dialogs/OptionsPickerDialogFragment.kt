@@ -5,10 +5,9 @@ import android.app.Dialog
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 
-class OptionsPickerDialogFragment : DialogFragment() {
+class OptionsPickerDialogFragment : androidx.fragment.app.DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bundle = arguments

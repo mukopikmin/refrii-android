@@ -3,13 +3,6 @@ package com.refrii.client.boxinfo
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
@@ -19,8 +12,13 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.api.models.Box
@@ -40,7 +38,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     @BindView(R.id.ownerTextView)
     lateinit var mOwnerText: TextView
     @BindView(R.id.sharedUsersLayout)
-    lateinit var mSharedUsersRecycler: RecyclerView
+    lateinit var mSharedUsersRecycler: androidx.recyclerview.widget.RecyclerView
     @BindView(R.id.createdTextView)
     lateinit var mCreatedText: TextView
     @BindView(R.id.updatedTextView)
@@ -85,7 +83,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        mSharedUsersRecycler.layoutManager = LinearLayoutManager(this)
+        mSharedUsersRecycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         mNameEditText.addTextChangedListener(mNameTextWatcher)
         mNoticeEditText.addTextChangedListener(mNoticeTextWatcher)
         mFab.setOnClickListener { mPresenter.updateBox() }

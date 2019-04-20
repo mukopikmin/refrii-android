@@ -8,7 +8,7 @@
     tools:context="com.refrii.client.unit.UnitActivity"
     tools:showIn="@layout/activity_unit">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -166,5 +166,5 @@
             android:textColor="@android:color/black"
             app:layout_constraintLeft_toRightOf="@+id/imageView18"
             app:layout_constraintTop_toBottomOf="@+id/textView13" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -7,15 +7,14 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.support.v7.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import com.refrii.client.R
 
-class CreateBoxDialogFragment : DialogFragment() {
+class CreateBoxDialogFragment : androidx.fragment.app.DialogFragment() {
 
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

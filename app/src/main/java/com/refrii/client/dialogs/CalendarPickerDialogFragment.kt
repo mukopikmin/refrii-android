@@ -7,10 +7,9 @@ import android.app.Dialog
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import java.util.*
 
-class CalendarPickerDialogFragment : DialogFragment() {
+class CalendarPickerDialogFragment : androidx.fragment.app.DialogFragment() {
 
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

@@ -8,9 +8,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import com.refrii.client.R
 
 class EditTextDialogFragment : DialogFragment() {

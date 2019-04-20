@@ -1,12 +1,11 @@
 package com.refrii.client.foodlist
 
-import android.support.constraint.ConstraintLayout
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.refrii.client.R
 
-class FoodViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class FoodViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
     val constraintLayout: ConstraintLayout = view.findViewById(R.id.constraintLayout)
     val name: TextView = view.findViewById(R.id.nameFoodListTextView)
     val expirationDate: TextView = view.findViewById(R.id.expirationDateFoodListTextView)

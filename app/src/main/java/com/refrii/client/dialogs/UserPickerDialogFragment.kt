@@ -5,11 +5,11 @@ import android.app.Dialog
 import android.app.DialogFragment
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ListView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import com.refrii.client.R
 import com.refrii.client.data.api.models.User
 import com.refrii.client.dialogs.adapters.UserListAdapter

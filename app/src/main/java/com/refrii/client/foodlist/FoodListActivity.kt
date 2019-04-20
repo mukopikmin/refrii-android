@@ -12,14 +12,6 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
-import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.*
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -28,11 +20,19 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
@@ -60,11 +60,11 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     @BindView(R.id.fab)
     lateinit var mFab: FloatingActionButton
     @BindView(R.id.drawer_layout)
-    lateinit var mDrawer: DrawerLayout
+    lateinit var mDrawer: androidx.drawerlayout.widget.DrawerLayout
     @BindView(R.id.nav_view)
     lateinit var mNavigationView: NavigationView
     @BindView(R.id.recyclerView)
-    lateinit var mRecyclerView: RecyclerView
+    lateinit var mRecyclerView: androidx.recyclerview.widget.RecyclerView
     @BindView(R.id.progressBar)
     lateinit var mProgressBar: ProgressBar
     @BindView(R.id.emptyBoxMessageContainer)
@@ -113,8 +113,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         toggle.syncState()
         mNavigationView.setNavigationItemSelectedListener(this@FoodListActivity)
 
-        mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        mRecyclerView.addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
+        mRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         mFirebaseAuth = FirebaseAuth.getInstance()
         mPreference = PreferenceManager.getDefaultSharedPreferences(this)
 
