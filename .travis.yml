@@ -12,11 +12,6 @@ android:
     - 'android-sdk-preview-license-52d11cd2'
     - 'android-sdk-license-.+'
     - 'google-gdk-license-.+'
-branches:
-  only:
-    - master
-    - development
-    - staging
 before_install:
   - openssl aes-256-cbc -K $encrypted_4bcc15171aaf_key -iv $encrypted_4bcc15171aaf_iv -in secretfiles.tar.gz.enc -out secretfiles.tar.gz -d
 script:
