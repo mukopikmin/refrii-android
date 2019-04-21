@@ -4,6 +4,7 @@ import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.Unit
 import com.refrii.client.data.source.ApiRepository
+import rx.Subscriber
 import java.util.*
 import javax.inject.Inject
 
@@ -27,42 +28,81 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
         mView = view
     }
 
-    override fun getFood(id: Int) {
-        mApiRepository.getFood(id)
-                .subscribe({
-                    mFood = it
-                    mId = it?.id
-                    mName = it?.name
-                    mAmount = it?.amount
-                    mNotice = it?.notice
-                    mExpirationDate = it?.expirationDate
-                    mBoxId = it?.box?.id
-                    mUnitId = it?.unit?.id
+    fun setFood(food: Food?) {
+        mFood = food
+        mId = food?.id
+        mName = food?.name
+        mAmount = food?.amount
+        mNotice = food?.notice
+        mExpirationDate = food?.expirationDate
+        mBoxId = food?.box?.id
+        mUnitId = food?.unit?.id
 
-                    mView?.setFood(it)
-                    mView?.setSelectedUnit(mUnitId)
-                }, {
-                    mView?.showToast(it.message)
+        mView?.setFood(food)
+        mView?.setSelectedUnit(food?.unit?.id)
+    }
+
+    fun setUnits(units: List<Unit>?) {
+        mUnits = units
+
+        mView?.setUnits(units)
+        mView?.setSelectedUnit(mUnitId)
+    }
+
+    override fun getFood(id: Int) {
+        mApiRepository.getFoodFromCache(id)
+                .subscribe(object : Subscriber<Food>() {
+                    override fun onNext(t: Food?) {
+                        setFood(t)
+                    }
+
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
+                })
+
+        mApiRepository.getFood(id)
+                .subscribe(object : Subscriber<Food>() {
+                    override fun onNext(t: Food?) {
+                        setFood(t)
+                    }
+
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
                 })
     }
 
     override fun getUnits(boxId: Int) {
         mApiRepository.getUnitsForBoxFromCache(boxId)
-                .subscribe({
-                    mUnits = it
-                    mView?.setUnits(it)
-                    mView?.setSelectedUnit(mUnitId)
-                }, {
-                    mView?.showToast(it.message)
+                .subscribe(object : Subscriber<List<Unit>>() {
+                    override fun onNext(t: List<Unit>?) {
+                        setUnits(t)
+                    }
+
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
+
                 })
 
         mApiRepository.getUnitsForBox(boxId)
-                .subscribe({
-                    mUnits = it
-                    mView?.setUnits(it)
-                    mView?.setSelectedUnit(mUnitId)
-                }, {
-                    mView?.showToast(it.message)
+                .subscribe(object : Subscriber<List<Unit>>() {
+                    override fun onNext(t: List<Unit>?) {
+                        setUnits(t)
+                    }
+
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
                 })
     }
 
@@ -71,11 +111,18 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
             mApiRepository.updateFood(id, mName, mNotice, mAmount, mExpirationDate, mBoxId, mUnitId)
                     .doOnSubscribe { mView?.showProgressBar() }
                     .doOnUnsubscribe { mView?.hideProgressBar() }
-                    .subscribe({
-                        mFood = it
-                        mView?.onUpdateCompleted()
-                    }, {
-                        mView?.showToast(it.message)
+                    .subscribe(object : Subscriber<Food>() {
+                        override fun onNext(t: Food?) {
+                            mFood = t
+                        }
+
+                        override fun onCompleted() {
+                            mView?.onUpdateCompleted()
+                        }
+
+                        override fun onError(e: Throwable?) {
+                            mView?.showToast(e?.message)
+                        }
                     })
         }
     }
@@ -90,19 +137,19 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun updateName(name: String) {
-        this.mName = name
+        mName = name
     }
 
     override fun updateAmount(amount: Double) {
-        this.mAmount = amount
+        mAmount = amount
     }
 
     override fun updateNotice(notice: String) {
-        this.mNotice = notice
+        mNotice = notice
     }
 
     override fun updateExpirationDate(date: Date) {
-        this.mExpirationDate = date
+        mExpirationDate = date
         mView?.setExpirationDate(date)
     }
 }
