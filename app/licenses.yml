@@ -1,31 +1,5 @@
-- artifact: com.android.support:+:+
-  name: Android Support Libraries
-  copyrightHolder: The Android Open Source Project
-  license: apache2
 - artifact: com.google.android.gms:+:+
   skip: true
-- artifact: com.android.support.constraint:+:+
-  name: Android Support Libraries
-  copyrightHolder: The Android Open Source Project
-  license: apache2
-- artifact: com.daimajia.androidanimations:library:+
-  name: AndroidAnimations Library
-  copyrightHolder: daimajia
-  license: MIT
-  licenseUrl: http://opensource.org/licenses/MIT
-  url: https://github.com/daimajia/AndroidAnimations
-- artifact: com.daimajia.easing:library:+
-  name: AndroidEasingFunctions Library
-  copyrightHolder: daimajia
-  license: MIT
-  licenseUrl: http://opensource.org/licenses/MIT
-  url: https://github.com/daimajia/AnimationEasingFunctions
-- artifact: com.daimajia.swipelayout:library:+
-  name: Android SwipeLayout Library
-  copyrightHolder: daimajia
-  license: MIT
-  licenseUrl: http://opensource.org/licenses/MIT
-  url: https://github.com/daimajia/AndroidSwipeLayout
 - artifact: com.google.code.gson:gson:+
   name: Gson
   copyrightHolder: Google Inc.
@@ -48,3 +22,143 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: https://github.com/hdodenhof/CircleImageView
+- artifact: org.jetbrains.kotlin:+:+
+  name: org.jetbrains.kotlin
+  copyrightHolder: JetBrains
+  license: The Apache License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://kotlinlang.org/
+- artifact: com.google.auto.value:auto-value-annotations:+
+  skip: true
+- artifact: androidx.vectordrawable:+:+
+  skip: true
+- artifact: com.google.firebase:+:+
+  skip: true
+- artifact: androidx.swiperefreshlayout:swiperefreshlayout:+
+  skip: true
+- artifact: androidx.versionedparcelable:versionedparcelable:+
+  skip: true
+- artifact: androidx.collection:collection:+
+  skip: true
+- artifact: androidx.lifecycle:lifecycle-livedata:+
+  skip: true
+- artifact: androidx.constraintlayout:constraintlayout:+
+  skip: true
+- artifact: io.realm:+:+
+  name: Realm
+  copyrightHolder: Realm
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://realm.io
+- artifact: org.yaml:snakeyaml:+
+  name: SnakeYAML
+  copyrightHolder: snakeyaml
+  license: Apache License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://www.snakeyaml.org
+- artifact: androidx.legacy:+:+
+  skip: true
+- artifact: com.jakewharton:+:+
+  name: Butterknife
+  copyrightHolder: JakeWharton
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/JakeWharton/butterknife/
+- artifact: androidx.print:print:+
+  skip: true
+- artifact: androidx.interpolator:interpolator:+
+  skip: true
+- artifact: androidx.viewpager:viewpager:+
+  skip: true
+- artifact: androidx.appcompat:appcompat:+
+  skip: true
+- artifact: androidx.lifecycle:lifecycle-livedata-core:+
+  skip: true
+- artifact: androidx.media:media:+
+  skip: true
+- artifact: androidx.annotation:annotation:+
+  skip: true
+- artifact: androidx.cursoradapter:cursoradapter:+
+  skip: true
+- artifact: androidx.lifecycle:lifecycle-common:+
+  skip: true
+- artifact: androidx.coordinatorlayout:coordinatorlayout:+
+  skip: true
+- artifact: androidx.cardview:cardview:+
+  skip: true
+- artifact: com.anupcowkur:reservoir:+
+  name: reservoir
+  copyrightHolder: Anup Cowkur
+  license: MIT License
+- artifact: androidx.lifecycle:lifecycle-runtime:+
+  skip: true
+- artifact: androidx.constraintlayout:constraintlayout-solver:+
+  skip: true
+- artifact: com.crashlytics.sdk.android:+:+
+  skip: true
+- artifact: androidx.loader:loader:+
+  skip: true
+- artifact: androidx.vectordrawable:vectordrawable-animated:+
+  skip: true
+- artifact: androidx.slidingpanelayout:slidingpanelayout:+
+  skip: true
+- artifact: androidx.customview:customview:+
+  skip: true
+- artifact: androidx.lifecycle:lifecycle-viewmodel:+
+  skip: true
+- artifact: androidx.localbroadcastmanager:localbroadcastmanager:+
+  skip: true
+- artifact: io.fabric.sdk.android:fabric:+
+  skip: true
+- artifact: androidx.legacy:legacy-support-core-utils:+
+  skip: true
+- artifact: com.google.android.material:material:+
+  skip: true
+- artifact: com.google.code.findbugs:jsr305:+
+  skip: true
+- artifact: androidx.drawerlayout:drawerlayout:+
+  skip: true
+- artifact: androidx.core:core:+
+  skip: true
+- artifact: io.reactivex:+:+
+  name: RxAndroid
+  copyrightHolder: RxAndroid authors
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/ReactiveX/RxAndroid
+- artifact: com.google.errorprone:error_prone_annotations:+
+  skip: true
+- artifact: androidx.recyclerview:recyclerview:+
+  skip: true
+- artifact: androidx.transition:transition:+
+  skip: true
+- artifact: com.google.dagger:+:+
+  name: Dagger
+  copyrightHolder: The Dagger Authors
+  license: Apache 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/google/dagger
+- artifact: androidx.documentfile:documentfile:+
+  skip: true
+- artifact: javax.inject:javax.inject:+
+  skip: true
+- artifact: androidx.arch.core:core-runtime:+
+  skip: true
+- artifact: com.getkeepsafe.relinker:relinker:+
+  name: ReLinker
+  copyrightHolder: Keepsafe Software Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/KeepSafe/ReLinker
+- artifact: androidx.arch.core:core-common:+
+  skip: true
+- artifact: androidx.asynclayoutinflater:asynclayoutinflater:+
+  skip: true
+- artifact: androidx.fragment:fragment:+
+  skip: true
+- artifact: org.jetbrains:annotations:+
+  name: IntelliJ IDEA Annotations
+  copyrightHolder: JetBrains
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://www.jetbrains.org
