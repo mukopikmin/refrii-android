@@ -485,7 +485,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         when (requestCode) {
             ADD_FOOD_REQUEST_CODE -> onAddFoodCompleted()
             ADD_BOX_REQUEST_CODE -> onAddBoxCompleted()
-            EDIT_FOOD_REQUEST_CODE -> mPresenter.getBoxes()
+            EDIT_FOOD_REQUEST_CODE -> onEditFoodCompleted(data)
             REMOVE_FOOD_REQUEST_CODE -> onRemoveFoodCompleted()
             REMOVE_BOX_REQUEST_CODE -> onRemoveBoxCompleted(data)
             CREATE_BOX_REQUEST_CODE -> createBox(data)
@@ -501,6 +501,16 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     private fun onAddFoodCompleted() {
         showSnackbar(getString(R.string.message_add_food_completed))
+        mPresenter.getBoxes()
+    }
+
+    private fun onEditFoodCompleted(data: Intent?) {
+        data?.let {
+            val name = it.getStringExtra(getString(R.string.key_food_name))
+
+            showSnackbar("$name が更新されました")
+        }
+
         mPresenter.getBoxes()
     }
 

@@ -15,7 +15,7 @@ interface FoodContract {
         fun showToast(message: String?)
         fun setUnits(units: List<Unit>?)
         fun setExpirationDate(date: Date?)
-        fun onUpdateCompleted()
+        fun onUpdateCompleted(food: Food?)
         fun setSelectedUnit(id: Int?)
     }
 

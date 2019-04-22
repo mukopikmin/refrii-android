@@ -222,7 +222,11 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         fragment.show(supportFragmentManager, "edit_expiration_date")
     }
 
-    override fun onUpdateCompleted() {
+    override fun onUpdateCompleted(food: Food?) {
+        val intent = Intent()
+
+        intent.putExtra(getString(R.string.key_food_name), food?.name)
+        setResult(Activity.RESULT_OK, intent)
         finish()
     }
 

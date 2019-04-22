@@ -81,7 +81,7 @@ class FoodPresenterTest {
 
         verify(viewMock, times(1)).showProgressBar()
         verify(viewMock, times(1)).hideProgressBar()
-        verify(viewMock, times(1)).onUpdateCompleted()
+        verify(viewMock, times(1)).onUpdateCompleted(MockitoHelper.any<Food>())
     }
 
     @Test

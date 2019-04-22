@@ -93,7 +93,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
                 val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
                 val date = Date(data.getLongExtra("date", 0.toLong()))
 
-                mExpirationDateEditText.setText(formatter.format(date))
+                mExpirationDateEditText.text = formatter.format(date)
             }
         }
     }

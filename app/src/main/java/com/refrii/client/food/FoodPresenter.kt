@@ -114,11 +114,10 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                     .subscribe(object : Subscriber<Food>() {
                         override fun onNext(t: Food?) {
                             mFood = t
+                            mView?.onUpdateCompleted(t)
                         }
 
-                        override fun onCompleted() {
-                            mView?.onUpdateCompleted()
-                        }
+                        override fun onCompleted() {}
 
                         override fun onError(e: Throwable?) {
                             mView?.showToast(e?.message)
