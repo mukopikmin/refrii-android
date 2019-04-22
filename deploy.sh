@@ -9,11 +9,14 @@ mv temp/keystore.jks .
 ./gradlew test
 
 if [ "$TRAVIS_BRANCH" = "master" ]; then
+  ./gradlew generateLicensePage
+
   echo "Do nothing on master branch."
   exit 0;
 fi
 
 if [ "$TRAVIS_BRANCH" = "development" ]; then
+  ./gradlew generateLicensePage
   ./gradlew assembleDevelopment;
   jarsigner \
     -verbose \
@@ -29,6 +32,7 @@ if [ "$TRAVIS_BRANCH" = "development" ]; then
 fi
 
 if [ "$TRAVIS_BRANCH" = "staging" ]; then
+  ./gradlew generateLicensePage
   ./gradlew assembleStaging;
   jarsigner \
     -verbose \
