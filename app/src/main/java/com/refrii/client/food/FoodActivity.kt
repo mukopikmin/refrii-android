@@ -13,6 +13,8 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -50,6 +52,10 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     lateinit var mFab: FloatingActionButton
     @BindView(R.id.unitsSpinner)
     lateinit var mUnitsSpinner: Spinner
+    @BindView(R.id.shopPlanecyclerView)
+    lateinit var mRecyclerView: RecyclerView
+    @BindView(R.id.emptyShppPlanTextView)
+    lateinit var mEmptyShopPlanMessage: TextView
 
     private var mUnitIds: List<Int>? = null
     private var mUnitLabels: MutableList<String?>? = null
@@ -88,6 +94,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         }
 
         mPreference = PreferenceManager.getDefaultSharedPreferences(this)
+
+        mRecyclerView.layoutManager = LinearLayoutManager(this)
 
         mFab.setOnClickListener { mPresenter.updateFood() }
         mName.addTextChangedListener(object : TextWatcher {
@@ -175,6 +183,22 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mNotice.setText(food?.notice)
         mCreated.text = "${timeFormatter.format(food?.createdAt)} (${food?.createdUser?.name})"
         mUpdate.text = "${timeFormatter.format(food?.updatedAt)} (${food?.updatedUser?.name})"
+
+        food?.shopPlans?.let { plans ->
+            if (plans.size > 0) {
+                mEmptyShopPlanMessage.visibility = View.GONE
+            }
+
+            food.unit?.let { unit ->
+                if (mRecyclerView.adapter == null) {
+                    mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(plans, unit)
+                } else {
+                    val adapter = mRecyclerView.adapter as ShopPlanRecyclerViewAdapter
+
+                    adapter.setShopPlans(plans)
+                }
+            }
+        }
 
         setExpirationDate(food?.expirationDate)
     }

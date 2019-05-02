@@ -4,17 +4,18 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.refrii.client.R
 import com.refrii.client.data.models.Food
 import java.text.SimpleDateFormat
 import java.util.*
 
-class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>() {
+class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var mOnClickListener: View.OnClickListener? = null
     private var mSelectedPosition: Int? = null
 
-    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val food = mFoods[position]
         val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
         val amountWithUnit = "${food.amount} ${food.unit?.label}"
@@ -35,8 +36,8 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : androidx.recycle
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.food_list_row, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.food_list_row, parent, false)
 
         return FoodViewHolder(view)
     }
