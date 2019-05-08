@@ -6,6 +6,7 @@ import com.refrii.client.foodlist.FoodListActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.newunit.NewUnitActivity
 import com.refrii.client.notification.PushNotificationService
+import com.refrii.client.shopplans.ShopPlansActivity
 import com.refrii.client.signin.SignInActivity
 import com.refrii.client.unit.UnitActivity
 import com.refrii.client.unitlist.UnitListActivity
@@ -28,5 +29,6 @@ interface AppComponent {
     fun inject(target: UnitListActivity)
     fun inject(target: UnitActivity)
     fun inject(target: NewUnitActivity)
+    fun inject(target: ShopPlansActivity)
     fun inject(target: PushNotificationService)
 }

@@ -147,6 +147,10 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         return mApiRemoteDataSource.registerPushToken(id, token)
     }
 
+    fun getShopPlans(): Observable<List<ShopPlan>> {
+        return mApiRemoteDataSource.getShopPlans()
+    }
+
     fun deleteLocalData() {
         mApiLocalDataSource.deleteAll()
     }

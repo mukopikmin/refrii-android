@@ -15,4 +15,5 @@ open class ShopPlan : RealmObject(), Serializable {
     open var done: Boolean = false
     open var createdAt: Date? = null
     open var updatedAt: Date? = null
+    open var food: Food? = null
 }

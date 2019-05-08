@@ -37,7 +37,7 @@ class UserListAdapter(
         val email = emails[i]
         val view = mLayoutInflater.inflate(R.layout.shared_user_list_row, viewGroup, false)
 
-        val nameTextView = view.findViewById<TextView>(R.id.nameTextView)
+        val nameTextView = view.findViewById<TextView>(R.id.foodNameTextView)
         val mailTextView = view.findViewById<TextView>(R.id.mailTextView)
         val removeImageView = view.findViewById<ImageView>(R.id.removeImageView)
 

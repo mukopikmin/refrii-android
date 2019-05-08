@@ -14,6 +14,16 @@
     </group>
 
     <group>
+        <item android:title="予定">
+            <menu>
+                <item
+                    android:id="@+id/nav_shop_plans"
+                    android:title="買い物の予定" />
+            </menu>
+        </item>
+    </group>
+
+    <group>
         <item android:title="@string/nav_filter">
             <menu>
                 <item

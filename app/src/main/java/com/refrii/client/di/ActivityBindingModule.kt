@@ -10,6 +10,8 @@ import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.newfood.NewFoodModule
 import com.refrii.client.newunit.NewUnitActivity
 import com.refrii.client.newunit.NewUnitModule
+import com.refrii.client.shopplans.ShopPlansActivity
+import com.refrii.client.shopplans.ShopPlansModule
 import com.refrii.client.signin.SignInActivity
 import com.refrii.client.signin.SigninModule
 import com.refrii.client.unit.UnitActivity
@@ -53,4 +55,8 @@ abstract class ActivityBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(NewUnitModule::class)])
     abstract fun newUnitActivity(): NewUnitActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = [(ShopPlansModule::class)])
+    abstract fun shopPlansActivity(): ShopPlansActivity
 }

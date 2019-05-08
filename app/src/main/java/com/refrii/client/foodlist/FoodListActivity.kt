@@ -46,6 +46,7 @@ import com.refrii.client.dialogs.CreateBoxDialogFragment
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.settings.SettingsActivity
+import com.refrii.client.shopplans.ShopPlansActivity
 import com.refrii.client.signin.SignInActivity
 import com.refrii.client.tasks.ImageDownloadTask
 import com.refrii.client.tasks.ImageDownloadTaskCallback
@@ -80,7 +81,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     lateinit var mIncrementButton: ImageView
     @BindView(R.id.decrementButton)
     lateinit var mDecrementButton: ImageView
-    @BindView(R.id.amountTextView)
+    @BindView(R.id.amountDiffTextView)
     lateinit var mAmountText: TextView
     @BindView(R.id.noticeTextView)
     lateinit var mNoticeText: TextView
@@ -106,7 +107,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         hideProgressBar()
         hideBottomNavigationWithoutAnimation()
-
 
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
@@ -288,6 +288,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 R.id.nav_settings -> startActivity(Intent(this, SettingsActivity::class.java))
                 R.id.nav_signout -> signOut()
                 R.id.nav_units -> startActivity(Intent(this, UnitListActivity::class.java))
+                R.id.nav_shop_plans -> startActivity(Intent(this, ShopPlansActivity::class.java))
             }
         }
 

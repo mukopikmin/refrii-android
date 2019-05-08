@@ -58,6 +58,9 @@
             android:name=".newunit.NewUnitActivity"
             android:label="@string/title_activity_new_unit"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".shopplans.ShopPlansActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service android:name=".notification.PushNotificationService">
             <intent-filter>

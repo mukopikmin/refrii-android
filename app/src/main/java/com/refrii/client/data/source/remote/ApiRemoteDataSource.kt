@@ -2,10 +2,7 @@ package com.refrii.client.data.source.remote
 
 import com.refrii.client.data.models.*
 import com.refrii.client.data.models.Unit
-import com.refrii.client.data.source.remote.services.BoxService
-import com.refrii.client.data.source.remote.services.FoodService
-import com.refrii.client.data.source.remote.services.UnitService
-import com.refrii.client.data.source.remote.services.UserService
+import com.refrii.client.data.source.remote.services.*
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
 import rx.Observable
@@ -210,6 +207,13 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
 
         return mRetrofit.create(UserService::class.java)
                 .registerPushToken(id, builder.build())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun getShopPlans(): Observable<List<ShopPlan>> {
+        return mRetrofit.create(ShopPlanService::class.java)
+                .getShopPlans()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

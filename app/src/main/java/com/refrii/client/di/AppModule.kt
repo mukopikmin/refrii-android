@@ -18,6 +18,8 @@ import com.refrii.client.newfood.NewFoodContract
 import com.refrii.client.newfood.NewFoodPresenter
 import com.refrii.client.newunit.NewUnitContract
 import com.refrii.client.newunit.NewUnitPresenter
+import com.refrii.client.shopplans.ShopPlansContract
+import com.refrii.client.shopplans.ShopPlansPresenter
 import com.refrii.client.signin.SigninContract
 import com.refrii.client.signin.SigninPresenter
 import com.refrii.client.unit.UnitContract
@@ -82,6 +84,11 @@ class AppModule(private var mApplication: Application) {
     @Provides
     fun provideNewUnitPresenter(apiRepository: ApiRepository): NewUnitContract.Presenter {
         return NewUnitPresenter(apiRepository)
+    }
+
+    @Provides
+    fun provideShopPlansPresenter(apiRepository: ApiRepository): ShopPlansContract.Presenter {
+        return ShopPlansPresenter(apiRepository)
     }
 
     @Singleton

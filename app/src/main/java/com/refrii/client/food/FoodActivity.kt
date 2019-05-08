@@ -184,21 +184,21 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mCreated.text = "${timeFormatter.format(food?.createdAt)} (${food?.createdUser?.name})"
         mUpdate.text = "${timeFormatter.format(food?.updatedAt)} (${food?.updatedUser?.name})"
 
-        food?.shopPlans?.let { plans ->
-            if (plans.size > 0) {
-                mEmptyShopPlanMessage.visibility = View.GONE
-            }
-
-            food.unit?.let { unit ->
-                if (mRecyclerView.adapter == null) {
-                    mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(plans, unit)
-                } else {
-                    val adapter = mRecyclerView.adapter as ShopPlanRecyclerViewAdapter
-
-                    adapter.setShopPlans(plans)
-                }
-            }
-        }
+//        food?.shopPlans?.let { plans ->
+//            if (plans.size > 0) {
+//                mEmptyShopPlanMessage.visibility = View.GONE
+//            }
+//
+//            food.unit?.let { unit ->
+//                if (mRecyclerView.adapter == null) {
+//                    mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(plans, unit)
+//                } else {
+//                    val adapter = mRecyclerView.adapter as ShopPlanRecyclerViewAdapter
+//
+//                    adapter.setShopPlans(plans)
+//                }
+//            }
+//        }
 
         setExpirationDate(food?.expirationDate)
     }
