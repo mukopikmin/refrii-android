@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.refrii.client.R
 
 class ShopPlanViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    val amountText: TextView = view.findViewById(R.id.amountDiffTextView)
-    val dateText: TextView = view.findViewById(R.id.dateTextView)
+    val amountDiff: TextView = view.findViewById(R.id.amountDiffTextView)
+    val afterAmount: TextView = view.findViewById(R.id.afterAmountTextView)
+    val date: TextView = view.findViewById(R.id.dateTextView)
 }

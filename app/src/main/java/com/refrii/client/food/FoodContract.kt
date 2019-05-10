@@ -1,6 +1,7 @@
 package com.refrii.client.food
 
 import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
 import java.util.*
 
@@ -17,6 +18,7 @@ interface FoodContract {
         fun setExpirationDate(date: Date?)
         fun onUpdateCompleted(food: Food?)
         fun setSelectedUnit(id: Int?)
+        fun setShopPlans(food: Food?, shopPlans: List<ShopPlan>?)
     }
 
     interface Presenter {
@@ -30,5 +32,6 @@ interface FoodContract {
         fun updateNotice(notice: String)
         fun updateExpirationDate(date: Date)
         fun selectUnit(id: Int)
+        fun getShopPlans(id: Int)
     }
 }

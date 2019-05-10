@@ -4,15 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.refrii.client.R
+import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
-import com.refrii.client.data.models.Unit
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ShopPlanRecyclerViewAdapter(private var mShopPlans: List<ShopPlan>, private val unit: Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ShopPlanRecyclerViewAdapter(private var mShopPlans: List<ShopPlan>, private val mFood: Food) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.row_shop_plan, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.row_shop_plan_compact, parent, false)
 
         return ShopPlanViewHolder(view)
     }
@@ -24,10 +24,14 @@ class ShopPlanRecyclerViewAdapter(private var mShopPlans: List<ShopPlan>, privat
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val shopPlan = mShopPlans[position]
         val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+        val unitLabel = mFood.unit?.label
+        val diff = shopPlan.amount
+        val after = mFood.amount + diff
 
         (holder as ShopPlanViewHolder).apply {
-            amountText.text = "${shopPlan.amount} ${unit.label}"
-            dateText.text = formatter.format(shopPlan.date)
+            amountDiff.text = arrayOf(diff, unitLabel).joinToString(" ")
+            afterAmount.text = arrayOf(after, unitLabel).joinToString(" ")
+            date.text = formatter.format(shopPlan.date)
         }
     }
 

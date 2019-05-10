@@ -2,6 +2,7 @@ package com.refrii.client.food
 
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
 import com.refrii.client.data.source.ApiRepository
 import rx.Subscriber
@@ -56,7 +57,9 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                         setFood(t)
                     }
 
-                    override fun onCompleted() {}
+                    override fun onCompleted() {
+                        getShopPlans(id)
+                    }
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
@@ -69,7 +72,9 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                         setFood(t)
                     }
 
-                    override fun onCompleted() {}
+                    override fun onCompleted() {
+                        getShopPlans(id)
+                    }
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
@@ -115,6 +120,23 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                         override fun onNext(t: Food?) {
                             mFood = t
                             mView?.onUpdateCompleted(t)
+                        }
+
+                        override fun onCompleted() {}
+
+                        override fun onError(e: Throwable?) {
+                            mView?.showToast(e?.message)
+                        }
+                    })
+        }
+    }
+
+    override fun getShopPlans(id: Int) {
+        mId?.let { id ->
+            mApiRepository.getShopPlansForFood(id)
+                    .subscribe(object : Subscriber<List<ShopPlan>>() {
+                        override fun onNext(t: List<ShopPlan>?) {
+                            mView?.setShopPlans(mFood, t)
                         }
 
                         override fun onCompleted() {}

@@ -22,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
 import java.text.SimpleDateFormat
@@ -135,11 +136,11 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val intent = intent
         val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
-//        val userId = mPreference.getInt(getString(R.string.preference_key_id), 0)
 
         mPresenter.takeView(this)
         mPresenter.getFood(foodId)
         mPresenter.getUnits(boxId)
+
         hideProgressBar()
     }
 
@@ -184,23 +185,26 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mCreated.text = "${timeFormatter.format(food?.createdAt)} (${food?.createdUser?.name})"
         mUpdate.text = "${timeFormatter.format(food?.updatedAt)} (${food?.updatedUser?.name})"
 
-//        food?.shopPlans?.let { plans ->
-//            if (plans.size > 0) {
-//                mEmptyShopPlanMessage.visibility = View.GONE
-//            }
-//
-//            food.unit?.let { unit ->
-//                if (mRecyclerView.adapter == null) {
-//                    mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(plans, unit)
-//                } else {
-//                    val adapter = mRecyclerView.adapter as ShopPlanRecyclerViewAdapter
-//
-//                    adapter.setShopPlans(plans)
-//                }
-//            }
-//        }
-
         setExpirationDate(food?.expirationDate)
+    }
+
+    override fun setShopPlans(food: Food?, shopPlans: List<ShopPlan>?) {
+        food ?: return
+        shopPlans ?: return
+
+        if (shopPlans.isNotEmpty()) {
+            mEmptyShopPlanMessage.visibility = View.GONE
+        }
+
+        food.unit?.let { unit ->
+            if (mRecyclerView.adapter == null) {
+                mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(shopPlans, food)
+            } else {
+                val adapter = mRecyclerView.adapter as ShopPlanRecyclerViewAdapter
+
+                adapter.setShopPlans(shopPlans)
+            }
+        }
     }
 
     override fun setExpirationDate(date: Date?) {
