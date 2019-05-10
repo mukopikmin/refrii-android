@@ -224,4 +224,19 @@ class ApiRemoteDataSource(private val mRetrofit: Retrofit) {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+    fun createShopPlan(foodId: Int, amount: Double, date: Date): Observable<ShopPlan> {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val body = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("food_id", foodId.toString())
+                .addFormDataPart("amount", amount.toString())
+                .addFormDataPart("date", formatter.format(date))
+                .build()
+
+        return mRetrofit.create(ShopPlanService::class.java)
+                .createShopPlans(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }

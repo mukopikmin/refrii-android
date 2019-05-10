@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -43,7 +42,9 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
     @BindView(R.id.progressBar)
     lateinit var mProgressBar: ProgressBar
     @BindView(R.id.historyContainer)
-    lateinit var mHistoryContainer: ConstraintLayout
+    lateinit var mHistoryContainer: View
+    @BindView(R.id.shopPlansContainer)
+    lateinit var mShopPlansContainer: View
 
     @Inject
     lateinit var mPresenter: NewFoodPresenter
@@ -69,6 +70,8 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         mExpirationDateEditText.setOnClickListener { showEditDateDialog() }
 
         mHistoryContainer.visibility = View.GONE
+        mShopPlansContainer.visibility = View.GONE
+
         hideProgressBar()
     }
 

@@ -25,6 +25,7 @@ import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
+import com.refrii.client.dialogs.CreateShopPlanDialogFragment
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -55,8 +56,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     lateinit var mUnitsSpinner: Spinner
     @BindView(R.id.shopPlanecyclerView)
     lateinit var mRecyclerView: RecyclerView
-    @BindView(R.id.emptyShppPlanTextView)
-    lateinit var mEmptyShopPlanMessage: TextView
+    @BindView(R.id.addPlanButton)
+    lateinit var mAddPlanButton: View
 
     private var mUnitIds: List<Int>? = null
     private var mUnitLabels: MutableList<String?>? = null
@@ -99,6 +100,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mRecyclerView.layoutManager = LinearLayoutManager(this)
 
         mFab.setOnClickListener { mPresenter.updateFood() }
+        mAddPlanButton.setOnClickListener { mPresenter.showCreateShopPlanDialog() }
         mName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {}
 
@@ -163,13 +165,27 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
             EDIT_NAME_REQUEST_CODE -> mPresenter.updateName(data.getStringExtra("text"))
             EDIT_AMOUNT_REQUEST_CODE -> mPresenter.updateAmount(data.getDoubleExtra("number", 0.toDouble()))
             EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
-            EDIT_EXPIRATION_DATE_REQUEST_CODE -> {
-                val date = Date()
-
-                date.time = data.getLongExtra("date", 0)
-                mPresenter.updateExpirationDate(date)
-            }
+            EDIT_EXPIRATION_DATE_REQUEST_CODE -> updateExpirationDate(data)
+            CREATE_SHOP_PLAN_REQUEST_CODE -> createShopPlan(data)
         }
+    }
+
+    private fun updateExpirationDate(data: Intent?) {
+        data ?: return
+
+        val date = Date()
+
+        date.time = data.getLongExtra("date", 0)
+        mPresenter.updateExpirationDate(date)
+    }
+
+    private fun createShopPlan(data: Intent?) {
+        data ?: return
+
+        val amount = data.getDoubleExtra("key_amount", 0.toDouble())
+        val date = Date(data.getLongExtra("key_date", Date().time))
+
+        mPresenter.createShopPlan(amount, date)
     }
 
     override fun setFood(food: Food?) {
@@ -192,18 +208,12 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         food ?: return
         shopPlans ?: return
 
-        if (shopPlans.isNotEmpty()) {
-            mEmptyShopPlanMessage.visibility = View.GONE
-        }
+        if (mRecyclerView.adapter == null) {
+            mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(shopPlans, food)
+        } else {
+            val adapter = mRecyclerView.adapter as ShopPlanRecyclerViewAdapter
 
-        food.unit?.let { unit ->
-            if (mRecyclerView.adapter == null) {
-                mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(shopPlans, food)
-            } else {
-                val adapter = mRecyclerView.adapter as ShopPlanRecyclerViewAdapter
-
-                adapter.setShopPlans(shopPlans)
-            }
+            adapter.setShopPlans(shopPlans)
         }
     }
 
@@ -278,10 +288,19 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
+    override fun showCreateShopPlanDialog(food: Food?) {
+        val label = food?.unit?.label ?: return
+        val fragment = CreateShopPlanDialogFragment.newInstance(label)
+
+        fragment.setTargetFragment(null, CREATE_SHOP_PLAN_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "create_shop_plan")
+    }
+
     companion object {
         private const val EDIT_NAME_REQUEST_CODE = 100
         private const val EDIT_AMOUNT_REQUEST_CODE = 101
         private const val EDIT_NOTICE_REQUEST_CODE = 102
         private const val EDIT_EXPIRATION_DATE_REQUEST_CODE = 103
+        private const val CREATE_SHOP_PLAN_REQUEST_CODE = 104
     }
 }

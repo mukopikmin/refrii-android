@@ -19,6 +19,7 @@ interface FoodContract {
         fun onUpdateCompleted(food: Food?)
         fun setSelectedUnit(id: Int?)
         fun setShopPlans(food: Food?, shopPlans: List<ShopPlan>?)
+        fun showCreateShopPlanDialog(food: Food?)
     }
 
     interface Presenter {
@@ -33,5 +34,7 @@ interface FoodContract {
         fun updateExpirationDate(date: Date)
         fun selectUnit(id: Int)
         fun getShopPlans(id: Int)
+        fun createShopPlan(amount: Double, date: Date)
+        fun showCreateShopPlanDialog()
     }
 }

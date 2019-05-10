@@ -132,14 +132,33 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun getShopPlans(id: Int) {
-        mId?.let { id ->
-            mApiRepository.getShopPlansForFood(id)
-                    .subscribe(object : Subscriber<List<ShopPlan>>() {
-                        override fun onNext(t: List<ShopPlan>?) {
-                            mView?.setShopPlans(mFood, t)
-                        }
+        mApiRepository.getShopPlansForFood(id)
+                .subscribe(object : Subscriber<List<ShopPlan>>() {
+                    override fun onNext(t: List<ShopPlan>?) {
+                        mView?.setShopPlans(mFood, t)
+                    }
 
-                        override fun onCompleted() {}
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
+                })
+    }
+
+    override fun showCreateShopPlanDialog() {
+        mView?.showCreateShopPlanDialog(mFood)
+    }
+
+    override fun createShopPlan(amount: Double, date: Date) {
+        mFood?.let {
+            mApiRepository.createShopPlan(it.id, amount, date)
+                    .subscribe(object : Subscriber<ShopPlan>() {
+                        override fun onNext(t: ShopPlan?) {}
+
+                        override fun onCompleted() {
+                            getShopPlans(it.id)
+                        }
 
                         override fun onError(e: Throwable?) {
                             mView?.showToast(e?.message)
