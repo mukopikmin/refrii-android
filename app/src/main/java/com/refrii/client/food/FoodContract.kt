@@ -20,6 +20,7 @@ interface FoodContract {
         fun setSelectedUnit(id: Int?)
         fun setShopPlans(food: Food?, shopPlans: List<ShopPlan>?)
         fun showCreateShopPlanDialog(food: Food?)
+        fun onCompletedCompleteShopPlan(shopPlan: ShopPlan?)
     }
 
     interface Presenter {
@@ -36,5 +37,6 @@ interface FoodContract {
         fun getShopPlans(id: Int)
         fun createShopPlan(amount: Double, date: Date)
         fun showCreateShopPlanDialog()
+        fun completeShopPlan(shopPlan: ShopPlan)
     }
 }

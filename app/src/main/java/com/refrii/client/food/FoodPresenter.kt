@@ -135,7 +135,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
         mApiRepository.getShopPlansForFood(id)
                 .subscribe(object : Subscriber<List<ShopPlan>>() {
                     override fun onNext(t: List<ShopPlan>?) {
-                        mView?.setShopPlans(mFood, t)
+                        mView?.setShopPlans(mFood, t?.filter { !it.done })
                     }
 
                     override fun onCompleted() {}
@@ -153,6 +153,8 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     override fun createShopPlan(amount: Double, date: Date) {
         mFood?.let {
             mApiRepository.createShopPlan(it.id, amount, date)
+                    .doOnSubscribe { mView?.showProgressBar() }
+                    .doOnUnsubscribe { mView?.hideProgressBar() }
                     .subscribe(object : Subscriber<ShopPlan>() {
                         override fun onNext(t: ShopPlan?) {}
 
@@ -165,6 +167,23 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                         }
                     })
         }
+    }
+
+    override fun completeShopPlan(shopPlan: ShopPlan) {
+        mApiRepository.updateShopPlan(shopPlan.id, null, null, true)
+                .doOnSubscribe { mView?.showProgressBar() }
+                .doOnUnsubscribe { mView?.hideProgressBar() }
+                .subscribe(object : Subscriber<ShopPlan>() {
+                    override fun onNext(t: ShopPlan?) {
+                        mView?.onCompletedCompleteShopPlan(t)
+                    }
+
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
+                })
     }
 
     override fun selectUnit(id: Int) {

@@ -9,4 +9,5 @@ class ShopPlanViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val amountDiff: TextView = view.findViewById(R.id.amountDiffTextView)
     val afterAmount: TextView = view.findViewById(R.id.afterAmountTextView)
     val date: TextView = view.findViewById(R.id.dateTextView)
+    val completeButton: View = view.findViewById(R.id.completeImageView)
 }

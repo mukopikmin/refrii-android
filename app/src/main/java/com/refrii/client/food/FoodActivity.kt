@@ -213,8 +213,20 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         } else {
             val adapter = mRecyclerView.adapter as ShopPlanRecyclerViewAdapter
 
+            adapter.setOnClickListener(View.OnClickListener {
+                val position = mRecyclerView.getChildAdapterPosition(it)
+                val shopPlan = adapter.getItemAtPosition(position)
+
+                mPresenter.completeShopPlan(shopPlan)
+            })
             adapter.setShopPlans(shopPlans)
         }
+    }
+
+    override fun onCompletedCompleteShopPlan(shopPlan: ShopPlan?) {
+        shopPlan ?: return
+
+        (mRecyclerView.adapter as ShopPlanRecyclerViewAdapter).completeShopPlan(shopPlan)
     }
 
     override fun setExpirationDate(date: Date?) {

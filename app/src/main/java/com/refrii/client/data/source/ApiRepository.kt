@@ -159,6 +159,10 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         return mApiRemoteDataSource.createShopPlan(foodId, amount, date)
     }
 
+    fun updateShopPlan(id: Int, amount: Double?, date: Date?, done: Boolean?): Observable<ShopPlan> {
+        return mApiRemoteDataSource.updateShopPlan(id, amount, date, done)
+    }
+
     fun deleteLocalData() {
         mApiLocalDataSource.deleteAll()
     }
