@@ -11,5 +11,6 @@ interface ShopPlansContract {
     interface Presenter {
         fun takeView(view: View)
         fun getShopPlans()
+        fun completeShopPlan(shopPlan: ShopPlan)
     }
 }

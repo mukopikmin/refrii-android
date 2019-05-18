@@ -100,6 +100,10 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
         return mApiRemoteDataSource.getShopPlansForFood(id)
     }
 
+    fun getShopPlansForFoodFromCache(id: Int): Observable<List<ShopPlan>> {
+        return mApiLocalDataSource.getShopPlansForFood(id)
+    }
+
     fun getExpiringFoods(): Observable<List<Food>> {
         return mApiRemoteDataSource.getFoods()
                 .flatMap { mApiLocalDataSource.saveFoods(it) }
@@ -153,14 +157,21 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
 
     fun getShopPlans(): Observable<List<ShopPlan>> {
         return mApiRemoteDataSource.getShopPlans()
+                .flatMap { mApiLocalDataSource.saveShopPlans(it) }
+    }
+
+    fun getShopPlansFromCache(): Observable<List<ShopPlan>> {
+        return mApiLocalDataSource.getShopPlans()
     }
 
     fun createShopPlan(foodId: Int, amount: Double, date: Date): Observable<ShopPlan> {
         return mApiRemoteDataSource.createShopPlan(foodId, amount, date)
+                .flatMap { mApiLocalDataSource.saveShopPlan(it) }
     }
 
-    fun updateShopPlan(id: Int, amount: Double?, date: Date?, done: Boolean?): Observable<ShopPlan> {
-        return mApiRemoteDataSource.updateShopPlan(id, amount, date, done)
+    fun completeShopPlan(id: Int): Observable<ShopPlan> {
+        return mApiRemoteDataSource.completeShopPlan(id)
+                .flatMap { mApiLocalDataSource.saveShopPlan(it) }
     }
 
     fun deleteLocalData() {

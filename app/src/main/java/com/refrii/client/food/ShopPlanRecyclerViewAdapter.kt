@@ -7,8 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.refrii.client.R
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
-import java.text.SimpleDateFormat
-import java.util.*
 
 class ShopPlanRecyclerViewAdapter(private var mShopPlans: List<ShopPlan>, private val mFood: Food) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -24,20 +22,12 @@ class ShopPlanRecyclerViewAdapter(private var mShopPlans: List<ShopPlan>, privat
         return mShopPlans.size
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(_holder: RecyclerView.ViewHolder, position: Int) {
         val shopPlan = mShopPlans[position]
-        val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-        val unitLabel = mFood.unit?.label
-        val diff = shopPlan.amount
-        val after = mFood.amount + diff
+        val holder = _holder as ShopPlanViewHolder
 
-        (holder as ShopPlanViewHolder).apply {
-            amountDiff.text = arrayOf(diff, unitLabel).joinToString(" ")
-            afterAmount.text = arrayOf(after, unitLabel).joinToString(" ")
-            date.text = formatter.format(shopPlan.date)
-
-            completeButton.setOnClickListener { mOnClickListener?.onClick(it.parent as View) }
-        }
+        holder.bind(shopPlan, mFood)
+        holder.completeButton.setOnClickListener { mOnClickListener?.onClick(it.parent as View) }
     }
 
     fun setShopPlans(shopPlans: List<ShopPlan>) {

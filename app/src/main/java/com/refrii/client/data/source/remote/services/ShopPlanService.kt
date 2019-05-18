@@ -12,6 +12,6 @@ interface ShopPlanService {
     @POST("/shop_plans")
     fun createShopPlans(@Body body: RequestBody): Observable<ShopPlan>
 
-    @PUT("/shop_plans/{id}")
-    fun updateShopPlan(@Path("id") id: Int, @Body body: RequestBody): Observable<ShopPlan>
+    @PUT("/shop_plans/{id}/complete")
+    fun updateShopPlan(@Path("id") id: Int): Observable<ShopPlan>
 }

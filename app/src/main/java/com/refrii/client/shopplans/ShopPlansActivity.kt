@@ -66,6 +66,12 @@ class ShopPlansActivity : AppCompatActivity(), ShopPlansContract.View {
                 val adapter = mRecyclerView.adapter as ShopPlansRecyclerViewAdapter
 
                 adapter.setShopPlans(it)
+                adapter.setOnClickListener(View.OnClickListener {
+                    val position = mRecyclerView.getChildAdapterPosition(it)
+                    val plan = adapter.getItemAtPosition(position)
+
+                    mPresenter.completeShopPlan(plan)
+                })
             }
         }
     }

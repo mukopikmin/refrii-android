@@ -1,9 +1,7 @@
 package com.refrii.client.data.source.local
 
-import com.refrii.client.data.models.Box
-import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.*
 import com.refrii.client.data.models.Unit
-import com.refrii.client.data.models.User
 import io.realm.Realm
 import io.realm.kotlin.oneOf
 import io.realm.kotlin.where
@@ -242,6 +240,52 @@ class ApiLocalDataSource(private val mRealm: Realm) {
         }
 
         return getUser(user.id)
+    }
+
+    fun getShopPlans(): Observable<List<ShopPlan>> {
+        val plans = mRealm.where<ShopPlan>()
+                .equalTo("done", false)
+                .sort("date")
+                .findAll()
+
+        return Observable.just(plans)
+    }
+
+    fun getShopPlansForFood(foodId: Int): Observable<List<ShopPlan>> {
+        val plans = mRealm.where<ShopPlan>()
+                .equalTo("food.id", foodId)
+                .findAll()
+
+        return Observable.just(plans)
+    }
+
+    fun getShopPlan(id: Int): Observable<ShopPlan> {
+        val plan = mRealm.where<ShopPlan>()
+                .equalTo("id", id)
+                .findFirst()
+
+        return Observable.just(plan)
+    }
+
+    fun saveShopPlans(shopPlans: List<ShopPlan>): Observable<List<ShopPlan>> {
+        mRealm.executeTransaction { realm ->
+            val onlyLocal = realm.where<Unit>()
+                    .not().oneOf("id", shopPlans.map { it.id }.toTypedArray())
+                    .findAll()
+
+            onlyLocal.deleteAllFromRealm()
+            realm.copyToRealmOrUpdate(shopPlans)
+        }
+
+        return getShopPlans()
+    }
+
+    fun saveShopPlan(shopPlan: ShopPlan): Observable<ShopPlan> {
+        mRealm.executeTransaction {
+            it.copyToRealmOrUpdate(shopPlan)
+        }
+
+        return getShopPlan(shopPlan.id)
     }
 
     fun deleteAll() {

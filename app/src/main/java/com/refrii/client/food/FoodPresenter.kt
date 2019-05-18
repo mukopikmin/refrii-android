@@ -132,6 +132,19 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun getShopPlans(id: Int) {
+        mApiRepository.getShopPlansForFoodFromCache(id)
+                .subscribe(object : Subscriber<List<ShopPlan>>() {
+                    override fun onNext(t: List<ShopPlan>?) {
+                        mView?.setShopPlans(mFood, t?.filter { !it.done })
+                    }
+
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
+                })
+
         mApiRepository.getShopPlansForFood(id)
                 .subscribe(object : Subscriber<List<ShopPlan>>() {
                     override fun onNext(t: List<ShopPlan>?) {
@@ -170,7 +183,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun completeShopPlan(shopPlan: ShopPlan) {
-        mApiRepository.updateShopPlan(shopPlan.id, null, null, true)
+        mApiRepository.completeShopPlan(shopPlan.id)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe(object : Subscriber<ShopPlan>() {
@@ -178,7 +191,11 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                         mView?.onCompletedCompleteShopPlan(t)
                     }
 
-                    override fun onCompleted() {}
+                    override fun onCompleted() {
+                        mFood?.id?.let {
+                            getFood(it)
+                        }
+                    }
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
