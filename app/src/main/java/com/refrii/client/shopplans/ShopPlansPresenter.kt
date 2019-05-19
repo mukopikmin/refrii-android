@@ -27,6 +27,7 @@ constructor(private val mApiRepository: ApiRepository) : ShopPlansContract.Prese
                     override fun onCompleted() {}
 
                     override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
                     }
                 })
 
@@ -40,6 +41,7 @@ constructor(private val mApiRepository: ApiRepository) : ShopPlansContract.Prese
                     override fun onCompleted() {}
 
                     override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
                     }
                 })
     }
@@ -47,13 +49,16 @@ constructor(private val mApiRepository: ApiRepository) : ShopPlansContract.Prese
     override fun completeShopPlan(shopPlan: ShopPlan) {
         mApiRepository.completeShopPlan(shopPlan.id)
                 .subscribe(object : Subscriber<ShopPlan>() {
-                    override fun onNext(t: ShopPlan?) {}
+                    override fun onNext(t: ShopPlan?) {
+                        mView?.showSnackBar("${t?.food?.name} の予定を完了しました")
+                    }
 
                     override fun onCompleted() {
                         getShopPlans()
                     }
 
                     override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
                     }
                 })
     }

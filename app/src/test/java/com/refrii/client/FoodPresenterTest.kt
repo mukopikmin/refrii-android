@@ -29,6 +29,7 @@ class FoodPresenterTest {
         on { getUnitsForBoxFromCache(any()) } doReturn Observable.just(listOf())
         on { updateFood(any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) } doReturn Observable.just(Food())
         on { getShopPlansForFood(any()) } doReturn Observable.just(listOf())
+        on { getShopPlansForFoodFromCache(any()) } doReturn Observable.just(listOf())
     }
 
     private lateinit var presenter: FoodPresenter

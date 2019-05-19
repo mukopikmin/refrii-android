@@ -26,11 +26,13 @@ class ShopPlanViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
     fun bind(shopPlan: ShopPlan, food: Food) {
-        val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+        val context = amountDiff.context
+        val formatter = SimpleDateFormat(context.getString(R.string.date_format), Locale.getDefault())
         val unitLabel = food.unit?.label
         val diff = shopPlan.amount
 
-        amountDiff.text = arrayOf(diff, unitLabel).joinToString(" ")
+        amountDiff.text = context.getString(R.string.amount_with_unit).format(diff, unitLabel)
         date.text = formatter.format(shopPlan.date)
+        completeButton.isChecked = false
     }
 }

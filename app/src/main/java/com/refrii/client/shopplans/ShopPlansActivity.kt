@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.snackbar.Snackbar
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.models.ShopPlan
@@ -86,5 +88,17 @@ class ShopPlansActivity : AppCompatActivity(), ShopPlansContract.View {
         }
 
         return result
+    }
+
+    override fun showToast(message: String?) {
+        message ?: return
+
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun showSnackBar(message: String?) {
+        message ?: return
+
+        Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_SHORT).show()
     }
 }

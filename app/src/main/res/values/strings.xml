@@ -69,4 +69,7 @@
     <string name="notification_topic_push">mytopic</string>
     <string name="preference_key_push_token">preference_key_push_token</string>
     <string name="key_food_name">key_food_name</string>
+    <string name="amount_with_unit">%.1f %s</string>
+    <string name="amount">%.1f</string>
+    <string name="date_format">yyyy/MM/dd</string>
 </resources>
