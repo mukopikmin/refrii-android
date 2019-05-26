@@ -286,6 +286,10 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
                 })
     }
 
+    override fun showNoticeDialog() {
+        mView?.showNoticeDialog(mFood?.name, mFood?.notice)
+    }
+
     override fun deleteLocalData() {
         mBox = null
 

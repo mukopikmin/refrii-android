@@ -30,6 +30,7 @@ import butterknife.ButterKnife
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -43,6 +44,7 @@ import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.CreateBoxDialogFragment
+import com.refrii.client.dialogs.NoticeDialogFragment
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.settings.SettingsActivity
@@ -73,22 +75,25 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     @BindView(R.id.addFoodButton)
     lateinit var mAddFoodButton: AppCompatButton
 
-    @BindView(R.id.bottomMenu)
-    lateinit var mBottomMenu: View
-    @BindView(R.id.shadow)
-    lateinit var mBottomNavigationShadow: View
-    @BindView(R.id.incrementButton)
-    lateinit var mIncrementButton: ImageView
-    @BindView(R.id.decrementButton)
-    lateinit var mDecrementButton: ImageView
-    @BindView(R.id.amountDiffTextView)
-    lateinit var mAmountText: TextView
-    @BindView(R.id.noticeTextView)
-    lateinit var mNoticeText: TextView
-    @BindView(R.id.editButton)
-    lateinit var mEditButton: ImageView
-    @BindView(R.id.deleteButton)
-    lateinit var mDeleteButton: ImageView
+//    @BindView(R.id.bottomMenu)
+//    lateinit var mBottomMenu: View
+//    @BindView(R.id.shadow)
+//    lateinit var mBottomNavigationShadow: View
+//    @BindView(R.id.incrementButton)
+//    lateinit var mIncrementButton: ImageView
+//    @BindView(R.id.decrementButton)
+//    lateinit var mDecrementButton: ImageView
+//    @BindView(R.id.amountDiffTextView)
+//    lateinit var mAmountText: TextView
+//    @BindView(R.id.noticeTextView)
+//    lateinit var mNoticeText: TextView
+//    @BindView(R.id.editButton)
+//    lateinit var mEditButton: ImageView
+//    @BindView(R.id.deleteButton)
+//    lateinit var mDeleteButton: ImageView
+
+    @BindView(R.id.bottomNavigation)
+    lateinit var mBottomNavigation: BottomNavigationView
 
     private lateinit var mFirebaseAuth: FirebaseAuth
     private lateinit var mPreference: SharedPreferences
@@ -106,7 +111,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         setSupportActionBar(mToolbar)
 
         hideProgressBar()
-        hideBottomNavigationWithoutAnimation()
+//        hideBottomNavigationWithoutAnimation()
 
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
@@ -119,13 +124,35 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mPreference = PreferenceManager.getDefaultSharedPreferences(this)
 
         mFab.setOnClickListener { mPresenter.addFood() }
-        mIncrementButton.setOnClickListener { mPresenter.incrementFood() }
-        mDecrementButton.setOnClickListener { mPresenter.decrementFood() }
-        mEditButton.setOnClickListener { mPresenter.showFood() }
-        mDeleteButton.setOnClickListener { mPresenter.confirmRemovingFood() }
+//        mIncrementButton.setOnClickListener { mPresenter.incrementFood() }
+//        mDecrementButton.setOnClickListener { mPresenter.decrementFood() }
+//        mEditButton.setOnClickListener { mPresenter.showFood() }
+//        mDeleteButton.setOnClickListener { mPresenter.confirmRemovingFood() }
         mAddFoodButton.setOnClickListener { mPresenter.addFood() }
 
         initPushNotification()
+
+        mBottomNavigation.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.navigation_edit -> mPresenter.showFood()
+                R.id.navigation_increment -> mPresenter.incrementFood()
+                R.id.navigation_decrement -> mPresenter.decrementFood()
+                R.id.navigation_notifications -> mPresenter.showNoticeDialog()
+                R.id.navigation_delete -> mPresenter.confirmRemovingFood()
+            }
+
+            true
+        }
+    }
+
+    override fun showNoticeDialog(name: String?, notice: String?) {
+        name ?: return
+        notice ?: return
+
+        val fragment = NoticeDialogFragment.newInstance(name, notice)
+
+        fragment.setTargetFragment(null, SHOW_NOTICE_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "show_notice")
     }
 
     private fun initPushNotification() {
@@ -175,7 +202,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         super.onStart()
 
         reauthorize()
-        hideBottomNavigationWithoutAnimation()
+        hideBottomNavigation()
+//        hideBottomNavigationWithoutAnimation()
     }
 
     private fun reauthorize() {
@@ -255,9 +283,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-        when (id) {
+        when (item.itemId) {
             R.id.action_box_info -> mPresenter.getBoxInfo()
             R.id.action_box_sync -> mPresenter.getBoxes()
         }
@@ -407,15 +433,16 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun showBottomNavigation(food: Food) {
-        mAmountText.text = "${food.amount} ${food.unit?.label}"
-        mNoticeText.text = food.notice
-        mBottomNavigationShadow.visibility = View.VISIBLE
-
-        mBottomMenu.animate()
-                .translationY(0.toFloat())
-                .withStartAction { mBottomMenu.visibility = View.VISIBLE }
-                .duration = 200
+//        mAmountText.text = "${food.amount} ${food.unit?.label}"
+//        mNoticeText.text = food.notice
+//        mBottomNavigationShadow.visibility = View.VISIBLE
+//
+//        mBottomMenu.animate()
+//                .translationY(0.toFloat())
+//                .withStartAction { mBottomMenu.visibility = View.VISIBLE }
+//                .duration = 200
         mFab.hide()
+        mBottomNavigation.visibility = View.VISIBLE
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
@@ -425,25 +452,26 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         }
     }
 
-    private fun hideBottomNavigationWithoutAnimation() {
-        mBottomMenu.visibility = View.GONE
-        mBottomNavigationShadow.visibility = View.GONE
-        mFab.show()
-
-        if (mRecyclerView.adapter != null) {
-            val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
-
-            adapter.deselectItem()
-        }
-    }
+//    private fun hideBottomNavigationWithoutAnimation() {
+////        mBottomMenu.visibility = View.GONE
+////        mBottomNavigationShadow.visibility = View.GONE
+//        mFab.show()
+//
+//        if (mRecyclerView.adapter != null) {
+//            val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
+//
+//            adapter.deselectItem()
+//        }
+//    }
 
     override fun hideBottomNavigation() {
-        mBottomNavigationShadow.visibility = View.GONE
-        mBottomMenu.animate()
-                .translationY(mBottomMenu.height.toFloat())
-                .withEndAction { mBottomMenu.visibility = View.GONE }
-                .duration = 200
+//        mBottomNavigationShadow.visibility = View.GONE
+//        mBottomMenu.animate()
+//                .translationY(mBottomMenu.height.toFloat())
+//                .withEndAction { mBottomMenu.visibility = View.GONE }
+//                .duration = 200
         mFab.show()
+        mBottomNavigation.visibility = View.GONE
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
@@ -581,5 +609,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         private const val REMOVE_FOOD_REQUEST_CODE = 104
         private const val REMOVE_BOX_REQUEST_CODE = 105
         private const val CREATE_BOX_REQUEST_CODE = 106
+        private const val SHOW_NOTICE_REQUEST_CODE = 107
     }
 }
