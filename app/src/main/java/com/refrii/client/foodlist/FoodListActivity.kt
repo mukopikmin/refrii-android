@@ -75,22 +75,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     @BindView(R.id.addFoodButton)
     lateinit var mAddFoodButton: AppCompatButton
 
-//    @BindView(R.id.bottomMenu)
-//    lateinit var mBottomMenu: View
-//    @BindView(R.id.shadow)
-//    lateinit var mBottomNavigationShadow: View
-//    @BindView(R.id.incrementButton)
-//    lateinit var mIncrementButton: ImageView
-//    @BindView(R.id.decrementButton)
-//    lateinit var mDecrementButton: ImageView
-//    @BindView(R.id.amountDiffTextView)
-//    lateinit var mAmountText: TextView
-//    @BindView(R.id.noticeTextView)
-//    lateinit var mNoticeText: TextView
-//    @BindView(R.id.editButton)
-//    lateinit var mEditButton: ImageView
-//    @BindView(R.id.deleteButton)
-//    lateinit var mDeleteButton: ImageView
 
     @BindView(R.id.bottomNavigation)
     lateinit var mBottomNavigation: BottomNavigationView
@@ -111,7 +95,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         setSupportActionBar(mToolbar)
 
         hideProgressBar()
-//        hideBottomNavigationWithoutAnimation()
 
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(toggle)
@@ -124,10 +107,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mPreference = PreferenceManager.getDefaultSharedPreferences(this)
 
         mFab.setOnClickListener { mPresenter.addFood() }
-//        mIncrementButton.setOnClickListener { mPresenter.incrementFood() }
-//        mDecrementButton.setOnClickListener { mPresenter.decrementFood() }
-//        mEditButton.setOnClickListener { mPresenter.showFood() }
-//        mDeleteButton.setOnClickListener { mPresenter.confirmRemovingFood() }
         mAddFoodButton.setOnClickListener { mPresenter.addFood() }
 
         initPushNotification()
@@ -180,7 +159,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                         val userId = mPreference.getInt(application.getString(R.string.preference_key_id), 0)
 
                         if (!task.isSuccessful) {
-//                            Log.w(PushNotificationService.TAG, "getInstanceId failed", task.exception)
                             return@OnCompleteListener
                         }
 
@@ -203,7 +181,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         reauthorize()
         hideBottomNavigation()
-//        hideBottomNavigationWithoutAnimation()
     }
 
     private fun reauthorize() {
@@ -433,14 +410,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun showBottomNavigation(food: Food) {
-//        mAmountText.text = "${food.amount} ${food.unit?.label}"
-//        mNoticeText.text = food.notice
-//        mBottomNavigationShadow.visibility = View.VISIBLE
-//
-//        mBottomMenu.animate()
-//                .translationY(0.toFloat())
-//                .withStartAction { mBottomMenu.visibility = View.VISIBLE }
-//                .duration = 200
         mFab.hide()
         mBottomNavigation.visibility = View.VISIBLE
 
@@ -452,24 +421,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         }
     }
 
-//    private fun hideBottomNavigationWithoutAnimation() {
-////        mBottomMenu.visibility = View.GONE
-////        mBottomNavigationShadow.visibility = View.GONE
-//        mFab.show()
-//
-//        if (mRecyclerView.adapter != null) {
-//            val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
-//
-//            adapter.deselectItem()
-//        }
-//    }
-
     override fun hideBottomNavigation() {
-//        mBottomNavigationShadow.visibility = View.GONE
-//        mBottomMenu.animate()
-//                .translationY(mBottomMenu.height.toFloat())
-//                .withEndAction { mBottomMenu.visibility = View.GONE }
-//                .duration = 200
         mFab.show()
         mBottomNavigation.visibility = View.GONE
 
