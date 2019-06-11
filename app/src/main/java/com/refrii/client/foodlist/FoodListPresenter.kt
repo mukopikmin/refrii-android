@@ -280,9 +280,8 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
                     }
 
                     override fun onError(e: Throwable?) {
-                        mView?.signOut()
+//                        mView?.signOut()
                     }
-
                 })
     }
 

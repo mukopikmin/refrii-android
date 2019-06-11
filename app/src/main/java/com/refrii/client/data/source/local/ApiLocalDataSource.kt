@@ -15,7 +15,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .findAll()
                 .sort("id")
 
-        return Observable.just(boxes)
+        return Observable.just(mRealm.copyFromRealm(boxes))
     }
 
     fun saveBoxes(boxes: List<Box>): Observable<List<Box>> {
@@ -51,7 +51,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .findAll()
                 .sort("id")
 
-        return Observable.just(units)
+        return Observable.just(mRealm.copyFromRealm(units))
     }
 
     fun getFoods(): Observable<List<Food>> {
@@ -59,7 +59,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .findAll()
                 .sort("id")
 
-        return Observable.just(foods)
+        return Observable.just(mRealm.copyFromRealm(foods))
     }
 
     fun getExpiringFoods(): Observable<List<Food>> {
@@ -70,7 +70,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .filter { it.expirationDate!!.time - now < week }
                 .sortedBy { it.expirationDate }
 
-        return Observable.just(foods)
+        return Observable.just(mRealm.copyFromRealm(foods))
     }
 
     fun saveFoods(foods: List<Food>): Observable<List<Food>> {
@@ -106,7 +106,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
             unit?.let { food.unit = unit }
         }
 
-        return Observable.just(food)
+        return Observable.just(mRealm.copyFromRealm(food))
     }
 
     fun saveFood(food: Food): Observable<Food?> {
@@ -122,7 +122,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .equalTo("id", id)
                 .findFirst()
 
-        return Observable.just(box)
+        return Observable.just(mRealm.copyFromRealm(box))
     }
 
     fun updateBox(box: Box) {
@@ -146,7 +146,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .findAll()
                 .sort("id")
 
-        return Observable.just(foods)
+        return Observable.just(mRealm.copyFromRealm(foods))
     }
 
     fun getFood(id: Int): Observable<Food?> {
@@ -154,7 +154,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .equalTo("id", id)
                 .findFirst()
 
-        return Observable.just(food)
+        return Observable.just(mRealm.copyFromRealm(food))
     }
 
     fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date) {
@@ -172,7 +172,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .sort("id")
                 .filter { it.user?.id == userId }
 
-        return Observable.just(units)
+        return Observable.just(mRealm.copyFromRealm(units))
     }
 
     fun getUnit(id: Int): Observable<Unit?> {
@@ -180,7 +180,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .equalTo("id", id)
                 .findFirst()
 
-        return Observable.just(unit)
+        return Observable.just(mRealm.copyFromRealm(unit))
     }
 
     fun saveUnits(units: List<Unit>): Observable<List<Unit>> {
@@ -231,7 +231,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .equalTo("id", id)
                 .findFirst()
 
-        return Observable.just(user)
+        return Observable.just(mRealm.copyFromRealm(user))
     }
 
     fun saveUser(user: User): Observable<User?> {
@@ -248,7 +248,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .sort("date")
                 .findAll()
 
-        return Observable.just(plans)
+        return Observable.just(mRealm.copyFromRealm(plans))
     }
 
     fun getShopPlansForFood(foodId: Int): Observable<List<ShopPlan>> {
@@ -256,7 +256,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .equalTo("food.id", foodId)
                 .findAll()
 
-        return Observable.just(plans)
+        return Observable.just(mRealm.copyFromRealm(plans))
     }
 
     fun getShopPlan(id: Int): Observable<ShopPlan> {
@@ -264,7 +264,7 @@ class ApiLocalDataSource(private val mRealm: Realm) {
                 .equalTo("id", id)
                 .findFirst()
 
-        return Observable.just(plan)
+        return Observable.just(mRealm.copyFromRealm(plan))
     }
 
     fun saveShopPlans(shopPlans: List<ShopPlan>): Observable<List<ShopPlan>> {

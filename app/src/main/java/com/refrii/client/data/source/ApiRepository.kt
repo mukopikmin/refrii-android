@@ -59,6 +59,7 @@ class ApiRepository(realm: Realm, retrofit: Retrofit) {
     fun getFoodsInBox(id: Int): Observable<List<Food>> {
         return mApiRemoteDataSource.getFoodsInBox(id)
                 .flatMap { mApiLocalDataSource.saveFoods(it) }
+                .flatMap { mApiLocalDataSource.getFoodsInBox(id) }
     }
 
     fun getFoodsInBoxFromCache(id: Int): Observable<List<Food>> {

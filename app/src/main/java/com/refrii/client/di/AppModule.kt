@@ -143,7 +143,7 @@ class AppModule(private var mApplication: Application) {
         val version = "v1"
 
         return if (BuildConfig.FLAVOR == "staging") {
-            "https://refrii-api-production-e4gheahv7q-uc.a.run.app/$version/"
+            "http://10.1.1.106:3000/$version/"
         } else {
             "https://api.refrii.com/$version/"
         }
