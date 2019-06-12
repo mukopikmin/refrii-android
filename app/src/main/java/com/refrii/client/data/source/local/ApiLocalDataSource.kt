@@ -75,10 +75,13 @@ class ApiLocalDataSource(private val mRealm: Realm) {
 
     fun saveFoods(foods: List<Food>): Observable<List<Food>> {
         mRealm.executeTransaction { realm ->
-            realm.where<Food>()
+            val a = realm.where<Food>()
                     .not().oneOf("id", foods.map { it.id }.toTypedArray())
                     .findAll()
-                    .deleteAllFromRealm()
+//            realm.where<Food>()
+//                    .not().oneOf("id", foods.map { it.id }.toTypedArray())
+//                    .findAll()
+//                    .deleteAllFromRealm()
             realm.copyToRealmOrUpdate(foods)
         }
 

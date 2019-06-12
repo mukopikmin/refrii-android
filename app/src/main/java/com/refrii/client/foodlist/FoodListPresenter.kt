@@ -205,7 +205,11 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         mApiRepository.getFoodsInBox(box.id)
                 .subscribe(object : Subscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {
-                        setBox(box, t)
+                        mBox?.let {
+                            if (it.id == box.id) {
+                                setBox(box, t)
+                            }
+                        }
                     }
 
                     override fun onCompleted() {}

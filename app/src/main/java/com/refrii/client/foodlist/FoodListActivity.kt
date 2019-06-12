@@ -387,14 +387,15 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         if (mRecyclerView.adapter == null) {
             val adapter = FoodRecyclerViewAdapter(foods)
 
-            title = boxName
             adapter.setOnClickListener(View.OnClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
 
                 mPresenter.selectFood(food)
             })
+
             mRecyclerView.adapter = adapter
+            title = boxName
         } else {
             updateFoods(boxName, foods)
         }
