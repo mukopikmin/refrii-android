@@ -1,12 +1,12 @@
 package com.refrii.client.newunit
 
 import com.refrii.client.data.models.Unit
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiUnitRepository
 import javax.inject.Inject
 
 class NewUnitPresenter
 @Inject
-constructor(private val mApiRepository: ApiRepository) : NewUnitContract.Presenter {
+constructor(private val mApiUnitRepository: ApiUnitRepository) : NewUnitContract.Presenter {
 
     private var mView: NewUnitContract.View? = null
     private var mUnit: Unit? = null
@@ -16,7 +16,7 @@ constructor(private val mApiRepository: ApiRepository) : NewUnitContract.Present
     }
 
     override fun createUnit(label: String, amount: Double) {
-        mApiRepository.createUnit(label, amount)
+        mApiUnitRepository.createUnit(label, amount)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe({

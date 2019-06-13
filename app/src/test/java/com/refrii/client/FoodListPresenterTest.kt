@@ -4,7 +4,9 @@ import com.nhaarman.mockitokotlin2.*
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.User
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiBoxRepository
+import com.refrii.client.data.source.ApiFoodRepository
+import com.refrii.client.data.source.ApiUserRepository
 import com.refrii.client.foodlist.FoodListContract
 import com.refrii.client.foodlist.FoodListPresenter
 import com.refrii.client.helpers.MockitoHelper
@@ -22,16 +24,20 @@ class FoodListPresenterTest {
     val mockito: MockitoRule = MockitoJUnit.rule()
 
     private val viewMock = mock<FoodListContract.View>()
-    private val apiRepositoryMock = mock<ApiRepository> {
+    private val apiBoxRepositoryMock = mock<ApiBoxRepository> {
         on { getFoodsInBoxFromCache(any()) } doReturn Observable.just(listOf())
         on { getFoodsInBox(any()) } doReturn Observable.just(listOf())
         on { getBoxesFromCache() } doReturn Observable.just(listOf())
         on { getBoxes() } doReturn Observable.just(listOf())
-        on { updateFood(any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) } doReturn Observable.just(Food())
-        on { removeFood(any()) } doReturn Observable.empty()
         on { createBox(any(), any()) } doReturn Observable.just(Box())
+    }
+    private val apiFoodRepositoryMock = mock<ApiFoodRepository> {
         on { getExpiringFoodsFromCache() } doReturn Observable.just(listOf())
         on { getExpiringFoods() } doReturn Observable.just(listOf())
+        on { updateFood(any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) } doReturn Observable.just(Food())
+        on { removeFood(any()) } doReturn Observable.empty()
+    }
+    private val apiUserRepositoryMock = mock<ApiUserRepository> {
         on { registerPushToken(any(), any()) } doReturn Observable.just(User())
         on { deleteLocalData() } doAnswer {}
     }
@@ -40,7 +46,7 @@ class FoodListPresenterTest {
 
     @Before
     fun setUp() {
-        presenter = FoodListPresenter(apiRepositoryMock)
+        presenter = FoodListPresenter(apiBoxRepositoryMock, apiFoodRepositoryMock, apiUserRepositoryMock)
         presenter.takeView(viewMock)
     }
 

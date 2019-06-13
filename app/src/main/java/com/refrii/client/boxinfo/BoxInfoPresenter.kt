@@ -3,13 +3,13 @@ package com.refrii.client.boxinfo
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Invitation
 import com.refrii.client.data.models.User
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiBoxRepository
 import rx.Subscriber
 import javax.inject.Inject
 
 class BoxInfoPresenter
 @Inject
-constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Presenter {
+constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.Presenter {
 
     private var mView: BoxInfoContract.View? = null
     private var mBox: Box? = null
@@ -36,14 +36,14 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
     }
 
     override fun getBox(id: Int) {
-        mApiRepository.getBoxFromCache(id)
+        mApiBoxRepository.getBoxFromCache(id)
                 .subscribe({
                     setBox(it)
                 }, {
                     mView?.showToast(it.message)
                 })
 
-        mApiRepository.getBox(id)
+        mApiBoxRepository.getBox(id)
                 .doOnSubscribe { mView?.onLoading() }
                 .doOnUnsubscribe { mView?.onLoaded() }
                 .subscribe({
@@ -55,7 +55,7 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
 
     override fun updateBox() {
         mId?.let { id ->
-            mApiRepository.updateBox(id, mName, mNotice)
+            mApiBoxRepository.updateBox(id, mName, mNotice)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
                     .subscribe({
@@ -70,7 +70,7 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
 
     override fun removeBox() {
         mId?.let { id ->
-            mApiRepository.removeBox(id)
+            mApiBoxRepository.removeBox(id)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
                     .subscribe(object : Subscriber<Void>() {
@@ -89,7 +89,7 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
 
     override fun invite(email: String) {
         mId?.let { id ->
-            mApiRepository.invite(id, email)
+            mApiBoxRepository.invite(id, email)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
                     .subscribe(object : Subscriber<Invitation>() {
@@ -113,7 +113,7 @@ constructor(private val mApiRepository: ApiRepository) : BoxInfoContract.Present
         val email = mUser?.email ?: return
 
         mId?.let { id ->
-            mApiRepository.uninvite(id, email)
+            mApiBoxRepository.uninvite(id, email)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
                     .subscribe(object : Subscriber<Void>() {

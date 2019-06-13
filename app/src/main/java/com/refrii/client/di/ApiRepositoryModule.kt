@@ -1,6 +1,6 @@
 package com.refrii.client.di
 
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.*
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
@@ -12,7 +12,31 @@ class ApiRepositoryModule {
 
     @Singleton
     @Provides
-    fun provideApiRepository(realm: Realm, retrofit: Retrofit): ApiRepository {
-        return ApiRepository(realm, retrofit)
+    fun provideApiBoxRepository(realm: Realm, retrofit: Retrofit): ApiBoxRepository {
+        return ApiBoxRepository(realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiFoodRepository(realm: Realm, retrofit: Retrofit): ApiFoodRepository {
+        return ApiFoodRepository(realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiShopPlanRepository(realm: Realm, retrofit: Retrofit): ApiShopPlanRepository {
+        return ApiShopPlanRepository(realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiUnitRepository(realm: Realm, retrofit: Retrofit): ApiUnitRepository {
+        return ApiUnitRepository(realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiUserRepository(realm: Realm, retrofit: Retrofit): ApiUserRepository {
+        return ApiUserRepository(realm, retrofit)
     }
 }

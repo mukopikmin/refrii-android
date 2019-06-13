@@ -14,7 +14,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.refrii.client.App
 import com.refrii.client.R
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiUserRepository
 import com.refrii.client.foodlist.FoodListActivity
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ class PushNotificationService : FirebaseMessagingService() {
     private lateinit var mPreference: SharedPreferences
 
     @Inject
-    lateinit var mApiRepository: ApiRepository
+    lateinit var mApiUserRepository: ApiUserRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -54,7 +54,7 @@ class PushNotificationService : FirebaseMessagingService() {
 
         val userId = mPreference.getInt(application.getString(R.string.preference_key_id), 0)
 
-        mApiRepository.registerPushToken(userId, token)
+        mApiUserRepository.registerPushToken(userId, token)
                 .subscribe({
                     val editor = mPreference.edit()
 

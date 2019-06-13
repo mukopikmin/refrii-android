@@ -3,13 +3,16 @@ package com.refrii.client.newfood
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.Unit
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiBoxRepository
+import com.refrii.client.data.source.ApiFoodRepository
 import java.util.*
 import javax.inject.Inject
 
 class NewFoodPresenter
 @Inject
-constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Presenter {
+constructor(
+        private val mApiBoxRepository: ApiBoxRepository,
+        private val mApiFoodRepository: ApiFoodRepository) : NewFoodContract.Presenter {
 
     private var mView: NewFoodContract.View? = null
     private var mUnits: List<Unit>? = null
@@ -24,7 +27,7 @@ constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Present
         unit ?: return
 
         mBox?.let { box ->
-            mApiRepository.createFood(name, notice, amount, box, unit, expirationDate)
+            mApiFoodRepository.createFood(name, notice, amount, box, unit, expirationDate)
                     .doOnSubscribe { mView?.showProgressBar() }
                     .doOnUnsubscribe { mView?.hideProgressBar() }
                     .subscribe({
@@ -37,7 +40,7 @@ constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Present
     }
 
     override fun getUnits(boxId: Int) {
-        mApiRepository.getUnitsForBoxFromCache(boxId)
+        mApiBoxRepository.getUnitsForBoxFromCache(boxId)
                 .subscribe({
                     mUnits = it
                     mView?.setUnits(it)
@@ -45,7 +48,7 @@ constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Present
                     mView?.showToast(it.message)
                 })
 
-        mApiRepository.getUnitsForBox(boxId)
+        mApiBoxRepository.getUnitsForBox(boxId)
                 .subscribe({
                     mUnits = it
                     mView?.setUnits(it)
@@ -55,7 +58,7 @@ constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Present
     }
 
     override fun getBox(id: Int) {
-        mApiRepository.getBoxFromCache(id)
+        mApiBoxRepository.getBoxFromCache(id)
                 .subscribe({
                     mBox = it
                     mView?.setBox(it)
@@ -63,7 +66,7 @@ constructor(private val mApiRepository: ApiRepository) : NewFoodContract.Present
                     mView?.showToast(it.message)
                 })
 
-        mApiRepository.getBox(id)
+        mApiBoxRepository.getBox(id)
                 .subscribe({
                     mBox = it
                     mView?.setBox(it)

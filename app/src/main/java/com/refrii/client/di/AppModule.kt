@@ -9,7 +9,7 @@ import com.refrii.client.BuildConfig
 import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoContract
 import com.refrii.client.boxinfo.BoxInfoPresenter
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.*
 import com.refrii.client.food.FoodContract
 import com.refrii.client.food.FoodPresenter
 import com.refrii.client.foodlist.FoodListContract
@@ -47,48 +47,48 @@ class AppModule(private var mApplication: Application) {
     }
 
     @Provides
-    fun provideSigninPresenter(apiRepository: ApiRepository): SigninContract.Presenter {
-        return SigninPresenter(apiRepository)
+    fun provideSigninPresenter(apiUserRepository: ApiUserRepository): SigninContract.Presenter {
+        return SigninPresenter(apiUserRepository)
     }
 
     @Provides
-    fun provideFoodListPresenter(apiRepository: ApiRepository): FoodListContract.Presenter {
-        return FoodListPresenter(apiRepository)
+    fun provideFoodListPresenter(boxRepository: ApiBoxRepository, foodRepository: ApiFoodRepository, userRepository: ApiUserRepository): FoodListContract.Presenter {
+        return FoodListPresenter(boxRepository, foodRepository, userRepository)
     }
 
     @Provides
-    fun provideFoodPresenter(apiRepository: ApiRepository): FoodContract.Presenter {
-        return FoodPresenter(apiRepository)
+    fun provideFoodPresenter(foodRepository: ApiFoodRepository, boxRepository: ApiBoxRepository, shopPlanRepository: ApiShopPlanRepository): FoodContract.Presenter {
+        return FoodPresenter(foodRepository, boxRepository, shopPlanRepository)
     }
 
     @Provides
-    fun provideNewFoodPresenter(apiRepository: ApiRepository): NewFoodContract.Presenter {
-        return NewFoodPresenter(apiRepository)
+    fun provideNewFoodPresenter(boxRepository: ApiBoxRepository, foodRepository: ApiFoodRepository): NewFoodContract.Presenter {
+        return NewFoodPresenter(boxRepository, foodRepository)
     }
 
     @Provides
-    fun provideBoxInfoPresenter(apiRepository: ApiRepository): BoxInfoContract.Presenter {
-        return BoxInfoPresenter(apiRepository)
+    fun provideBoxInfoPresenter(boxRepository: ApiBoxRepository): BoxInfoContract.Presenter {
+        return BoxInfoPresenter(boxRepository)
     }
 
     @Provides
-    fun provideUnitListPresenter(apiRepository: ApiRepository): UnitListContract.Presenter {
-        return UnitListPresenter(apiRepository)
+    fun provideUnitListPresenter(unitRepository: ApiUnitRepository): UnitListContract.Presenter {
+        return UnitListPresenter(unitRepository)
     }
 
     @Provides
-    fun provideUnitPresenter(apiRepository: ApiRepository): UnitContract.Presenter {
-        return UnitPresenter(apiRepository)
+    fun provideUnitPresenter(unitRepository: ApiUnitRepository): UnitContract.Presenter {
+        return UnitPresenter(unitRepository)
     }
 
     @Provides
-    fun provideNewUnitPresenter(apiRepository: ApiRepository): NewUnitContract.Presenter {
-        return NewUnitPresenter(apiRepository)
+    fun provideNewUnitPresenter(unitRepository: ApiUnitRepository): NewUnitContract.Presenter {
+        return NewUnitPresenter(unitRepository)
     }
 
     @Provides
-    fun provideShopPlansPresenter(apiRepository: ApiRepository): ShopPlansContract.Presenter {
-        return ShopPlansPresenter(apiRepository)
+    fun provideShopPlansPresenter(shopPlanRepository: ApiShopPlanRepository): ShopPlansContract.Presenter {
+        return ShopPlansPresenter(shopPlanRepository)
     }
 
     @Singleton

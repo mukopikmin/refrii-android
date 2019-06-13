@@ -3,7 +3,9 @@ package com.refrii.client
 import com.nhaarman.mockitokotlin2.*
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.Unit
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiBoxRepository
+import com.refrii.client.data.source.ApiFoodRepository
+import com.refrii.client.data.source.ApiShopPlanRepository
 import com.refrii.client.food.FoodContract
 import com.refrii.client.food.FoodPresenter
 import com.refrii.client.helpers.MockitoHelper
@@ -22,21 +24,24 @@ class FoodPresenterTest {
     val mockito: MockitoRule = MockitoJUnit.rule()
 
     private val viewMock = mock<FoodContract.View>()
-    private val apiRepositoryMock = mock<ApiRepository> {
-        on { getFood(any()) } doReturn Observable.just(Food())
-        on { getFoodFromCache(any()) } doReturn Observable.just(Food())
+    private val apiBoxRepositoryMock = mock<ApiBoxRepository> {
         on { getUnitsForBox(any()) } doReturn Observable.just(listOf())
         on { getUnitsForBoxFromCache(any()) } doReturn Observable.just(listOf())
+    }
+    private val apiFoodRepositoryMock = mock<ApiFoodRepository> {
+        on { getFood(any()) } doReturn Observable.just(Food())
+        on { getFoodFromCache(any()) } doReturn Observable.just(Food())
         on { updateFood(any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) } doReturn Observable.just(Food())
         on { getShopPlansForFood(any()) } doReturn Observable.just(listOf())
         on { getShopPlansForFoodFromCache(any()) } doReturn Observable.just(listOf())
     }
+    private val apiShopPlanRepositoryMock = mock<ApiShopPlanRepository> { }
 
     private lateinit var presenter: FoodPresenter
 
     @Before
     fun setUp() {
-        presenter = FoodPresenter(apiRepositoryMock)
+        presenter = FoodPresenter(apiFoodRepositoryMock, apiBoxRepositoryMock, apiShopPlanRepositoryMock)
         presenter.takeView(viewMock)
     }
 

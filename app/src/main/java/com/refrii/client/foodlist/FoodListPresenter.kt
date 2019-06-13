@@ -3,14 +3,19 @@ package com.refrii.client.foodlist
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.User
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiBoxRepository
+import com.refrii.client.data.source.ApiFoodRepository
+import com.refrii.client.data.source.ApiUserRepository
 import retrofit2.HttpException
 import rx.Subscriber
 import javax.inject.Inject
 
 class FoodListPresenter
 @Inject
-constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presenter {
+constructor(
+        private val mApiBoxRepository: ApiBoxRepository,
+        private val mApiFoodRepository: ApiFoodRepository,
+        private val mApiUserRepository: ApiUserRepository) : FoodListContract.Presenter {
 
     private var mView: FoodListContract.View? = null
     private var mBoxes: List<Box>? = null
@@ -58,7 +63,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         // Temporally clear boxes set in drawer, for updating cache
         mView?.clearBoxes()
 
-        mApiRepository.getBoxesFromCache()
+        mApiBoxRepository.getBoxesFromCache()
                 .subscribe(object : Subscriber<List<Box>>() {
                     override fun onNext(t: List<Box>?) {
                         setBoxes(t)
@@ -71,7 +76,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
                     }
                 })
 
-        mApiRepository.getBoxes()
+        mApiBoxRepository.getBoxes()
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe(object : Subscriber<List<Box>>() {
@@ -117,7 +122,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     }
 
     fun updateFood(food: Food, amount: Double = 0.toDouble()) {
-        mApiRepository.updateFood(food.id, null, null, amount, null, null, null)
+        mApiFoodRepository.updateFood(food.id, null, null, amount, null, null, null)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe(object : Subscriber<Food>() {
@@ -140,7 +145,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
 
     override fun removeFood() {
         mFood?.let {
-            mApiRepository.removeFood(it.id)
+            mApiFoodRepository.removeFood(it.id)
                     .doOnSubscribe { mView?.showProgressBar() }
                     .doOnUnsubscribe { mView?.hideProgressBar() }
                     .subscribe(object : Subscriber<Void>() {
@@ -162,7 +167,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     }
 
     override fun createBox(name: String, notice: String) {
-        mApiRepository.createBox(name, notice)
+        mApiBoxRepository.createBox(name, notice)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe(object : Subscriber<Box>() {
@@ -189,7 +194,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     override fun selectBox(box: Box) {
         mBox = box
 
-        mApiRepository.getFoodsInBoxFromCache(box.id)
+        mApiBoxRepository.getFoodsInBoxFromCache(box.id)
                 .subscribe(object : Subscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {
                         setBox(box, t)
@@ -202,7 +207,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
                     }
                 })
 
-        mApiRepository.getFoodsInBox(box.id)
+        mApiBoxRepository.getFoodsInBox(box.id)
                 .subscribe(object : Subscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {
                         mBox?.let {
@@ -244,7 +249,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     override fun getExpiringFoods() {
         mBox = null
 
-        mApiRepository.getExpiringFoodsFromCache()
+        mApiFoodRepository.getExpiringFoodsFromCache()
                 .subscribe(object : Subscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {
                         mFoods = t
@@ -258,7 +263,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
                     }
                 })
 
-        mApiRepository.getExpiringFoods()
+        mApiFoodRepository.getExpiringFoods()
                 .subscribe(object : Subscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {
                         mFoods = t
@@ -274,7 +279,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
     }
 
     override fun registerPushToken(userId: Int, token: String) {
-        mApiRepository.registerPushToken(userId, token)
+        mApiUserRepository.registerPushToken(userId, token)
                 .subscribe(object : Subscriber<User>() {
                     override fun onNext(t: User?) {}
 
@@ -297,6 +302,6 @@ constructor(private val mApiRepository: ApiRepository) : FoodListContract.Presen
         mBox = null
 
         mView?.clearBoxes()
-        mApiRepository.deleteLocalData()
+        mApiUserRepository.deleteLocalData()
     }
 }

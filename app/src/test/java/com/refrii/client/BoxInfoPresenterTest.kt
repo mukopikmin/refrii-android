@@ -6,7 +6,7 @@ import com.refrii.client.boxinfo.BoxInfoPresenter
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Invitation
 import com.refrii.client.data.models.User
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiBoxRepository
 import com.refrii.client.helpers.MockitoHelper
 import org.junit.Before
 import org.junit.Rule
@@ -22,7 +22,7 @@ class BoxInfoPresenterTest {
     val mockito: MockitoRule = MockitoJUnit.rule()
 
     private val viewMock = mock<BoxInfoContract.View>()
-    private val apiRepositoryMock = mock<ApiRepository> {
+    private val apiBoxRepositoryMock = mock<ApiBoxRepository> {
         on { getBoxFromCache(any()) } doReturn Observable.just(Box())
         on { getBox(any()) } doReturn Observable.just(Box())
         on { updateBox(any(), any(), any()) } doReturn Observable.just(Box())
@@ -35,7 +35,7 @@ class BoxInfoPresenterTest {
 
     @Before
     fun setUp() {
-        presenter = BoxInfoPresenter(apiRepositoryMock)
+        presenter = BoxInfoPresenter(apiBoxRepositoryMock)
         presenter.takeView(viewMock)
     }
 

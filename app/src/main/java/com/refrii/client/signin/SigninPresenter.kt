@@ -1,11 +1,11 @@
 package com.refrii.client.signin
 
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiUserRepository
 import javax.inject.Inject
 
 class SigninPresenter
 @Inject
-constructor(private val mApiRepository: ApiRepository) : SigninContract.Presenter {
+constructor(private val mApiUserRepository: ApiUserRepository) : SigninContract.Presenter {
 
     private var mView: SigninContract.View? = null
 
@@ -14,7 +14,7 @@ constructor(private val mApiRepository: ApiRepository) : SigninContract.Presente
     }
 
     override fun verifyAccount() {
-        mApiRepository.verify()
+        mApiUserRepository.verify()
                 .subscribe({
                     mView?.saveAccount(it)
                     mView?.onLoginCompleted()

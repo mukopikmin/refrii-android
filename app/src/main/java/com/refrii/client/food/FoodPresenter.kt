@@ -4,14 +4,19 @@ import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiBoxRepository
+import com.refrii.client.data.source.ApiFoodRepository
+import com.refrii.client.data.source.ApiShopPlanRepository
 import rx.Subscriber
 import java.util.*
 import javax.inject.Inject
 
 class FoodPresenter
 @Inject
-constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter {
+constructor(
+        private val mApiFoodRepository: ApiFoodRepository,
+        private val mApiBoxRepository: ApiBoxRepository,
+        private val mApiShopPlanRepository: ApiShopPlanRepository) : FoodContract.Presenter {
 
     private var mView: FoodContract.View? = null
     private var mFood: Food? = null
@@ -51,7 +56,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun getFood(id: Int) {
-        mApiRepository.getFoodFromCache(id)
+        mApiFoodRepository.getFoodFromCache(id)
                 .subscribe(object : Subscriber<Food>() {
                     override fun onNext(t: Food?) {
                         setFood(t)
@@ -66,7 +71,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                     }
                 })
 
-        mApiRepository.getFood(id)
+        mApiFoodRepository.getFood(id)
                 .subscribe(object : Subscriber<Food>() {
                     override fun onNext(t: Food?) {
                         setFood(t)
@@ -83,7 +88,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun getUnits(boxId: Int) {
-        mApiRepository.getUnitsForBoxFromCache(boxId)
+        mApiBoxRepository.getUnitsForBoxFromCache(boxId)
                 .subscribe(object : Subscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>?) {
                         setUnits(t)
@@ -97,7 +102,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
 
                 })
 
-        mApiRepository.getUnitsForBox(boxId)
+        mApiBoxRepository.getUnitsForBox(boxId)
                 .subscribe(object : Subscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>?) {
                         setUnits(t)
@@ -113,7 +118,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
 
     override fun updateFood() {
         mId?.let { id ->
-            mApiRepository.updateFood(id, mName, mNotice, mAmount, mExpirationDate, mBoxId, mUnitId)
+            mApiFoodRepository.updateFood(id, mName, mNotice, mAmount, mExpirationDate, mBoxId, mUnitId)
                     .doOnSubscribe { mView?.showProgressBar() }
                     .doOnUnsubscribe { mView?.hideProgressBar() }
                     .subscribe(object : Subscriber<Food>() {
@@ -132,7 +137,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun getShopPlans(id: Int) {
-        mApiRepository.getShopPlansForFoodFromCache(id)
+        mApiFoodRepository.getShopPlansForFoodFromCache(id)
                 .subscribe(object : Subscriber<List<ShopPlan>>() {
                     override fun onNext(t: List<ShopPlan>?) {
                         mView?.setShopPlans(mFood, t?.filter { !it.done })
@@ -145,7 +150,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
                     }
                 })
 
-        mApiRepository.getShopPlansForFood(id)
+        mApiFoodRepository.getShopPlansForFood(id)
                 .subscribe(object : Subscriber<List<ShopPlan>>() {
                     override fun onNext(t: List<ShopPlan>?) {
                         mView?.setShopPlans(mFood, t?.filter { !it.done })
@@ -165,7 +170,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
 
     override fun createShopPlan(amount: Double, date: Date) {
         mFood?.let {
-            mApiRepository.createShopPlan(it.id, amount, date)
+            mApiShopPlanRepository.createShopPlan(it.id, amount, date)
                     .doOnSubscribe { mView?.showProgressBar() }
                     .doOnUnsubscribe { mView?.hideProgressBar() }
                     .subscribe(object : Subscriber<ShopPlan>() {
@@ -183,7 +188,7 @@ constructor(private val mApiRepository: ApiRepository) : FoodContract.Presenter 
     }
 
     override fun completeShopPlan(shopPlan: ShopPlan) {
-        mApiRepository.completeShopPlan(shopPlan.id)
+        mApiShopPlanRepository.completeShopPlan(shopPlan.id)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe(object : Subscriber<ShopPlan>() {

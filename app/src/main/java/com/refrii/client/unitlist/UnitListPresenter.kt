@@ -1,12 +1,12 @@
 package com.refrii.client.unitlist
 
 import com.refrii.client.data.models.Unit
-import com.refrii.client.data.source.ApiRepository
+import com.refrii.client.data.source.ApiUnitRepository
 import javax.inject.Inject
 
 class UnitListPresenter
 @Inject
-constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presenter {
+constructor(private val mApiUnitRepository: ApiUnitRepository) : UnitListContract.Presenter {
 
     private var mView: UnitListContract.View? = null
     private var mUnits: List<Unit>? = null
@@ -16,7 +16,7 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
     }
 
     override fun getUnits(userId: Int) {
-        mApiRepository.getUnits(userId)
+        mApiUnitRepository.getUnits(userId)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe({
@@ -28,7 +28,7 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
     }
 
     override fun removeUnit(id: Int, userId: Int) {
-        mApiRepository.removeUnit(id)
+        mApiUnitRepository.removeUnit(id)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe({
@@ -40,7 +40,7 @@ constructor(private val mApiRepository: ApiRepository) : UnitListContract.Presen
     }
 
     override fun getUnit(id: Int) {
-        mApiRepository.getUnit(id)
+        mApiUnitRepository.getUnit(id)
                 .subscribe({
                     mView?.onUnitCreateCompleted(it)
                 }, {
