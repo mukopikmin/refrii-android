@@ -92,7 +92,13 @@ class ApiLocalFoodSource(private val mRealm: Realm) {
     }
 
     fun removeFood(id: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val food = mRealm.where<Food>()
+                .equalTo("id", id)
+                .findFirst()
+
+        mRealm.executeTransaction {
+            food?.deleteFromRealm()
+        }
     }
 
 

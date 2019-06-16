@@ -34,9 +34,24 @@ class ApiBoxRepository(realm: Realm, retrofit: Retrofit) {
     }
 
     fun getFoodsInBox(id: Int): Observable<List<Food>> {
-        return mApiRemoteBoxSource.getFoodsInBox(id)
-                .flatMap { mApiLocalFoodSource.saveFoods(it) }
-                .flatMap { mApiLocalBoxSource.getFoodsInBox(id) }
+        return Observable.zip(
+                mApiRemoteBoxSource.getFoodsInBox(id),
+                mApiLocalBoxSource.getFoodsInBox(id)
+        ) { remoteFoods, cachedFoods -> Pair(remoteFoods, cachedFoods) }
+                .flatMap { pair ->
+                    val remote = pair.first
+                    val cache = pair.second
+
+                    cache.forEach { food ->
+                        val ids = remote.map { it.id }
+
+                        if (!ids.contains(food.id)) {
+                            mApiLocalFoodSource.removeFood(food.id)
+                        }
+                    }
+
+                    mApiLocalBoxSource.getFoodsInBox(id)
+                }
     }
 
     fun getFoodsInBoxFromCache(id: Int): Observable<List<Food>> {
