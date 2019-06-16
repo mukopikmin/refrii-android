@@ -75,6 +75,16 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
         return mFoods[position]
     }
 
+    fun updateItem(food: Food) {
+        val index = mFoods.indexOf(food)
+        val foods = mFoods.toMutableList()
+
+        foods[index] = food
+        mFoods = foods.toList()
+
+        notifyDataSetChanged()
+    }
+
     fun isItemSelected(): Boolean {
         return mSelectedPosition != null
     }

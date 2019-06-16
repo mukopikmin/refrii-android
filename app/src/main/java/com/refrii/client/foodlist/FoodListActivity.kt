@@ -434,11 +434,12 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun onFoodUpdated(food: Food?) {
-        mRecyclerView.adapter?.notifyDataSetChanged()
+        food ?: return
 
-        food?.let {
-            showBottomNavigation(food)
-        }
+        val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
+
+        adapter.updateItem(food)
+        showBottomNavigation(food)
     }
 
     override fun showProgressBar() {
