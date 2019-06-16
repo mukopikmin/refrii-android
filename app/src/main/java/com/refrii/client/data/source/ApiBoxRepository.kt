@@ -42,6 +42,8 @@ class ApiBoxRepository(realm: Realm, retrofit: Retrofit) {
                     val remote = pair.first
                     val cache = pair.second
 
+                    remote.forEach { mApiLocalFoodSource.saveFood(it) }
+
                     cache.forEach { food ->
                         val ids = remote.map { it.id }
 

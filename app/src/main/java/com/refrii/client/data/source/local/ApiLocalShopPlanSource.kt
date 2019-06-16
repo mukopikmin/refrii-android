@@ -38,6 +38,16 @@ class ApiLocalShopPlanSource(private val mRealm: Realm) {
         return getShopPlans()
     }
 
+    fun complete(id: Int) {
+        mRealm.executeTransaction { realm ->
+            val plan = realm.where<ShopPlan>()
+                    .equalTo("id", id)
+                    .findFirst()
+
+            plan?.done = true
+        }
+    }
+
     fun saveShopPlan(shopPlan: ShopPlan): Observable<ShopPlan> {
         mRealm.executeTransaction {
             it.copyToRealmOrUpdate(shopPlan)

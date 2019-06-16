@@ -14,8 +14,26 @@ class ApiShopPlanRepository(realm: Realm, retrofit: Retrofit) {
     private val mApiLocalShopPlanSource = ApiLocalShopPlanSource(realm)
 
     fun getShopPlans(): Observable<List<ShopPlan>> {
-        return mApiRemoteShopPlanSource.getShopPlans()
-                .flatMap { mApiLocalShopPlanSource.saveShopPlans(it) }
+        return Observable.zip(
+                mApiRemoteShopPlanSource.getShopPlans(),
+                mApiLocalShopPlanSource.getShopPlans()
+        ) { remote, cache -> Pair(remote, cache) }
+                .flatMap { pair ->
+                    val remote = pair.first
+                    val cache = pair.second
+
+                    remote.forEach { mApiLocalShopPlanSource.saveShopPlan(it) }
+
+                    cache.forEach { plan ->
+                        val ids = remote.map { it.id }
+
+                        if (!ids.contains(plan.id)) {
+                            mApiLocalShopPlanSource.complete(plan.id)
+                        }
+                    }
+
+                    mApiLocalShopPlanSource.getShopPlans()
+                }
     }
 
     fun getShopPlansFromCache(): Observable<List<ShopPlan>> {
