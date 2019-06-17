@@ -24,6 +24,7 @@ interface FoodListContract {
         fun setEmptyMessage(foods: List<Food>?)
         fun savePushToken(token: String)
         fun showNoticeDialog(name: String?, notice: String?)
+        fun deselectFood()
     }
 
     interface Presenter {
@@ -42,6 +43,8 @@ interface FoodListContract {
         fun getExpiringFoods()
         fun deleteLocalData()
         fun selectFood(food: Food)
+        fun deselectFood()
+        fun isFoodSelected(): Boolean
         fun confirmRemovingFood()
         fun registerPushToken(userId: Int, token: String)
         fun showNoticeDialog()

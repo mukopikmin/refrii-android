@@ -241,12 +241,12 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         when {
             mDrawer.isDrawerOpen(GravityCompat.START) -> mDrawer.closeDrawer(GravityCompat.START)
-            adapter.isItemSelected() -> deselectFood()
+            adapter.isItemSelected() -> mPresenter.deselectFood()
             else -> super.onBackPressed()
         }
     }
 
-    private fun deselectFood() {
+    override fun deselectFood() {
         val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
 
         adapter.deselectItem()
@@ -391,7 +391,11 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
 
-                mPresenter.selectFood(food)
+                if (mPresenter.isFoodSelected()) {
+                    mPresenter.deselectFood()
+                } else {
+                    mPresenter.selectFood(food)
+                }
             })
 
             mRecyclerView.adapter = adapter
@@ -439,7 +443,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
 
         adapter.updateItem(food)
-        showBottomNavigation(food)
+        mPresenter.selectFood(food)
     }
 
     override fun showProgressBar() {

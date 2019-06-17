@@ -48,20 +48,11 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
     }
 
     fun selectItem(position: Int) {
-        if (isItemSelected()) {
-            mSelectedPosition?.let {
-                if (it == position) {
-                    mSelectedPosition = null
-                } else {
-                    mSelectedPosition = position
-                }
-            }
-        } else {
-            mSelectedPosition = position
-        }
+        mSelectedPosition = position
 
         notifyDataSetChanged()
     }
+
 
     fun setOnClickListener(listener: View.OnClickListener) {
         mOnClickListener = listener

@@ -225,21 +225,19 @@ constructor(
                 })
     }
 
+
     override fun selectFood(food: Food) {
-        if (mFood == null) {
-            mFood = food
-            mView?.showBottomNavigation(food)
-        } else {
-            mFood?.let {
-                if (it.id == food.id) {
-                    mFood = null
-                    mView?.hideBottomNavigation()
-                } else {
-                    mFood = food
-                    mView?.showBottomNavigation(food)
-                }
-            }
-        }
+        mFood = food
+        mView?.showBottomNavigation(food)
+    }
+
+    override fun isFoodSelected(): Boolean {
+        return mFood != null
+    }
+
+    override fun deselectFood() {
+        mFood = null
+        mView?.deselectFood()
     }
 
     override fun addFood() {
