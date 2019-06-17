@@ -5,7 +5,6 @@ import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
 import io.realm.Realm
-import io.realm.kotlin.oneOf
 import io.realm.kotlin.where
 import rx.Observable
 import java.util.*
@@ -37,21 +36,6 @@ class ApiLocalFoodSource(private val mRealm: Realm) {
                 .sortedBy { it.expirationDate }
 
         return Observable.just(mRealm.copyFromRealm(foods))
-    }
-
-    fun saveFoods(foods: List<Food>): Observable<List<Food>> {
-        mRealm.executeTransaction { realm ->
-            val a = realm.where<Food>()
-                    .not().oneOf("id", foods.map { it.id }.toTypedArray())
-                    .findAll()
-//            realm.where<Food>()
-//                    .not().oneOf("id", foods.map { it.id }.toTypedArray())
-//                    .findAll()
-//                    .deleteAllFromRealm()
-            realm.copyToRealmOrUpdate(foods)
-        }
-
-        return getFoods()
     }
 
     fun updateFood(id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {

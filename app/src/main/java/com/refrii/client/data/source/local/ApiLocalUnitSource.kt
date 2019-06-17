@@ -2,7 +2,6 @@ package com.refrii.client.data.source.local
 
 import com.refrii.client.data.models.Unit
 import io.realm.Realm
-import io.realm.kotlin.oneOf
 import io.realm.kotlin.where
 import rx.Observable
 
@@ -23,22 +22,6 @@ class ApiLocalUnitSource(private val mRealm: Realm) {
                 .findFirst()
 
         return Observable.just(mRealm.copyFromRealm(unit))
-    }
-
-    fun saveUnits(units: List<Unit>): Observable<List<Unit>> {
-        val userId = units.first().user?.id ?: return Observable.empty()
-
-        mRealm.executeTransaction { realm ->
-            val onlyLocal = realm.where<Unit>()
-                    .equalTo("user.id", userId)
-                    .not().oneOf("id", units.map { it.id }.toTypedArray())
-                    .findAll()
-
-            onlyLocal.deleteAllFromRealm()
-            realm.copyToRealmOrUpdate(units)
-        }
-
-        return getUnits(userId)
     }
 
     fun saveUnit(unit: Unit): Observable<Unit?> {

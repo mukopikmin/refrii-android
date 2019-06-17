@@ -5,7 +5,6 @@ import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.Unit
 import com.refrii.client.data.models.User
 import io.realm.Realm
-import io.realm.kotlin.oneOf
 import io.realm.kotlin.where
 import rx.Observable
 
@@ -17,19 +16,6 @@ class ApiLocalBoxSource(private val mRealm: Realm) {
                 .sort("id")
 
         return Observable.just(mRealm.copyFromRealm(boxes))
-    }
-
-    fun saveBoxes(boxes: List<Box>): Observable<List<Box>> {
-        mRealm.executeTransaction { realm ->
-            val onlyLocal = realm.where<Box>()
-                    .not().oneOf("id", boxes.map { it.id }.toTypedArray())
-                    .findAll()
-
-            onlyLocal.deleteAllFromRealm()
-            realm.copyToRealmOrUpdate(boxes)
-        }
-
-        return getBoxes()
     }
 
     fun saveBox(box: Box): Observable<Box?> {
@@ -63,8 +49,12 @@ class ApiLocalBoxSource(private val mRealm: Realm) {
         return Observable.just(mRealm.copyFromRealm(box))
     }
 
-    fun updateBox(box: Box) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    fun updateBox(box: Box): Observable<Box?> {
+        mRealm.executeTransaction {
+            it.copyToRealmOrUpdate(box)
+        }
+
+        return getBox(box.id)
     }
 
     fun removeBox(id: Int): Observable<Void> {

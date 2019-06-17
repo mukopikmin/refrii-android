@@ -13,8 +13,24 @@ class ApiUnitRepository(realm: Realm, retrofit: Retrofit) {
     private val mApiLocalUnitSource = ApiLocalUnitSource(realm)
 
     fun getUnits(userId: Int): Observable<List<Unit>> {
-        return mApiRemoteUnitSource.getUnits()
-                .flatMap { mApiLocalUnitSource.saveUnits(it) }
+        return Observable.zip(
+                mApiRemoteUnitSource.getUnits(),
+                mApiLocalUnitSource.getUnits(userId)
+        ) { remote, cache -> Pair(remote, cache) }
+                .flatMap { pair ->
+                    val remote = pair.first
+                    val cache = pair.second
+
+                    remote.forEach { mApiLocalUnitSource.saveUnit(it) }
+
+                    cache.forEach { unit ->
+                        if (!remote.map { it.id }.contains(unit.id)) {
+                            mApiLocalUnitSource.removeUnit(unit.id)
+                        }
+                    }
+
+                    mApiLocalUnitSource.getUnits(userId)
+                }
     }
 
     fun getUnit(id: Int): Observable<Unit?> {

@@ -20,8 +20,24 @@ class ApiBoxRepository(realm: Realm, retrofit: Retrofit) {
     private val mApiLocalFoodSource = ApiLocalFoodSource(realm)
 
     fun getBoxes(): Observable<List<Box>> {
-        return mApiRemoteBoxSource.getBoxes()
-                .flatMap { mApiLocalBoxSource.saveBoxes(it) }
+        return Observable.zip(
+                mApiRemoteBoxSource.getBoxes(),
+                mApiLocalBoxSource.getBoxes()
+        ) { remote, cache -> Pair(remote, cache) }
+                .flatMap { pair ->
+                    val remote = pair.first
+                    val cache = pair.second
+
+                    remote.forEach { mApiLocalBoxSource.saveBox(it) }
+
+                    cache.forEach { box ->
+                        if (!remote.map { it.id }.contains(box.id)) {
+                            mApiLocalBoxSource.removeBox(box.id)
+                        }
+                    }
+
+                    mApiLocalBoxSource.getBoxes()
+                }
     }
 
     fun getBoxesFromCache(): Observable<List<Box>> {
@@ -70,8 +86,24 @@ class ApiBoxRepository(realm: Realm, retrofit: Retrofit) {
     }
 
     fun getUnitsForBox(id: Int): Observable<List<Unit>> {
-        return mApiRemoteBoxSource.getUnitsForBox(id)
-                .flatMap { mApiLocalUnitSource.saveUnits(it) }
+        return Observable.zip(
+                mApiRemoteBoxSource.getUnitsForBox(id),
+                mApiLocalBoxSource.getUnitsForBox(id)
+        ) { remote, cache -> Pair(remote, cache) }
+                .flatMap { pair ->
+                    val remote = pair.first
+                    val cache = pair.second
+
+                    remote.forEach { mApiLocalUnitSource.saveUnit(it) }
+
+                    cache.forEach { unit ->
+                        if (!remote.map { it.id }.contains(unit.id)) {
+                            mApiLocalUnitSource.removeUnit(unit.id)
+                        }
+                    }
+
+                    mApiLocalBoxSource.getUnitsForBox(id)
+                }
     }
 
     fun getUnitsForBoxFromCache(id: Int): Observable<List<Unit>> {

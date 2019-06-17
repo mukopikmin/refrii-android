@@ -17,8 +17,24 @@ class ApiFoodRepository(realm: Realm, retrofit: Retrofit) {
     private val mApiLocalFoodSource = ApiLocalFoodSource(realm)
 
     fun getFoods(): Observable<List<Food>> {
-        return mApiRemoteFoodSource.getFoods()
-                .flatMap { mApiLocalFoodSource.saveFoods(it) }
+        return Observable.zip(
+                mApiRemoteFoodSource.getFoods(),
+                mApiLocalFoodSource.getFoods()
+        ) { remote, cache -> Pair(remote, cache) }
+                .flatMap { pair ->
+                    val remote = pair.first
+                    val cache = pair.second
+
+                    remote.forEach { mApiLocalFoodSource.saveFood(it) }
+
+                    cache.forEach { box ->
+                        if (!remote.map { it.id }.contains(box.id)) {
+                            mApiLocalFoodSource.removeFood(box.id)
+                        }
+                    }
+
+                    mApiLocalFoodSource.getFoods()
+                }
     }
 
 
@@ -44,8 +60,7 @@ class ApiFoodRepository(realm: Realm, retrofit: Retrofit) {
     }
 
     fun getExpiringFoods(): Observable<List<Food>> {
-        return mApiRemoteFoodSource.getFoods()
-                .flatMap { mApiLocalFoodSource.saveFoods(it) }
+        return mApiLocalFoodSource.getExpiringFoods()
     }
 
     fun getExpiringFoodsFromCache(): Observable<List<Food>> {
