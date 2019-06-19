@@ -231,8 +231,12 @@ constructor(
         mView?.showBottomNavigation(food)
     }
 
-    override fun isFoodSelected(): Boolean {
-        return mFood != null
+    override fun isFoodSelected(food: Food): Boolean {
+        mFood?.let {
+            return it.id == food.id
+        }
+
+        return false
     }
 
     override fun deselectFood() {

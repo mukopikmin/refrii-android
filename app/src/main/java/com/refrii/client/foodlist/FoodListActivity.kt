@@ -391,7 +391,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val food = adapter.getItemAtPosition(position)
 
-                if (mPresenter.isFoodSelected()) {
+                if (mPresenter.isFoodSelected(food)) {
                     mPresenter.deselectFood()
                 } else {
                     mPresenter.selectFood(food)

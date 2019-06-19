@@ -44,7 +44,7 @@ interface FoodListContract {
         fun deleteLocalData()
         fun selectFood(food: Food)
         fun deselectFood()
-        fun isFoodSelected(): Boolean
+        fun isFoodSelected(food: Food): Boolean
         fun confirmRemovingFood()
         fun registerPushToken(userId: Int, token: String)
         fun showNoticeDialog()
