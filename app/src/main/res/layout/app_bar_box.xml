@@ -21,5 +21,4 @@
 
     <include layout="@layout/content_box" />
 
-    <include layout="@layout/fab_add" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

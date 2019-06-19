@@ -24,6 +24,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -76,6 +77,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     lateinit var mAddFoodButton: AppCompatButton
 
 
+    @BindView(R.id.coordinatorLayout)
+    lateinit var mCoordinatorLayout: CoordinatorLayout
     @BindView(R.id.bottomNavigation)
     lateinit var mBottomNavigation: BottomNavigationView
 
@@ -415,7 +418,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun showBottomNavigation(food: Food) {
-        mFab.hide()
         mBottomNavigation.visibility = View.VISIBLE
 
         if (mRecyclerView.adapter != null) {
@@ -427,7 +429,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun hideBottomNavigation() {
-        mFab.show()
         mBottomNavigation.visibility = View.GONE
 
         if (mRecyclerView.adapter != null) {
@@ -463,7 +464,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun showSnackbar(message: String?) {
         message ?: return
 
-        Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
