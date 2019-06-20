@@ -38,7 +38,6 @@ constructor(
         mFoods = foods
 
         mView?.setFoods(box?.name, foods)
-        mView?.setEmptyMessage(foods)
     }
 
     override fun getBox(): Box? {
@@ -213,6 +212,8 @@ constructor(
                         mBox?.let {
                             if (it.id == box.id) {
                                 setBox(box, t)
+
+                                mView?.setEmptyMessage(t)
                             }
                         }
                     }

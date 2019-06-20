@@ -76,7 +76,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     @BindView(R.id.addFoodButton)
     lateinit var mAddFoodButton: AppCompatButton
 
-
     @BindView(R.id.coordinatorLayout)
     lateinit var mCoordinatorLayout: CoordinatorLayout
     @BindView(R.id.bottomNavigation)
@@ -108,6 +107,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         mFirebaseAuth = FirebaseAuth.getInstance()
         mPreference = PreferenceManager.getDefaultSharedPreferences(this)
+        mEmptyMessageContainer.visibility = View.GONE
 
         mFab.setOnClickListener { mPresenter.addFood() }
         mAddFoodButton.setOnClickListener { mPresenter.addFood() }
@@ -553,11 +553,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun setEmptyMessage(foods: List<Food>?) {
         foods ?: return
 
-        if (foods.isEmpty()) {
-            mEmptyMessageContainer.visibility = View.VISIBLE
-        } else {
-            mEmptyMessageContainer.visibility = View.GONE
-        }
+        mEmptyMessageContainer.visibility = if (foods.isEmpty()) View.VISIBLE else View.GONE
     }
 
     companion object {

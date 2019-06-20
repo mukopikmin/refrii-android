@@ -67,7 +67,6 @@ class FoodListPresenterTest {
         presenter.setBox(box, foods)
 
         verify(viewMock, times(1)).setFoods(MockitoHelper.any<String>(), MockitoHelper.any<List<Food>>())
-        verify(viewMock, times(1)).setEmptyMessage(MockitoHelper.any<List<Food>>())
     }
 
     @Test
@@ -93,7 +92,7 @@ class FoodListPresenterTest {
         presenter.pickBox(any())
 
         verify(viewMock, times(2)).setFoods(MockitoHelper.any<String>(), MockitoHelper.any<List<Food>>())
-        verify(viewMock, times(2)).setEmptyMessage(MockitoHelper.any<List<Food>>())
+        verify(viewMock, times(1)).setEmptyMessage(MockitoHelper.any<List<Food>>())
     }
 
     @Test
@@ -210,7 +209,7 @@ class FoodListPresenterTest {
         presenter.selectBox(box)
 
         verify(viewMock, times(2)).setFoods(MockitoHelper.any<String>(), MockitoHelper.any<List<Food>>())
-        verify(viewMock, times(2)).setEmptyMessage(any())
+        verify(viewMock, times(1)).setEmptyMessage(any())
     }
 
     @Test
