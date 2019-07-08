@@ -10,6 +10,13 @@ import rx.schedulers.Schedulers
 
 class ApiRemoteUserSource(private val mRetrofit: Retrofit) {
 
+    fun signup(): Observable<User> {
+        return mRetrofit.create(UserService::class.java)
+                .signupWithGoogle()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun verify(): Observable<User> {
         return mRetrofit.create(UserService::class.java)
                 .verify()

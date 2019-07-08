@@ -9,6 +9,9 @@ import retrofit2.http.Path
 import rx.Observable
 
 interface UserService {
+    @POST("/users/google")
+    fun signupWithGoogle(): Observable<User>
+
     @GET("/users/verify")
     fun verify(): Observable<User>
 

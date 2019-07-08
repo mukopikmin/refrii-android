@@ -12,6 +12,11 @@ class ApiUserRepository(realm: Realm, retrofit: Retrofit) {
     private val mAPiRemoteUserSource = ApiRemoteUserSource(retrofit)
     private val mApiLocalUserSource = ApiLocalUserSource(realm)
 
+    fun signup(): Observable<User> {
+        return mAPiRemoteUserSource.signup()
+                .flatMap { mApiLocalUserSource.saveUser(it) }
+    }
+
     fun verify(): Observable<User> {
         return mAPiRemoteUserSource.verify()
                 .flatMap { mApiLocalUserSource.saveUser(it) }

@@ -14,6 +14,7 @@ interface SigninContract {
 
     interface Presenter {
         fun takeView(view: View)
+        fun signup()
         fun verifyAccount()
     }
 }

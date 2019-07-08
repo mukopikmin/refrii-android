@@ -4,8 +4,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.text.util.Linkify
 import android.view.View
+import android.widget.CheckBox
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import butterknife.BindView
@@ -17,19 +20,26 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.models.User
+import java.util.regex.Pattern
 import javax.inject.Inject
+
 
 class SignInActivity : AppCompatActivity(), SigninContract.View {
 
-    @BindView(R.id.googleSignInButton)
+    @BindView(R.id.googleSigninButton)
     lateinit var mSignInButton: SignInButton
+    @BindView(R.id.googleSignupButton)
+    lateinit var mSignUpButton: SignInButton
     @BindView(R.id.progressBar)
     lateinit var mProgressBar: ProgressBar
+    @BindView(R.id.textViewSignup)
+    lateinit var mSignupTextView: TextView
+    @BindView(R.id.acceptPrivacyPolicyCheckBox)
+    lateinit var mAcceptPrivacyPilicy: CheckBox
 
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var mFirebaseAuth: FirebaseAuth
@@ -54,6 +64,33 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
         mFirebaseAuth = FirebaseAuth.getInstance()
         mSignInButton.setOnClickListener { googleSignIn() }
+        mSignUpButton.setOnClickListener { googleSignUp() }
+        mAcceptPrivacyPilicy.setOnCheckedChangeListener { _, isChecked -> mSignUpButton.isEnabled = isChecked }
+        mSignUpButton.isEnabled = false
+
+        setGoogleSigninButtonText(mSignInButton, "Google でログイン")
+        setGoogleSigninButtonText(mSignUpButton, "Google でアカウントを作成")
+        setLinkedSignupMessage()
+    }
+
+    private fun setGoogleSigninButtonText(signInButton: SignInButton, buttonText: String) {
+        for (i in 0 until signInButton.childCount) {
+            val v = signInButton.getChildAt(i)
+
+            if (v is TextView) {
+                val tv = v as TextView
+                tv.text = buttonText
+                return
+            }
+        }
+    }
+
+    private fun setLinkedSignupMessage() {
+        val pattern = Pattern.compile("プライバシーポリシー")
+        val strUrl = "https://refrii.com/privacy"
+        val filter = Linkify.TransformFilter { _, _ -> strUrl }
+
+        Linkify.addLinks(mSignupTextView, pattern, strUrl, null, filter)
     }
 
     override fun onStart() {
@@ -71,14 +108,14 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         super.onActivityResult(requestCode, resultCode, data)
 
         when (requestCode) {
-            GOOGLE_SIGN_IN_REQUEST_CODE -> {
+            GOOGLE_SIGN_IN_REQUEST_CODE, GOOGLE_SIGN_UP_REQUEST_CODE -> {
                 val task = GoogleSignIn.getSignedInAccountFromIntent(data)
 
                 try {
                     val account = task.getResult(ApiException::class.java)
 
                     onLoading()
-                    firebaseAuthWithGoogle(account)
+                    firebaseAuthWithGoogle(account, requestCode)
                 } catch (e: ApiException) {
                     showToast("Login failed with code: " + e.statusCode)
                 }
@@ -86,7 +123,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         }
     }
 
-    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?) {
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?, requestCode: Int) {
         account ?: return
 
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
@@ -94,9 +131,27 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         mFirebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        val user = mFirebaseAuth.currentUser
+                        val editor = mPreference.edit()
 
-                        onGoogleSignInSuccess(user)
+                        mFirebaseAuth.currentUser?.getIdToken(true)?.addOnCompleteListener {
+                            editor.apply {
+                                putString(getString(R.string.preference_key_jwt), it.result?.token)
+                                putString(getString(R.string.preference_key_mail), account.email)
+                                putString(getString(R.string.preference_key_name), account.displayName)
+                                putString(getString(R.string.preference_key_avatar), account.photoUrl.toString())
+                                putString(getString(R.string.preference_key_signin_provider), it.result?.signInProvider)
+
+                                it.result?.expirationTimestamp?.let {
+                                    putLong(getString(R.string.preference_key_expiration_timestamp), it)
+                                }
+                            }
+                            editor.apply()
+
+                            when (requestCode) {
+                                GOOGLE_SIGN_IN_REQUEST_CODE -> mPresenter.verifyAccount()
+                                GOOGLE_SIGN_UP_REQUEST_CODE -> mPresenter.signup()
+                            }
+                        }
                     } else {
                         showToast("Failed to login")
                     }
@@ -136,31 +191,38 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST_CODE)
     }
 
-    private fun onGoogleSignInSuccess(account: FirebaseUser?) {
-        account ?: return
+    private fun googleSignUp() {
+        val signInIntent = mGoogleSignInClient.signInIntent
 
-        val editor = mPreference.edit()
-
-        account.getIdToken(true).addOnCompleteListener {
-            editor.apply {
-                putString(getString(R.string.preference_key_jwt), it.result?.token)
-                putString(getString(R.string.preference_key_mail), account.email)
-                putString(getString(R.string.preference_key_name), account.displayName)
-                putString(getString(R.string.preference_key_avatar), account.photoUrl.toString())
-                putString(getString(R.string.preference_key_signin_provider), it.result?.signInProvider)
-
-                it.result?.expirationTimestamp?.let {
-                    putLong(getString(R.string.preference_key_expiration_timestamp), it)
-                }
-            }
-            editor.apply()
-            mPresenter.verifyAccount()
-        }
+        startActivityForResult(signInIntent, GOOGLE_SIGN_UP_REQUEST_CODE)
     }
+
+//    private fun onGoogleSignInSuccess(account: FirebaseUser?) {
+//        account ?: return
+//
+//        val editor = mPreference.edit()
+//
+//        account.getIdToken(true).addOnCompleteListener {
+//            editor.apply {
+//                putString(getString(R.string.preference_key_jwt), it.result?.token)
+//                putString(getString(R.string.preference_key_mail), account.email)
+//                putString(getString(R.string.preference_key_name), account.displayName)
+//                putString(getString(R.string.preference_key_avatar), account.photoUrl.toString())
+//                putString(getString(R.string.preference_key_signin_provider), it.result?.signInProvider)
+//
+//                it.result?.expirationTimestamp?.let {
+//                    putLong(getString(R.string.preference_key_expiration_timestamp), it)
+//                }
+//            }
+//            editor.apply()
+//            mPresenter.verifyAccount()
+//        }
+//    }
 
     companion object {
         @Suppress("unused")
         private const val TAG = "SignInActivity"
         private const val GOOGLE_SIGN_IN_REQUEST_CODE = 101
+        private const val GOOGLE_SIGN_UP_REQUEST_CODE = 102
     }
 }
