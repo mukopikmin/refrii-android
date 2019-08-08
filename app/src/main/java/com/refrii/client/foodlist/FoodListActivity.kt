@@ -54,6 +54,7 @@ import com.refrii.client.signin.SignInActivity
 import com.refrii.client.tasks.ImageDownloadTask
 import com.refrii.client.tasks.ImageDownloadTaskCallback
 import com.refrii.client.unitlist.UnitListActivity
+import com.refrii.client.welcome.WelcomeActivity
 import java.util.*
 import javax.inject.Inject
 
@@ -184,6 +185,12 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         reauthorize()
         hideBottomNavigation()
+    }
+
+    override fun welcome() {
+        val intent = Intent(this, WelcomeActivity::class.java)
+
+        startActivity(intent)
     }
 
     private fun reauthorize() {

@@ -18,6 +18,8 @@ import com.refrii.client.unit.UnitActivity
 import com.refrii.client.unit.UnitModule
 import com.refrii.client.unitlist.UnitListActivity
 import com.refrii.client.unitlist.UnitListModule
+import com.refrii.client.welcome.WelcomeActivity
+import com.refrii.client.welcome.WelcomeModule
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -59,4 +61,8 @@ abstract class ActivityBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(ShopPlansModule::class)])
     abstract fun shopPlansActivity(): ShopPlansActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = [(WelcomeModule::class)])
+    abstract fun welcomeActivity(): WelcomeActivity
 }

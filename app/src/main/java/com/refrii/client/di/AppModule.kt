@@ -26,6 +26,8 @@ import com.refrii.client.unit.UnitContract
 import com.refrii.client.unit.UnitPresenter
 import com.refrii.client.unitlist.UnitListContract
 import com.refrii.client.unitlist.UnitListPresenter
+import com.refrii.client.welcome.WelcomeContract
+import com.refrii.client.welcome.WelcomePresenter
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
@@ -91,6 +93,11 @@ class AppModule(private var mApplication: Application) {
         return ShopPlansPresenter(shopPlanRepository)
     }
 
+    @Provides
+    fun provideWelcomePresenter(boxRepository: ApiBoxRepository): WelcomeContract.Presenter {
+        return WelcomePresenter(boxRepository)
+    }
+
     @Singleton
     @Provides
     fun provideRetrofit(): Retrofit {
@@ -143,8 +150,8 @@ class AppModule(private var mApplication: Application) {
         val version = "v1"
 
         return if (BuildConfig.FLAVOR == "staging") {
-//            "http://10.1.1.106:3000/"
-            "https://staging.api.refrii.com/$version/"
+            "http://192.168.1.104:3000/"
+//            "https://staging.api.refrii.com/$version/"
         } else {
             "https://api.refrii.com/$version/"
         }

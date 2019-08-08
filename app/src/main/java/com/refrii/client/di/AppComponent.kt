@@ -10,6 +10,7 @@ import com.refrii.client.shopplans.ShopPlansActivity
 import com.refrii.client.signin.SignInActivity
 import com.refrii.client.unit.UnitActivity
 import com.refrii.client.unitlist.UnitListActivity
+import com.refrii.client.welcome.WelcomeActivity
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
@@ -30,5 +31,6 @@ interface AppComponent {
     fun inject(target: UnitActivity)
     fun inject(target: NewUnitActivity)
     fun inject(target: ShopPlansActivity)
+    fun inject(target: WelcomeActivity)
     fun inject(target: PushNotificationService)
 }

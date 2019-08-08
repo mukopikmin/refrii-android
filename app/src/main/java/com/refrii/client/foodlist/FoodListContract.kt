@@ -25,6 +25,7 @@ interface FoodListContract {
         fun savePushToken(token: String)
         fun showNoticeDialog(name: String?, notice: String?)
         fun deselectFood()
+        fun welcome()
     }
 
     interface Presenter {

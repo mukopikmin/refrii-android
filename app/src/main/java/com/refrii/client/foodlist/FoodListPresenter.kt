@@ -81,6 +81,10 @@ constructor(
                 .subscribe(object : Subscriber<List<Box>>() {
                     override fun onNext(t: List<Box>?) {
                         setBoxes(t)
+
+                        if (t.isNullOrEmpty()) {
+                            mView?.welcome()
+                        }
                     }
 
                     override fun onCompleted() {
