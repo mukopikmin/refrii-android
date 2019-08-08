@@ -7,7 +7,6 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -51,10 +50,9 @@ import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.settings.SettingsActivity
 import com.refrii.client.shopplans.ShopPlansActivity
 import com.refrii.client.signin.SignInActivity
-import com.refrii.client.tasks.ImageDownloadTask
-import com.refrii.client.tasks.ImageDownloadTaskCallback
 import com.refrii.client.unitlist.UnitListActivity
 import com.refrii.client.welcome.WelcomeActivity
+import com.squareup.picasso.Picasso
 import java.util.*
 import javax.inject.Inject
 
@@ -365,13 +363,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         nameTextView.text = name
         mailTextView.text = mail
 
-        avatarUrl?.let {
-            ImageDownloadTask(object : ImageDownloadTaskCallback {
-                override fun onPostExecuted(result: Bitmap) {
-                    avatarImageView.setImageBitmap(result)
-                }
-            }).execute(avatarUrl)
-        }
+        Picasso.with(this).load(avatarUrl).into(avatarImageView);
     }
 
     override fun showFood(id: Int, box: Box?) {

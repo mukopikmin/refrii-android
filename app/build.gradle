@@ -102,6 +102,7 @@ dependencies {
     implementation 'org.yaml:snakeyaml:1.24'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation 'com.jakewharton:butterknife:10.1.0'
+    implementation 'com.squareup.picasso:picasso:2.3.3'
 
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
