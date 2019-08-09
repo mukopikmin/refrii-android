@@ -1,6 +1,7 @@
 package com.refrii.client.foodlist
 
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.refrii.client.R
@@ -10,10 +11,7 @@ class FoodViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.Vie
     val name: TextView = view.findViewById(R.id.nameFoodListTextView)
     val expirationDate: TextView = view.findViewById(R.id.expirationDateFoodListTextView)
     val amount: TextView = view.findViewById(R.id.amountFoodListTextView)
-//    val menu: ConstraintLayout = view.findViewById(R.id.menu)
-//    val editAmountTextView: TextView = view.findViewById(R.id.editAmountTextView)
-//    val incrementButton: ImageButton = view.findViewById(R.id.incrementButton)
-//    val decrementButton: ImageButton = view.findViewById(R.id.decrementButton)
-//    val deleteButton: ImageButton = view.findViewById(R.id.deleteButton)
-//    val editButton: ImageButton = view.findViewById(R.id.editButton)
+    val lastUpdateUserView: View = view.findViewById(R.id.lastUpdatedUserView)
+    val lastUpdatedUserNameTextView: TextView = view.findViewById(R.id.lastUpdatedUserNameTextView)
+    val lastUpdatedUserAvatarImageView: ImageView = view.findViewById(R.id.lastUpdatedUserAvatarImageView)
 }

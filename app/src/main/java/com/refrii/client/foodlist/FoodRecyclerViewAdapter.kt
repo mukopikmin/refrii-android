@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.refrii.client.R
 import com.refrii.client.data.models.Food
+import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,6 +25,18 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
             name.text = food.name
             expirationDate.text = formatter.format(food.expirationDate)
             amount.text = amountWithUnit
+
+            if (food.updatedUser == null) {
+                lastUpdateUserView.visibility = View.GONE
+            } else {
+                val url = food.updatedUser?.avatarUrl
+
+                lastUpdatedUserNameTextView.text = food.updatedUser?.name
+                Picasso.with(lastUpdatedUserAvatarImageView.context)
+                        .load(url)
+                        .placeholder(R.drawable.ic_outline_account_circle)
+                        .into(lastUpdatedUserAvatarImageView)
+            }
 
             constraintLayout.setBackgroundColor(Color.parseColor("#00000000"))
             mSelectedPosition?.let {

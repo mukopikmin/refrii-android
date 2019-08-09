@@ -150,8 +150,8 @@ class AppModule(private var mApplication: Application) {
         val version = "v1"
 
         return if (BuildConfig.FLAVOR == "staging") {
-            "http://192.168.1.104:3000/"
-//            "https://staging.api.refrii.com/$version/"
+//            "http://192.168.1.104:3000/"
+            "https://staging.api.refrii.com/$version/"
         } else {
             "https://api.refrii.com/$version/"
         }

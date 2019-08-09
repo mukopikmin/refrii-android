@@ -353,7 +353,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val headerView = mNavigationView.getHeaderView(0)
         val nameTextView = headerView.findViewById<TextView>(R.id.nameNavHeaderTextView)
         val mailTextView = headerView.findViewById<TextView>(R.id.mailNavHeaderTextView)
-        val avatarImageView = headerView.findViewById<ImageView>(R.id.avatarNavHeaderImageView)
+        val avatarImageView = headerView.findViewById<ImageView>(R.id.lastUpdatedUserAvatarImageView)
         val name = sharedPreferences.getString(getString(R.string.preference_key_name), getString(R.string.default_name))
         val mail = sharedPreferences.getString(getString(R.string.preference_key_mail), getString(R.string.default_mail))
         val avatarUrl = sharedPreferences.getString(getString(R.string.preference_key_avatar), null)
@@ -363,7 +363,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         nameTextView.text = name
         mailTextView.text = mail
 
-        Picasso.with(this).load(avatarUrl).into(avatarImageView);
+        Picasso.with(this).load(avatarUrl).into(avatarImageView)
     }
 
     override fun showFood(id: Int, box: Box?) {
