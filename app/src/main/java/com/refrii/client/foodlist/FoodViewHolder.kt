@@ -13,5 +13,6 @@ class FoodViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.Vie
     val amount: TextView = view.findViewById(R.id.amountFoodListTextView)
     val lastUpdateUserView: View = view.findViewById(R.id.lastUpdatedUserView)
     val lastUpdatedUserNameTextView: TextView = view.findViewById(R.id.lastUpdatedUserNameTextView)
+    val lastUpdatedAtTextView: TextView = view.findViewById(R.id.lastUpdatedAtTextView)
     val lastUpdatedUserAvatarImageView: ImageView = view.findViewById(R.id.lastUpdatedUserAvatarImageView)
 }

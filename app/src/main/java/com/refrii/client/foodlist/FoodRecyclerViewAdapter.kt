@@ -32,6 +32,7 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
                 val url = food.updatedUser?.avatarUrl
 
                 lastUpdatedUserNameTextView.text = food.updatedUser?.name
+                lastUpdatedAtTextView.text = formatter.format(food.updatedAt)
                 Picasso.with(lastUpdatedUserAvatarImageView.context)
                         .load(url)
                         .placeholder(R.drawable.ic_outline_account_circle)
