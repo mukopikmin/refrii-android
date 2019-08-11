@@ -8,6 +8,10 @@
   name: OkHttp
   copyrightHolder: square
   license: apache2
+- artifact: com.squareup.picasso:picasso:+
+  name: Picasso
+  copyrightHolder: square
+  license: apache2
 - artifact: com.squareup.okio:okio:+
   name: Okio
   copyrightHolder: square
