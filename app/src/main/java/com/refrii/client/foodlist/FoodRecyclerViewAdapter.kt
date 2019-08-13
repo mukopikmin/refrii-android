@@ -26,17 +26,16 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
             expirationDate.text = formatter.format(food.expirationDate)
             amount.text = amountWithUnit
 
-            if (food.updatedUser == null) {
-                lastUpdateUserView.visibility = View.GONE
-            } else {
-                val url = food.updatedUser?.avatarUrl
+            Picasso.with(lastUpdatedUserAvatarImageView.context)
+                    .load(food.updatedUser?.avatarUrl)
+                    .placeholder(R.drawable.ic_outline_account_circle)
+                    .into(lastUpdatedUserAvatarImageView)
 
-                lastUpdatedUserNameTextView.text = food.updatedUser?.name
-                lastUpdatedAtTextView.text = formatter.format(food.updatedAt)
-                Picasso.with(lastUpdatedUserAvatarImageView.context)
-                        .load(url)
-                        .placeholder(R.drawable.ic_outline_account_circle)
-                        .into(lastUpdatedUserAvatarImageView)
+            if (food.notice.isNullOrBlank()) {
+                noticeCountView.visibility = View.GONE
+            } else {
+                noticeCountView.visibility = View.VISIBLE
+                noticeCountTextView.text = "1"
             }
 
             constraintLayout.setBackgroundColor(Color.parseColor("#00000000"))
