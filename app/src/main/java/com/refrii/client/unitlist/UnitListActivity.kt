@@ -56,7 +56,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        mPreference = PreferenceManager.getDefaultSharedPreferences(this)
+        mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
         fab.setOnClickListener {
             val intent = Intent(this@UnitListActivity, NewUnitActivity::class.java)
@@ -92,7 +92,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
     override fun onResume() {
         super.onResume()
 
-        val preference = PreferenceManager.getDefaultSharedPreferences(this)
+        val preference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val userId = preference.getInt(getString(R.string.preference_key_id), -1)
 
         mPresenter.getUnits(userId)
@@ -124,7 +124,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
                     }
                     // Remove
                     1 -> {
-                        val preference = PreferenceManager.getDefaultSharedPreferences(this)
+                        val preference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
                         val userId = preference.getInt(getString(R.string.preference_key_id), 0)
 
                         mPresenter.removeUnit(unitId, userId)

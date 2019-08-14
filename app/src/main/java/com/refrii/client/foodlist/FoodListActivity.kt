@@ -105,7 +105,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mRecyclerView.addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         mFirebaseAuth = FirebaseAuth.getInstance()
-        mPreference = PreferenceManager.getDefaultSharedPreferences(this)
+        mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         mEmptyMessageContainer.visibility = View.GONE
 
         mFab.setOnClickListener { mPresenter.addFood() }
@@ -349,7 +349,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     private fun setNavigationHeader() {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val headerView = mNavigationView.getHeaderView(0)
         val nameTextView = headerView.findViewById<TextView>(R.id.nameNavHeaderTextView)
         val mailTextView = headerView.findViewById<TextView>(R.id.mailNavHeaderTextView)
@@ -386,8 +386,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         boxName ?: return
         foods ?: return
 
+        val userId = mPreference.getInt(getString(R.string.preference_key_id), -1)
+
         if (mRecyclerView.adapter == null) {
-            val adapter = FoodRecyclerViewAdapter(foods)
+            val adapter = FoodRecyclerViewAdapter(foods, userId)
 
             adapter.setOnClickListener(View.OnClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)
@@ -532,7 +534,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun signOut() {
-        val editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+        val editor = PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
         val intent = Intent(this@FoodListActivity, SignInActivity::class.java)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()

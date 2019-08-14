@@ -95,7 +95,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        mPreference = PreferenceManager.getDefaultSharedPreferences(this)
+        mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
         mRecyclerView.layoutManager = LinearLayoutManager(this)
 

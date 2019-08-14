@@ -31,7 +31,7 @@ class PushNotificationService : FirebaseMessagingService() {
 
         (application as App).getComponent().inject(this)
 
-        mPreference = PreferenceManager.getDefaultSharedPreferences(this)
+        mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
     }
 
     override fun onNewToken(newToken: String?) {

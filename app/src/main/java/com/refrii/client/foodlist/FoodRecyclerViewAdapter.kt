@@ -11,7 +11,10 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
-class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class FoodRecyclerViewAdapter(
+        private var mFoods: List<Food>,
+        private val mUserId: Int
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var mOnClickListener: View.OnClickListener? = null
     private var mSelectedPosition: Int? = null
@@ -26,10 +29,14 @@ class FoodRecyclerViewAdapter(private var mFoods: List<Food>) : RecyclerView.Ada
             expirationDate.text = formatter.format(food.expirationDate)
             amount.text = amountWithUnit
 
-            Picasso.with(lastUpdatedUserAvatarImageView.context)
-                    .load(food.updatedUser?.avatarUrl)
-                    .placeholder(R.drawable.ic_outline_account_circle)
-                    .into(lastUpdatedUserAvatarImageView)
+            if (mUserId == food.updatedUser?.id) {
+                lastUpdatedUserAvatarImageView.visibility = View.GONE
+            } else {
+                Picasso.with(lastUpdatedUserAvatarImageView.context)
+                        .load(food.updatedUser?.avatarUrl)
+                        .placeholder(R.drawable.ic_outline_account_circle)
+                        .into(lastUpdatedUserAvatarImageView)
+            }
 
             if (food.notice.isNullOrBlank()) {
                 noticeCountView.visibility = View.GONE
