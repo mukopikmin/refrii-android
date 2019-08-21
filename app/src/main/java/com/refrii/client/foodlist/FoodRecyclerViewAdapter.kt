@@ -32,6 +32,7 @@ class FoodRecyclerViewAdapter(
             if (mUserId == food.updatedUser?.id) {
                 lastUpdatedUserAvatarImageView.visibility = View.GONE
             } else {
+                lastUpdatedUserAvatarImageView.visibility = View.VISIBLE
                 Picasso.with(lastUpdatedUserAvatarImageView.context)
                         .load(food.updatedUser?.avatarUrl)
                         .placeholder(R.drawable.ic_outline_account_circle)

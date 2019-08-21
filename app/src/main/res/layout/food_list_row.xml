@@ -22,10 +22,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -34,31 +35,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameFoodListTextView">
 
-        <TextView
-            android:id="@+id/expirationDateFoodListTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            android:text="1989/03/02"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView22"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/amountFoodListTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="23 packs"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/lastUpdatedUserAvatarImageView"
             android:layout_width="14sp"
             android:layout_height="14sp"
+            android:layout_gravity="center"
             android:layout_marginEnd="16dp"
             android:src="@drawable/ic_outline_account_circle"
             app:civ_border_color="#FFFFFFFF"
@@ -71,23 +52,35 @@
             android:id="@+id/imageView22"
             android:layout_width="14sp"
             android:layout_height="14sp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="4dp"
             android:tint="@android:color/darker_gray"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/expirationDateFoodListTextView"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_outline_schedule"
-            tools:layout_editor_absoluteX="30dp" />
+            app:srcCompat="@drawable/ic_outline_schedule" />
+
+        <TextView
+            android:id="@+id/expirationDateFoodListTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="16dp"
+            android:text="1989/03/02"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/noticeCountView"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/noticeCountView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="16dp"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/expirationDateFoodListTextView"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="139dp">
 
             <ImageView
                 android:id="@+id/imageView25"
@@ -106,103 +99,27 @@
                 android:text="100" />
         </LinearLayout>
 
-        <!--<LinearLayout-->
-        <!--android:id="@+id/shopPlanCountView"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="16dp"-->
-        <!--android:orientation="horizontal"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintStart_toEndOf="@+id/noticeCountView"-->
-        <!--app:layout_constraintTop_toTopOf="parent">-->
-
-        <!--<ImageView-->
-        <!--android:id="@+id/imageView23"-->
-        <!--android:layout_width="14sp"-->
-        <!--android:layout_height="14sp"-->
-        <!--android:layout_gravity="center"-->
-        <!--android:tint="@android:color/darker_gray"-->
-        <!--app:srcCompat="@drawable/ic_baseline_add_shopping_cart" />-->
-
-        <!--<TextView-->
-        <!--android:id="@+id/shopPlanCountTextView"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="4dp"-->
-        <!--android:layout_weight="1"-->
-        <!--android:text="100" />-->
-        <!--</LinearLayout>-->
-
         <ImageView
             android:id="@+id/imageView24"
             android:layout_width="14sp"
             android:layout_height="14sp"
+            android:layout_gravity="center"
             android:layout_marginEnd="4dp"
             android:tint="@android:color/darker_gray"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/amountFoodListTextView"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_opacity_black" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!--<androidx.constraintlayout.widget.ConstraintLayout-->
-    <!--android:id="@+id/lastUpdatedUserView"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginStart="16dp"-->
-    <!--android:layout_marginEnd="16dp"-->
-    <!--android:layout_marginBottom="8dp"-->
-    <!--android:orientation="horizontal"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintTop_toBottomOf="@+id/amountFoodListTextView">-->
+        <TextView
+            android:id="@+id/amountFoodListTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="23 packs"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <!--<de.hdodenhof.circleimageview.CircleImageView-->
-    <!--android:id="@+id/lastUpdatedUserAvatarImageView"-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="20dp"-->
-    <!--android:src="@drawable/ic_outline_account_circle"-->
-    <!--app:civ_border_color="#FFFFFFFF"-->
-    <!--app:civ_border_width="2dp"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintEnd_toStartOf="@+id/lastUpdatedUserNameTextView"-->
-    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/lastUpdatedUserNameTextView"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginEnd="8dp"-->
-    <!--android:text="last updated user"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintEnd_toStartOf="@+id/lastUpdatedAtTextView"-->
-    <!--app:layout_constraintTop_toTopOf="parent"-->
-    <!--app:layout_constraintVertical_bias="0.5" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/lastUpdatedAtTextView"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="2000/01/01"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintEnd_toEndOf="parent"-->
-    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/imageView22"-->
-    <!--android:layout_width="16dp"-->
-    <!--android:layout_height="16dp"-->
-    <!--android:layout_marginStart="8dp"-->
-    <!--android:layout_marginTop="8dp"-->
-    <!--android:layout_marginEnd="8dp"-->
-    <!--android:layout_marginBottom="8dp"-->
-    <!--android:tint="@android:color/darker_gray"-->
-    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--app:layout_constraintEnd_toStartOf="@+id/lastUpdatedUserAvatarImageView"-->
-    <!--app:layout_constraintHorizontal_bias="1.0"-->
-    <!--app:layout_constraintStart_toStartOf="parent"-->
-    <!--app:layout_constraintTop_toTopOf="parent"-->
-    <!--app:srcCompat="@drawable/ic_outline_update" />-->
-    <!--</androidx.constraintlayout.widget.ConstraintLayout>-->
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
