@@ -17,6 +17,7 @@ import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
+import com.refrii.client.unitlist.UnitListActivity
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -111,6 +112,12 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         }
 
         return result
+    }
+
+    override fun goToAddUnit() {
+        val intent = Intent(this, UnitListActivity::class.java)
+
+        startActivity(intent)
     }
 
     override fun setBox(box: Box?) {

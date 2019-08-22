@@ -7,10 +7,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ListView
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import butterknife.BindView
@@ -35,11 +32,33 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
     lateinit var fab: FloatingActionButton
     @BindView(R.id.progressBar)
     lateinit var progressBar: ProgressBar
+    @BindView(R.id.emptyUnitMessage)
+    lateinit var mEmptyUnitMessage: View
+    @BindView(R.id.addButton)
+    lateinit var mAddUnitButton: Button
 
     @Inject
     lateinit var mPresenter: UnitListPresenter
 
     private lateinit var mPreference: SharedPreferences
+
+    private val onItemClickListActivity = AdapterView.OnItemClickListener { adapterView, _, i, _ ->
+        val unit = adapterView.getItemAtPosition(i) as Unit
+        val intent = Intent(this@UnitListActivity, UnitActivity::class.java)
+
+        intent.putExtra("unit_id", unit.id)
+        startActivity(intent)
+    }
+    private val onItemLongClickListener = AdapterView.OnItemLongClickListener { adapterView, _, i, _ ->
+        val unit = adapterView.getItemAtPosition(i) as Unit
+        val options = arrayOf(getString(R.string.message_show_detail), getString(R.string.message_delete), getString(R.string.message_cancel))
+        val fragment = OptionsPickerDialogFragment.newInstance(unit.label!!, options, unit.id)
+
+        fragment.setTargetFragment(null, UNIT_OPTIONS_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "unit_option")
+
+        true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,30 +76,19 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
         }
 
         mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        listView.onItemClickListener = onItemClickListActivity
+        listView.onItemLongClickListener = onItemLongClickListener
 
-        fab.setOnClickListener {
-            val intent = Intent(this@UnitListActivity, NewUnitActivity::class.java)
-            startActivityForResult(intent, NEW_UNIT_REQUEST_CODE)
-        }
+        fab.setOnClickListener { addUnit() }
+        mAddUnitButton.setOnClickListener { addUnit() }
 
-        listView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, _, i, _ ->
-            val unit = adapterView.getItemAtPosition(i) as Unit
-            val intent = Intent(this@UnitListActivity, UnitActivity::class.java)
+        hideEmptyMessage()
+    }
 
-            intent.putExtra("unit_id", unit.id)
-            startActivity(intent)
-        }
+    private fun addUnit() {
+        val intent = Intent(this@UnitListActivity, NewUnitActivity::class.java)
 
-        listView.onItemLongClickListener = AdapterView.OnItemLongClickListener { adapterView, _, i, _ ->
-            val unit = adapterView.getItemAtPosition(i) as Unit
-            val options = arrayOf(getString(R.string.message_show_detail), getString(R.string.message_delete), getString(R.string.message_cancel))
-            val fragment = OptionsPickerDialogFragment.newInstance(unit.label!!, options, unit.id)
-
-            fragment.setTargetFragment(null, UNIT_OPTIONS_REQUEST_CODE)
-            fragment.show(supportFragmentManager, "unit_option")
-
-            true
-        }
+        startActivityForResult(intent, NEW_UNIT_REQUEST_CODE)
     }
 
     override fun onStart() {
@@ -101,15 +109,14 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        val preference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val userId = preference.getInt(getString(R.string.preference_key_id), -1)
+
         if (resultCode != Activity.RESULT_OK) return
         data ?: return
 
         when (requestCode) {
-            NEW_UNIT_REQUEST_CODE -> {
-                val unitId = data.getIntExtra(getString(R.string.key_unit_id), 0)
-
-                mPresenter.getUnit(unitId)
-            }
+            NEW_UNIT_REQUEST_CODE -> mPresenter.getUnits(userId)
             UNIT_OPTIONS_REQUEST_CODE -> {
                 val option = data.getIntExtra("option", -1)
                 val unitId = data.getIntExtra("target_id", 0)
@@ -123,17 +130,20 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
                         startActivity(intent)
                     }
                     // Remove
-                    1 -> {
-                        val preference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-                        val userId = preference.getInt(getString(R.string.preference_key_id), 0)
-
-                        mPresenter.removeUnit(unitId, userId)
-                    }
+                    1 -> mPresenter.removeUnit(unitId, userId)
                     // Cancel
                     else -> return
                 }
             }
         }
+    }
+
+    override fun showEmptyMessage() {
+        mEmptyUnitMessage.visibility = View.VISIBLE
+    }
+
+    override fun hideEmptyMessage() {
+        mEmptyUnitMessage.visibility = View.GONE
     }
 
     override fun onUnitCreateCompleted(unit: Unit?) {

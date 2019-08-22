@@ -11,6 +11,8 @@ interface UnitListContract {
         fun hideProgressBar()
         fun showToast(message: String?)
         fun showSnackbar(message: String?)
+        fun showEmptyMessage()
+        fun hideEmptyMessage()
     }
 
     interface Presenter {

@@ -72,7 +72,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     lateinit var mProgressBar: ProgressBar
     @BindView(R.id.emptyBoxMessageContainer)
     lateinit var mEmptyMessageContainer: View
-    @BindView(R.id.addFoodButton)
+    @BindView(R.id.addButton)
     lateinit var mAddFoodButton: AppCompatButton
 
     @BindView(R.id.coordinatorLayout)

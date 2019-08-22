@@ -14,6 +14,7 @@ interface NewFoodContract {
         fun showProgressBar()
         fun hideProgressBar()
         fun showToast(message: String?)
+        fun goToAddUnit()
     }
 
     interface Presenter {
