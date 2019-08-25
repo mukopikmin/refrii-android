@@ -181,7 +181,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun onStart() {
         super.onStart()
 
-        reauthorize()
         hideBottomNavigation()
     }
 
@@ -238,10 +237,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         }
     }
 
-    override fun onRestart() {
-        super.onRestart()
+    override fun onResume() {
+        super.onResume()
 
-        mPresenter.getBoxes()
+        reauthorize()
     }
 
     override fun onBackPressed() {

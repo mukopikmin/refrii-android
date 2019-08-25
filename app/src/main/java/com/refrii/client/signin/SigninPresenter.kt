@@ -2,6 +2,7 @@ package com.refrii.client.signin
 
 import com.refrii.client.data.models.User
 import com.refrii.client.data.source.ApiUserRepository
+import retrofit2.HttpException
 import rx.Subscriber
 import javax.inject.Inject
 
@@ -27,7 +28,11 @@ constructor(private val mApiUserRepository: ApiUserRepository) : SigninContract.
                     }
 
                     override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
+                        if ((e as HttpException).response().code() == 401) {
+                            mView?.showToast("アカウントがありません。利用を始めるにはアカウントを作成してください。")
+                        } else {
+                            mView?.showToast(e.message)
+                        }
                     }
                 })
     }
