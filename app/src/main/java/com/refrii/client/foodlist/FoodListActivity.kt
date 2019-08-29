@@ -39,6 +39,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
 import com.refrii.client.App
 import com.refrii.client.R
+import com.refrii.client.SettingsActivity
 import com.refrii.client.boxinfo.BoxInfoActivity
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
@@ -47,7 +48,6 @@ import com.refrii.client.dialogs.CreateBoxDialogFragment
 import com.refrii.client.dialogs.NoticeDialogFragment
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.newfood.NewFoodActivity
-import com.refrii.client.settings.SettingsActivity
 import com.refrii.client.shopplans.ShopPlansActivity
 import com.refrii.client.signin.SignInActivity
 import com.refrii.client.unitlist.UnitListActivity

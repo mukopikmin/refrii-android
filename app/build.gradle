@@ -104,6 +104,7 @@ dependencies {
     implementation 'com.jakewharton:butterknife:10.1.0'
     implementation 'com.squareup.picasso:picasso:2.3.3'
 
+    implementation 'androidx.preference:preference:1.1.0-alpha05'
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 
