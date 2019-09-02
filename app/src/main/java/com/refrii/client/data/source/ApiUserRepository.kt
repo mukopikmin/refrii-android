@@ -26,6 +26,10 @@ class ApiUserRepository(realm: Realm, retrofit: Retrofit) {
         return mAPiRemoteUserSource.registerPushToken(id, token)
     }
 
+    fun update(id: Int, name: String?): Observable<User> {
+        return mAPiRemoteUserSource.update(id, name)
+    }
+
     fun deleteLocalData() {
         mApiLocalUserSource.deleteAll()
     }

@@ -28,10 +28,22 @@ class ApiRemoteUserSource(private val mRetrofit: Retrofit) {
         val builder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
 
-        token?.let { builder.addFormDataPart("token", token) }
+        token?.let { builder.addFormDataPart("token", it) }
 
         return mRetrofit.create(UserService::class.java)
                 .registerPushToken(id, builder.build())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun update(id: Int, name: String?): Observable<User> {
+        val builder = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+        name?.let { builder.addFormDataPart("name", it) }
+
+        return mRetrofit.create(UserService::class.java)
+                .update(id, builder.build())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

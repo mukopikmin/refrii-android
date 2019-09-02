@@ -39,7 +39,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
     @BindView(R.id.textViewSignup)
     lateinit var mSignupTextView: TextView
     @BindView(R.id.acceptPrivacyPolicyCheckBox)
-    lateinit var mAcceptPrivacyPilicy: CheckBox
+    lateinit var mAcceptPrivacyPolicy: CheckBox
 
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var mFirebaseAuth: FirebaseAuth
@@ -65,7 +65,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         mFirebaseAuth = FirebaseAuth.getInstance()
         mSignInButton.setOnClickListener { googleSignIn() }
         mSignUpButton.setOnClickListener { googleSignUp() }
-        mAcceptPrivacyPilicy.setOnCheckedChangeListener { _, isChecked -> mSignUpButton.isEnabled = isChecked }
+        mAcceptPrivacyPolicy.setOnCheckedChangeListener { _, isChecked -> mSignUpButton.isEnabled = isChecked }
         mSignUpButton.isEnabled = false
 
         setGoogleSigninButtonText(mSignInButton, "Google でログイン")

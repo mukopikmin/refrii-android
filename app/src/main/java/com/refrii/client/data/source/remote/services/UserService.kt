@@ -2,10 +2,7 @@ package com.refrii.client.data.source.remote.services
 
 import com.refrii.client.data.models.User
 import okhttp3.RequestBody
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
 import rx.Observable
 
 interface UserService {
@@ -15,7 +12,9 @@ interface UserService {
     @GET("/users/verify")
     fun verify(): Observable<User>
 
-    @POST("users/{id}/push_token")
-    fun registerPushToken(@Path("id") id: Int,
-                          @Body body: RequestBody): Observable<User>
+    @POST("/users/{id}/push_token")
+    fun registerPushToken(@Path("id") id: Int, @Body body: RequestBody): Observable<User>
+
+    @PUT("/users/{id}")
+    fun update(@Path("id") id: Int, @Body body: RequestBody): Observable<User>
 }
