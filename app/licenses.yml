@@ -166,3 +166,15 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: http://www.jetbrains.org
+- artifact: androidx.appcompat:appcompat-resources:+
+  skip: true
+- artifact: androidx.preference:preference:+
+  skip: true
+- artifact: androidx.concurrent:concurrent-futures:+
+  skip: true
+- artifact: androidx.savedstate:savedstate:+
+  skip: true
+- artifact: androidx.activity:activity:+
+  skip: true
+- artifact: com.google.guava:listenablefuture:+
+  skip: true
