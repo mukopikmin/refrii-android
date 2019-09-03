@@ -296,7 +296,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 R.id.nav_expiring -> mPresenter.getExpiringFoods()
                 R.id.nav_add_box -> addBox()
                 R.id.nav_settings -> startActivity(Intent(this, SettingsActivity::class.java))
-                R.id.nav_signout -> signOut()
                 R.id.nav_units -> startActivity(Intent(this, UnitListActivity::class.java))
                 R.id.nav_shop_plans -> startActivity(Intent(this, ShopPlansActivity::class.java))
             }

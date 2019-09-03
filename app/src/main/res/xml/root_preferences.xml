@@ -23,4 +23,11 @@
             app:key="version"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
+
+    <PreferenceCategory app:title="アプリについて">
+
+        <Preference
+            app:title="ログアウト"
+            app:key="signout" />
+    </PreferenceCategory>
 </PreferenceScreen>

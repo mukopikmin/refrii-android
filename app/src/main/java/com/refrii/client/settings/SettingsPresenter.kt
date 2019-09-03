@@ -25,4 +25,8 @@ constructor(private val mApiUserRepository: ApiUserRepository) : SettingsContrac
                     override fun onError(e: Throwable?) {}
                 })
     }
+
+    override fun deleteLocalData() {
+        mApiUserRepository.deleteLocalData()
+    }
 }

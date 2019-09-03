@@ -7,5 +7,6 @@ interface SettingsContract {
     interface Presenter {
         fun takeView(view: View)
         fun updateUser(id: Int, name: String?)
+        fun deleteLocalData()
     }
 }

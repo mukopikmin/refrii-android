@@ -24,6 +24,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.models.User
+import com.refrii.client.foodlist.FoodListActivity
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -182,7 +183,10 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
     }
 
     override fun onLoginCompleted() {
-        finish()
+        val intent = Intent(this, FoodListActivity::class.java)
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
     }
 
     private fun googleSignIn() {

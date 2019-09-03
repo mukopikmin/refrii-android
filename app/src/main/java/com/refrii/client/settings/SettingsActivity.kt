@@ -3,12 +3,16 @@ package com.refrii.client.settings
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.refrii.client.App
 import com.refrii.client.R
+import com.refrii.client.signin.SignInActivity
 import com.refrii.client.webview.WebViewActivity
 import javax.inject.Inject
 
@@ -23,6 +27,18 @@ class SettingsActivity : AppCompatActivity() {
                 .replace(R.id.settings, SettingsFragment())
                 .commit()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        var result = true
+
+        when (id) {
+            android.R.id.home -> finish()
+            else -> result = super.onOptionsItemSelected(item)
+        }
+
+        return result
     }
 
     class SettingsFragment : PreferenceFragmentCompat(), SettingsContract.View {
@@ -46,6 +62,7 @@ class SettingsActivity : AppCompatActivity() {
             setPreferenceLinkListener("privacy_policy", "https://refrii.com/privacy")
             setPreferenceLinkListener("oss_license", "file:///android_asset/licenses.html")
             setVersionPreference()
+            setSignoutPreference()
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -86,11 +103,37 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         private fun setVersionPreference() {
-            val versionPreference = findPreference<Preference>("version")
+            val pref = findPreference<Preference>("version")
             val packageInfo = activity?.packageManager?.getPackageInfo(activity?.application?.packageName, 0)
             val version = packageInfo?.versionName
 
-            versionPreference?.summary = version
+            pref?.summary = version
+        }
+
+        private fun setSignoutPreference() {
+            val pref = findPreference<Preference>("signout")
+
+            pref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                val intent = Intent(activity, SignInActivity::class.java)
+                val editor = mPreferences?.edit()
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .build()
+
+                activity?.let {
+                    val googleSignInClient = GoogleSignIn.getClient(it, gso)
+
+                    googleSignInClient.revokeAccess()
+
+                    editor?.clear()
+                    editor?.apply()
+                    mPresenter.deleteLocalData()
+
+                    startActivity(intent)
+                }
+
+                true
+            }
         }
     }
 }
