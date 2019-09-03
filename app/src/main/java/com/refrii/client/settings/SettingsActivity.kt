@@ -45,6 +45,7 @@ class SettingsActivity : AppCompatActivity() {
 
             setPreferenceLinkListener("privacy_policy", "https://refrii.com/privacy")
             setPreferenceLinkListener("oss_license", "file:///android_asset/licenses.html")
+            setVersionPreference()
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -82,6 +83,14 @@ class SettingsActivity : AppCompatActivity() {
 
                 true
             }
+        }
+
+        private fun setVersionPreference() {
+            val versionPreference = findPreference<Preference>("version")
+            val packageInfo = activity?.packageManager?.getPackageInfo(activity?.application?.packageName, 0)
+            val version = packageInfo?.versionName
+
+            versionPreference?.summary = version
         }
     }
 }
