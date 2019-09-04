@@ -22,7 +22,7 @@ class FoodRecyclerViewAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val food = mFoods[position]
         val formatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
-        val amountWithUnit = "${food.amount} ${food.unit?.label}"
+        val amountWithUnit = "${String.format("%.2f", food.amount)} ${food.unit?.label}"
 
         (holder as FoodViewHolder).apply {
             name.text = food.name

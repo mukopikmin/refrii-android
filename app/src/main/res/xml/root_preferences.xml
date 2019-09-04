@@ -24,7 +24,7 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="アプリについて">
+    <PreferenceCategory app:title="その他">
 
         <Preference
             app:title="ログアウト"
