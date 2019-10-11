@@ -8,7 +8,10 @@ import com.refrii.client.R
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
 
-class ShopPlanRecyclerViewAdapter(private var mShopPlans: List<ShopPlan>, private val mFood: Food) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ShopPlanRecyclerViewAdapter(
+        private var mShopPlans: List<ShopPlan>,
+        private val mFood: Food
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var mOnClickListener: View.OnClickListener? = null
 

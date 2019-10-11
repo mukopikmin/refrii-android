@@ -2,6 +2,7 @@ package com.refrii.client.foodlist
 
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.Notice
 
 interface FoodListContract {
 
@@ -23,7 +24,7 @@ interface FoodListContract {
         fun showConfirmDialog(food: Food?)
         fun setEmptyMessage(foods: List<Food>?)
         fun savePushToken(token: String)
-        fun showNoticeDialog(name: String?, notice: String?)
+        fun showNoticeDialog(name: String?, notices: List<Notice>?)
         fun deselectFood()
         fun welcome()
     }

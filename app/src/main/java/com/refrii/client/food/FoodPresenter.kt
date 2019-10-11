@@ -39,7 +39,7 @@ constructor(
         mId = food?.id
         mName = food?.name
         mAmount = food?.amount
-        mNotice = food?.notice
+//        mNotice = food?.notice
         mExpirationDate = food?.expirationDate
         mBoxId = food?.box?.id
         mUnitId = food?.unit?.id
@@ -118,7 +118,7 @@ constructor(
 
     override fun updateFood() {
         mId?.let { id ->
-            mApiFoodRepository.updateFood(id, mName, mNotice, mAmount, mExpirationDate, mBoxId, mUnitId)
+            mApiFoodRepository.updateFood(id, mName, mAmount, mExpirationDate, mBoxId, mUnitId)
                     .doOnSubscribe { mView?.showProgressBar() }
                     .doOnUnsubscribe { mView?.hideProgressBar() }
                     .subscribe(object : Subscriber<Food>() {

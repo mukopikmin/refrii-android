@@ -38,7 +38,7 @@ class ApiLocalFoodSource(private val mRealm: Realm) {
         return Observable.just(mRealm.copyFromRealm(foods))
     }
 
-    fun updateFood(id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
+    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
         val food = mRealm.where<Food>()
                 .equalTo("id", id)
                 .findFirst() ?: return Observable.error(Throwable("見つかりませんでした"))
@@ -52,7 +52,6 @@ class ApiLocalFoodSource(private val mRealm: Realm) {
                     .findFirst()
 
             name?.let { food.name = it }
-            notice?.let { food.notice = it }
             amount?.let { food.amount = it }
             expirationDate?.let { food.expirationDate = it }
             box?.let { food.box = box }
@@ -71,7 +70,7 @@ class ApiLocalFoodSource(private val mRealm: Realm) {
     }
 
 
-    fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date) {
+    fun createFood(name: String, amount: Double, box: Box, unit: Unit, expirationDate: Date) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

@@ -26,4 +26,10 @@ interface FoodService {
 
     @DELETE("/foods/{id}")
     fun removeFood(@Path("id") id: Int): Observable<Void>
+
+    @POST("/foods/{id}/notices")
+    fun addNotice(@Path("id") id: Int): Observable<Food>
+
+    @DELETE("/foods/{food_id}/notices/{id}")
+    fun removeNotice(@Path("food_id") foodId: Int, @Path("id") id: Int): Observable<Void>
 }

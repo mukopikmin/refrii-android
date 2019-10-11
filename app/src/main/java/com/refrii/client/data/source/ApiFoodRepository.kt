@@ -67,14 +67,14 @@ class ApiFoodRepository(realm: Realm, retrofit: Retrofit) {
         return mApiLocalFoodSource.getExpiringFoods()
     }
 
-    fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Observable<Food> {
-        return mApiRemoteFoodSource.createFood(name, notice, amount, box, unit, expirationDate)
+    fun createFood(name: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Observable<Food> {
+        return mApiRemoteFoodSource.createFood(name, amount, box, unit, expirationDate)
                 .flatMap { mApiLocalFoodSource.saveFood(it) }
     }
 
-    fun updateFood(id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
-        return mApiRemoteFoodSource.updateFood(id, name, notice, amount, expirationDate, boxId, unitId)
-                .flatMap { mApiLocalFoodSource.updateFood(it.id, it.name, it.notice, it.amount, it.expirationDate, it.box?.id, it.unit?.id) }
+    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
+        return mApiRemoteFoodSource.updateFood(id, name, amount, expirationDate, boxId, unitId)
+                .flatMap { mApiLocalFoodSource.updateFood(it.id, it.name, it.amount, it.expirationDate, it.box?.id, it.unit?.id) }
     }
 
     fun removeFood(id: Int): Observable<Void> {

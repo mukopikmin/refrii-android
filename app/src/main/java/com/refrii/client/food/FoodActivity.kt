@@ -159,6 +159,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
         if (data == null || resultCode != Activity.RESULT_OK) return
 
         when (requestCode) {
@@ -197,7 +199,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mName.setText(food?.name)
         mBoxName.text = food?.box?.name
         mAmount.setText(String.format("%.2f", food?.amount))
-        mNotice.setText(food?.notice)
+//        mNotice.setText(food?.notice)
         mCreated.text = "${timeFormatter.format(food?.createdAt)} (${food?.createdUser?.name})"
         mUpdate.text = "${timeFormatter.format(food?.updatedAt)} (${food?.updatedUser?.name})"
 

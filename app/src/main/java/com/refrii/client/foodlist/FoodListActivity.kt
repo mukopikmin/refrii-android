@@ -42,9 +42,10 @@ import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoActivity
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.Notice
 import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.CreateBoxDialogFragment
-import com.refrii.client.dialogs.NoticeDialogFragment
+import com.refrii.client.dialogs.NoticesDialogFragment
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.settings.SettingsActivity
@@ -126,11 +127,11 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         }
     }
 
-    override fun showNoticeDialog(name: String?, notice: String?) {
+    override fun showNoticeDialog(name: String?, notices: List<Notice>?) {
         name ?: return
-        notice ?: return
+        notices ?: return
 
-        val fragment = NoticeDialogFragment.newInstance(name, notice)
+        val fragment = NoticesDialogFragment.newInstance(name, notices)
 
         fragment.setTargetFragment(null, SHOW_NOTICE_REQUEST_CODE)
         fragment.show(supportFragmentManager, "show_notice")
@@ -467,6 +468,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
         if (resultCode != Activity.RESULT_OK || data == null) return
 
         when (requestCode) {

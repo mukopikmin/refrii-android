@@ -39,11 +39,11 @@ class FoodRecyclerViewAdapter(
                         .into(lastUpdatedUserAvatarImageView)
             }
 
-            if (food.notice.isNullOrBlank()) {
+            if (food.notices.isNullOrEmpty()) {
                 noticeCountView.visibility = View.GONE
             } else {
                 noticeCountView.visibility = View.VISIBLE
-                noticeCountTextView.text = "1"
+                noticeCountTextView.text = food.notices?.size.toString()
             }
 
             constraintLayout.setBackgroundColor(Color.parseColor("#00000000"))

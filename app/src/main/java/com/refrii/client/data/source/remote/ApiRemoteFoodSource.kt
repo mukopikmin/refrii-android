@@ -36,12 +36,11 @@ class ApiRemoteFoodSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun createFood(name: String, notice: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Observable<Food> {
+    fun createFood(name: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Observable<Food> {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("name", name)
-                .addFormDataPart("notice", notice)
                 .addFormDataPart("amount", amount.toString())
                 .addFormDataPart("box_id", box.id.toString())
                 .addFormDataPart("unit_id", unit.id.toString())
@@ -54,13 +53,12 @@ class ApiRemoteFoodSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun updateFood(id: Int, name: String?, notice: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
+    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val bodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
 
         name?.let { bodyBuilder.addFormDataPart("name", it) }
-        notice?.let { bodyBuilder.addFormDataPart("notice", it) }
         amount?.let { bodyBuilder.addFormDataPart("amount", it.toString()) }
         expirationDate?.let { bodyBuilder.addFormDataPart("expiration_date", simpleDateFormat.format(it)) }
         boxId?.let { bodyBuilder.addFormDataPart("box_id", it.toString()) }

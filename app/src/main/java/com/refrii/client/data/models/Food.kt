@@ -1,5 +1,6 @@
 package com.refrii.client.data.models
 
+import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import java.io.Serializable
@@ -10,7 +11,7 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
     @PrimaryKey
     open var id: Int = 0
     open var name: String? = null
-    open var notice: String? = null
+    open var notices: RealmList<Notice>? = null
     open var amount: Double = 0.toDouble()
     open var expirationDate: Date? = null
     open var isNeedsAdding: Boolean = false
@@ -35,7 +36,7 @@ open class Food : RealmObject(), Serializable, Comparable<Food> {
     override fun hashCode(): Int {
         var result = id
         result = 31 * result + (name?.hashCode() ?: 0)
-        result = 31 * result + (notice?.hashCode() ?: 0)
+        result = 31 * result + notices.hashCode()
         result = 31 * result + amount.hashCode()
         result = 31 * result + (expirationDate?.hashCode() ?: 0)
         result = 31 * result + isNeedsAdding.hashCode()

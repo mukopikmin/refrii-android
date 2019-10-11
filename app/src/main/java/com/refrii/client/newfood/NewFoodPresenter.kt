@@ -28,7 +28,7 @@ constructor(
         unit ?: return
 
         mBox?.let { box ->
-            mApiFoodRepository.createFood(name, notice, amount, box, unit, expirationDate)
+            mApiFoodRepository.createFood(name, amount, box, unit, expirationDate)
                     .doOnSubscribe { mView?.showProgressBar() }
                     .doOnUnsubscribe { mView?.hideProgressBar() }
                     .subscribe(object : Subscriber<Food>() {

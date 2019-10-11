@@ -125,7 +125,7 @@ constructor(
     }
 
     fun updateFood(food: Food, amount: Double = 0.toDouble()) {
-        mApiFoodRepository.updateFood(food.id, null, null, amount, null, null, null)
+        mApiFoodRepository.updateFood(food.id, null, amount, null, null, null)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe(object : Subscriber<Food>() {
@@ -302,7 +302,7 @@ constructor(
     }
 
     override fun showNoticeDialog() {
-        mView?.showNoticeDialog(mFood?.name, mFood?.notice)
+        mView?.showNoticeDialog(mFood?.name, mFood?.notices?.toList())
     }
 
     override fun deleteLocalData() {
