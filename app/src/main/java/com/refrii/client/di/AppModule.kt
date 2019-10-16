@@ -2,11 +2,6 @@ package com.refrii.client.di
 
 import android.app.Application
 import android.content.Context
-import android.preference.PreferenceManager
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.GsonBuilder
-import com.refrii.client.BuildConfig
-import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoContract
 import com.refrii.client.boxinfo.BoxInfoPresenter
 import com.refrii.client.data.source.*
@@ -34,10 +29,6 @@ import dagger.Module
 import dagger.Provides
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 
@@ -107,22 +98,6 @@ class AppModule(private var mApplication: Application) {
 
     @Singleton
     @Provides
-    fun provideRetrofit(): Retrofit {
-        val gson = GsonBuilder()
-                .setLenient()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create()
-
-        return Retrofit.Builder()
-                .baseUrl(getApiEndpoint())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .client(provideHttpClient())
-                .build()
-    }
-
-    @Singleton
-    @Provides
     fun provideRealm(): Realm {
         Realm.init(provideApplicationContext())
         Realm.setDefaultConfiguration(RealmConfiguration.Builder()
@@ -130,37 +105,5 @@ class AppModule(private var mApplication: Application) {
                 .build())
 
         return Realm.getDefaultInstance()
-    }
-
-    @Singleton
-    @Provides
-    fun provideHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-                .addInterceptor { chain ->
-                    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(provideApplicationContext())
-                    val original = chain.request()
-                    val jwt = sharedPreferences.getString(provideApplicationContext().getString(R.string.preference_key_jwt), null)
-                    val request = original.newBuilder()
-                            .header("Accept", "application/json")
-
-                    if (jwt != null) {
-                        request.header("Authorization", "Bearer $jwt")
-                    }
-
-                    request.method(original.method(), original.body())
-                    chain.proceed(request.build())
-                }
-                .build()
-    }
-
-    private fun getApiEndpoint(): String {
-        val version = "v1"
-
-        return if (BuildConfig.FLAVOR == "staging") {
-//            "http://192.168.1.104:3000/"
-            "https://staging.api.refrii.com/$version/"
-        } else {
-            "https://api.refrii.com/$version/"
-        }
     }
 }
