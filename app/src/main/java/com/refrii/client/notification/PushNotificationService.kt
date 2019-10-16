@@ -34,17 +34,17 @@ class PushNotificationService : FirebaseMessagingService() {
         mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
     }
 
-    override fun onNewToken(newToken: String?) {
-        super.onNewToken(newToken)
+    override fun onNewToken(p0: String) {
+        super.onNewToken(p0)
 
-        register(newToken)
+        register(p0)
     }
 
-    override fun onMessageReceived(message: RemoteMessage?) {
-        super.onMessageReceived(message)
+    override fun onMessageReceived(p0: RemoteMessage) {
+        super.onMessageReceived(p0)
 
-        val title = message?.notification?.title
-        val body = message?.notification?.body
+        val title = p0.notification?.title
+        val body = p0.notification?.body
 
         sendNotification(title, body)
     }
