@@ -30,8 +30,6 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
     lateinit var mNameEditText: EditText
     @BindView(R.id.boxTextView)
     lateinit var mBoxNameText: TextView
-    @BindView(R.id.noticeEditText)
-    lateinit var mNoticeEditText: EditText
     @BindView(R.id.amountEditText)
     lateinit var mAmountEditText: EditText
     @BindView(R.id.unitsSpinner)
@@ -178,12 +176,11 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         }
 
         val name = mNameEditText.text.toString()
-        val notice = mNoticeEditText.text.toString()
         val amount = mAmountEditText.text.toString().toDouble()
         val unit = mPresenter.pickUnit(mSpinner.selectedItem.toString())
         val expirationDate = formatter.parse(mExpirationDateEditText.text.toString())
 
-        mPresenter.createFood(name, notice, amount, unit, expirationDate)
+        mPresenter.createFood(name, amount, unit, expirationDate)
     }
 
     private fun showEditDateDialog() {

@@ -24,7 +24,7 @@ constructor(
         mView = view
     }
 
-    override fun createFood(name: String, notice: String, amount: Double, unit: Unit?, expirationDate: Date) {
+    override fun createFood(name: String, amount: Double, unit: Unit?, expirationDate: Date) {
         unit ?: return
 
         mBox?.let { box ->

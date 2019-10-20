@@ -19,7 +19,7 @@ interface NewFoodContract {
 
     interface Presenter {
         fun takeView(view: View)
-        fun createFood(name: String, notice: String, amount: Double, unit: Unit?, expirationDate: Date)
+        fun createFood(name: String, amount: Double, unit: Unit?, expirationDate: Date)
         fun getUnits(boxId: Int)
         fun getBox(id: Int)
         fun pickUnit(label: String): Unit?
