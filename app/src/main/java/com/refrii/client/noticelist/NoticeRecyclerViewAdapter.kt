@@ -1,15 +1,13 @@
-package com.refrii.client.dialogs.adapters
+package com.refrii.client.noticelist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.refrii.client.R
-import java.text.SimpleDateFormat
-import java.util.*
+import com.refrii.client.data.models.Notice
 
 class NoticeRecyclerViewAdapter(
-        private val mTexts: List<String>,
-        private val mTimestamps: List<Date>
+        private var mNotices: List<Notice>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -19,15 +17,18 @@ class NoticeRecyclerViewAdapter(
     }
 
     override fun getItemCount(): Int {
-        return mTexts.size
+        return mNotices.size
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
-        val text = mTexts[position]
-        val timestamp = formatter.format(mTimestamps[position])
+        val notice = mNotices[position]
 
-        (holder as NoticeViewHolder).bind(text, timestamp)
+        (holder as NoticeViewHolder).bind(notice)
     }
 
+    fun setNotices(notices: List<Notice>) {
+        mNotices = notices
+
+        notifyDataSetChanged()
+    }
 }

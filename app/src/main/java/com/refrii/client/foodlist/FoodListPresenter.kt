@@ -301,8 +301,10 @@ constructor(
                 })
     }
 
-    override fun showNoticeDialog() {
-        mView?.showNoticeDialog(mFood?.name, mFood?.notices?.toList())
+    override fun showNotices() {
+        mFood?.let {
+            mView?.showNotices(it)
+        }
     }
 
     override fun deleteLocalData() {

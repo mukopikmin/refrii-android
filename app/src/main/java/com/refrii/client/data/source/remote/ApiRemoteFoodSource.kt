@@ -76,4 +76,16 @@ class ApiRemoteFoodSource(private val mRetrofit: Retrofit) {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+    fun createNotice(foodId: Int, text: String): Observable<Food> {
+        val bodyBuilder = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+        text?.let { bodyBuilder.addFormDataPart("text", it) }
+
+        return mRetrofit.create(FoodService::class.java)
+                .addNotice(foodId, bodyBuilder.build())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }

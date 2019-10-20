@@ -80,4 +80,9 @@ class ApiFoodRepository(realm: Realm, retrofit: Retrofit) {
     fun removeFood(id: Int): Observable<Void> {
         return mApiRemoteFoodSource.removeFood(id)
     }
+
+    fun createNotice(foodId: Int, text: String): Observable<Food> {
+        return mApiRemoteFoodSource.createNotice(foodId, text)
+                .flatMap { mApiLocalFoodSource.saveFood(it) }
+    }
 }

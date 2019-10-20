@@ -42,12 +42,11 @@ import com.refrii.client.R
 import com.refrii.client.boxinfo.BoxInfoActivity
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
-import com.refrii.client.data.models.Notice
 import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.CreateBoxDialogFragment
-import com.refrii.client.dialogs.NoticesDialogFragment
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.newfood.NewFoodActivity
+import com.refrii.client.noticelist.NoticeListActivity
 import com.refrii.client.settings.SettingsActivity
 import com.refrii.client.shopplans.ShopPlansActivity
 import com.refrii.client.signin.SignInActivity
@@ -119,7 +118,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 R.id.navigation_edit -> mPresenter.showFood()
                 R.id.navigation_increment -> mPresenter.incrementFood()
                 R.id.navigation_decrement -> mPresenter.decrementFood()
-                R.id.navigation_notifications -> mPresenter.showNoticeDialog()
+                R.id.navigation_notifications -> mPresenter.showNotices()
                 R.id.navigation_delete -> mPresenter.confirmRemovingFood()
             }
 
@@ -127,14 +126,11 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         }
     }
 
-    override fun showNoticeDialog(name: String?, notices: List<Notice>?) {
-        name ?: return
-        notices ?: return
+    override fun showNotices(food: Food) {
+        val intent = Intent(this, NoticeListActivity::class.java)
 
-        val fragment = NoticesDialogFragment.newInstance(name, notices)
-
-        fragment.setTargetFragment(null, SHOW_NOTICE_REQUEST_CODE)
-        fragment.show(supportFragmentManager, "show_notice")
+        intent.putExtra(getString(R.string.key_food_id), food.id)
+        startActivity(intent)
     }
 
     private fun initPushNotification() {
