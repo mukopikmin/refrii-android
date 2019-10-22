@@ -2,6 +2,7 @@ package com.refrii.client.noticelist
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -85,6 +86,17 @@ class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
         if (mRecyclerView.adapter == null) {
             val adapter = NoticeRecyclerViewAdapter(notices)
 
+            adapter.setOnLongClickListener(View.OnLongClickListener {
+                val position = mRecyclerView.getChildAdapterPosition(it)
+                val notice = adapter.getItemAt(position)
+
+                showToast(mRecyclerView.getChildAdapterPosition(it).toString())
+
+                mPresenter.removeNotice(notice)
+
+                true
+            })
+
             mRecyclerView.adapter = adapter
             mRecyclerView.scrollToPosition(adapter.itemCount - 1)
         } else {
@@ -97,6 +109,12 @@ class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
 
     override fun resetForm() {
         mNoticeEditText.text = null
+    }
+
+    override fun onRemoveCompleted() {
+        val foodId = intent.getIntExtra(getString(R.string.key_food_id), -1)
+
+        mPresenter.getFood(foodId)
     }
 
     override fun showToast(message: String) {

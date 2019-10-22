@@ -72,6 +72,7 @@
     <string name="amount_with_unit">%.1f %s</string>
     <string name="amount">%.1f</string>
     <string name="date_format">yyyy/MM/dd</string>
+    <string name="datetime_format">yyyy/MM/dd HH:mm</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Preference Titles -->

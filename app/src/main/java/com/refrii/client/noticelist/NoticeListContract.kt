@@ -9,6 +9,7 @@ interface NoticeListContract {
         fun setFood(food: Food)
         fun setNotices(notices: List<Notice>)
         fun resetForm()
+        fun onRemoveCompleted()
         fun showToast(message: String)
     }
 
@@ -16,5 +17,6 @@ interface NoticeListContract {
         fun init(view: View)
         fun getFood(id: Int)
         fun createNotice(text: String)
+        fun removeNotice(notice: Notice)
     }
 }

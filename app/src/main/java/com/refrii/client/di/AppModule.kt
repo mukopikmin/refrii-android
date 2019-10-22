@@ -13,6 +13,8 @@ import com.refrii.client.newfood.NewFoodContract
 import com.refrii.client.newfood.NewFoodPresenter
 import com.refrii.client.newunit.NewUnitContract
 import com.refrii.client.newunit.NewUnitPresenter
+import com.refrii.client.noticelist.NoticeListContract
+import com.refrii.client.noticelist.NoticeListPresenter
 import com.refrii.client.settings.SettingsContract
 import com.refrii.client.settings.SettingsPresenter
 import com.refrii.client.shopplans.ShopPlansContract
@@ -89,6 +91,11 @@ class AppModule(private var mApplication: Application) {
     @Provides
     fun provideWelcomePresenter(boxRepository: ApiBoxRepository): WelcomeContract.Presenter {
         return WelcomePresenter(boxRepository)
+    }
+
+    @Provides
+    fun provideNoticeListPresenter(foodRepository: ApiFoodRepository, noticeRepository: ApiNoticeRepository): NoticeListContract.Presenter {
+        return NoticeListPresenter(foodRepository, noticeRepository)
     }
 
     @Provides

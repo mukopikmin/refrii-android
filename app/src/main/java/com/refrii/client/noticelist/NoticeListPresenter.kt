@@ -1,13 +1,18 @@
 package com.refrii.client.noticelist
 
 import com.refrii.client.data.models.Food
+import com.refrii.client.data.models.Notice
 import com.refrii.client.data.source.ApiFoodRepository
+import com.refrii.client.data.source.ApiNoticeRepository
 import rx.Subscriber
 import javax.inject.Inject
 
 class NoticeListPresenter
 @Inject
-constructor(private val mApiFoodRepository: ApiFoodRepository) : NoticeListContract.Presenter {
+constructor(
+        private val mApiFoodRepository: ApiFoodRepository,
+        private val mApiNoticeRepository: ApiNoticeRepository
+) : NoticeListContract.Presenter {
 
     private var mView: NoticeListContract.View? = null
     private var mFood: Food? = null
@@ -68,5 +73,22 @@ constructor(private val mApiFoodRepository: ApiFoodRepository) : NoticeListContr
                         }
                     })
         }
+    }
+
+    override fun removeNotice(notice: Notice) {
+        mApiNoticeRepository.remove(notice.id)
+                .subscribe(object : Subscriber<Void>() {
+                    override fun onNext(t: Void?) {}
+
+                    override fun onCompleted() {
+                        mView?.onRemoveCompleted()
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        e?.message?.let {
+                            mView?.showToast(it)
+                        }
+                    }
+                })
     }
 }
