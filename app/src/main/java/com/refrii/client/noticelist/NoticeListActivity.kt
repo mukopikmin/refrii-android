@@ -1,5 +1,7 @@
 package com.refrii.client.noticelist
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +18,7 @@ import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.Notice
+import com.refrii.client.dialogs.ConfirmDialogFragment
 import javax.inject.Inject
 
 class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
@@ -70,6 +73,16 @@ class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
         return result
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK || data == null) return
+
+        when (requestCode) {
+            REMOVE_NOTICE_REQUEST_CODE -> mPresenter.removeNotice()
+        }
+    }
+
     private fun createNotice() {
         val text = mNoticeEditText.text.toString()
 
@@ -90,9 +103,7 @@ class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
                 val position = mRecyclerView.getChildAdapterPosition(it)
                 val notice = adapter.getItemAt(position)
 
-                showToast(mRecyclerView.getChildAdapterPosition(it).toString())
-
-                mPresenter.removeNotice(notice)
+                mPresenter.confirmRemovingNotice(notice)
 
                 true
             })
@@ -117,7 +128,18 @@ class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
         mPresenter.getFood(foodId)
     }
 
+    override fun showRemoveConfirmation(title: String, notice: Notice) {
+        val fragment = ConfirmDialogFragment.newInstance(title, "削除していいですか？", notice.id)
+
+        fragment.setTargetFragment(null, REMOVE_NOTICE_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "delete_food")
+    }
+
     override fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    companion object {
+        private const val REMOVE_NOTICE_REQUEST_CODE = 101
     }
 }

@@ -16,6 +16,7 @@ constructor(
 
     private var mView: NoticeListContract.View? = null
     private var mFood: Food? = null
+    private var mNotice: Notice? = null
 
     override fun init(view: NoticeListContract.View) {
         mView = view
@@ -75,20 +76,30 @@ constructor(
         }
     }
 
-    override fun removeNotice(notice: Notice) {
-        mApiNoticeRepository.remove(notice.id)
-                .subscribe(object : Subscriber<Void>() {
-                    override fun onNext(t: Void?) {}
+    override fun removeNotice() {
+        mNotice?.let {
+            mApiNoticeRepository.remove(it.id)
+                    .subscribe(object : Subscriber<Void>() {
+                        override fun onNext(t: Void?) {}
 
-                    override fun onCompleted() {
-                        mView?.onRemoveCompleted()
-                    }
-
-                    override fun onError(e: Throwable?) {
-                        e?.message?.let {
-                            mView?.showToast(it)
+                        override fun onCompleted() {
+                            mView?.onRemoveCompleted()
                         }
-                    }
-                })
+
+                        override fun onError(e: Throwable?) {
+                            e?.message?.let {
+                                mView?.showToast(it)
+                            }
+                        }
+                    })
+        }
+    }
+
+    override fun confirmRemovingNotice(notice: Notice) {
+        mNotice = notice
+
+        mFood?.name?.let {
+            mView?.showRemoveConfirmation(it, notice)
+        }
     }
 }
