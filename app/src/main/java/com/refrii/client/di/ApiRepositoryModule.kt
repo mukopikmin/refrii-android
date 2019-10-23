@@ -39,4 +39,10 @@ class ApiRepositoryModule {
     fun provideApiUserRepository(realm: Realm, retrofit: Retrofit): ApiUserRepository {
         return ApiUserRepository(realm, retrofit)
     }
+
+    @Singleton
+    @Provides
+    fun provideApiNoticeRepository(realm: Realm, retrofit: Retrofit): ApiNoticeRepository {
+        return ApiNoticeRepository(realm, retrofit)
+    }
 }

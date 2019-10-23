@@ -80,8 +80,7 @@ class ApiRemoteFoodSource(private val mRetrofit: Retrofit) {
     fun createNotice(foodId: Int, text: String): Observable<Food> {
         val bodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-
-        text?.let { bodyBuilder.addFormDataPart("text", it) }
+                .addFormDataPart("text", text)
 
         return mRetrofit.create(FoodService::class.java)
                 .addNotice(foodId, bodyBuilder.build())
