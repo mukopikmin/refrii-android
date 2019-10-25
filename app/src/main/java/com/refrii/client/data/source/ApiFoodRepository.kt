@@ -1,5 +1,6 @@
 package com.refrii.client.data.source
 
+import android.graphics.Bitmap
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
@@ -72,9 +73,9 @@ class ApiFoodRepository(realm: Realm, retrofit: Retrofit) {
                 .flatMap { mApiLocalFoodSource.saveFood(it) }
     }
 
-    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
-        return mApiRemoteFoodSource.updateFood(id, name, amount, expirationDate, boxId, unitId)
-                .flatMap { mApiLocalFoodSource.updateFood(it.id, it.name, it.amount, it.expirationDate, it.box?.id, it.unit?.id) }
+    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, bitmap: Bitmap?, boxId: Int?, unitId: Int?): Observable<Food> {
+        return mApiRemoteFoodSource.updateFood(id, name, amount, expirationDate, bitmap, boxId, unitId)
+                .flatMap { mApiLocalFoodSource.updateFood(it.id, it.name, it.amount, it.expirationDate, it.imageUrl, it.box?.id, it.unit?.id) }
     }
 
     fun removeFood(id: Int): Observable<Void> {

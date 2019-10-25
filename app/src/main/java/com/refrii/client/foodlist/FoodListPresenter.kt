@@ -125,7 +125,7 @@ constructor(
     }
 
     fun updateFood(food: Food, amount: Double = 0.toDouble()) {
-        mApiFoodRepository.updateFood(food.id, null, amount, null, null, null)
+        mApiFoodRepository.updateFood(food.id, null, amount, null, null, null, null)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe(object : Subscriber<Food>() {

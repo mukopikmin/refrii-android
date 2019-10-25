@@ -1,5 +1,6 @@
 package com.refrii.client.food
 
+import android.graphics.Bitmap
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
@@ -27,6 +28,7 @@ constructor(
     private var mAmount: Double? = null
     private var mNotice: String? = null
     private var mExpirationDate: Date? = null
+    private var mImage: Bitmap? = null
     private var mBoxId: Int? = null
     private var mUnitId: Int? = null
 
@@ -118,7 +120,7 @@ constructor(
 
     override fun updateFood() {
         mId?.let { id ->
-            mApiFoodRepository.updateFood(id, mName, mAmount, mExpirationDate, mBoxId, mUnitId)
+            mApiFoodRepository.updateFood(id, mName, mAmount, mExpirationDate, mImage, mBoxId, mUnitId)
                     .doOnSubscribe { mView?.showProgressBar() }
                     .doOnUnsubscribe { mView?.hideProgressBar() }
                     .subscribe(object : Subscriber<Food>() {
@@ -232,5 +234,9 @@ constructor(
     override fun updateExpirationDate(date: Date) {
         mExpirationDate = date
         mView?.setExpirationDate(date)
+    }
+
+    override fun updateImage(image: Bitmap) {
+        mImage = image
     }
 }

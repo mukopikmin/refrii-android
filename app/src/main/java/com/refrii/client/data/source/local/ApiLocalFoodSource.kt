@@ -38,7 +38,7 @@ class ApiLocalFoodSource(private val mRealm: Realm) {
         return Observable.just(mRealm.copyFromRealm(foods))
     }
 
-    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, boxId: Int?, unitId: Int?): Observable<Food> {
+    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, imageUrl: String?, boxId: Int?, unitId: Int?): Observable<Food> {
         val food = mRealm.where<Food>()
                 .equalTo("id", id)
                 .findFirst() ?: return Observable.error(Throwable("見つかりませんでした"))
@@ -54,8 +54,9 @@ class ApiLocalFoodSource(private val mRealm: Realm) {
             name?.let { food.name = it }
             amount?.let { food.amount = it }
             expirationDate?.let { food.expirationDate = it }
-            box?.let { food.box = box }
-            unit?.let { food.unit = unit }
+            imageUrl?.let { food.imageUrl = it }
+            box?.let { food.box = it }
+            unit?.let { food.unit = it }
         }
 
         return Observable.just(mRealm.copyFromRealm(food))

@@ -1,5 +1,6 @@
 package com.refrii.client.food
 
+import android.graphics.Bitmap
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
@@ -33,6 +34,7 @@ interface FoodContract {
         fun updateAmount(amount: Double)
         fun updateNotice(notice: String)
         fun updateExpirationDate(date: Date)
+        fun updateImage(image: Bitmap)
         fun selectUnit(id: Int)
         fun getShopPlans(id: Int)
         fun createShopPlan(amount: Double, date: Date)

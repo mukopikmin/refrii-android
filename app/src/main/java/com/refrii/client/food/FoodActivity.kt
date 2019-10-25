@@ -3,9 +3,11 @@ package com.refrii.client.food
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MenuItem
@@ -13,6 +15,8 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
@@ -26,12 +30,15 @@ import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
 import com.refrii.client.dialogs.CreateShopPlanDialogFragment
+import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
 class FoodActivity : AppCompatActivity(), FoodContract.View {
 
+    @BindView(R.id.constraintLayout)
+    lateinit var mConstraintLayout: ConstraintLayout
     @BindView(R.id.foodProgressBar)
     lateinit var mProgressBar: ProgressBar
     @BindView(R.id.toolbar)
@@ -56,6 +63,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     lateinit var mRecyclerView: RecyclerView
     @BindView(R.id.addPlanButton)
     lateinit var mAddPlanButton: View
+    @BindView(R.id.cameraImageView)
+    lateinit var mCameraImageView: ImageView
 
     private var mUnitIds: List<Int>? = null
     private var mUnitLabels: MutableList<String?>? = null
@@ -119,6 +128,13 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         })
         mUnitsSpinner.onItemSelectedListener = mOnUnitSelectedListener
         mExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
+        mCameraImageView.setOnClickListener { launchCamera() }
+    }
+
+    private fun launchCamera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        startActivityForResult(intent, RESULT_CAMERA)
     }
 
     override fun onStart() {
@@ -158,7 +174,35 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
             EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> updateExpirationDate(data)
             CREATE_SHOP_PLAN_REQUEST_CODE -> createShopPlan(data)
+            RESULT_CAMERA -> onTookPicture(data)
         }
+    }
+
+    private fun onTookPicture(data: Intent?) {
+        data ?: return
+
+        val bitmap = data.extras?.get("data") as Bitmap?
+
+        bitmap?.let {
+            onBeforeSetImage()
+            mCameraImageView.setImageBitmap(it)
+            mPresenter.updateImage(it)
+        }
+    }
+
+    private fun onBeforeSetImage() {
+        val density = resources.displayMetrics.density
+        val height = ((150 * density) + 0.5).toInt()
+        val set = ConstraintSet()
+
+        set.clone(mConstraintLayout)
+        set.constrainWidth(mCameraImageView.id, ConstraintSet.MATCH_CONSTRAINT)
+        set.constrainHeight(mCameraImageView.id, height)
+        set.applyTo(mConstraintLayout)
+
+        mCameraImageView.setPadding(0, 0, 0, 0)
+        mCameraImageView.scaleType = ImageView.ScaleType.CENTER_CROP
+        mCameraImageView.imageTintList = null
     }
 
     private fun updateExpirationDate(data: Intent?) {
@@ -193,6 +237,11 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mUpdate.text = "${timeFormatter.format(food?.updatedAt)} (${food?.updatedUser?.name})"
 
         setExpirationDate(food?.expirationDate)
+
+        food?.imageUrl?.let {
+            onBeforeSetImage()
+            Picasso.with(this).load(it).into(mCameraImageView)
+        }
     }
 
     override fun setShopPlans(food: Food?, shopPlans: List<ShopPlan>?) {
@@ -305,5 +354,6 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         private const val EDIT_NOTICE_REQUEST_CODE = 102
         private const val EDIT_EXPIRATION_DATE_REQUEST_CODE = 103
         private const val CREATE_SHOP_PLAN_REQUEST_CODE = 104
+        private const val RESULT_CAMERA = 105
     }
 }
