@@ -355,5 +355,6 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         private const val EDIT_EXPIRATION_DATE_REQUEST_CODE = 103
         private const val CREATE_SHOP_PLAN_REQUEST_CODE = 104
         private const val RESULT_CAMERA = 105
+        private const val PERMISSION_CAMERA_REQUEST_CODE = 200
     }
 }
