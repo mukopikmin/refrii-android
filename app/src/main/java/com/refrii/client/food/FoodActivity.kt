@@ -3,8 +3,8 @@ package com.refrii.client.food
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.provider.MediaStore
@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
@@ -24,6 +25,7 @@ import butterknife.ButterKnife
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.refrii.client.App
+import com.refrii.client.BuildConfig
 import com.refrii.client.R
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
@@ -31,6 +33,8 @@ import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
 import com.refrii.client.dialogs.CreateShopPlanDialogFragment
 import com.squareup.picasso.Picasso
+import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -68,6 +72,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     private var mUnitIds: List<Int>? = null
     private var mUnitLabels: MutableList<String?>? = null
+    private var mImageUri: Uri? = null
     private val mOnUnitSelectedListener = object : AdapterView.OnItemSelectedListener {
         override fun onNothingSelected(parent: AdapterView<*>?) {}
 
@@ -133,8 +138,29 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     private fun launchCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val file = createOutputFile()
 
+        mImageUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file)
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri)
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         startActivityForResult(intent, RESULT_CAMERA)
+    }
+
+    private fun createOutputFile(): File {
+        val tempFile = File(filesDir, "temp/sample")
+
+        if (!tempFile.exists()) {
+            try {
+                tempFile.parentFile.mkdirs()
+                tempFile.createNewFile()
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
+        return tempFile
     }
 
     override fun onStart() {
@@ -181,7 +207,9 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     private fun onTookPicture(data: Intent?) {
         data ?: return
 
-        val bitmap = data.extras?.get("data") as Bitmap?
+//        val bitmap = data.extras?.get("data") as Bitmap?
+
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, mImageUri)
 
         bitmap?.let {
             onBeforeSetImage()
