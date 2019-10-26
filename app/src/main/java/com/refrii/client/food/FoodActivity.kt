@@ -144,6 +144,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri)
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivityForResult(intent, RESULT_CAMERA)
     }
 
@@ -205,17 +206,17 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun onTookPicture(data: Intent?) {
-        data ?: return
+        showToast("data: ${data == null}")
 
-//        val bitmap = data.extras?.get("data") as Bitmap?
+        data ?: return
 
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, mImageUri)
 
-        bitmap?.let {
-            onBeforeSetImage()
-            mCameraImageView.setImageBitmap(it)
-            mPresenter.updateImage(it)
-        }
+        showToast("data: ${bitmap}")
+
+        onBeforeSetImage()
+        mCameraImageView.setImageBitmap(bitmap)
+        mPresenter.updateImage(bitmap)
     }
 
     private fun onBeforeSetImage() {
@@ -260,7 +261,6 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mName.setText(food?.name)
         mBoxName.text = food?.box?.name
         mAmount.setText(String.format("%.2f", food?.amount))
-//        mNotice.setText(food?.notice)
         mCreated.text = "${timeFormatter.format(food?.createdAt)} (${food?.createdUser?.name})"
         mUpdate.text = "${timeFormatter.format(food?.updatedAt)} (${food?.updatedUser?.name})"
 
