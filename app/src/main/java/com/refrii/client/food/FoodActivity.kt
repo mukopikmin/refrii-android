@@ -144,7 +144,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri)
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivityForResult(intent, RESULT_CAMERA)
     }
 
@@ -193,6 +193,10 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        when (requestCode) {
+            RESULT_CAMERA -> onTookPicture()
+        }
+
         if (data == null || resultCode != Activity.RESULT_OK) return
 
         when (requestCode) {
@@ -201,18 +205,11 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
             EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> updateExpirationDate(data)
             CREATE_SHOP_PLAN_REQUEST_CODE -> createShopPlan(data)
-            RESULT_CAMERA -> onTookPicture(data)
         }
     }
 
-    private fun onTookPicture(data: Intent?) {
-        showToast("data: ${data == null}")
-
-        data ?: return
-
+    private fun onTookPicture() {
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, mImageUri)
-
-        showToast("data: ${bitmap}")
 
         onBeforeSetImage()
         mCameraImageView.setImageBitmap(bitmap)
@@ -383,6 +380,5 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         private const val EDIT_EXPIRATION_DATE_REQUEST_CODE = 103
         private const val CREATE_SHOP_PLAN_REQUEST_CODE = 104
         private const val RESULT_CAMERA = 105
-        private const val PERMISSION_CAMERA_REQUEST_CODE = 200
     }
 }
