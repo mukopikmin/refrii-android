@@ -292,12 +292,9 @@ constructor(
 
                     override fun onCompleted() {
                         mView?.savePushToken(token)
-                        mView?.showToast(token)
                     }
 
-                    override fun onError(e: Throwable?) {
-//                        mView?.signOut()
-                    }
+                    override fun onError(e: Throwable?) {}
                 })
     }
 

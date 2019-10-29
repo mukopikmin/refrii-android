@@ -88,7 +88,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
 
     private fun setLinkedSignupMessage() {
         val pattern = Pattern.compile("プライバシーポリシー")
-        val strUrl = "https://refrii.com/privacy"
+        val strUrl = getString(R.string.privacy_policy_url)
         val filter = Linkify.TransformFilter { _, _ -> strUrl }
 
         Linkify.addLinks(mSignupTextView, pattern, strUrl, null, filter)
@@ -201,31 +201,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         startActivityForResult(signInIntent, GOOGLE_SIGN_UP_REQUEST_CODE)
     }
 
-//    private fun onGoogleSignInSuccess(account: FirebaseUser?) {
-//        account ?: return
-//
-//        val editor = mPreference.edit()
-//
-//        account.getIdToken(true).addOnCompleteListener {
-//            editor.apply {
-//                putString(getString(R.string.preference_key_jwt), it.result?.token)
-//                putString(getString(R.string.preference_key_mail), account.email)
-//                putString(getString(R.string.preference_key_name), account.displayName)
-//                putString(getString(R.string.preference_key_avatar), account.photoUrl.toString())
-//                putString(getString(R.string.preference_key_signin_provider), it.result?.signInProvider)
-//
-//                it.result?.expirationTimestamp?.let {
-//                    putLong(getString(R.string.preference_key_expiration_timestamp), it)
-//                }
-//            }
-//            editor.apply()
-//            mPresenter.verifyAccount()
-//        }
-//    }
-
     companion object {
-        @Suppress("unused")
-        private const val TAG = "SignInActivity"
         private const val GOOGLE_SIGN_IN_REQUEST_CODE = 101
         private const val GOOGLE_SIGN_UP_REQUEST_CODE = 102
     }

@@ -144,7 +144,6 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri)
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivityForResult(intent, RESULT_CAMERA)
     }
 
