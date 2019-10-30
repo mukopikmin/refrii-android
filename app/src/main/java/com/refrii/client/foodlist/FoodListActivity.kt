@@ -358,7 +358,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         nameTextView.text = name
         mailTextView.text = mail
 
-        Picasso.with(this).load(avatarUrl).into(avatarImageView)
+        Picasso.get().load(avatarUrl).into(avatarImageView)
     }
 
     override fun showFood(id: Int, box: Box?) {

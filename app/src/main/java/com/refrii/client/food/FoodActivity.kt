@@ -32,6 +32,7 @@ import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
 import com.refrii.client.dialogs.CreateShopPlanDialogFragment
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.io.File
 import java.io.IOException
@@ -107,6 +108,14 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
             it.setHomeButtonEnabled(true)
         }
 
+        val intent = intent
+        val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
+        val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
+
+        mPresenter.takeView(this)
+        mPresenter.getFood(foodId)
+        mPresenter.getUnits(boxId)
+
         mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
         mRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -148,13 +157,14 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun createOutputFile(): File {
-        val tempFile = File(filesDir, "temp/sample")
+        val formatter = SimpleDateFormat("yyyyMMddhhmmss", Locale.getDefault())
+        val filename = formatter.format(Date())
+        val tempFile = File(filesDir, "temp/$filename")
 
         if (!tempFile.exists()) {
             try {
                 tempFile.parentFile.mkdirs()
                 tempFile.createNewFile()
-
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -163,16 +173,9 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         return tempFile
     }
 
+
     override fun onStart() {
         super.onStart()
-
-        val intent = intent
-        val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
-        val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
-
-        mPresenter.takeView(this)
-        mPresenter.getFood(foodId)
-        mPresenter.getUnits(boxId)
 
         hideProgressBar()
     }
@@ -263,8 +266,18 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         setExpirationDate(food?.expirationDate)
 
         food?.imageUrl?.let {
-            onBeforeSetImage()
-            Picasso.with(this).load(it).into(mCameraImageView)
+            Picasso.get()
+                    .load(it)
+                    .placeholder(R.drawable.ic_photo)
+                    .into(mCameraImageView, object : Callback {
+                        override fun onSuccess() {
+                            onBeforeSetImage()
+                        }
+
+                        override fun onError(e: Exception?) {
+                            showToast(e?.message)
+                        }
+                    })
         }
     }
 

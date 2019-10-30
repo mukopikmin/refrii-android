@@ -63,8 +63,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_settings_applications" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/24px.svg" />
+                            <entry key="outputName" value="ic_photo" />
+                            <entry key="sourceFile" value="$USER_HOME$/Downloads/photo-24px.svg" />
                           </map>
                         </option>
                       </PersistentState>
