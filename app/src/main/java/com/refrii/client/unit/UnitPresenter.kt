@@ -2,6 +2,7 @@ package com.refrii.client.unit
 
 import com.refrii.client.data.models.Unit
 import com.refrii.client.data.source.ApiUnitRepository
+import rx.Subscriber
 import javax.inject.Inject
 
 class UnitPresenter
@@ -19,47 +20,38 @@ constructor(private val mApiUnitRepository: ApiUnitRepository) : UnitContract.Pr
         mApiUnitRepository.getUnit(id)
                 .doOnSubscribe { mView?.onLoading() }
                 .doOnUnsubscribe { mView?.onLoaded() }
-                .subscribe({
-                    mUnit = it
-                    mView?.setUnit(it)
-                    mView?.onBeforeEdit()
-                }, {
-                    mView?.showToast(it.message)
+                .subscribe(object : Subscriber<Unit>() {
+                    override fun onNext(t: Unit?) {
+                        mUnit = t
+                        mView?.setUnit(t)
+                    }
+
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
                 })
     }
 
-    override fun updateUnit() {
-        mUnit?.let { unit ->
-            mApiUnitRepository.updateUnit(unit)
+    override fun updateUnit(label: String?, step: Double) {
+        mUnit?.let {
+            mApiUnitRepository.updateUnit(it.id, label, step)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe({
-                        mUnit = it
-                        mView?.setUnit(it)
-                        mView?.showSnackbar("Unit ${it.label} is updated successfully")
+                    .subscribe(object : Subscriber<Unit>() {
+                        override fun onNext(t: Unit?) {
+                            mUnit = t
+                            mView?.setUnit(t)
+                            mView?.showSnackbar("Unit ${t?.label} is updated successfully")
+                        }
 
-                        mView?.onBeforeEdit()
-                    }, {
-                        mView?.showToast(it.message)
+                        override fun onCompleted() {}
+
+                        override fun onError(e: Throwable?) {
+                            mView?.showToast(e?.message)
+                        }
                     })
         }
-    }
-
-    override fun editLabel() {
-        mView?.showEditLabelDialog(mUnit?.label)
-    }
-
-    override fun editStep() {
-        mView?.showEditStepDIalog(mUnit?.step)
-    }
-
-    override fun updateLabel(label: String) {
-        mUnit?.label = label
-        mView?.setUnit(mUnit)
-    }
-
-    override fun updateStep(step: Double) {
-        mUnit?.step = step
-        mView?.setUnit(mUnit)
     }
 }

@@ -37,9 +37,15 @@ class ApiRemoteUnitSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun updateUnit(unit: Unit): Observable<Unit> {
+    fun updateUnit(id: Int, label: String?, step: Double?): Observable<Unit> {
+        val builder = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+        label?.let { builder.addFormDataPart("label", it) }
+        step?.let { builder.addFormDataPart("step", it.toString()) }
+
         return mRetrofit.create(UnitService::class.java)
-                .updateUnit(unit.id, unit.toMultipartBody())
+                .updateUnit(id, builder.build())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

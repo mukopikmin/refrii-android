@@ -43,8 +43,8 @@ class ApiUnitRepository(realm: Realm, retrofit: Retrofit) {
                 .flatMap { mApiLocalUnitSource.saveUnit(it) }
     }
 
-    fun updateUnit(unit: Unit): Observable<Unit> {
-        return mApiRemoteUnitSource.updateUnit(unit)
+    fun updateUnit(id: Int, label: String?, step: Double?): Observable<Unit> {
+        return mApiRemoteUnitSource.updateUnit(id, label, step)
                 .flatMap { mApiLocalUnitSource.saveUnit(it) }
     }
 
