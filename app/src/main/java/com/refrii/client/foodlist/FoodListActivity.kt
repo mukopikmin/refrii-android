@@ -16,7 +16,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -25,6 +24,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -56,7 +56,7 @@ import com.squareup.picasso.Picasso
 import java.util.*
 import javax.inject.Inject
 
-class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationView.OnNavigationItemSelectedListener {
+class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationView.OnNavigationItemSelectedListener, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
@@ -66,10 +66,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     lateinit var mDrawer: androidx.drawerlayout.widget.DrawerLayout
     @BindView(R.id.nav_view)
     lateinit var mNavigationView: NavigationView
+    @BindView(R.id.swipeRefreshLayout)
+    lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     @BindView(R.id.recyclerView)
     lateinit var mRecyclerView: androidx.recyclerview.widget.RecyclerView
-    @BindView(R.id.progressBar)
-    lateinit var mProgressBar: ProgressBar
     @BindView(R.id.emptyBoxMessageContainer)
     lateinit var mEmptyMessageContainer: View
     @BindView(R.id.addButton)
@@ -107,6 +107,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mFirebaseAuth = FirebaseAuth.getInstance()
         mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         mEmptyMessageContainer.visibility = View.GONE
+        mSwipeRefreshLayout.setOnRefreshListener(this)
+        mSwipeRefreshLayout.setColorSchemeColors(getColor(R.color.colorPrimary))
 
         mFab.setOnClickListener { mPresenter.addFood() }
         mAddFoodButton.setOnClickListener { mPresenter.addFood() }
@@ -124,6 +126,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
             true
         }
+    }
+
+    override fun onRefresh() {
+        mPresenter.getBoxes()
     }
 
     override fun showNotices(food: Food) {
@@ -444,12 +450,12 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     }
 
     override fun showProgressBar() {
-        mProgressBar.visibility = View.VISIBLE
+        mSwipeRefreshLayout.isRefreshing = true
         mFab.hide()
     }
 
     override fun hideProgressBar() {
-        mProgressBar.visibility = View.GONE
+        mSwipeRefreshLayout.isRefreshing = false
         mFab.show()
     }
 
