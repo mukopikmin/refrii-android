@@ -83,8 +83,12 @@ class FoodRecyclerViewAdapter(
         return mFoods.size
     }
 
-    fun getItemAtPosition(position: Int): Food {
-        return mFoods[position]
+    fun getItemAtPosition(position: Int): Food? {
+        return if (position < 0) {
+            null
+        } else {
+            mFoods[position]
+        }
     }
 
     fun updateItem(food: Food) {
