@@ -58,7 +58,7 @@ class FoodRecyclerViewAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.food_list_row, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.row_food, parent, false)
 
         return FoodViewHolder(view)
     }
