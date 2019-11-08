@@ -34,6 +34,7 @@ import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
 import com.refrii.client.dialogs.CreateShopPlanDialogFragment
 import com.refrii.client.dialogs.ImageViewDialogFragment
+import com.refrii.client.dialogs.OptionsPickerDialogFragment
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.io.File
@@ -144,8 +145,22 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         })
         mUnitsSpinner.onItemSelectedListener = mOnUnitSelectedListener
         mExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
-//        mCameraImageView.setOnClickListener { launchCamera() }
         mCameraImageView.setOnClickListener { mPresenter.showImage() }
+        mCameraImageView.setOnLongClickListener { showImageOptions() }
+    }
+
+    private fun showImageOptions(): Boolean {
+        val options = arrayOf(
+                "別の画像を撮影する",
+                "画像を表示する",
+                "キャンセル"
+        )
+        val fragment = OptionsPickerDialogFragment.newInstance(null, options, null)
+
+        fragment.setTargetFragment(null, IMAGE_OPTIONS_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "image_option")
+
+        return true
     }
 
     override fun showImageDialog(imageUrl: String) {
@@ -218,6 +233,16 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
             EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> updateExpirationDate(data)
             CREATE_SHOP_PLAN_REQUEST_CODE -> createShopPlan(data)
+            IMAGE_OPTIONS_REQUEST_CODE -> {
+                when (data.getIntExtra("option", -1)) {
+                    // Take a picture
+                    0 -> launchCamera()
+                    // Show the picture
+                    1 -> mPresenter.showImage()
+                    // Cancel
+                    else -> return
+                }
+            }
         }
     }
 
@@ -403,5 +428,6 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         private const val EDIT_EXPIRATION_DATE_REQUEST_CODE = 103
         private const val CREATE_SHOP_PLAN_REQUEST_CODE = 104
         private const val RESULT_CAMERA = 105
+        private const val IMAGE_OPTIONS_REQUEST_CODE = 106
     }
 }

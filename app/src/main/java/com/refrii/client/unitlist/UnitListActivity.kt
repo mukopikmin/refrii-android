@@ -49,6 +49,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
         intent.putExtra("unit_id", unit.id)
         startActivity(intent)
     }
+
     private val onItemLongClickListener = AdapterView.OnItemLongClickListener { adapterView, _, i, _ ->
         val unit = adapterView.getItemAtPosition(i) as Unit
         val options = arrayOf(getString(R.string.message_show_detail), getString(R.string.message_delete), getString(R.string.message_cancel))

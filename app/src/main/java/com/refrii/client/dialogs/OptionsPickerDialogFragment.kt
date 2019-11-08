@@ -13,29 +13,30 @@ class OptionsPickerDialogFragment : androidx.fragment.app.DialogFragment() {
         val bundle = arguments
         val title = bundle?.getString("title")
         val options = bundle?.getStringArray("options")
-        val targetId = bundle?.getInt("target_id", 0)
+        val targetId = bundle?.getInt("target_id")
+        val dialogBuilder = AlertDialog.Builder(activity!!)
 
-        return AlertDialog.Builder(activity!!)
-                .setTitle(title)
-                .setItems(options) { _, which ->
-                    val intent = Intent()
-                    intent.putExtra("option", which)
-                    intent.putExtra("target_id", targetId)
+        title?.let { dialogBuilder.setTitle(title) }
+        dialogBuilder.setItems(options) { _, which ->
+            val intent = Intent()
+            intent.putExtra("option", which)
+            intent.putExtra("target_id", targetId)
 
-                    val pendingIntent = activity?.createPendingResult(targetRequestCode, intent, PendingIntent.FLAG_ONE_SHOT)
-                    pendingIntent?.send(Activity.RESULT_OK)
-                }
-                .create()
+            val pendingIntent = activity?.createPendingResult(targetRequestCode, intent, PendingIntent.FLAG_ONE_SHOT)
+            pendingIntent?.send(Activity.RESULT_OK)
+        }
+
+        return dialogBuilder.create()
     }
 
     companion object {
-        fun newInstance(title: String, options: Array<String>, targetId: Int): OptionsPickerDialogFragment {
+        fun newInstance(title: String?, options: Array<String>, targetId: Int?): OptionsPickerDialogFragment {
             val instance = OptionsPickerDialogFragment()
             val bundle = Bundle()
 
             bundle.putString("title", title)
             bundle.putStringArray("options", options)
-            bundle.putInt("target_id", targetId)
+            targetId?.let { bundle.putInt("target_id", it) }
             instance.arguments = bundle
 
             return instance
