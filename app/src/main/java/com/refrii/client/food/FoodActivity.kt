@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -32,6 +33,7 @@ import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
 import com.refrii.client.dialogs.CalendarPickerDialogFragment
 import com.refrii.client.dialogs.CreateShopPlanDialogFragment
+import com.refrii.client.dialogs.ImageViewDialogFragment
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.io.File
@@ -142,7 +144,16 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         })
         mUnitsSpinner.onItemSelectedListener = mOnUnitSelectedListener
         mExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
-        mCameraImageView.setOnClickListener { launchCamera() }
+//        mCameraImageView.setOnClickListener { launchCamera() }
+        mCameraImageView.setOnClickListener { mPresenter.showImage() }
+    }
+
+    override fun showImageDialog(imageUrl: String) {
+        val image = (mCameraImageView.drawable as BitmapDrawable).bitmap
+        val fragment = ImageViewDialogFragment.newInstance(image)
+
+        fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
+        fragment.show(supportFragmentManager, "edit_expiration_date")
     }
 
     private fun launchCamera() {

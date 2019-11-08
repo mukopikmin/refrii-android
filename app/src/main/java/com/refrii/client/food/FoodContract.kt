@@ -22,6 +22,8 @@ interface FoodContract {
         fun setShopPlans(food: Food?, shopPlans: List<ShopPlan>?)
         fun showCreateShopPlanDialog(food: Food?)
         fun onCompletedCompleteShopPlan(shopPlan: ShopPlan?)
+        fun showImageDialog(imageUrl: String)
+//        fun showImageDialog(image: Bitmap)
     }
 
     interface Presenter {
@@ -40,5 +42,6 @@ interface FoodContract {
         fun createShopPlan(amount: Double, date: Date)
         fun showCreateShopPlanDialog()
         fun completeShopPlan(shopPlan: ShopPlan)
+        fun showImage()
     }
 }

@@ -1,7 +1,6 @@
 package com.refrii.client.food
 
 import android.graphics.Bitmap
-import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
@@ -21,7 +20,6 @@ constructor(
 
     private var mView: FoodContract.View? = null
     private var mFood: Food? = null
-    private var mBox: Box? = null
     private var mUnits: List<Unit>? = null
     private var mId: Int? = null
     private var mName: String? = null
@@ -31,6 +29,7 @@ constructor(
     private var mImage: Bitmap? = null
     private var mBoxId: Int? = null
     private var mUnitId: Int? = null
+    private var mImageUrl: String? = null
 
     override fun takeView(view: FoodContract.View) {
         mView = view
@@ -41,10 +40,10 @@ constructor(
         mId = food?.id
         mName = food?.name
         mAmount = food?.amount
-//        mNotice = food?.notice
         mExpirationDate = food?.expirationDate
         mBoxId = food?.box?.id
         mUnitId = food?.unit?.id
+        mImageUrl = food?.imageUrl
 
         mView?.setFood(food)
         mView?.setSelectedUnit(food?.unit?.id)
@@ -208,6 +207,12 @@ constructor(
                         mView?.showToast(e?.message)
                     }
                 })
+    }
+
+    override fun showImage() {
+        mImageUrl?.let {
+            mView?.showImageDialog(it)
+        }
     }
 
     override fun selectUnit(id: Int) {
