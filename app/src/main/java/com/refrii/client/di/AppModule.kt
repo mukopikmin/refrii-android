@@ -64,8 +64,8 @@ class AppModule(private var mApplication: Application) {
     }
 
     @Provides
-    fun provideBoxInfoPresenter(boxRepository: ApiBoxRepository): BoxInfoContract.Presenter {
-        return BoxInfoPresenter(boxRepository)
+    fun provideBoxInfoPresenter(boxRepository: ApiBoxRepository, invitationRepository: ApiInvitationRepository): BoxInfoContract.Presenter {
+        return BoxInfoPresenter(boxRepository, invitationRepository)
     }
 
     @Provides

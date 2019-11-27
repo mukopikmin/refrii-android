@@ -4,12 +4,16 @@ import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Invitation
 import com.refrii.client.data.models.User
 import com.refrii.client.data.source.ApiBoxRepository
+import com.refrii.client.data.source.ApiInvitationRepository
 import rx.Subscriber
 import javax.inject.Inject
 
 class BoxInfoPresenter
 @Inject
-constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.Presenter {
+constructor(
+        private val mApiBoxRepository: ApiBoxRepository,
+        private val mApiInvitationRepository: ApiInvitationRepository
+) : BoxInfoContract.Presenter {
 
     private var mView: BoxInfoContract.View? = null
     private var mBox: Box? = null
@@ -17,6 +21,8 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
     private var mName: String? = null
     private var mNotice: String? = null
     private var mUser: User? = null
+    private var mInvitations: List<Invitation>? = null
+    private var mInvitation: Invitation? = null
 
     override fun takeView(view: BoxInfoContract.View) {
         mView = view
@@ -27,8 +33,13 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
         mId = box?.id
         mName = box?.name
         mNotice = box?.notice
+        mInvitations = box?.invitations
 
         mView?.setBox(box)
+
+        box?.invitations?.let {
+            mView?.setInvitations(it)
+        }
     }
 
     fun setUser(user: User?) {
@@ -37,19 +48,31 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
 
     override fun getBox(id: Int) {
         mApiBoxRepository.getBoxFromCache(id)
-                .subscribe({
-                    setBox(it)
-                }, {
-                    mView?.showToast(it.message)
+                .subscribe(object : Subscriber<Box>() {
+                    override fun onNext(t: Box?) {
+                        setBox(t)
+                    }
+
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
                 })
 
         mApiBoxRepository.getBox(id)
                 .doOnSubscribe { mView?.onLoading() }
                 .doOnUnsubscribe { mView?.onLoaded() }
-                .subscribe({
-                    setBox(it)
-                }, {
-                    mView?.showToast(it.message)
+                .subscribe(object : Subscriber<Box>() {
+                    override fun onNext(t: Box?) {
+                        setBox(t)
+                    }
+
+                    override fun onCompleted() {}
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
                 })
     }
 
@@ -58,13 +81,22 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
             mApiBoxRepository.updateBox(id, mName, mNotice)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe({
-                        mBox = it
-                        mView?.setBox(it)
-                        mView?.showSnackbar("Box ${it.name} is updated successfully")
-                    }, {
-                        mView?.showToast(it.message)
+                    .subscribe(object : Subscriber<Box>() {
+                        override fun onNext(t: Box?) {
+                            mBox = t
+                            mView?.setBox(t)
+                            mView?.showSnackbar("Box ${t?.name} is updated successfully")
+                        }
+
+                        override fun onCompleted() {}
+
+                        override fun onError(e: Throwable?) {
+                            mView?.showToast(e?.message)
+                        }
+
                     })
+
+
         }
     }
 
@@ -87,7 +119,7 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
         }
     }
 
-    override fun invite(email: String) {
+    override fun createInvitation(email: String) {
         mId?.let { id ->
             mApiBoxRepository.invite(id, email)
                     .doOnSubscribe { mView?.onLoading() }
@@ -96,7 +128,9 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
                         override fun onNext(t: Invitation?) {
                             val name = t?.user?.name
 
-                            mView?.setSharedUsers(t?.box?.invitedUsers)
+                            t?.let {
+                                //                                mView?.setInvitations(it)
+                            }
                             mView?.showSnackbar("$name と共有しました")
                         }
 
@@ -109,11 +143,9 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
         }
     }
 
-    override fun uninvite() {
-        val email = mUser?.email ?: return
-
-        mId?.let { id ->
-            mApiBoxRepository.uninvite(id, email)
+    override fun removeInvitation() {
+        mInvitation?.id?.let {
+            mApiInvitationRepository.remove(it)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
                     .subscribe(object : Subscriber<Void>() {
@@ -121,7 +153,7 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
 
                         override fun onCompleted() {
                             mView?.showSnackbar("共有を解除しました")
-                            getBox(id)
+                            //                        getBox(id)
                         }
 
                         override fun onError(e: Throwable?) {
@@ -132,7 +164,9 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
     }
 
     override fun showInviteUserDialog() {
-        mView?.showInviteUserDialog(mBox?.invitedUsers)
+        mInvitations?.let { invitations ->
+            mView?.showInviteUserDialog(invitations.mapNotNull { it.user })
+        }
     }
 
     override fun updateName(name: String) {
@@ -147,8 +181,8 @@ constructor(private val mApiBoxRepository: ApiBoxRepository) : BoxInfoContract.P
         mView?.removeBox(mId, mName)
     }
 
-    override fun confirmUninviting(user: User?) {
-        mUser = user
-        mView?.uninvite(mBox?.name, user)
+    override fun confirmRemovingInvitation(invitation: Invitation) {
+        mInvitation = invitation
+        mView?.removeInvitation(mBox?.name, invitation)
     }
 }

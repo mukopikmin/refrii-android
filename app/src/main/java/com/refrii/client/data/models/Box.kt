@@ -3,7 +3,6 @@ package com.refrii.client.data.models
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
-import okhttp3.MultipartBody
 import java.io.Serializable
 import java.util.*
 
@@ -17,7 +16,7 @@ open class Box : RealmObject(), Serializable {
     open var isInvited: Boolean = false
     open var updatedAt: Date? = null
     open var createdAt: Date? = null
-    open var invitedUsers: RealmList<User>? = null
+    open var invitations: RealmList<Invitation>? = null
     open var owner: User? = null
 
     override fun equals(other: Any?): Boolean {
@@ -37,21 +36,9 @@ open class Box : RealmObject(), Serializable {
         result = 31 * result + isInvited.hashCode()
         result = 31 * result + (updatedAt?.hashCode() ?: 0)
         result = 31 * result + (createdAt?.hashCode() ?: 0)
-        result = 31 * result + (invitedUsers?.hashCode() ?: 0)
+        result = 31 * result + (invitations?.hashCode() ?: 0)
         result = 31 * result + (owner?.hashCode() ?: 0)
 
         return result
-    }
-
-    fun toMultipartBody(): MultipartBody {
-        val builder = MultipartBody.Builder().setType(MultipartBody.FORM)
-
-        builder.addFormDataPart("id", id.toString())
-        builder.addFormDataPart("is_invited", isInvited.toString())
-        name?.let { builder.addFormDataPart("name", it) }
-        notice?.let { builder.addFormDataPart("notice", it) }
-        imageUrl?.let { builder.addFormDataPart("imageUrl", it) }
-
-        return builder.build()
     }
 }

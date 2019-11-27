@@ -123,8 +123,4 @@ class ApiBoxRepository(realm: Realm, retrofit: Retrofit) {
     fun invite(boxId: Int, email: String): Observable<Invitation> {
         return mApiRemoteBoxSource.invite(boxId, email)
     }
-
-    fun uninvite(boxId: Int, email: String): Observable<Void> {
-        return mApiRemoteBoxSource.uninvite(boxId, email)
-    }
 }

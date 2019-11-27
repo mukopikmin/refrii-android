@@ -22,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.data.models.Box
+import com.refrii.client.data.models.Invitation
 import com.refrii.client.data.models.User
 import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.InviteUserDialogFragment
@@ -136,16 +137,18 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         when(requestCode) {
             REMOVE_BOX_REQUEST_CODE -> mPresenter.removeBox()
-            REMOVE_INVITATION_REQUEST_CODE -> mPresenter.uninvite()
+            REMOVE_INVITATION_REQUEST_CODE -> mPresenter.removeInvitation()
             EDIT_SHARED_USERS_REQUEST_CODE -> onInviteRequested(data)
         }
     }
 
-    override fun uninvite(boxName: String?, user: User?) {
+    override fun removeInvitation(boxName: String?, invitation: Invitation) {
         boxName ?: return
-        user ?: return
 
-        val fragment = ConfirmDialogFragment.newInstance("共有の解除", "${user?.name} への $boxName の共有を解除していいですか？", user.id)
+        val user = invitation.user
+        val userId = invitation.user?.id ?: return
+        val message = "${user?.name} への $boxName の共有を解除していいですか？"
+        val fragment = ConfirmDialogFragment.newInstance("共有の解除", message, userId)
 
         fragment.setTargetFragment(null, REMOVE_INVITATION_REQUEST_CODE)
         fragment.show(supportFragmentManager, "delete_invitation")
@@ -156,13 +159,13 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         val email = data.getStringExtra("email")
 
-        mPresenter.invite(email)
+        mPresenter.createInvitation(email)
     }
 
     override fun setBox(box: Box?) {
         box ?: return
 
-        val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
+        val formatter = SimpleDateFormat(getString(R.string.datetime_format), Locale.getDefault())
 
         mToolbar.title = box.name
         setSupportActionBar(mToolbar)
@@ -173,24 +176,21 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         mUpdatedText.text = formatter.format(box.updatedAt)
 
         box.owner?.let { mOwnerText.text = it.name }
-        setSharedUsers(box.invitedUsers)
     }
 
-    override fun setSharedUsers(users: List<User>?) {
-        users ?: return
-
+    override fun setInvitations(invitations: List<Invitation>) {
         if (mSharedUsersRecycler.adapter == null) {
-            val adapter = SharedUserRecyclerViewAdapter(users)
+            val adapter = InvitationsRecyclerViewAdapter(invitations)
 
             adapter.setDeinviteClickListener(View.OnClickListener {
                 val position = mSharedUsersRecycler.getChildAdapterPosition(it)
                 val user = adapter.getItemAtPosition(position)
 
-                mPresenter.confirmUninviting(user)
+                mPresenter.confirmRemovingInvitation(user)
             })
             mSharedUsersRecycler.adapter = adapter
         } else {
-            (mSharedUsersRecycler.adapter as SharedUserRecyclerViewAdapter).setUsers(users)
+            (mSharedUsersRecycler.adapter as InvitationsRecyclerViewAdapter).setInvitations(invitations)
         }
     }
 

@@ -23,15 +23,10 @@ interface BoxService {
             @Path("id") id: Int,
             @Body body: RequestBody): Observable<Box>
 
-    @POST("/boxes/{id}/invite")
+    @POST("/boxes/{id}/invitations")
     fun invite(
             @Path("id") id: Int,
             @Body body: RequestBody): Observable<Invitation>
-
-    @DELETE("/boxes/{id}/invite")
-    fun uninvite(
-            @Path("id") id: Int,
-            @Query("email") email: String): Observable<Void>
 
     @GET("/boxes/{id}/foods")
     fun getFoodsInBox(@Path("id") id: Int): Observable<List<Food>>

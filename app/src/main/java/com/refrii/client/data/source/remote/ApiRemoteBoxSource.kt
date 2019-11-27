@@ -86,11 +86,4 @@ class ApiRemoteBoxSource(private val mRetrofit: Retrofit) {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
-
-    fun uninvite(boxId: Int, email: String): Observable<Void> {
-        return mRetrofit.create(BoxService::class.java)
-                .uninvite(boxId, email)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
 }
