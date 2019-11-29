@@ -128,13 +128,14 @@ constructor(
                         override fun onNext(t: Invitation?) {
                             val name = t?.user?.name
 
-                            t?.let {
-                                //                                mView?.setInvitations(it)
-                            }
                             mView?.showSnackbar("$name と共有しました")
                         }
 
-                        override fun onCompleted() {}
+                        override fun onCompleted() {
+                            mId?.let {
+                                getBox(it)
+                            }
+                        }
 
                         override fun onError(e: Throwable?) {
                             mView?.showToast(e?.message)
@@ -144,8 +145,8 @@ constructor(
     }
 
     override fun removeInvitation() {
-        mInvitation?.id?.let {
-            mApiInvitationRepository.remove(it)
+        mInvitation?.id?.let { id ->
+            mApiInvitationRepository.remove(id)
                     .doOnSubscribe { mView?.onLoading() }
                     .doOnUnsubscribe { mView?.onLoaded() }
                     .subscribe(object : Subscriber<Void>() {
@@ -153,7 +154,9 @@ constructor(
 
                         override fun onCompleted() {
                             mView?.showSnackbar("共有を解除しました")
-                            //                        getBox(id)
+                            mId?.let {
+                                getBox(it)
+                            }
                         }
 
                         override fun onError(e: Throwable?) {
