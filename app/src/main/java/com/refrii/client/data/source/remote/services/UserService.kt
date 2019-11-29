@@ -12,7 +12,7 @@ interface UserService {
     @GET("/users/verify")
     fun verify(): Observable<User>
 
-    @POST("/users/{id}/push_token")
+    @POST("/users/{id}/push_tokens")
     fun registerPushToken(@Path("id") id: Int, @Body body: RequestBody): Observable<User>
 
     @PUT("/users/{id}")
