@@ -36,7 +36,6 @@ constructor(
         mInvitations = box?.invitations
 
         mView?.setBox(box)
-
         box?.invitations?.let {
             mView?.setInvitations(it)
         }
