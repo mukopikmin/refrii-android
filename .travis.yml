@@ -16,6 +16,8 @@ before_install:
   - openssl aes-256-cbc -K $encrypted_4bcc15171aaf_key -iv $encrypted_4bcc15171aaf_iv -in secretfiles.tar.gz.enc -out secretfiles.tar.gz -d
 script:
   - ./deploy.sh
+on:
+  tags: true
 env:
   global:
     - DEPLOYGATE_APP_OWNER_NAME=mukopikmin
