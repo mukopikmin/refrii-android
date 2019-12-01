@@ -82,17 +82,18 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="139dp">
 
-            <ImageView
+            <net.steamcrafted.materialiconlib.MaterialIconView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:materialIcon="message_outline"
+                app:materialIconColor="@android:color/darker_gray"
+                app:materialIconSize="14sp"
                 android:id="@+id/imageView25"
-                android:layout_width="14sp"
-                android:layout_height="14sp"
-                android:layout_gravity="center"
-                android:tint="@android:color/darker_gray"
-                app:srcCompat="@drawable/ic_baseline_chat_bubble_outline" />
+                android:layout_gravity="center" />
 
             <TextView
                 android:id="@+id/noticeCountTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_weight="1"
