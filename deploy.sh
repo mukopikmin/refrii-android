@@ -3,7 +3,7 @@
 set -ex
 
 DEVELOPMENT_TAG=development
-STAGING_TAG=staging
+STAGING_TAG=staging-env
 
 tar -zxvf secretfiles.tar.gz
 mv temp/google-services.json app/
@@ -11,7 +11,7 @@ mv temp/keystore.jks .
 
 # ./gradlew test
 
-if [ $TRAVIS_TAG = $DEVELOPMENT_TAG ] ; then
+if [ "$TRAVIS_TAG" = "$DEVELOPMENT_TAG" ] ; then
   ./gradlew generateLicensePage
   ./gradlew assembleDevelopment;
   jarsigner \
@@ -21,11 +21,11 @@ if [ $TRAVIS_TAG = $DEVELOPMENT_TAG ] ; then
     -sigalg SHA1withRSA \
     -digestalg SHA1 \
     -keystore keystore.jks \
-    -signedjar app/${TRAVIS_BRANCH}/release/app-${TRAVIS_BRANCH}-release.apk \
-    app/build/outputs/apk/${TRAVIS_BRANCH}/release/app-${TRAVIS_BRANCH}-release-unsigned.apk \
+    -signedjar app/development/release/app-development-release.apk \
+    app/build/outputs/apk/development/release/app-development-release-unsigned.apk \
     $KEYSTORE_ALIAS;
   ./gradlew uploadDeployGateDevelopmentRelease;
-elif [ $TRAVIS_TAG = $STAGING_TAG ] ; then
+elif [ "$TRAVIS_TAG" = "$STAGING_TAG" ] ; then
   ./gradlew generateLicensePage
   ./gradlew assembleStaging;
   jarsigner \
@@ -35,8 +35,8 @@ elif [ $TRAVIS_TAG = $STAGING_TAG ] ; then
     -sigalg SHA1withRSA \
     -digestalg SHA1 \
     -keystore keystore.jks \
-    -signedjar app/${TRAVIS_BRANCH}/release/app-${TRAVIS_BRANCH}-release.apk \
-    app/build/outputs/apk/${TRAVIS_BRANCH}/release/app-${TRAVIS_BRANCH}-release-unsigned.apk \
+    -signedjar app/staging/release/app-staging-release.apk \
+    app/build/outputs/apk/staging/release/app-staging-release-unsigned.apk \
     $KEYSTORE_ALIAS;
   ./gradlew uploadDeployGateStagingRelease;
 else
