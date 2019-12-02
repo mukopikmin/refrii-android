@@ -1,6 +1,9 @@
 #! /bin/sh
 
-set -e
+set -ex
+
+DEVELOPMENT_TAG=development
+STAGING_TAG=staging
 
 tar -zxvf secretfiles.tar.gz
 mv temp/google-services.json app/
@@ -8,14 +11,7 @@ mv temp/keystore.jks .
 
 # ./gradlew test
 
-if [ "$TRAVIS_BRANCH" = "master" ]; then
-  ./gradlew generateLicensePage
-
-  echo "Do nothing on master branch."
-  exit 0;
-fi
-
-if [ "$TRAVIS_BRANCH" = "development" ]; then
+if [ $TRAVIS_TAG = $DEVELOPMENT_TAG ] ; then
   ./gradlew generateLicensePage
   ./gradlew assembleDevelopment;
   jarsigner \
@@ -29,9 +25,7 @@ if [ "$TRAVIS_BRANCH" = "development" ]; then
     app/build/outputs/apk/${TRAVIS_BRANCH}/release/app-${TRAVIS_BRANCH}-release-unsigned.apk \
     $KEYSTORE_ALIAS;
   ./gradlew uploadDeployGateDevelopmentRelease;
-fi
-
-if [ "$TRAVIS_BRANCH" = "staging" ]; then
+elif [ $TRAVIS_TAG = $STAGING_TAG ] ; then
   ./gradlew generateLicensePage
   ./gradlew assembleStaging;
   jarsigner \
@@ -45,6 +39,8 @@ if [ "$TRAVIS_BRANCH" = "staging" ]; then
     app/build/outputs/apk/${TRAVIS_BRANCH}/release/app-${TRAVIS_BRANCH}-release-unsigned.apk \
     $KEYSTORE_ALIAS;
   ./gradlew uploadDeployGateStagingRelease;
+else
+  echo "Do nothing on master branch."
+  ./gradlew generateLicensePage
 fi
-
 

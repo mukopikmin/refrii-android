@@ -184,3 +184,7 @@
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: http://developer.android.com/tools/extras/support-library.html
   skip: true
+- artifact: net.steamcrafted:materialiconlib:+
+  name: materialiconlib
+  copyrightHolder: CodeCrafted
+  license: Apache 2.0
