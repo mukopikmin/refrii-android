@@ -1,9 +1,6 @@
-#! /bin/sh
+#! /bin/bash
 
 set -ex
-
-DEVELOPMENT_TAG=development
-STAGING_TAG=staging-env
 
 tar -zxvf secretfiles.tar.gz
 mv temp/google-services.json app/
@@ -11,7 +8,8 @@ mv temp/keystore.jks .
 
 # ./gradlew test
 
-if [ "$TRAVIS_TAG" = "$DEVELOPMENT_TAG" ] ; then
+if [[ "$TAVIS_TAG" =~ ^[0-9\.]+$ ]] ; then
+  echo "Start production build."
   ./gradlew generateLicensePage
   ./gradlew assembleDevelopment;
   jarsigner \
@@ -25,7 +23,9 @@ if [ "$TRAVIS_TAG" = "$DEVELOPMENT_TAG" ] ; then
     app/build/outputs/apk/development/release/app-development-release-unsigned.apk \
     $KEYSTORE_ALIAS;
   ./gradlew uploadDeployGateDevelopmentRelease;
-elif [ "$TRAVIS_TAG" = "$STAGING_TAG" ] ; then
+elif [[ "$TRAVIS_TAG" =~ ^[0-9\.]+ ]] ; then
+  echo "Start staging build."
+  ./gradlew generateLicensePage
   ./gradlew generateLicensePage
   ./gradlew assembleStaging;
   jarsigner \
@@ -40,7 +40,7 @@ elif [ "$TRAVIS_TAG" = "$STAGING_TAG" ] ; then
     $KEYSTORE_ALIAS;
   ./gradlew uploadDeployGateStagingRelease;
 else
-  echo "Do nothing on master branch."
+  echo "Releasing is not triggered.."
   ./gradlew generateLicensePage
 fi
 
