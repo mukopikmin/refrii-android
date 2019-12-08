@@ -12,7 +12,7 @@ deploygate {
 
     deployments {
         developmentRelease {
-            def flavor = 'development'
+            def flavor = 'production'
 
             message = "${flavor} build ${hash}"
             sourceFile = file("${project.rootDir}/app/${flavor}/release/app-${flavor}-release.apk")
@@ -47,11 +47,7 @@ android {
         }
         development {
             applicationId "com.refrii.client.development"
-            versionNameSuffix "-dev"
-        }
-        staging {
-            applicationId "com.refrii.client.staging"
-            versionNameSuffix "-staging"
+            versionNameSuffix "-development"
         }
     }
 

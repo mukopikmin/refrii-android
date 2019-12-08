@@ -81,7 +81,7 @@ class RetrofitModule {
     private fun getApiEndpoint(): String {
         val version = "v1"
 
-        return if (BuildConfig.FLAVOR == "staging") {
+        return if (BuildConfig.FLAVOR == "development") {
 //            "http://192.168.1.104:3000/"
             "https://staging.api.refrii.com/$version/"
         } else {
