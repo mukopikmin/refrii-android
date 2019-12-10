@@ -11,15 +11,15 @@ deploygate {
     def hash = 'git rev-parse --short HEAD'.execute([], project.rootDir).in.text.trim()
 
     deployments {
-        developmentRelease {
+        productionRelease {
             def flavor = 'production'
 
             message = "${flavor} build ${hash}"
             sourceFile = file("${project.rootDir}/app/${flavor}/release/app-${flavor}-release.apk")
         }
 
-        stagingRelease {
-            def flavor = 'staging'
+        developmentRelease {
+            def flavor = 'development'
 
             message = "${flavor} build ${hash}"
             sourceFile = file("${project.rootDir}/app/${flavor}/release/app-${flavor}-release.apk")
