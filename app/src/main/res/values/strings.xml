@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="app_name">Refrii</string>
+    <string name="amount">%.1f</string>
+    <string name="amount_with_unit">%.1f %s</string>
+
+    <string name="app_name">myPantry</string>
+
+    <string name="date_format">yyyy/MM/dd</string>
+
+    <string name="datetime_format">yyyy/MM/dd HH:mm</string>
 
     <string name="default_mail">default@example.com</string>
     <string name="default_name">Default name</string>
@@ -13,16 +20,20 @@
 
     <string name="key_box_id">key_box_id</string>
     <string name="key_food_id">key_food_id</string>
+    <string name="key_food_name">key_food_name</string>
     <string name="key_unit_id">key_unit_id</string>
 
+    <string name="message_add_box_completed">カテゴリが追加されました</string>
     <string name="message_add_food_completed">食材が追加されました</string>
     <string name="message_cancel">キャンセル</string>
     <string name="message_delete">削除する</string>
     <string name="message_no">いいえ</string>
+    <string name="message_share_box">共有する</string>
     <string name="message_show_detail">詳細を表示する</string>
     <string name="message_unfilled_form">未入力の項目があります</string>
     <string name="message_yes">はい</string>
 
+    <string name="nav_add_box">カテゴリの追加</string>
     <string name="nav_categories">カテゴリ</string>
     <string name="nav_expiring">期限が1週間以内</string>
     <string name="nav_filter">フィルター</string>
@@ -34,60 +45,31 @@
     <string name="navigation_drawer_close">Close navigation mDrawer</string>
     <string name="navigation_drawer_open">Open navigation mDrawer</string>
 
+    <string name="notification_channel_id_push">com.refrii.client.notification.push</string>
+    <string name="notification_channel_name_push">Push Notification</string>
+    <string name="notification_topic_push">mytopic</string>
+
     <string name="preference_key_avatar">preference_key_avatar</string>
     <string name="preference_key_expiration_timestamp">preference_expiration_timestamp</string>
     <string name="preference_key_id">preference_key_id</string>
     <string name="preference_key_jwt">preference_key_jwt</string>
     <string name="preference_key_mail">preference_key_mail</string>
     <string name="preference_key_name">preference_key_name</string>
+    <string name="preference_key_push_token">preference_key_push_token</string>
     <string name="preference_key_signin_provider">preference_key_signin_provider</string>
     <string name="preference_selected_box_id">preference_selected_box_id</string>
+
+    <string name="privacy_policy_url">https://refrii.com/privacy</string>
 
     <string name="settings_display_name">ユーザー名</string>
     <string name="settings_title">設定</string>
 
     <string name="signin_welcome_message">家族でストックをシェアしましょう！</string>
-    <string name="signin_welcome_title">Refriiへようこそ</string>
+    <string name="signin_welcome_title">%1$s へようこそ</string>
 
-    <string name="title_activity_box_info">BoxInfoActivity</string>
-    <string name="title_activity_edit_food">EditFoodActivity</string>
-    <string name="title_activity_error">ErrorActivity</string>
-    <string name="title_activity_food">FoodActivity</string>
-    <string name="title_activity_new_food">NewFoodActivity</string>
-    <string name="title_activity_new_unit">NewUnitActivity</string>
-    <string name="title_activity_signin">SigninActivity</string>
-    <string name="title_activity_unit">UnitActivity</string>
-    <string name="title_activity_units">UnitsActivity</string>
+    <string name="title_activity_settings">Settings</string>
     <string name="title_add_food">食材の追加</string>
     <string name="title_unit_list">単位の一覧</string>
-    <string name="nav_add_box">カテゴリの追加</string>
-    <string name="title_activity_new_box">NewBoxActivity</string>
-    <string name="message_add_box_completed">カテゴリが追加されました</string>
-    <string name="message_share_box">共有する</string>
-    <string name="notification_channel_id_push">com.refrii.client.notification.push</string>
-    <string name="notification_channel_name_push">Push Notification</string>
-    <string name="notification_topic_push">mytopic</string>
-    <string name="preference_key_push_token">preference_key_push_token</string>
-    <string name="key_food_name">key_food_name</string>
-    <string name="amount_with_unit">%.1f %s</string>
-    <string name="amount">%.1f</string>
-    <string name="date_format">yyyy/MM/dd</string>
-    <string name="datetime_format">yyyy/MM/dd HH:mm</string>
-    <string name="title_activity_settings">Settings</string>
-
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="privacy_policy_url">https://refrii.com/privacy</string>
+    <string name="signin_message_create_account">アカウントを作成する場合は、プライバシーポリシーに同意して、下記のボタンを押してください。</string>
+    <string name="signin_message_agree_privacy">プライバシーポリシーに同意する</string>
 </resources>

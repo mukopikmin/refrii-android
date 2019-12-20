@@ -15,7 +15,7 @@ class NoticeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     @BindView(R.id.constraintLayout)
     lateinit var constraintLayout: ConstraintLayout
-    @BindView(R.id.textView)
+    @BindView(R.id.textTextView)
     lateinit var textTextView: TextView
     @BindView(R.id.timestampTextView)
     lateinit var timestampTextView: TextView

@@ -91,6 +91,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
             }
         }
     }
+    private var mImageLoaded = false
 
     @Inject
     lateinit var mPresenter: FoodPresenter
@@ -145,8 +146,16 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         })
         mUnitsSpinner.onItemSelectedListener = mOnUnitSelectedListener
         mExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
-        mCameraImageView.setOnClickListener { mPresenter.showImage() }
+        mCameraImageView.setOnClickListener { launchCameraOrShowImage() }
         mCameraImageView.setOnLongClickListener { showImageOptions() }
+    }
+
+    private fun launchCameraOrShowImage() {
+        if (mPresenter.isImageRegistered()) {
+            mPresenter.showImage()
+        } else {
+            launchCamera()
+        }
     }
 
     private fun showImageOptions(): Boolean {
@@ -164,11 +173,15 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     override fun showImageDialog(imageUrl: String) {
-        val image = (mCameraImageView.drawable as BitmapDrawable).bitmap
-        val fragment = ImageViewDialogFragment.newInstance(image)
+        if (mImageLoaded) {
+            val image = (mCameraImageView.drawable as BitmapDrawable).bitmap
+            val fragment = ImageViewDialogFragment.newInstance(image)
 
-        fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
-        fragment.show(supportFragmentManager, "edit_expiration_date")
+            fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
+            fragment.show(supportFragmentManager, "edit_expiration_date")
+        } else {
+            showToast("画像を読込中です...")
+        }
     }
 
     private fun launchCamera() {
@@ -221,13 +234,10 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        when (requestCode) {
-            RESULT_CAMERA -> onTookPicture()
-        }
-
         if (data == null || resultCode != Activity.RESULT_OK) return
 
         when (requestCode) {
+            RESULT_CAMERA -> onTookPicture()
             EDIT_NAME_REQUEST_CODE -> mPresenter.updateName(data.getStringExtra("text"))
             EDIT_AMOUNT_REQUEST_CODE -> mPresenter.updateAmount(data.getDoubleExtra("number", 0.toDouble()))
             EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
@@ -302,12 +312,15 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         setExpirationDate(food?.expirationDate)
 
         food?.imageUrl?.let {
+            mImageLoaded = false
+
             Picasso.get()
                     .load(it)
                     .placeholder(R.drawable.ic_photo)
                     .into(mCameraImageView, object : Callback {
                         override fun onSuccess() {
                             onBeforeSetImage()
+                            mImageLoaded = true
                         }
 
                         override fun onError(e: Exception?) {

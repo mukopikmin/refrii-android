@@ -13,9 +13,6 @@ import java.nio.ByteBuffer
 
 class ImageViewDialogFragment : DialogFragment() {
 
-    private var mHeight: Int? = null
-    private var mWidth: Int? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val content = inflater.inflate(R.layout.dialog_image, container, false)
         val imageView = content.findViewById<ImageView>(R.id.imageView)

@@ -209,6 +209,10 @@ constructor(
                 })
     }
 
+    override fun isImageRegistered(): Boolean {
+        return mImageUrl.isNullOrBlank()
+    }
+
     override fun showImage() {
         mImageUrl?.let {
             mView?.showImageDialog(it)

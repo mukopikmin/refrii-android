@@ -41,6 +41,8 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
     lateinit var mSignupTextView: TextView
     @BindView(R.id.acceptPrivacyPolicyCheckBox)
     lateinit var mAcceptPrivacyPolicy: CheckBox
+    @BindView(R.id.titleTextView)
+    lateinit var mTitleTextView: TextView
 
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var mFirebaseAuth: FirebaseAuth
@@ -52,6 +54,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val appName = getString(R.string.app_name)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -68,6 +71,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         mSignUpButton.setOnClickListener { googleSignUp() }
         mAcceptPrivacyPolicy.setOnCheckedChangeListener { _, isChecked -> mSignUpButton.isEnabled = isChecked }
         mSignUpButton.isEnabled = false
+        mTitleTextView.text = String.format(getString(R.string.signin_welcome_title), appName)
 
         setGoogleSigninButtonText(mSignInButton, "Google でログイン")
         setGoogleSigninButtonText(mSignUpButton, "Google でアカウントを作成")

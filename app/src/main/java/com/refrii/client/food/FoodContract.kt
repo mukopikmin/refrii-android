@@ -23,7 +23,6 @@ interface FoodContract {
         fun showCreateShopPlanDialog(food: Food?)
         fun onCompletedCompleteShopPlan(shopPlan: ShopPlan?)
         fun showImageDialog(imageUrl: String)
-//        fun showImageDialog(image: Bitmap)
     }
 
     interface Presenter {
@@ -42,6 +41,7 @@ interface FoodContract {
         fun createShopPlan(amount: Double, date: Date)
         fun showCreateShopPlanDialog()
         fun completeShopPlan(shopPlan: ShopPlan)
+        fun isImageRegistered(): Boolean
         fun showImage()
     }
 }
