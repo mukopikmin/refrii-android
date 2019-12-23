@@ -210,7 +210,7 @@ constructor(
     }
 
     override fun isImageRegistered(): Boolean {
-        return mImageUrl.isNullOrBlank()
+        return !mImageUrl.isNullOrBlank()
     }
 
     override fun showImage() {
