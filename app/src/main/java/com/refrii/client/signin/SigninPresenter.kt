@@ -28,7 +28,7 @@ constructor(private val mApiUserRepository: ApiUserRepository) : SigninContract.
                     }
 
                     override fun onError(e: Throwable?) {
-                        if ((e as HttpException).response().code() == 401) {
+                        if ((e as HttpException).response()?.code() == 401) {
                             mView?.showToast("アカウントがありません。利用を始めるにはアカウントを作成してください。")
                         } else {
                             mView?.showToast(e.message)
