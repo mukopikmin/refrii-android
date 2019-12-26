@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    <string name="amount">%.1f</string>
-    <string name="amount_with_unit">%.1f %s</string>
-
     <string name="app_name">myPantry</string>
-
-    <string name="date_format">yyyy/MM/dd</string>
-
-    <string name="datetime_format">yyyy/MM/dd HH:mm</string>
 
     <string name="default_mail">default@example.com</string>
     <string name="default_name">Default name</string>
 
-    <string name="foodlist_menu_about">カテゴリの詳細</string>
-    <string name="foodlist_menu_sync">同期</string>
-    <string name="foodlist_options_cancel">キャンセル</string>
-    <string name="foodlist_options_remove">削除</string>
-    <string name="foodlist_options_show">詳細を表示</string>
+    <string name="format_amount">%.1f</string>
+    <string name="format_amount_with_unit">%.1f %s</string>
+    <string name="format_date">yyyy/MM/dd</string>
+    <string name="format_datetime">yyyy/MM/dd HH:mm</string>
 
     <string name="key_box_id">key_box_id</string>
     <string name="key_food_id">key_food_id</string>
@@ -25,12 +17,21 @@
 
     <string name="message_add_box_completed">カテゴリが追加されました</string>
     <string name="message_add_food_completed">食材が追加されました</string>
+    <string name="message_agree_privacy">プライバシーポリシーに同意する</string>
+    <string name="message_box_detail">カテゴリの詳細</string>
     <string name="message_cancel">キャンセル</string>
+    <string name="message_create_account">アカウントを作成する場合は、プライバシーポリシーに同意して、下記のボタンを押してください。</string>
     <string name="message_delete">削除する</string>
+    <string name="message_loading_image">画像を読込中です…</string>
     <string name="message_no">いいえ</string>
     <string name="message_share_box">共有する</string>
     <string name="message_show_detail">詳細を表示する</string>
+    <string name="message_show_image">画像を表示する</string>
+    <string name="message_sync">同期</string>
+    <string name="message_take_picture">別の画像を撮影する</string>
     <string name="message_unfilled_form">未入力の項目があります</string>
+    <string name="message_welcome">家族でストックをシェアしましょう！</string>
+    <string name="message_welcome_title">%1$s へようこそ</string>
     <string name="message_yes">はい</string>
 
     <string name="nav_add_box">カテゴリの追加</string>
@@ -64,12 +65,7 @@
     <string name="settings_display_name">ユーザー名</string>
     <string name="settings_title">設定</string>
 
-    <string name="signin_welcome_message">家族でストックをシェアしましょう！</string>
-    <string name="signin_welcome_title">%1$s へようこそ</string>
-
-    <string name="title_activity_settings">Settings</string>
     <string name="title_add_food">食材の追加</string>
+    <string name="title_add_unit">単位の作成</string>
     <string name="title_unit_list">単位の一覧</string>
-    <string name="signin_message_create_account">アカウントを作成する場合は、プライバシーポリシーに同意して、下記のボタンを押してください。</string>
-    <string name="signin_message_agree_privacy">プライバシーポリシーに同意する</string>
 </resources>

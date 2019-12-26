@@ -71,7 +71,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         mSignUpButton.setOnClickListener { googleSignUp() }
         mAcceptPrivacyPolicy.setOnCheckedChangeListener { _, isChecked -> mSignUpButton.isEnabled = isChecked }
         mSignUpButton.isEnabled = false
-        mTitleTextView.text = String.format(getString(R.string.signin_welcome_title), appName)
+        mTitleTextView.text = String.format(getString(R.string.message_welcome_title), appName)
 
         setGoogleSigninButtonText(mSignInButton, "Google でログイン")
         setGoogleSigninButtonText(mSignUpButton, "Google でアカウントを作成")

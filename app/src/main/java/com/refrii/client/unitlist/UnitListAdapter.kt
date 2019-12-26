@@ -22,7 +22,7 @@ class UnitListAdapter(
     override fun getItemId(i: Int): Long = units[i].id.toLong()
 
     override fun getView(i: Int, _view: View?, viewGroup: ViewGroup): View {
-        val view = mLayoutInflater.inflate(R.layout.unit_list_row, viewGroup, false)
+        val view = mLayoutInflater.inflate(R.layout.row_unit, viewGroup, false)
         val labelTextView = view.findViewById<TextView>(R.id.labelTextView)
         val unit: Unit = units[i]
 

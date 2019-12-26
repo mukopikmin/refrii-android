@@ -88,7 +88,7 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
     override fun setUnit(unit: Unit?) {
         unit ?: return
 
-        val formatter = SimpleDateFormat(getString(R.string.datetime_format), Locale.getDefault())
+        val formatter = SimpleDateFormat(getString(R.string.format_datetime), Locale.getDefault())
 
         title = unit.label
         mLabelEditText.setText(unit.label)

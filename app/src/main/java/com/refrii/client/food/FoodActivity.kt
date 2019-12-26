@@ -42,6 +42,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.abs
 
 class FoodActivity : AppCompatActivity(), FoodContract.View {
 
@@ -160,9 +161,9 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     private fun showImageOptions(): Boolean {
         val options = arrayOf(
-                "別の画像を撮影する",
-                "画像を表示する",
-                "キャンセル"
+                getString(R.string.message_take_picture),
+                getString(R.string.message_show_image),
+                getString(R.string.message_cancel)
         )
         val fragment = OptionsPickerDialogFragment.newInstance(null, options, null)
 
@@ -180,7 +181,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
             fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
             fragment.show(supportFragmentManager, "edit_expiration_date")
         } else {
-            showToast("画像を読込中です...")
+            showToast(getString(R.string.message_loading_image))
         }
     }
 
@@ -359,15 +360,15 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val today = Date()
         val oneDayMilliSec = 24 * 60 * 60 * 1000
         val daysLeft = ((date?.time ?: today.time) - today.time) / oneDayMilliSec
-        val dateFormatter = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+        val dateFormatter = SimpleDateFormat(getString(R.string.format_date), Locale.getDefault())
 
         mExpirationDate.text = dateFormatter.format(date)
 
         if (daysLeft < 0) {
-            mExpirationDate.append(" (${Math.abs(daysLeft)} 日過ぎています)")
+            mExpirationDate.append(" (${abs(daysLeft)} 日過ぎています)")
             mExpirationDate.setTextColor(Color.RED)
         } else {
-            mExpirationDate.append(" (残り ${Math.abs(daysLeft)} 日)")
+            mExpirationDate.append(" (残り ${abs(daysLeft)} 日)")
             mExpirationDate.setTextColor(Color.BLACK)
         }
     }

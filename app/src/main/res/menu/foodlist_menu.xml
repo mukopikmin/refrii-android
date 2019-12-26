@@ -4,11 +4,11 @@
     <item
         android:id="@+id/action_box_info"
         android:orderInCategory="100"
-        android:title="@string/foodlist_menu_about"
+        android:title="@string/message_box_detail"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_box_sync"
         android:orderInCategory="100"
-        android:title="@string/foodlist_menu_sync"
+        android:title="@string/message_sync"
         app:showAsAction="never" />
 </menu>

@@ -18,7 +18,7 @@ class EditTextDialogFragment : DialogFragment() {
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val content = inflater.inflate(R.layout.edit_text_dialog, null)
+        val content = inflater.inflate(R.layout.dialog_edit_text, null)
         val editText = content.findViewById<EditText>(R.id.editText)
         val bundle = arguments
         val title = bundle.getString("title")

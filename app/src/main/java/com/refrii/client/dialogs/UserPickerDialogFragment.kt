@@ -20,7 +20,7 @@ class UserPickerDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = activity
         val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val content = inflater.inflate(R.layout.shared_users_dialog, null)
+        val content = inflater.inflate(R.layout.dialog_shared_users, null)
         val bundle = arguments
         val title = bundle.getString("title")
         val names = bundle.getStringArrayList("names")

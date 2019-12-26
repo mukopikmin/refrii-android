@@ -19,7 +19,7 @@ class CreateBoxDialogFragment : androidx.fragment.app.DialogFragment() {
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val content = inflater.inflate(R.layout.create_box_dialog, null)
+        val content = inflater.inflate(R.layout.dialog_create_box, null)
         val editText = content.findViewById<EditText>(R.id.editText)
         val dialog = AlertDialog.Builder(activity!!)
                 .setTitle("カテゴリの作成")

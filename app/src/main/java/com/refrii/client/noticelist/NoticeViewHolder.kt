@@ -26,7 +26,7 @@ class NoticeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     fun bind(notice: Notice, listener: View.OnLongClickListener) {
         val context = textTextView.context
-        val formatter = SimpleDateFormat(context.getString(R.string.datetime_format), Locale.getDefault())
+        val formatter = SimpleDateFormat(context.getString(R.string.format_datetime), Locale.getDefault())
 
         textTextView.text = notice.text
         timestampTextView.text = formatter.format(notice.createdAt)

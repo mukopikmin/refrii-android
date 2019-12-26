@@ -35,7 +35,7 @@ class UserListAdapter(
 //        var view = view
         val name = names[i]
         val email = emails[i]
-        val view = mLayoutInflater.inflate(R.layout.shared_user_list_row, viewGroup, false)
+        val view = mLayoutInflater.inflate(R.layout.row_shared_user, viewGroup, false)
 
         val nameTextView = view.findViewById<TextView>(R.id.foodNameTextView)
         val mailTextView = view.findViewById<TextView>(R.id.mailTextView)

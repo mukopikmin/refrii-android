@@ -27,11 +27,11 @@ class ShopPlanViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     fun bind(shopPlan: ShopPlan, food: Food) {
         val context = amountDiff.context
-        val formatter = SimpleDateFormat(context.getString(R.string.date_format), Locale.getDefault())
+        val formatter = SimpleDateFormat(context.getString(R.string.format_date), Locale.getDefault())
         val unitLabel = food.unit?.label
         val diff = shopPlan.amount
 
-        amountDiff.text = context.getString(R.string.amount_with_unit).format(diff, unitLabel)
+        amountDiff.text = context.getString(R.string.format_amount_with_unit).format(diff, unitLabel)
         date.text = formatter.format(shopPlan.date)
         completeButton.isChecked = false
     }

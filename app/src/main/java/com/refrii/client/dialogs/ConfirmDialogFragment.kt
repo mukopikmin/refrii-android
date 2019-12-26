@@ -18,7 +18,7 @@ class ConfirmDialogFragment : androidx.fragment.app.DialogFragment() {
         val inflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val title = bundle?.getString("title")
         val message = bundle?.getString("message")
-        val content = inflater.inflate(R.layout.confirm_dialog, null)
+        val content = inflater.inflate(R.layout.dialog_confirm, null)
         val messageText = content.findViewById<TextView>(R.id.messageText)
         val targetId = bundle?.getInt("target_id", 0)
 

@@ -43,7 +43,7 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
         ButterKnife.bind(this)
         hideProgressBar()
         setSupportActionBar(mToolbar)
-        mToolbar.title = "Add unit"
+        mToolbar.title = getString(R.string.title_add_unit)
         setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)

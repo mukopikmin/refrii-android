@@ -39,7 +39,7 @@
         app:srcCompat="@drawable/ic_icon_inverse"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintTop_creator="1"
-        android:contentDescription="@string/signin_welcome_title" />
+        android:contentDescription="@string/message_welcome_title" />
 
     <TextView
         android:id="@+id/titleTextView"
@@ -50,7 +50,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="64dp"
-        android:text="@string/signin_welcome_title"
+        android:text="@string/message_welcome_title"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -70,7 +70,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/signin_welcome_message"
+        android:text="@string/message_welcome"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="16sp"
@@ -111,7 +111,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:text="@string/signin_message_create_account"
+        android:text="@string/message_create_account"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/googleSignupButton"
@@ -126,7 +126,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="32dp"
-        android:text="@string/signin_message_agree_privacy"
+        android:text="@string/message_agree_privacy"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"

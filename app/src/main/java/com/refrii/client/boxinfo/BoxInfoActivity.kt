@@ -165,7 +165,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     override fun setBox(box: Box?) {
         box ?: return
 
-        val formatter = SimpleDateFormat(getString(R.string.datetime_format), Locale.getDefault())
+        val formatter = SimpleDateFormat(getString(R.string.format_datetime), Locale.getDefault())
 
         mToolbar.title = box.name
         setSupportActionBar(mToolbar)

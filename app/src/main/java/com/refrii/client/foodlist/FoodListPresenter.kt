@@ -88,7 +88,7 @@ constructor(
                     }
 
                     override fun onCompleted() {
-                        mView?.showToast("同期が完了しました")
+//                        mView?.showToast("同期が完了しました")
                     }
 
                     override fun onError(e: Throwable?) {
