@@ -82,8 +82,9 @@ class RetrofitModule {
         val version = "v1"
 
         return if (BuildConfig.FLAVOR == "development") {
-//            "http://192.168.1.104:3000/"
-            "https://staging.api.refrii.com/$version/"
+            "https://staging.api.refrii.com"
+//            "https://staging-create-staging-env-e4gheahv7q-an.a.run.app/$version/"
+//            "http://192.168.1.106:3000/"
         } else {
             "https://api.refrii.com/$version/"
         }

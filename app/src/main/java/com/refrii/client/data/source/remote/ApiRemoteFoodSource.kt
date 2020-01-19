@@ -1,33 +1,41 @@
 package com.refrii.client.data.source.remote
 
+import android.content.Context
 import android.graphics.Bitmap
-import android.util.Base64
 import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Food
 import com.refrii.client.data.models.ShopPlan
 import com.refrii.client.data.models.Unit
 import com.refrii.client.data.source.remote.services.FoodService
+import okhttp3.MediaType
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ApiRemoteFoodSource(private val mRetrofit: Retrofit) {
+
+class ApiRemoteFoodSource(
+        private val mContext: Context,
+        private val mRetrofit: Retrofit
+) {
 
     fun getFoods(): Observable<List<Food>> {
         return mRetrofit.create(FoodService::class.java)
-                .getFodos()
+                .getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun getFood(id: Int): Observable<Food> {
         return mRetrofit.create(FoodService::class.java)
-                .getFood(id)
+                .getById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -51,39 +59,47 @@ class ApiRemoteFoodSource(private val mRetrofit: Retrofit) {
                 .build()
 
         return mRetrofit.create(FoodService::class.java)
-                .addFood(body)
+                .create(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, bitmap: Bitmap?, boxId: Int?, unitId: Int?): Observable<Food> {
+    fun update(id: Int, name: String?, amount: Double?, expirationDate: Date?, bitmap: Bitmap?, boxId: Int?, unitId: Int?): Observable<Food> {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val bodyBuilder = MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
+        val params: HashMap<String, RequestBody> = HashMap()
+        var image: MultipartBody.Part? = null
 
-        name?.let { bodyBuilder.addFormDataPart("name", it) }
-        amount?.let { bodyBuilder.addFormDataPart("amount", it.toString()) }
-        expirationDate?.let { bodyBuilder.addFormDataPart("expiration_date", simpleDateFormat.format(it)) }
+        name?.let { params["name"] = RequestBody.create(MediaType.parse("multipart/form-data"), it) }
+        amount?.let { params["amount"] = RequestBody.create(MediaType.parse("multipart/form-data"), it.toString()) }
+        expirationDate?.let { params["expiration_date"] = RequestBody.create(MediaType.parse("multipart/form-data"), simpleDateFormat.format(it)) }
         bitmap?.let {
+            val imageFile = File(mContext.cacheDir, "temp.jpg")
             val byteArrayOutputStream = ByteArrayOutputStream()
-            it.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-            val byteArray = byteArrayOutputStream.toByteArray()
-            val encodedImage = Base64.encodeToString(byteArray, Base64.NO_WRAP)
 
-            bodyBuilder.addFormDataPart("image", "data:image/jpeg;base64,$encodedImage")
+            imageFile.createNewFile()
+            it.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+
+            val bitmapByteArray = byteArrayOutputStream.toByteArray()
+            val fileOutputStream = FileOutputStream(imageFile)
+
+            fileOutputStream.write(bitmapByteArray)
+            fileOutputStream.flush()
+            fileOutputStream.close()
+
+            image = MultipartBody.Part.createFormData("image", "image.jpg", RequestBody.create(MediaType.parse("image/jpeg"), File(mContext.cacheDir, "temp.jpg")));
         }
-        boxId?.let { bodyBuilder.addFormDataPart("box_id", it.toString()) }
-        unitId?.let { bodyBuilder.addFormDataPart("unit_id", it.toString()) }
+        boxId?.let { params["box_id"] = RequestBody.create(MediaType.parse("multipart/form-data"), it.toString()) }
+        unitId?.let { params["unit_id"] = RequestBody.create(MediaType.parse("multipart/form-data"), it.toString()) }
 
         return mRetrofit.create(FoodService::class.java)
-                .updateFood(id, bodyBuilder.build())
+                .update(id, params, image)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun removeFood(id: Int): Observable<Void> {
         return mRetrofit.create(FoodService::class.java)
-                .removeFood(id)
+                .remove(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
