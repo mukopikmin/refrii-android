@@ -83,8 +83,6 @@ class RetrofitModule {
 
         return if (BuildConfig.FLAVOR == "development") {
             "https://staging.api.refrii.com"
-//            "https://staging-create-staging-env-e4gheahv7q-an.a.run.app/$version/"
-//            "http://192.168.1.106:3000/"
         } else {
             "https://api.refrii.com/$version/"
         }

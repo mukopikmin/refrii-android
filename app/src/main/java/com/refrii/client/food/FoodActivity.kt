@@ -198,7 +198,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     private fun createOutputFile(): File {
         val formatter = SimpleDateFormat("yyyyMMddhhmmss", Locale.getDefault())
-        val filename = formatter.format(Date())
+        val filename = formatter.format(Date()) + ".jpg"
         val tempFile = File(filesDir, "temp/$filename")
 
         if (!tempFile.exists()) {
@@ -235,10 +235,15 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (data == null || resultCode != Activity.RESULT_OK) return
+        if (resultCode != Activity.RESULT_OK) return
 
         when (requestCode) {
             RESULT_CAMERA -> onTookPicture()
+        }
+
+        if (data == null) return
+
+        when (requestCode) {
             EDIT_NAME_REQUEST_CODE -> mPresenter.updateName(data.getStringExtra("text"))
             EDIT_AMOUNT_REQUEST_CODE -> mPresenter.updateAmount(data.getDoubleExtra("number", 0.toDouble()))
             EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
