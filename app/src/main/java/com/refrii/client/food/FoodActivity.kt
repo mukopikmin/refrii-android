@@ -77,7 +77,6 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     private var mUnitIds: List<Int>? = null
     private var mUnitLabels: MutableList<String?>? = null
-    private var mImageUri: Uri? = null
     private val mOnUnitSelectedListener = object : AdapterView.OnItemSelectedListener {
         override fun onNothingSelected(parent: AdapterView<*>?) {}
 
@@ -188,18 +187,19 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     private fun launchCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         val file = createOutputFile()
+        val uri = getTempImageUri(file)
 
-        mImageUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file)
-
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         startActivityForResult(intent, RESULT_CAMERA)
     }
 
+    private fun getTempImageUri(file: File): Uri {
+        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file)
+    }
+
     private fun createOutputFile(): File {
-        val formatter = SimpleDateFormat("yyyyMMddhhmmss", Locale.getDefault())
-        val filename = formatter.format(Date()) + ".jpg"
-        val tempFile = File(filesDir, "temp/$filename")
+        val tempFile = File(filesDir, TEMP_IMAGE_FILENAME)
 
         if (!tempFile.exists()) {
             try {
@@ -263,7 +263,9 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun onTookPicture() {
-        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, mImageUri)
+        val file = File(filesDir, TEMP_IMAGE_FILENAME)
+        val uri = getTempImageUri(file)
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
         onBeforeSetImage()
         mCameraImageView.setImageBitmap(bitmap)
@@ -448,5 +450,6 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         private const val CREATE_SHOP_PLAN_REQUEST_CODE = 104
         private const val RESULT_CAMERA = 105
         private const val IMAGE_OPTIONS_REQUEST_CODE = 106
+        private const val TEMP_IMAGE_FILENAME = "temp/temp.jpg"
     }
 }
