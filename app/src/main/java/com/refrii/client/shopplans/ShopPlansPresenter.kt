@@ -47,7 +47,7 @@ constructor(private val mApiShopPlanRepository: ApiShopPlanRepository) : ShopPla
     }
 
     override fun completeShopPlan(shopPlan: ShopPlan) {
-        mApiShopPlanRepository.completeShopPlan(shopPlan.id)
+        mApiShopPlanRepository.updateShopPlan(shopPlan.id, true)
                 .subscribe(object : Subscriber<ShopPlan>() {
                     override fun onNext(t: ShopPlan?) {
                         mView?.showSnackBar("${t?.food?.name} の予定を完了しました")

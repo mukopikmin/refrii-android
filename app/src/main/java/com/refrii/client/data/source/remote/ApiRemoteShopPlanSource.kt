@@ -33,9 +33,14 @@ class ApiRemoteShopPlanSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun completeShopPlan(id: Int): Observable<ShopPlan> {
+    fun updateShopPlan(id: Int, done: Boolean?): Observable<ShopPlan> {
+        val body = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+        done?.let { body.addFormDataPart("done", it.toString()) }
+
         return mRetrofit.create(ShopPlanService::class.java)
-                .updateShopPlan(id)
+                .updateShopPlan(id, body.build())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

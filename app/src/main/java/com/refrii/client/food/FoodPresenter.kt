@@ -189,7 +189,7 @@ constructor(
     }
 
     override fun completeShopPlan(shopPlan: ShopPlan) {
-        mApiShopPlanRepository.completeShopPlan(shopPlan.id)
+        mApiShopPlanRepository.updateShopPlan(shopPlan.id, true)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe(object : Subscriber<ShopPlan>() {

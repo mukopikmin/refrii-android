@@ -45,8 +45,8 @@ class ApiShopPlanRepository(realm: Realm, retrofit: Retrofit) {
                 .flatMap { mApiLocalShopPlanSource.saveShopPlan(it) }
     }
 
-    fun completeShopPlan(id: Int): Observable<ShopPlan> {
-        return mApiRemoteShopPlanSource.completeShopPlan(id)
+    fun updateShopPlan(id: Int, done: Boolean?): Observable<ShopPlan> {
+        return mApiRemoteShopPlanSource.updateShopPlan(id, done)
                 .flatMap { mApiLocalShopPlanSource.saveShopPlan(it) }
     }
 }
