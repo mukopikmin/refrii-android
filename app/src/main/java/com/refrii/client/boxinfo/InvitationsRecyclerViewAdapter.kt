@@ -5,10 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.refrii.client.R
+import com.refrii.client.data.models.Box
 import com.refrii.client.data.models.Invitation
 
 class InvitationsRecyclerViewAdapter(
-        private var mInvitaions: List<Invitation>
+        private var mInvitaions: List<Invitation>,
+        private val mBox: Box
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var mDeinviteClickListener: View.OnClickListener? = null
@@ -27,7 +29,7 @@ class InvitationsRecyclerViewAdapter(
         val invitation = mInvitaions[position]
 
         mDeinviteClickListener?.let {
-            (holder as InvitationViewHolder).bind(invitation, it)
+            (holder as InvitationViewHolder).bind(invitation, mBox, it)
         }
     }
 

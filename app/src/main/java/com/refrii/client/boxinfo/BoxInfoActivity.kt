@@ -176,11 +176,15 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         mUpdatedText.text = formatter.format(box.updatedAt)
 
         box.owner?.let { mOwnerText.text = it.name }
+
+        if (box.isInvited) {
+            mInviteLayout.visibility = View.GONE
+        }
     }
 
-    override fun setInvitations(invitations: List<Invitation>) {
+    override fun setInvitations(invitations: List<Invitation>, box: Box) {
         if (mSharedUsersRecycler.adapter == null) {
-            val adapter = InvitationsRecyclerViewAdapter(invitations)
+            val adapter = InvitationsRecyclerViewAdapter(invitations, box)
 
             adapter.setDeinviteClickListener(View.OnClickListener {
                 val position = mSharedUsersRecycler.getChildAdapterPosition(it)

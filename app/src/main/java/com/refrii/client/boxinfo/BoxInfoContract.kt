@@ -15,7 +15,7 @@ interface BoxInfoContract {
         fun showToast(message: String?)
         fun onDeleteCompleted(name: String?)
         fun removeBox(id: Int?, name: String?)
-        fun setInvitations(invitations: List<Invitation>)
+        fun setInvitations(invitations: List<Invitation>, box: Box)
         fun removeInvitation(boxName: String?, invitation: Invitation)
     }
 
