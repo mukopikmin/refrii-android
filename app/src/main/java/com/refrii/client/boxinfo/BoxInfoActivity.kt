@@ -14,7 +14,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -26,6 +25,7 @@ import com.refrii.client.data.models.Invitation
 import com.refrii.client.data.models.User
 import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.InviteUserDialogFragment
+import com.refrii.client.invitations.InvitationListActivity
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -38,8 +38,6 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     lateinit var mNoticeEditText: EditText
     @BindView(R.id.ownerTextView)
     lateinit var mOwnerText: TextView
-    @BindView(R.id.sharedUsersLayout)
-    lateinit var mSharedUsersRecycler: androidx.recyclerview.widget.RecyclerView
     @BindView(R.id.createdTextView)
     lateinit var mCreatedText: TextView
     @BindView(R.id.updatedTextView)
@@ -50,8 +48,8 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     lateinit var mToolbar: Toolbar
     @BindView(R.id.progressBar)
     lateinit var mProgressBar: ProgressBar
-    @BindView(R.id.addSharedUserLayout)
-    lateinit var mInviteLayout: ConstraintLayout
+    @BindView(R.id.sharedCountTextView)
+    lateinit var mSharedCountText: TextView
 
     private val mNameTextWatcher = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {}
@@ -79,16 +77,16 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         setContentView(R.layout.activity_box_info)
         ButterKnife.bind(this)
         setSupportActionBar(mToolbar)
+
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
-        mSharedUsersRecycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         mNameEditText.addTextChangedListener(mNameTextWatcher)
         mNoticeEditText.addTextChangedListener(mNoticeTextWatcher)
         mFab.setOnClickListener { mPresenter.updateBox() }
-        mInviteLayout.setOnClickListener { mPresenter.showInviteUserDialog() }
+        mSharedCountText.setOnClickListener { mPresenter.showInvitations() }
     }
 
     override fun onStart() {
@@ -113,11 +111,19 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         when (id) {
             android.R.id.home -> finish()
+            R.id.menu_invite -> mPresenter.showInvitations()
             R.id.menu_remove_box -> mPresenter.confirmRemovingBox()
             else -> result = super.onOptionsItemSelected(item)
         }
 
         return result
+    }
+
+    override fun showInvitations(box: Box) {
+        val intent = Intent(this, InvitationListActivity::class.java)
+
+        intent.putExtra(getString(R.string.key_box_id), box.id)
+        startActivity(intent)
     }
 
     override fun removeBox(id: Int?, name: String?) {
@@ -177,25 +183,26 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         box.owner?.let { mOwnerText.text = it.name }
 
-        if (box.isInvited) {
-            mInviteLayout.visibility = View.GONE
-        }
+//        if (box.isInvited) {
+//            mInviteLayout.visibility = View.GONE
+//        }
     }
 
     override fun setInvitations(invitations: List<Invitation>, box: Box) {
-        if (mSharedUsersRecycler.adapter == null) {
-            val adapter = InvitationsRecyclerViewAdapter(invitations, box)
-
-            adapter.setDeinviteClickListener(View.OnClickListener {
-                val position = mSharedUsersRecycler.getChildAdapterPosition(it)
-                val user = adapter.getItemAtPosition(position)
-
-                mPresenter.confirmRemovingInvitation(user)
-            })
-            mSharedUsersRecycler.adapter = adapter
-        } else {
-            (mSharedUsersRecycler.adapter as InvitationsRecyclerViewAdapter).setInvitations(invitations)
-        }
+        mSharedCountText.text = "${invitations.count()} 人のユーザーと共有しています"
+//        if (mSharedUsersRecycler.adapter == null) {
+//            val adapter = InvitationsRecyclerViewAdapter(invitations, box)
+//
+//            adapter.setDeinviteClickListener(View.OnClickListener {
+//                val position = mSharedUsersRecycler.getChildAdapterPosition(it)
+//                val user = adapter.getItemAtPosition(position)
+//
+//                mPresenter.confirmRemovingInvitation(user)
+//            })
+//            mSharedUsersRecycler.adapter = adapter
+//        } else {
+//            (mSharedUsersRecycler.adapter as InvitationsRecyclerViewAdapter).setInvitations(invitations)
+//        }
     }
 
     override fun showInviteUserDialog(users: List<User>?) {

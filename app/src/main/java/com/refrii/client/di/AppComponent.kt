@@ -3,6 +3,7 @@ package com.refrii.client.di
 import com.refrii.client.boxinfo.BoxInfoActivity
 import com.refrii.client.food.FoodActivity
 import com.refrii.client.foodlist.FoodListActivity
+import com.refrii.client.invitations.InvitationListActivity
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.newunit.NewUnitActivity
 import com.refrii.client.noticelist.NoticeListActivity
@@ -38,4 +39,5 @@ interface AppComponent {
     fun inject(target: SettingsActivity.SettingsFragment)
     fun inject(target: PushNotificationService)
     fun inject(target: NoticeListActivity)
+    fun inject(target: InvitationListActivity)
 }

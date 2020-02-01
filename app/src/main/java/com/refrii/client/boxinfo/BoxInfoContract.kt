@@ -17,6 +17,7 @@ interface BoxInfoContract {
         fun removeBox(id: Int?, name: String?)
         fun setInvitations(invitations: List<Invitation>, box: Box)
         fun removeInvitation(boxName: String?, invitation: Invitation)
+        fun showInvitations(box: Box)
     }
 
     interface Presenter {
@@ -31,5 +32,6 @@ interface BoxInfoContract {
         fun updateName(name: String)
         fun updateNotice(notice: String)
         fun confirmRemovingInvitation(invitation: Invitation)
+        fun showInvitations()
     }
 }

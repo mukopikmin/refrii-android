@@ -187,4 +187,10 @@ constructor(
         mInvitation = invitation
         mView?.removeInvitation(mBox?.name, invitation)
     }
+
+    override fun showInvitations() {
+        mBox?.let {
+            mView?.showInvitations(it)
+        }
+    }
 }

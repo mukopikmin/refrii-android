@@ -9,6 +9,8 @@ import com.refrii.client.food.FoodContract
 import com.refrii.client.food.FoodPresenter
 import com.refrii.client.foodlist.FoodListContract
 import com.refrii.client.foodlist.FoodListPresenter
+import com.refrii.client.invitations.InvitationListContract
+import com.refrii.client.invitations.InvitationListPresenter
 import com.refrii.client.newfood.NewFoodContract
 import com.refrii.client.newfood.NewFoodPresenter
 import com.refrii.client.newunit.NewUnitContract
@@ -96,6 +98,11 @@ class AppModule(private var mApplication: Application) {
     @Provides
     fun provideNoticeListPresenter(foodRepository: ApiFoodRepository, noticeRepository: ApiNoticeRepository): NoticeListContract.Presenter {
         return NoticeListPresenter(foodRepository, noticeRepository)
+    }
+
+    @Provides
+    fun provideInvitationListPresenter(boxRepository: ApiBoxRepository, invitationRepository: ApiInvitationRepository): InvitationListContract.Presenter {
+        return InvitationListPresenter(boxRepository, invitationRepository)
     }
 
     @Provides

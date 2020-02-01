@@ -74,7 +74,6 @@ class FoodRecyclerViewAdapter(
         notifyDataSetChanged()
     }
 
-
     fun setOnClickListener(listener: View.OnClickListener) {
         mOnClickListener = listener
     }

@@ -6,6 +6,8 @@ import com.refrii.client.food.FoodActivity
 import com.refrii.client.food.FoodModule
 import com.refrii.client.foodlist.FoodListActivity
 import com.refrii.client.foodlist.FoodListModule
+import com.refrii.client.invitations.InvitationListActivity
+import com.refrii.client.invitations.InvitationListModule
 import com.refrii.client.newfood.NewFoodActivity
 import com.refrii.client.newfood.NewFoodModule
 import com.refrii.client.newunit.NewUnitActivity
@@ -77,4 +79,8 @@ abstract class ActivityBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(SettingsModule::class)])
     abstract fun settingsFragment(): SettingsActivity.SettingsFragment
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = [(InvitationListModule::class)])
+    abstract fun invitationListActivity(): InvitationListActivity
 }

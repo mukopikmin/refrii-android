@@ -18,7 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <activity
+            android:name=".invitations.InvitationListActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".noticelist.NoticeListActivity" />
         <activity android:name=".welcome.WelcomeActivity" />
         <activity
