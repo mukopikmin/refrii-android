@@ -22,7 +22,7 @@
 
     <include layout="@layout/progressbar" />
 
-    <include layout="@layout/content_new_unit" />
+    <include layout="@layout/edit_unit" />
 
     <include layout="@layout/fab_check" />
 

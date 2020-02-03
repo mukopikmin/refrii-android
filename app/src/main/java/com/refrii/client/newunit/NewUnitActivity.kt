@@ -30,6 +30,8 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
     lateinit var mFab: FloatingActionButton
     @BindView(R.id.progressBar)
     lateinit var mProgressBar: ProgressBar
+    @BindView(R.id.timestampContainer)
+    lateinit var mTimestamp: View
 
     @Inject
     lateinit var mPresenter: NewUnitContract.Presenter
@@ -44,6 +46,7 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
         hideProgressBar()
         setSupportActionBar(mToolbar)
         mToolbar.title = getString(R.string.title_add_unit)
+        mTimestamp.visibility = View.GONE
         setSupportActionBar(mToolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)

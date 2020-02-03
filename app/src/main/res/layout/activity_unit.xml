@@ -21,7 +21,8 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/progressbar" />
-    <include layout="@layout/content_unit" />
+
+    <include layout="@layout/edit_unit" />
     <include layout="@layout/fab_check" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
