@@ -26,9 +26,11 @@ import com.refrii.client.data.models.User
 import com.refrii.client.dialogs.ConfirmDialogFragment
 import com.refrii.client.dialogs.InviteUserDialogFragment
 import com.refrii.client.invitations.InvitationListActivity
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.reflect.jvm.internal.impl.descriptors.runtime.components.RuntimeErrorReporter
 
 class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
