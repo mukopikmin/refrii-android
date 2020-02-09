@@ -16,7 +16,7 @@
     <string name="key_unit_id">key_unit_id</string>
 
     <string name="message_add_box_completed">カテゴリが追加されました</string>
-    <string name="message_add_food_completed">食材が追加されました</string>
+    <string name="message_add_food_completed">ストックが追加されました</string>
     <string name="message_agree_privacy">プライバシーポリシーに同意する</string>
     <string name="message_box_detail">カテゴリの詳細</string>
     <string name="message_cancel">キャンセル</string>
@@ -68,5 +68,4 @@
     <string name="title_add_food">食材の追加</string>
     <string name="title_add_unit">単位の作成</string>
     <string name="title_unit_list">単位の一覧</string>
-    <string name="title_activity_invitation_list">InvitationListActivity</string>
 </resources>
