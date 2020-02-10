@@ -3,25 +3,25 @@
     <item
         android:id="@+id/navigation_edit"
         android:icon="@drawable/ic_edit_black"
-        android:title="edit" />
+        android:title="" />
 
     <item
         android:id="@+id/navigation_decrement"
         android:icon="@drawable/ic_remove_circle_outline_black"
-        android:title="decrement" />
+        android:title="" />
 
     <item
         android:id="@+id/navigation_increment"
         android:icon="@drawable/ic_add_circle_outline_black"
-        android:title="increment" />
+        android:title="" />
 
     <item
         android:id="@+id/navigation_notifications"
         android:icon="@drawable/ic_baseline_chat_bubble_outline"
-        android:title="notice" />
+        android:title="" />
 
     <item
         android:id="@+id/navigation_delete"
         android:icon="@drawable/ic_baseline_delete"
-        android:title="delete" />
+        android:title="" />
 </menu>

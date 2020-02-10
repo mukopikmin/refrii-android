@@ -14,11 +14,11 @@
     </group>
 
     <group>
-        <item android:title="予定">
+        <item android:title="@string/message_plan">
             <menu>
                 <item
                     android:id="@+id/nav_shop_plans"
-                    android:title="買い物の予定" />
+                    android:title="@string/message_shop_plan" />
             </menu>
         </item>
     </group>

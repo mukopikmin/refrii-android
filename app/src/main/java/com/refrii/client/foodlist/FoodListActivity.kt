@@ -124,7 +124,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 R.id.navigation_delete -> mPresenter.confirmRemovingFood()
             }
 
-            true
+            false
         }
     }
 
@@ -423,6 +423,14 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     override fun showBottomNavigation(food: Food) {
         mBottomNavigation.visibility = View.VISIBLE
+//        food.notices?.let { notices ->
+//            mBottomNavigation.menu.getItem(3).itemId.let {
+//                mBottomNavigation.getOrCreateBadge(it).apply {
+//                    number = notices.size
+//                    isVisible = true
+//                }
+//            }
+//        }
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
@@ -488,7 +496,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     private fun createBox(data: Intent?) {
         val name = data?.getStringExtra("name") ?: return
-        val notice = "" ?: return
+        val notice = ""
 
         mPresenter.createBox(name, notice)
     }

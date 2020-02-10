@@ -68,4 +68,7 @@
     <string name="title_add_food">食材の追加</string>
     <string name="title_add_unit">単位の作成</string>
     <string name="title_unit_list">単位の一覧</string>
+    <string name="message_share">共有</string>
+    <string name="message_plan">予定</string>
+    <string name="message_shop_plan">買い物の予定</string>
 </resources>

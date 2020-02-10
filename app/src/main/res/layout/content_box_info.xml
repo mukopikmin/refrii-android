@@ -160,6 +160,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:text="0 人のユーザーと共有しています"
+            android:textColor="@android:color/black"
             app:layout_constraintBottom_toTopOf="@+id/include5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView8"

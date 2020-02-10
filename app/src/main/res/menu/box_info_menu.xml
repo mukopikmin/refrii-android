@@ -4,11 +4,11 @@
 
     <item
         android:id="@+id/menu_invite"
-        android:title="共有"
+        android:title="@string/message_share"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/menu_remove_box"
-        android:title="削除"
+        android:title="@string/message_delete"
         app:showAsAction="never" />
 </menu>
