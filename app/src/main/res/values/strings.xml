@@ -71,4 +71,5 @@
     <string name="message_share">共有</string>
     <string name="message_plan">予定</string>
     <string name="message_shop_plan">買い物の予定</string>
+    <string name="message_box_name">カテゴリの名前</string>
 </resources>

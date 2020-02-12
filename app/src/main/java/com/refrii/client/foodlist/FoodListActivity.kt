@@ -423,14 +423,15 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     override fun showBottomNavigation(food: Food) {
         mBottomNavigation.visibility = View.VISIBLE
-//        food.notices?.let { notices ->
-//            mBottomNavigation.menu.getItem(3).itemId.let {
-//                mBottomNavigation.getOrCreateBadge(it).apply {
-//                    number = notices.size
-//                    isVisible = true
-//                }
-//            }
-//        }
+        food.notices?.let { notices ->
+            mBottomNavigation.menu.getItem(3).itemId.let {
+                mBottomNavigation.getOrCreateBadge(it).apply {
+                    number = notices.size
+                    isVisible = notices.size > 0
+                    backgroundColor = getColor(R.color.colorAccent)
+                }
+            }
+        }
 
         if (mRecyclerView.adapter != null) {
             val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
