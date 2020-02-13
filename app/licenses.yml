@@ -183,7 +183,7 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: http://developer.android.com/tools/extras/support-library.html
-  skip: true
+  skip: trueyy
 - artifact: net.steamcrafted:materialiconlib:+
   name: materialiconlib
   copyrightHolder: CodeCrafted
@@ -193,3 +193,10 @@
   copyrightHolder: Google
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+- artifact: androidx.viewpager2:+:+
+  skip: true
+  name: AndroidX Widget ViewPager2
+  copyrightHolder: #COPYRIGHT_HOLDER#
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/jetpack/androidx
