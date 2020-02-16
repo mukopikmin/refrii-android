@@ -429,6 +429,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                     number = notices.size
                     isVisible = notices.size > 0
                     backgroundColor = getColor(R.color.colorAccent)
+                    badgeTextColor = getColor(android.R.color.white)
                 }
             }
         }
