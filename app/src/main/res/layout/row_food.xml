@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_outline_account_circle"
+        android:src="@drawable/outline_account_circle_black_48dp"
         app:civ_border_color="#FFFFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +50,7 @@
         <ImageView
             android:id="@+id/imageView22"
             android:layout_width="14sp"
-            android:layout_height="14sp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginEnd="4dp"
             android:tint="@android:color/darker_gray"
@@ -82,13 +82,13 @@
             tools:layout_editor_absoluteX="139dp">
 
             <net.steamcrafted.materialiconlib.MaterialIconView
+                android:id="@+id/imageView25"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
                 app:materialIcon="message_outline"
                 app:materialIconColor="@android:color/darker_gray"
-                app:materialIconSize="14sp"
-                android:id="@+id/imageView25"
-                android:layout_gravity="center" />
+                app:materialIconSize="14sp" />
 
             <TextView
                 android:id="@+id/noticeCountTextView"
@@ -102,7 +102,7 @@
         <ImageView
             android:id="@+id/imageView24"
             android:layout_width="14sp"
-            android:layout_height="14sp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginEnd="4dp"
             android:tint="@android:color/darker_gray"
