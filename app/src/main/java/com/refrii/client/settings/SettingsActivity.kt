@@ -10,6 +10,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.refrii.client.App
 import com.refrii.client.R
 import com.refrii.client.signin.SignInActivity
@@ -131,6 +132,8 @@ class SettingsActivity : AppCompatActivity() {
 
                     startActivity(intent)
                 }
+
+                FirebaseAuth.getInstance().signOut()
 
                 true
             }
