@@ -53,7 +53,6 @@ import com.refrii.client.signin.SignInActivity
 import com.refrii.client.unitlist.UnitListActivity
 import com.refrii.client.welcome.WelcomeActivity
 import com.squareup.picasso.Picasso
-import java.util.*
 import javax.inject.Inject
 
 class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationView.OnNavigationItemSelectedListener, SwipeRefreshLayout.OnRefreshListener {
@@ -102,18 +101,26 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         toggle.syncState()
         mNavigationView.setNavigationItemSelectedListener(this@FoodListActivity)
 
+        mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+
+        initPushNotification()
+        initView()
+
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            welcome()
+        }
+    }
+
+    private fun initView() {
         mRecyclerView.addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
         mRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         mFirebaseAuth = FirebaseAuth.getInstance()
-        mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         mEmptyMessageContainer.visibility = View.GONE
         mSwipeRefreshLayout.setOnRefreshListener(this)
         mSwipeRefreshLayout.setColorSchemeColors(getColor(R.color.colorPrimary))
 
         mFab.setOnClickListener { mPresenter.addFood() }
         mAddFoodButton.setOnClickListener { mPresenter.addFood() }
-
-        initPushNotification()
 
         mBottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
@@ -193,38 +200,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         startActivity(intent)
     }
 
-    private fun reauthorize() {
-        val expiresAt = mPreference.getLong(getString(R.string.preference_key_expiration_timestamp), 0) * 1000
-        val currentUser = mFirebaseAuth.currentUser
-
-        if (expiresAt < Date().time) {
-            if (currentUser == null) {
-                signOut()
-            } else {
-                currentUser.getIdToken(true).addOnCompleteListener {
-                    val editor = mPreference.edit()
-
-                    editor.apply {
-                        putString(getString(R.string.preference_key_jwt), it.result?.token)
-
-                        it.result?.expirationTimestamp?.let {
-                            putLong(getString(R.string.preference_key_expiration_timestamp), it)
-                        }
-                    }
-                    editor.apply()
-
-                    mPresenter.takeView(this)
-                    mPresenter.getBoxes()
-                    setNavigationHeader()
-                }
-            }
-        } else {
-            mPresenter.takeView(this)
-            mPresenter.getBoxes()
-            setNavigationHeader()
-        }
-    }
-
     override fun onPause() {
         super.onPause()
 
@@ -243,7 +218,9 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun onResume() {
         super.onResume()
 
-        reauthorize()
+        mPresenter.takeView(this)
+        mPresenter.getBoxes()
+        setNavigationHeader()
     }
 
     override fun onBackPressed() {

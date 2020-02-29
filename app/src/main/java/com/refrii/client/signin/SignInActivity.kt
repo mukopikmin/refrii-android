@@ -96,6 +96,7 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
         val filter = Linkify.TransformFilter { _, _ -> strUrl }
 
         Linkify.addLinks(mSignupTextView, pattern, strUrl, null, filter)
+        mSignupTextView.setLinkTextColor(getColor(R.color.colorAccent))
     }
 
     override fun onStart() {

@@ -92,10 +92,8 @@ constructor(
                     }
 
                     override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-
-                        if (e is HttpException && e.code() == 401) {
-                            mView?.signOut()
+                        if (e is HttpException) {
+                            mView?.showToast(e.response()?.message())
                         }
                     }
 
