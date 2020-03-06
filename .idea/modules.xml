@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/refrii-android.iml" filepath="$PROJECT_DIR$/refrii-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="refrii-android/app" />
+      <module fileurl="file://$PROJECT_DIR$/refrii-android.iml" filepath="$PROJECT_DIR$/refrii-android.iml" group="refrii-android" />
     </modules>
   </component>
 </project>
