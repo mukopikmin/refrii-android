@@ -32,7 +32,7 @@ android {
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        applicationId "com.refrii.client"
+        applicationId "app.muko.mypantry"
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 37
@@ -43,10 +43,10 @@ android {
     flavorDimensions "default"
     productFlavors {
         production {
-            applicationId "com.refrii.client"
+            applicationId "app.muko.mypantry"
         }
         development {
-            applicationId "com.refrii.client.development"
+            applicationId "app.muko.mypantry.development"
             versionNameSuffix "-development"
         }
     }

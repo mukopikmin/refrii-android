@@ -46,7 +46,7 @@
     <string name="navigation_drawer_close">Close navigation mDrawer</string>
     <string name="navigation_drawer_open">Open navigation mDrawer</string>
 
-    <string name="notification_channel_id_push">com.refrii.client.notification.push</string>
+    <string name="notification_channel_id_push">app.muko.mypantry.notification.push</string>
     <string name="notification_channel_name_push">Push Notification</string>
     <string name="notification_topic_push">mytopic</string>
 

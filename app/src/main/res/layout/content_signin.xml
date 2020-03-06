@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.refrii.client.signin.SignInActivity"
+    tools:context="app.muko.mypantry.signin.SignInActivity"
     tools:showIn="@layout/activity_signin"
     android:background="#328ae9">
 

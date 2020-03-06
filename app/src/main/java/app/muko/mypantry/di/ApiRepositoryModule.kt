@@ -1,0 +1,55 @@
+package app.muko.mypantry.di
+
+import android.content.Context
+import app.muko.mypantry.data.source.*
+import dagger.Module
+import dagger.Provides
+import io.realm.Realm
+import retrofit2.Retrofit
+import javax.inject.Singleton
+
+@Module
+class ApiRepositoryModule {
+
+    @Singleton
+    @Provides
+    fun provideApiBoxRepository(realm: Realm, retrofit: Retrofit): ApiBoxRepository {
+        return ApiBoxRepository(realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiFoodRepository(realm: Realm, retrofit: Retrofit, context: Context): ApiFoodRepository {
+        return ApiFoodRepository(context, realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiShopPlanRepository(realm: Realm, retrofit: Retrofit): ApiShopPlanRepository {
+        return ApiShopPlanRepository(realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiUnitRepository(realm: Realm, retrofit: Retrofit): ApiUnitRepository {
+        return ApiUnitRepository(realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiUserRepository(realm: Realm, retrofit: Retrofit): ApiUserRepository {
+        return ApiUserRepository(realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiNoticeRepository(realm: Realm, retrofit: Retrofit): ApiNoticeRepository {
+        return ApiNoticeRepository(realm, retrofit)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiInvitationRepository(realm: Realm, retrofit: Retrofit): ApiInvitationRepository {
+        return ApiInvitationRepository(realm, retrofit)
+    }
+}
