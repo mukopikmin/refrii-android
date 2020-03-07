@@ -1,6 +1,6 @@
 #! /bin/sh
 
-set -e
+set -ex
 
 temp_dir=temp
 filename=secretfiles.tar.gz
@@ -16,4 +16,3 @@ tar -zcvf $filename $temp_dir/*
 travis encrypt-file $filename
 
 rm -rf temp
-rm -rf $filename

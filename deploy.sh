@@ -10,7 +10,7 @@ mv temp/keystore.jks .
 
 if [[ $TRAVIS_TAG =~ ^[0-9\.]+$ ]] ; then
   echo "Start production build."
-  ./gradlew generateLicensePage
+  ./gradlew generateLicensePage;
   ./gradlew assembleProduction;
   jarsigner \
     -verbose \
@@ -27,7 +27,7 @@ fi
    
 if [ "$TRAVIS_BRANCH" = "master" ] ; then
     echo "Start staging build."
-    ./gradlew generateLicensePage
+    ./gradlew generateLicensePage;
     ./gradlew assembleDevelopment;
     jarsigner \
       -verbose \

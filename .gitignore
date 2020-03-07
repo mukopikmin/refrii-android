@@ -126,6 +126,7 @@ app/src/main/assets
 app/google-services.json
 
 temp
+secretfiles.tar.gz
 *.jks
 
 app/production/release/*
