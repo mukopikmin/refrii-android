@@ -1,19 +1,27 @@
 package app.muko.mypantry.foodlist
 
+import android.content.Context
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Food
+import com.ethanhua.skeleton.Skeleton
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class FoodRecyclerViewAdapter(
         private var mFoods: List<Food>,
-        private val mUserId: Int
+        private val mUserId: Int,
+        private val mContext: Context
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var mOnClickListener: View.OnClickListener? = null
@@ -25,18 +33,41 @@ class FoodRecyclerViewAdapter(
         val amountWithUnit = "${String.format("%.2f", food.amount)} ${food.unit?.label}"
 
         (holder as FoodViewHolder).apply {
+            val user = food.updatedUser
             name.text = food.name
             expirationDate.text = formatter.format(food.expirationDate)
             amount.text = amountWithUnit
 
-            if (mUserId == food.updatedUser?.id) {
+            if (mUserId == user?.id) {
                 lastUpdatedUserAvatarImageView.visibility = View.GONE
             } else {
                 lastUpdatedUserAvatarImageView.visibility = View.VISIBLE
-                Picasso.get()
-                        .load(food.updatedUser?.avatarUrl)
-                        .placeholder(R.drawable.ic_outline_account_circle)
-                        .into(lastUpdatedUserAvatarImageView)
+
+                if (user != null) {
+                    if (user.avatarUrl.isNullOrEmpty()) {
+                        val d: Drawable = mContext.getDrawable(R.drawable.ic_outline_account_circle)
+                        d.setTint(ContextCompat.getColor(mContext, android.R.color.darker_gray))
+                        d.setTintMode(PorterDuff.Mode.SRC_IN)
+
+                        lastUpdatedUserAvatarImageView.setImageResource(R.drawable.ic_outline_account_circle)
+                    } else {
+                        val skeleton = Skeleton.bind(lastUpdatedUserAvatarImageView)
+                                .load(R.layout.skeleton_circle_image)
+                                .duration(800)
+                                .show()
+
+                        Picasso.get()
+                                .load(food.updatedUser?.avatarUrl)
+                                .placeholder(R.drawable.ic_outline_account_circle)
+                                .into(lastUpdatedUserAvatarImageView, object : Callback {
+                                    override fun onSuccess() {
+                                        skeleton.hide()
+                                    }
+
+                                    override fun onError(e: Exception?) {}
+                                })
+                    }
+                }
             }
 
             if (food.notices.isNullOrEmpty()) {

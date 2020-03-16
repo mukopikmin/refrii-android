@@ -200,3 +200,13 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: https://developer.android.com/jetpack/androidx
+- artifact: com.ethanhua:skeleton:+
+  name: skeleton
+  copyrightHolder: ethanhua
+  license: Apache 2.0
+- artifact: io.supercharge:shimmerlayout:+
+  name: ShimmerLayout
+  copyrightHolder: veghtomi
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/team-supercharge/ShimmerLayout

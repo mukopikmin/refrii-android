@@ -13,7 +13,6 @@
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/outline_account_circle_black_48dp"
         app:civ_border_color="#FFFFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
