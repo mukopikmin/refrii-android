@@ -50,7 +50,7 @@ class InvitationViewHolder(view: View) : RecyclerView.ViewHolder(view) {
                 mAvatarImage.setImageResource(R.drawable.ic_outline_account_circle)
             } else {
                 val skeleton = Skeleton.bind(mAvatarImage)
-                        .load(R.layout.skeleton_circle_image)
+                        .load(R.layout.skeleton_circle_image_large)
                         .duration(800)
                         .show()
 
