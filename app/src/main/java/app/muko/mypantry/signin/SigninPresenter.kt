@@ -53,4 +53,8 @@ constructor(private val mApiUserRepository: ApiUserRepository) : SigninContract.
                     }
                 })
     }
+
+    override fun deleteLocalData() {
+        mApiUserRepository.deleteLocalData()
+    }
 }

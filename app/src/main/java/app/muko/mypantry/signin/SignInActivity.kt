@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.util.Linkify
+import android.util.Log
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ProgressBar
@@ -102,8 +103,25 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
     override fun onStart() {
         super.onStart()
 
+        signOut()
         onLoaded()
         mPresenter.takeView(this)
+    }
+
+    private fun signOut() {
+        val editor = mPreference.edit()
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build()
+        val googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+        googleSignInClient.revokeAccess()
+                .addOnCompleteListener(this) { Log.i(TAG, "Revoke access finished") }
+        FirebaseAuth.getInstance().signOut()
+
+        editor.clear()
+        editor.apply()
+        mPresenter.deleteLocalData()
     }
 
     override fun onBackPressed() {
@@ -209,5 +227,6 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
     companion object {
         private const val GOOGLE_SIGN_IN_REQUEST_CODE = 101
         private const val GOOGLE_SIGN_UP_REQUEST_CODE = 102
+        private const val TAG = "SigninActivity"
     }
 }

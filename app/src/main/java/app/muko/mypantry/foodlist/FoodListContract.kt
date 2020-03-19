@@ -17,7 +17,6 @@ interface FoodListContract {
         fun hideProgressBar()
         fun showToast(message: String?)
         fun showSnackbar(message: String?)
-        fun signOut()
         fun showBottomNavigation(food: Food)
         fun hideBottomNavigation()
         fun showConfirmDialog(food: Food?)

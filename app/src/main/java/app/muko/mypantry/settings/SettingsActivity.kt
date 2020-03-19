@@ -12,9 +12,6 @@ import app.muko.mypantry.App
 import app.muko.mypantry.R
 import app.muko.mypantry.signin.SignInActivity
 import app.muko.mypantry.webview.WebViewActivity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
 
 class SettingsActivity : AppCompatActivity() {
@@ -116,24 +113,8 @@ class SettingsActivity : AppCompatActivity() {
 
             pref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 val intent = Intent(activity, SignInActivity::class.java)
-                val editor = mPreferences?.edit()
-                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestEmail()
-                        .build()
 
-                activity?.let {
-                    val googleSignInClient = GoogleSignIn.getClient(it, gso)
-
-                    googleSignInClient.revokeAccess()
-
-                    editor?.clear()
-                    editor?.apply()
-                    mPresenter.deleteLocalData()
-
-                    startActivity(intent)
-                }
-
-                FirebaseAuth.getInstance().signOut()
+                startActivity(intent)
 
                 true
             }

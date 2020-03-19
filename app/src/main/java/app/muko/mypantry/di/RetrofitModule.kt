@@ -45,9 +45,10 @@ class RetrofitModule {
         val version = "v1"
 
         return if (BuildConfig.FLAVOR == "development") {
-            "https://staging.api.refrii.com"
+            "https://staging.api.mypantry.muko.app/$version/"
+            "http://192.168.1.102:3000/"
         } else {
-            "https://api.refrii.com/$version/"
+            "https://api.mypantry.muko.app/$version/"
         }
     }
 }

@@ -16,5 +16,6 @@ interface SigninContract {
         fun takeView(view: View)
         fun signup()
         fun verifyAccount()
+        fun deleteLocalData()
     }
 }

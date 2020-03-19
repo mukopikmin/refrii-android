@@ -11,7 +11,6 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -37,13 +36,10 @@ import app.muko.mypantry.newfood.NewFoodActivity
 import app.muko.mypantry.noticelist.NoticeListActivity
 import app.muko.mypantry.settings.SettingsActivity
 import app.muko.mypantry.shopplans.ShopPlansActivity
-import app.muko.mypantry.signin.SignInActivity
 import app.muko.mypantry.unitlist.UnitListActivity
 import app.muko.mypantry.welcome.WelcomeActivity
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -523,24 +519,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         intent.putExtra(getString(R.string.key_box_id), box.id)
         startActivityForResult(intent, ADD_FOOD_REQUEST_CODE)
-    }
-
-    override fun signOut() {
-        val editor = PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
-        val intent = Intent(this@FoodListActivity, SignInActivity::class.java)
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build()
-        val googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-        googleSignInClient.revokeAccess()
-                .addOnCompleteListener(this) { Log.i(TAG, "Revoke access finished") }
-
-        editor.clear()
-        editor.apply()
-        mPresenter.deleteLocalData()
-
-        startActivity(intent)
     }
 
     override fun setEmptyMessage(foods: List<Food>?) {
