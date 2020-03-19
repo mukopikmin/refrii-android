@@ -1,9 +1,7 @@
 package app.muko.mypantry.foodlist
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,8 +18,7 @@ import java.util.*
 
 class FoodRecyclerViewAdapter(
         private var mFoods: List<Food>,
-        private val mUserId: Int,
-        private val mContext: Context
+        private val mUserId: Int
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var mOnClickListener: View.OnClickListener? = null
@@ -43,11 +40,15 @@ class FoodRecyclerViewAdapter(
             } else {
                 lastUpdatedUserAvatarImageView.visibility = View.VISIBLE
 
-                if (user != null) {
+                user?.let {
                     if (user.avatarUrl.isNullOrEmpty()) {
-                        val d: Drawable = mContext.getDrawable(R.drawable.ic_outline_account_circle)
-                        d.setTint(ContextCompat.getColor(mContext, android.R.color.darker_gray))
-                        d.setTintMode(PorterDuff.Mode.SRC_IN)
+                        val context = lastUpdatedUserAvatarImageView.context
+                        val avatar = context.getDrawable(R.drawable.ic_outline_account_circle)
+
+                        avatar?.let {
+                            it.setTint(ContextCompat.getColor(context, android.R.color.darker_gray))
+                            it.setTintMode(PorterDuff.Mode.SRC_IN)
+                        }
 
                         lastUpdatedUserAvatarImageView.setImageResource(R.drawable.ic_outline_account_circle)
                     } else {

@@ -46,7 +46,7 @@ class RetrofitModule {
 
         return if (BuildConfig.FLAVOR == "development") {
             "https://staging.api.mypantry.muko.app/$version/"
-            "http://192.168.1.102:3000/"
+//            "http://192.168.1.102:3000/"
         } else {
             "https://api.mypantry.muko.app/$version/"
         }

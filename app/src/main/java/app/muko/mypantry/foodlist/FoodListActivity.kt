@@ -363,7 +363,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         val userId = mPreference.getInt(getString(R.string.preference_key_id), -1)
 
         if (mRecyclerView.adapter == null) {
-            val adapter = FoodRecyclerViewAdapter(foods, userId, this)
+            val adapter = FoodRecyclerViewAdapter(foods, userId)
 
             adapter.setOnClickListener(View.OnClickListener {
                 val position = mRecyclerView.getChildAdapterPosition(it)
