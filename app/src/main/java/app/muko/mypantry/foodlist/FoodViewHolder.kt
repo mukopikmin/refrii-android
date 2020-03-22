@@ -20,22 +20,16 @@ class FoodViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.Vie
 
     @BindView(R.id.constraintLayout)
     lateinit var mContainer: View
-
     @BindView(R.id.nameFoodListTextView)
     lateinit var mName: TextView
-
     @BindView(R.id.expirationDateFoodListTextView)
     lateinit var mExpirationDate: TextView
-
     @BindView(R.id.amountFoodListTextView)
     lateinit var mAmount: TextView
-
     @BindView(R.id.lastUpdatedUserAvatarImageView)
     lateinit var mUpdatedUserAvatar: ImageView
-
     @BindView(R.id.noticeCountView)
     lateinit var mNoticeIcon: View
-
     @BindView(R.id.noticeCountTextView)
     lateinit var mNoticeCount: TextView
 
@@ -81,7 +75,9 @@ class FoodViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.Vie
                                     skeleton.hide()
                                 }
 
-                                override fun onError(e: Exception?) {}
+                                override fun onError(e: Exception?) {
+                                    skeleton.hide()
+                                }
                             })
                 }
             }

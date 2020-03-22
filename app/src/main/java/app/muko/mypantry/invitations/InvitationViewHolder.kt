@@ -61,7 +61,18 @@ class InvitationViewHolder(view: View) : RecyclerView.ViewHolder(view) {
                                 skeleton.hide()
                             }
 
-                            override fun onError(e: Exception?) {}
+                            override fun onError(e: Exception?) {
+                                val context = mAvatarImage.context
+                                val avatar = context.getDrawable(R.drawable.ic_outline_account_circle)
+
+                                avatar?.let {
+                                    it.setTint(ContextCompat.getColor(context, android.R.color.darker_gray))
+                                    it.setTintMode(PorterDuff.Mode.SRC_IN)
+                                }
+
+                                mAvatarImage.setImageResource(R.drawable.ic_outline_account_circle)
+                                skeleton.hide()
+                            }
                         })
             }
         }
