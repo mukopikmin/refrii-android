@@ -23,8 +23,9 @@ interface FoodListContract {
         fun setEmptyMessage(foods: List<Food>?)
         fun savePushToken(token: String)
         fun deselectFood()
-        fun welcome()
         fun showNotices(food: Food)
+        fun setNoBoxesMessage()
+        fun onBoxCreated()
     }
 
     interface Presenter {

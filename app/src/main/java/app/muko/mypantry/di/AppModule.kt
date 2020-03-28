@@ -27,8 +27,6 @@ import app.muko.mypantry.unit.UnitContract
 import app.muko.mypantry.unit.UnitPresenter
 import app.muko.mypantry.unitlist.UnitListContract
 import app.muko.mypantry.unitlist.UnitListPresenter
-import app.muko.mypantry.welcome.WelcomeContract
-import app.muko.mypantry.welcome.WelcomePresenter
 import dagger.Module
 import dagger.Provides
 import io.realm.Realm
@@ -88,11 +86,6 @@ class AppModule(private var mApplication: Application) {
     @Provides
     fun provideShopPlansPresenter(shopPlanRepository: ApiShopPlanRepository): ShopPlansContract.Presenter {
         return ShopPlansPresenter(shopPlanRepository)
-    }
-
-    @Provides
-    fun provideWelcomePresenter(boxRepository: ApiBoxRepository): WelcomeContract.Presenter {
-        return WelcomePresenter(boxRepository)
     }
 
     @Provides

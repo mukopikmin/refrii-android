@@ -24,8 +24,6 @@ import app.muko.mypantry.unit.UnitActivity
 import app.muko.mypantry.unit.UnitModule
 import app.muko.mypantry.unitlist.UnitListActivity
 import app.muko.mypantry.unitlist.UnitListModule
-import app.muko.mypantry.welcome.WelcomeActivity
-import app.muko.mypantry.welcome.WelcomeModule
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -67,10 +65,6 @@ abstract class ActivityBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(ShopPlansModule::class)])
     abstract fun shopPlansActivity(): ShopPlansActivity
-
-    @ActivityScoped
-    @ContributesAndroidInjector(modules = [(WelcomeModule::class)])
-    abstract fun welcomeActivity(): WelcomeActivity
 
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(NoticeListModule::class)])

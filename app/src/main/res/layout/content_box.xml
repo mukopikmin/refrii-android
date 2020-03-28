@@ -31,6 +31,10 @@
         android:id="@+id/emptyBoxMessageContainer"
         layout="@layout/empty_box_message" />
 
+    <include
+        android:id="@+id/noBoxesMessageContainer"
+        layout="@layout/no_boxes_message" />
+
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinatorLayout"
         android:layout_width="0dp"

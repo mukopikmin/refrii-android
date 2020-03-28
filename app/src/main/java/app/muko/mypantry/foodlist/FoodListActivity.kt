@@ -37,7 +37,6 @@ import app.muko.mypantry.noticelist.NoticeListActivity
 import app.muko.mypantry.settings.SettingsActivity
 import app.muko.mypantry.shopplans.ShopPlansActivity
 import app.muko.mypantry.unitlist.UnitListActivity
-import app.muko.mypantry.welcome.WelcomeActivity
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.gms.tasks.OnCompleteListener
@@ -67,9 +66,14 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     lateinit var mRecyclerView: androidx.recyclerview.widget.RecyclerView
     @BindView(R.id.emptyBoxMessageContainer)
     lateinit var mEmptyMessageContainer: View
+
+    @BindView(R.id.noBoxesMessageContainer)
+    lateinit var mNoBoxesMessageContainer: View
     @BindView(R.id.addButton)
     lateinit var mAddFoodButton: AppCompatButton
 
+    @BindView(R.id.addBoxButton)
+    lateinit var mAddBoxButton: AppCompatButton
     @BindView(R.id.coordinatorLayout)
     lateinit var mCoordinatorLayout: CoordinatorLayout
     @BindView(R.id.bottomNavigation)
@@ -93,7 +97,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         hideProgressBar()
 
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        mDrawer.addDrawerListener(toggle)
+        mDrawer.addDrawerListener(ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close))
         toggle.syncState()
         mNavigationView.setNavigationItemSelectedListener(this@FoodListActivity)
 
@@ -101,10 +105,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         initPushNotification()
         initView()
-
-        if (FirebaseAuth.getInstance().currentUser == null) {
-            welcome()
-        }
     }
 
     private fun initView() {
@@ -112,11 +112,13 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         mFirebaseAuth = FirebaseAuth.getInstance()
         mEmptyMessageContainer.visibility = View.GONE
+        mNoBoxesMessageContainer.visibility = View.GONE
         mSwipeRefreshLayout.setOnRefreshListener(this)
         mSwipeRefreshLayout.setColorSchemeColors(getColor(R.color.colorPrimary))
 
         mFab.setOnClickListener { mPresenter.addFood() }
         mAddFoodButton.setOnClickListener { mPresenter.addFood() }
+        mAddBoxButton.setOnClickListener { addBox() }
 
         mBottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
@@ -188,12 +190,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         super.onStart()
 
         hideBottomNavigation()
-    }
-
-    override fun welcome() {
-        val intent = Intent(this, WelcomeActivity::class.java)
-
-        startActivity(intent)
     }
 
     override fun onPause() {
@@ -451,7 +447,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun showSnackbar(message: String?) {
         message ?: return
 
-        Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_SHORT).show()
+        val snackbar = Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_SHORT)
+
+        snackbar.animationMode = Snackbar.ANIMATION_MODE_SLIDE;
+        snackbar.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -525,6 +524,14 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         foods ?: return
 
         mEmptyMessageContainer.visibility = if (foods.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    override fun setNoBoxesMessage() {
+        mNoBoxesMessageContainer.visibility = View.VISIBLE
+    }
+
+    override fun onBoxCreated() {
+        mNoBoxesMessageContainer.visibility = View.GONE
     }
 
     companion object {

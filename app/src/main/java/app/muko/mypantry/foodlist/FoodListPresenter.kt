@@ -83,7 +83,7 @@ constructor(
                         setBoxes(t)
 
                         if (t.isNullOrEmpty()) {
-                            mView?.welcome()
+                            mView?.setNoBoxesMessage()
                         }
                     }
 
@@ -173,6 +173,7 @@ constructor(
                 .doOnUnsubscribe { mView?.hideProgressBar() }
                 .subscribe(object : Subscriber<Box>() {
                     override fun onNext(t: Box?) {
+                        mView?.onBoxCreated()
                         mView?.showSnackbar("${t?.name} が作成されました")
                     }
 

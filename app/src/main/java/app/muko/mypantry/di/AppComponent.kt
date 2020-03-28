@@ -13,7 +13,6 @@ import app.muko.mypantry.shopplans.ShopPlansActivity
 import app.muko.mypantry.signin.SignInActivity
 import app.muko.mypantry.unit.UnitActivity
 import app.muko.mypantry.unitlist.UnitListActivity
-import app.muko.mypantry.welcome.WelcomeActivity
 import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
@@ -35,7 +34,6 @@ interface AppComponent {
     fun inject(target: UnitActivity)
     fun inject(target: NewUnitActivity)
     fun inject(target: ShopPlansActivity)
-    fun inject(target: WelcomeActivity)
     fun inject(target: SettingsActivity.SettingsFragment)
     fun inject(target: PushNotificationService)
     fun inject(target: NoticeListActivity)
