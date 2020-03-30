@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
+
 class UnitActivity : AppCompatActivity(), UnitContract.View {
 
     @BindView(R.id.toolbar)
@@ -88,13 +89,13 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
     override fun setUnit(unit: Unit?) {
         unit ?: return
 
-        val formatter = SimpleDateFormat(getString(R.string.format_datetime), Locale.getDefault())
+        val dateFormatter = SimpleDateFormat(getString(R.string.format_datetime), Locale.getDefault())
 
         title = unit.label
         mLabelEditText.setText(unit.label)
-        mStepEditText.setText(unit.step.toString())
-        mCreated.text = formatter.format(unit.createdAt)
-        mUpdated.text = formatter.format(unit.updatedAt)
+        mStepEditText.setText(String.format("%.2f", unit.step))
+        mCreated.text = dateFormatter.format(unit.createdAt)
+        mUpdated.text = dateFormatter.format(unit.updatedAt)
     }
 
     override fun onLoading() {

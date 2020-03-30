@@ -14,7 +14,7 @@ class ApiErrorInterceptor(private val context: Context) : Interceptor {
         val response = chain.proceed(chain.request())
 
         when (response.code()) {
-            400 -> showToast("Bad request")
+//            400 -> showToast("Bad request")
             401 -> {
                 val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                 val tasks = activityManager.appTasks

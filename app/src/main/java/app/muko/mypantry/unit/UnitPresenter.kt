@@ -43,7 +43,7 @@ constructor(private val mApiUnitRepository: ApiUnitRepository) : UnitContract.Pr
                         override fun onNext(t: Unit?) {
                             mUnit = t
                             mView?.setUnit(t)
-                            mView?.showSnackbar("Unit ${t?.label} is updated successfully")
+                            mView?.showSnackbar("${t?.label} を更新しました")
                         }
 
                         override fun onCompleted() {}
