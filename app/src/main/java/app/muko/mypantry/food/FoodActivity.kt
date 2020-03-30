@@ -3,14 +3,13 @@ package app.muko.mypantry.food
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
@@ -75,28 +74,15 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     @BindView(R.id.cameraImageView)
     lateinit var mCameraImageView: ImageView
 
-    private var mUnitIds: List<Int>? = null
-    private var mUnitLabels: MutableList<String?>? = null
-    private val mOnUnitSelectedListener = object : AdapterView.OnItemSelectedListener {
-        override fun onNothingSelected(parent: AdapterView<*>?) {}
-
-        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-            val spinnerParent = parent as Spinner
-            val item = spinnerParent.selectedItem as String
-
-            mUnitIds?.let { ids ->
-                mUnitLabels?.indexOf(item)?.let {
-                    mPresenter.selectUnit(ids[it])
-                }
-            }
-        }
-    }
-    private var mImageLoaded = false
-
     @Inject
     lateinit var mPresenter: FoodPresenter
 
     private lateinit var mPreference: SharedPreferences
+    private var mImageLoaded = false
+    private var mFood: Food? = null
+    private var mUnits: List<Unit>? = null
+    private var mDate: Date? = null
+    private var mImage: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,49 +98,41 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        val intent = intent
-        val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
-        val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
-
-        mPresenter.takeView(this)
-        mPresenter.getFood(foodId)
-        mPresenter.getUnits(boxId)
-
         mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
+        initView()
+    }
+
+    private fun initView() {
+        mPresenter.takeView(this)
+
         mRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        mFab.setOnClickListener { mPresenter.updateFood() }
-        mAddPlanButton.setOnClickListener { mPresenter.showCreateShopPlanDialog() }
-        mName.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                mPresenter.updateName(s.toString())
-            }
-        })
-        mAmount.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                mPresenter.updateAmount(s.toString().toDouble())
-            }
-        })
-        mUnitsSpinner.onItemSelectedListener = mOnUnitSelectedListener
-        mExpirationDate.setOnClickListener { mPresenter.editExpirationDate() }
+        mFab.setOnClickListener { updateFood() }
+        mAddPlanButton.setOnClickListener { showCreateShopPlanDialog() }
+        mExpirationDate.setOnClickListener { showEditDateDialog() }
         mCameraImageView.setOnClickListener { launchCameraOrShowImage() }
         mCameraImageView.setOnLongClickListener { showImageOptions() }
     }
 
+    private fun updateFood() {
+        val foodId = mFood?.id
+        val name = mName.text.toString()
+        val amount = mAmount.text.toString().toDouble()
+        val unitLabel = mUnitsSpinner.selectedItem.toString()
+        val unit = mUnits?.single { it.label == unitLabel }
+
+        foodId ?: return
+
+        mPresenter.updateFood(foodId, name, amount, mDate, mImage, mFood?.box?.id, unit?.id)
+    }
+
     private fun launchCameraOrShowImage() {
-        if (mPresenter.isImageRegistered()) {
-            mPresenter.showImage()
-        } else {
+        val imageUrl = mFood?.imageUrl
+
+        if (imageUrl.isNullOrEmpty()) {
             launchCamera()
+        } else {
+            showImageDialog()
         }
     }
 
@@ -172,7 +150,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         return true
     }
 
-    override fun showImageDialog(imageUrl: String) {
+    private fun showImageDialog() {
         if (mImageLoaded) {
             val image = (mCameraImageView.drawable as BitmapDrawable).bitmap
             val fragment = ImageViewDialogFragment.newInstance(image)
@@ -217,6 +195,12 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     override fun onStart() {
         super.onStart()
 
+        val intent = intent
+        val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
+        val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
+
+        mPresenter.getFood(foodId)
+        mPresenter.getUnits(boxId)
         hideProgressBar()
     }
 
@@ -244,9 +228,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         if (data == null) return
 
         when (requestCode) {
-            EDIT_NAME_REQUEST_CODE -> mPresenter.updateName(data.getStringExtra("text"))
-            EDIT_AMOUNT_REQUEST_CODE -> mPresenter.updateAmount(data.getDoubleExtra("number", 0.toDouble()))
-            EDIT_NOTICE_REQUEST_CODE -> mPresenter.updateNotice(data.getStringExtra("text"))
+            EDIT_NAME_REQUEST_CODE -> mName.setText(data.getStringExtra("text")) //mPresenter.updateName(data.getStringExtra("text"))
+            EDIT_AMOUNT_REQUEST_CODE -> mAmount.setText(data.getDoubleExtra("number", 0.toDouble()).toString()) //mPresenter.updateAmount(data.getDoubleExtra("number", 0.toDouble()))
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> updateExpirationDate(data)
             CREATE_SHOP_PLAN_REQUEST_CODE -> createShopPlan(data)
             IMAGE_OPTIONS_REQUEST_CODE -> {
@@ -254,7 +237,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
                     // Take a picture
                     0 -> launchCamera()
                     // Show the picture
-                    1 -> mPresenter.showImage()
+                    1 -> showImageDialog()
                     // Cancel
                     else -> return
                 }
@@ -267,9 +250,9 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val uri = getTempImageUri(file)
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
+        mImage = bitmap
         onBeforeSetImage()
         mCameraImageView.setImageBitmap(bitmap)
-        mPresenter.updateImage(bitmap)
     }
 
     private fun onBeforeSetImage() {
@@ -292,8 +275,9 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         val date = Date()
 
+        mDate = date
         date.time = data.getLongExtra("date", 0)
-        mPresenter.updateExpirationDate(date)
+        setExpirationDate(date)
     }
 
     private fun createShopPlan(data: Intent?) {
@@ -302,12 +286,15 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val amount = data.getDoubleExtra("key_amount", 0.toDouble())
         val date = Date(data.getLongExtra("key_date", Date().time))
 
-        mPresenter.createShopPlan(amount, date)
+        mFood?.id?.let {
+            mPresenter.createShopPlan(amount, date, it)
+        }
     }
 
     override fun setFood(food: Food?) {
         val timeFormatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
 
+        mFood = food
         mToolbar.title = food?.name
         setSupportActionBar(mToolbar)
 
@@ -329,6 +316,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
                         override fun onSuccess() {
                             onBeforeSetImage()
                             mImageLoaded = true
+                            mImage = (mCameraImageView.drawable as BitmapDrawable).bitmap
                         }
 
                         override fun onError(e: Exception?) {
@@ -338,12 +326,13 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         }
     }
 
-    override fun setShopPlans(food: Food?, shopPlans: List<ShopPlan>?) {
-        food ?: return
+    override fun setShopPlans(shopPlans: List<ShopPlan>?) {
         shopPlans ?: return
 
         if (mRecyclerView.adapter == null) {
-            mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(shopPlans, food)
+            mFood?.let {
+                mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(shopPlans, it)
+            }
         } else {
             val adapter = mRecyclerView.adapter as ShopPlanRecyclerViewAdapter
 
@@ -363,7 +352,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         (mRecyclerView.adapter as ShopPlanRecyclerViewAdapter).completeShopPlan(shopPlan)
     }
 
-    override fun setExpirationDate(date: Date?) {
+    private fun setExpirationDate(date: Date?) {
         val today = Date()
         val oneDayMilliSec = 24 * 60 * 60 * 1000
         val daysLeft = ((date?.time ?: today.time) - today.time) / oneDayMilliSec
@@ -383,27 +372,30 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     override fun setUnits(units: List<Unit>?) {
         units ?: return
 
-        mUnitLabels = units.map { it.label }.toMutableList()
-        mUnitIds = units.map { it.id }
+        val labels = units.map { it.label }.toMutableList()
 
-        mUnitLabels?.let {
+        mUnits = units
+        labels.let {
             mUnitsSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
         }
     }
 
     override fun setSelectedUnit(id: Int?) {
-        val index = mUnitIds?.indexOf(id) ?: 0
+        mUnits?.let { units ->
+            val ids = units.map { it.id }
+            val index = ids.indexOf(id)
 
-        mUnitsSpinner.setSelection(index)
+            mUnitsSpinner.setSelection(index)
+        }
     }
 
-    override fun showEditDateDialog(date: Date?) {
-        date ?: return
+    override fun showEditDateDialog() {
+        mFood?.expirationDate?.let {
+            val fragment = CalendarPickerDialogFragment.newInstance(it)
 
-        val fragment = CalendarPickerDialogFragment.newInstance(date)
-
-        fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
-        fragment.show(supportFragmentManager, "edit_expiration_date")
+            fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
+            fragment.show(supportFragmentManager, "edit_expiration_date")
+        }
     }
 
     override fun onUpdateCompleted(food: Food?) {
@@ -434,8 +426,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun showCreateShopPlanDialog(food: Food?) {
-        val label = food?.unit?.label ?: return
+    override fun showCreateShopPlanDialog() {
+        val label = mFood?.unit?.label ?: return
         val fragment = CreateShopPlanDialogFragment.newInstance(label)
 
         fragment.setTargetFragment(null, CREATE_SHOP_PLAN_REQUEST_CODE)
@@ -445,7 +437,6 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     companion object {
         private const val EDIT_NAME_REQUEST_CODE = 100
         private const val EDIT_AMOUNT_REQUEST_CODE = 101
-        private const val EDIT_NOTICE_REQUEST_CODE = 102
         private const val EDIT_EXPIRATION_DATE_REQUEST_CODE = 103
         private const val CREATE_SHOP_PLAN_REQUEST_CODE = 104
         private const val RESULT_CAMERA = 105
