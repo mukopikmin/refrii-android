@@ -9,7 +9,7 @@ import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Invitation
 
 class InvitationsRecyclerViewAdapter(
-        private var mInvitaions: List<Invitation>,
+        private var mInvitations: List<Invitation>,
         private val mBox: Box
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -23,11 +23,11 @@ class InvitationsRecyclerViewAdapter(
     }
 
     override fun getItemCount(): Int {
-        return mInvitaions.size
+        return mInvitations.size
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val invitation = mInvitaions[position]
+        val invitation = mInvitations[position]
 
         onLongClockListener?.let {
             (holder as InvitationViewHolder).bind(invitation, mBox, it)
@@ -35,7 +35,7 @@ class InvitationsRecyclerViewAdapter(
     }
 
     fun setInvitations(invitations: List<Invitation>) {
-        mInvitaions = invitations
+        mInvitations = invitations
         notifyDataSetChanged()
     }
 
@@ -48,6 +48,6 @@ class InvitationsRecyclerViewAdapter(
     }
 
     fun getItemAtPosition(position: Int): Invitation {
-        return mInvitaions[position]
+        return mInvitations[position]
     }
 }

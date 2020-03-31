@@ -2,6 +2,7 @@ package app.muko.mypantry.invitations
 
 import android.graphics.PorterDuff
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -10,10 +11,8 @@ import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Invitation
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.ethanhua.skeleton.Skeleton
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import de.hdodenhof.circleimageview.CircleImageView
 
 class InvitationViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
@@ -24,7 +23,7 @@ class InvitationViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     @BindView(R.id.emailTextView)
     lateinit var mEmailText: TextView
     @BindView(R.id.avatarImageView)
-    lateinit var mAvatarImage: CircleImageView
+    lateinit var mAvatarImage: ImageView
 
     init {
         ButterKnife.bind(this, view)
@@ -49,29 +48,20 @@ class InvitationViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
                 mAvatarImage.setImageResource(R.drawable.ic_outline_account_circle)
             } else {
-                val skeleton = Skeleton.bind(mAvatarImage)
-                        .load(R.layout.skeleton_circle_image_large)
-                        .duration(800)
-                        .show()
+//                val skeleton = Skeleton.bind(mAvatarImage)
+//                        .load(R.layout.skeleton_circle_image_large)
+//                        .duration(800)
+//                        .show()
 
                 Picasso.get()
                         .load(user.avatarUrl)
                         .into(mAvatarImage, object : Callback {
                             override fun onSuccess() {
-                                skeleton.hide()
+//                                skeleton.hide()
                             }
 
                             override fun onError(e: Exception?) {
-                                val context = mAvatarImage.context
-                                val avatar = context.getDrawable(R.drawable.ic_outline_account_circle)
-
-                                avatar?.let {
-                                    it.setTint(ContextCompat.getColor(context, android.R.color.darker_gray))
-                                    it.setTintMode(PorterDuff.Mode.SRC_IN)
-                                }
-
-                                mAvatarImage.setImageResource(R.drawable.ic_outline_account_circle)
-                                skeleton.hide()
+//                                skeleton.hide()
                             }
                         })
             }

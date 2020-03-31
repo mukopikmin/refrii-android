@@ -84,7 +84,7 @@ constructor(
                         override fun onNext(t: Box?) {
                             mBox = t
                             mView?.setBox(t)
-                            mView?.showSnackbar("Box ${t?.name} is updated successfully")
+                            mView?.showSnackbar("カテゴリ ${t?.name} を更新しました")
                         }
 
                         override fun onCompleted() {}
