@@ -33,6 +33,8 @@ class FoodViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.Vie
     @BindView(R.id.noticeCountTextView)
     lateinit var mNoticeCount: TextView
 
+    private var mImageInjected = false
+
     init {
         ButterKnife.bind(this, view)
     }
@@ -62,7 +64,7 @@ class FoodViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.Vie
                     }
 
                     mUpdatedUserAvatar.setImageResource(R.drawable.ic_outline_account_circle)
-                } else {
+                } else if (!mImageInjected) {
                     val skeleton = Skeleton.bind(mUpdatedUserAvatar)
                             .load(R.layout.skeleton_circle_image)
                             .duration(800)
@@ -72,6 +74,7 @@ class FoodViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.Vie
                             .load(user.avatarUrl)
                             .into(mUpdatedUserAvatar, object : Callback {
                                 override fun onSuccess() {
+                                    mImageInjected = true
                                     skeleton.hide()
                                 }
 
