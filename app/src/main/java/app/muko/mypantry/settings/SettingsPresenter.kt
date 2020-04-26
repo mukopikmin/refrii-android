@@ -27,6 +27,6 @@ constructor(private val mApiUserRepository: ApiUserRepository) : SettingsContrac
     }
 
     override fun deleteLocalData() {
-        mApiUserRepository.deleteLocalData()
+//        mApiUserRepository.deleteLocalData()
     }
 }

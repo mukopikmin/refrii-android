@@ -46,19 +46,6 @@ constructor(
     }
 
     override fun getBox(id: Int) {
-        mApiBoxRepository.getBoxFromCache(id)
-                .subscribe(object : Subscriber<Box>() {
-                    override fun onNext(t: Box?) {
-                        setBox(t)
-                    }
-
-                    override fun onCompleted() {}
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
-
         mApiBoxRepository.getBox(id)
                 .doOnSubscribe { mView?.onLoading() }
                 .doOnUnsubscribe { mView?.onLoaded() }

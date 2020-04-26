@@ -1,12 +1,9 @@
 package app.muko.mypantry.data.models
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
 import java.util.*
 
-open class Notice : RealmObject() {
+open class Notice  {
 
-    @PrimaryKey
     open var id: Int = 0
     open var text: String? = null
     open var createdUser: User? = null

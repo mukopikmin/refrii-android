@@ -1,17 +1,12 @@
 package app.muko.mypantry.data.models
 
-import io.realm.RealmList
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import java.io.Serializable
 import java.util.*
 
-open class Food : RealmObject(), Serializable, Comparable<Food> {
+open class Food : Comparable<Food> {
 
-    @PrimaryKey
     open var id: Int = 0
     open var name: String? = null
-    open var notices: RealmList<Notice>? = null
+    open var notices: List<Notice>? = null
     open var amount: Double = 0.toDouble()
     open var expirationDate: Date? = null
     open var isNeedsAdding: Boolean = false

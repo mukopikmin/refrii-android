@@ -1,14 +1,9 @@
 package app.muko.mypantry.data.models
 
-import io.realm.RealmList
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import java.io.Serializable
 import java.util.*
 
-open class Box : RealmObject(), Serializable {
+open class Box {
 
-    @PrimaryKey
     open var id: Int = 0
     open var name: String? = null
     open var notice: String? = null
@@ -16,7 +11,7 @@ open class Box : RealmObject(), Serializable {
     open var isInvited: Boolean = false
     open var updatedAt: Date? = null
     open var createdAt: Date? = null
-    open var invitations: RealmList<Invitation>? = null
+    open var invitations: List<Invitation>? = null
     open var owner: User? = null
 
     override fun equals(other: Any?): Boolean {

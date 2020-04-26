@@ -47,20 +47,6 @@ constructor(
     }
 
     override fun getUnits(boxId: Int) {
-        mApiBoxRepository.getUnitsForBoxFromCache(boxId)
-                .subscribe(object : Subscriber<List<Unit>>() {
-                    override fun onNext(t: List<Unit>?) {
-                        mUnits = t
-                        mView?.setUnits(t)
-                    }
-
-                    override fun onCompleted() {}
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
-
         mApiBoxRepository.getUnitsForBox(boxId)
                 .subscribe(object : Subscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>?) {
@@ -81,20 +67,18 @@ constructor(
     }
 
     override fun getBox(id: Int) {
-        mApiBoxRepository.getBoxFromCache(id)
-                .subscribe({
-                    mBox = it
-                    mView?.setBox(it)
-                }, {
-                    mView?.showToast(it.message)
-                })
-
         mApiBoxRepository.getBox(id)
-                .subscribe({
-                    mBox = it
-                    mView?.setBox(it)
-                }, {
-                    mView?.showToast(it.message)
+                .subscribe(object: Subscriber<Box>() {
+                    override fun onNext(t: Box?) {
+                        mBox = t
+                        mView?.setBox(t)
+                    }
+
+                    override fun onCompleted() { }
+
+                    override fun onError(e: Throwable?) {
+                        mView?.showToast(e?.message)
+                    }
                 })
     }
 

@@ -62,19 +62,6 @@ constructor(
         // Temporally clear boxes set in drawer, for updating cache
         mView?.clearBoxes()
 
-        mApiBoxRepository.getBoxesFromCache()
-                .subscribe(object : Subscriber<List<Box>>() {
-                    override fun onNext(t: List<Box>?) {
-                        setBoxes(t)
-                    }
-
-                    override fun onCompleted() {}
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
-
         mApiBoxRepository.getBoxes()
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doOnUnsubscribe { mView?.hideProgressBar() }
@@ -196,19 +183,6 @@ constructor(
     override fun selectBox(box: Box) {
         mBox = box
 
-        mApiBoxRepository.getFoodsInBoxFromCache(box.id)
-                .subscribe(object : Subscriber<List<Food>>() {
-                    override fun onNext(t: List<Food>?) {
-                        setBox(box, t)
-                    }
-
-                    override fun onCompleted() {}
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
-
         mApiBoxRepository.getFoodsInBox(box.id)
                 .subscribe(object : Subscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {
@@ -255,33 +229,19 @@ constructor(
     override fun getExpiringFoods() {
         mBox = null
 
-        mApiFoodRepository.getExpiringFoodsFromCache()
-                .subscribe(object : Subscriber<List<Food>>() {
-                    override fun onNext(t: List<Food>?) {
-                        mFoods = t
-                        mView?.setFoods("期限が1週間以内", t)
-                    }
-
-                    override fun onCompleted() {}
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
-
-        mApiFoodRepository.getExpiringFoods()
-                .subscribe(object : Subscriber<List<Food>>() {
-                    override fun onNext(t: List<Food>?) {
-                        mFoods = t
-                        mView?.setFoods("期限が1週間以内", t)
-                    }
-
-                    override fun onCompleted() {}
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
+//        mApiFoodRepository.getExpiringFoods()
+//                .subscribe(object : Subscriber<List<Food>>() {
+//                    override fun onNext(t: List<Food>?) {
+//                        mFoods = t
+//                        mView?.setFoods("期限が1週間以内", t)
+//                    }
+//
+//                    override fun onCompleted() {}
+//
+//                    override fun onError(e: Throwable?) {
+//                        mView?.showToast(e?.message)
+//                    }
+//                })
     }
 
     override fun registerPushToken(userId: Int, token: String) {
@@ -307,6 +267,6 @@ constructor(
         mBox = null
 
         mView?.clearBoxes()
-        mApiUserRepository.deleteLocalData()
+//        mApiUserRepository.deleteLocalData()
     }
 }

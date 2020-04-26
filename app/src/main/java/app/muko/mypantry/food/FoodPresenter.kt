@@ -26,19 +26,6 @@ constructor(
     }
 
     override fun getFood(id: Int) {
-        mApiFoodRepository.getFoodFromCache(id)
-                .subscribe(object : Subscriber<Food>() {
-                    override fun onNext(t: Food?) {
-                        mView?.setFood(t)
-                    }
-
-                    override fun onCompleted() { }
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
-
         mApiFoodRepository.getFood(id)
                 .subscribe(object : Subscriber<Food>() {
                     override fun onNext(t: Food?) {
@@ -54,20 +41,6 @@ constructor(
     }
 
     override fun getUnits(boxId: Int) {
-        mApiBoxRepository.getUnitsForBoxFromCache(boxId)
-                .subscribe(object : Subscriber<List<Unit>>() {
-                    override fun onNext(t: List<Unit>?) {
-                        mView?.setUnits(t)
-                    }
-
-                    override fun onCompleted() {}
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-
-                })
-
         mApiBoxRepository.getUnitsForBox(boxId)
                 .subscribe(object : Subscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>?) {
@@ -100,19 +73,6 @@ constructor(
     }
 
     override fun getShopPlans(id: Int) {
-        mApiFoodRepository.getShopPlansForFoodFromCache(id)
-                .subscribe(object : Subscriber<List<ShopPlan>>() {
-                    override fun onNext(t: List<ShopPlan>?) {
-                        mView?.setShopPlans(t?.filter { !it.done })
-                    }
-
-                    override fun onCompleted() {}
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
-
         mApiFoodRepository.getShopPlansForFood(id)
                 .subscribe(object : Subscriber<List<ShopPlan>>() {
                     override fun onNext(t: List<ShopPlan>?) {

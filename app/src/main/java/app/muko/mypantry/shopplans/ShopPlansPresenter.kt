@@ -17,20 +17,6 @@ constructor(private val mApiShopPlanRepository: ApiShopPlanRepository) : ShopPla
     }
 
     override fun getShopPlans() {
-        mApiShopPlanRepository.getShopPlansFromCache()
-                .subscribe(object : Subscriber<List<ShopPlan>>() {
-                    override fun onNext(t: List<ShopPlan>?) {
-                        mShopPlans = t
-                        mView?.setShopPlans(t)
-                    }
-
-                    override fun onCompleted() {}
-
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
-                    }
-                })
-
         mApiShopPlanRepository.getShopPlans()
                 .subscribe(object : Subscriber<List<ShopPlan>>() {
                     override fun onNext(t: List<ShopPlan>?) {

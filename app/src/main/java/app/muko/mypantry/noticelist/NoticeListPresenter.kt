@@ -23,7 +23,7 @@ constructor(
     }
 
     override fun getFood(id: Int) {
-        mApiFoodRepository.getFoodFromCache(id)
+        mApiFoodRepository.getFood(id)
                 .flatMap {
                     onGetFoodCompleted(it)
 

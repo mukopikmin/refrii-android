@@ -1,13 +1,9 @@
 package app.muko.mypantry.data.models
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import java.io.Serializable
 import java.util.*
 
-open class User : RealmObject(), Serializable {
+open class User {
 
-    @PrimaryKey
     open var id: Int = 0
     open var name: String? = null
     open var email: String? = null

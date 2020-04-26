@@ -1,11 +1,10 @@
 package app.muko.mypantry.data.source
 
 import app.muko.mypantry.data.source.remote.ApiRemoteNoticeSource
-import io.realm.Realm
 import retrofit2.Retrofit
 import rx.Observable
 
-class ApiNoticeRepository(realm: Realm, retrofit: Retrofit) {
+class ApiNoticeRepository(retrofit: Retrofit) {
 
     private val mApiRemoteNoticeSource = ApiRemoteNoticeSource(retrofit)
 

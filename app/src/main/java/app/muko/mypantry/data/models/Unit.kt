@@ -1,14 +1,11 @@
 package app.muko.mypantry.data.models
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
 import okhttp3.MultipartBody
 import java.io.Serializable
 import java.util.*
 
-open class Unit : RealmObject(), Serializable {
+open class Unit  {
 
-    @PrimaryKey
     open var id: Int = 0
     open var label: String? = null
     open var step: Double = 0.toDouble()
@@ -31,5 +28,15 @@ open class Unit : RealmObject(), Serializable {
         builder.addFormDataPart("step", step.toString())
 
         return builder.build()
+    }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + (label?.hashCode() ?: 0)
+        result = 31 * result + step.hashCode()
+        result = 31 * result + (createdAt?.hashCode() ?: 0)
+        result = 31 * result + (updatedAt?.hashCode() ?: 0)
+        result = 31 * result + (user?.hashCode() ?: 0)
+        return result
     }
 }

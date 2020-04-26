@@ -29,8 +29,6 @@ import app.muko.mypantry.unitlist.UnitListContract
 import app.muko.mypantry.unitlist.UnitListPresenter
 import dagger.Module
 import dagger.Provides
-import io.realm.Realm
-import io.realm.RealmConfiguration
 import javax.inject.Singleton
 
 
@@ -101,16 +99,5 @@ class AppModule(private var mApplication: Application) {
     @Provides
     fun provideSettingsPresenter(userRepository: ApiUserRepository): SettingsContract.Presenter {
         return SettingsPresenter(userRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideRealm(): Realm {
-        Realm.init(provideApplicationContext())
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder()
-                .deleteRealmIfMigrationNeeded()
-                .build())
-
-        return Realm.getDefaultInstance()
     }
 }
