@@ -201,6 +201,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         mPresenter.getFood(foodId)
         mPresenter.getUnits(boxId)
+        mPresenter.getShopPlans(foodId)
         hideProgressBar()
     }
 
@@ -306,6 +307,13 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         setExpirationDate(food?.expirationDate)
 
+        mUnits?.let { units ->
+            val ids = units.map { it.id }
+            val index = ids.indexOf(food?.unit?.id)
+
+            mUnitsSpinner.setSelection(index)
+        }
+
         food?.imageUrl?.let {
             mImageLoaded = false
 
@@ -377,15 +385,6 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mUnits = units
         labels.let {
             mUnitsSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
-        }
-    }
-
-    override fun setSelectedUnit(id: Int?) {
-        mUnits?.let { units ->
-            val ids = units.map { it.id }
-            val index = ids.indexOf(id)
-
-            mUnitsSpinner.setSelection(index)
         }
     }
 

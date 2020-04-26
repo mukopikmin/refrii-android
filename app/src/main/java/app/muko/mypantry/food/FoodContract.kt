@@ -17,7 +17,6 @@ interface FoodContract {
         fun showToast(message: String?)
         fun setUnits(units: List<Unit>?)
         fun onUpdateCompleted(food: Food?)
-        fun setSelectedUnit(id: Int?)
         fun setShopPlans(shopPlans: List<ShopPlan>?)
         fun showCreateShopPlanDialog()
         fun onCompletedCompleteShopPlan(shopPlan: ShopPlan?)

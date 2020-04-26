@@ -2,6 +2,7 @@ package app.muko.mypantry.helpers
 
 import org.mockito.Mockito
 
+@Suppress("UNCHECKED_CAST")
 class MockitoHelper {
     companion object {
         fun <T> any(): T {

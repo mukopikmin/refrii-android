@@ -1,6 +1,8 @@
 package app.muko.mypantry
 
+import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Food
+import app.muko.mypantry.data.models.Notice
 import app.muko.mypantry.data.models.Unit
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiFoodRepository
@@ -9,123 +11,101 @@ import app.muko.mypantry.food.FoodContract
 import app.muko.mypantry.food.FoodPresenter
 import app.muko.mypantry.helpers.MockitoHelper
 import com.nhaarman.mockitokotlin2.*
+import io.realm.RealmList
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.mockito.junit.MockitoJUnit
-import org.mockito.junit.MockitoRule
 import rx.Observable
 import java.util.*
+import kotlin.math.exp
 
 class FoodPresenterTest {
-
-    @Rule
-    @JvmField
-    val mockito: MockitoRule = MockitoJUnit.rule()
-
-    private val viewMock = mock<FoodContract.View>()
-    private val apiBoxRepositoryMock = mock<ApiBoxRepository> {
-        on { getUnitsForBox(any()) } doReturn Observable.just(listOf())
-        on { getUnitsForBoxFromCache(any()) } doReturn Observable.just(listOf())
-    }
-    private val apiFoodRepositoryMock = mock<ApiFoodRepository> {
-        on { getFood(any()) } doReturn Observable.just(Food())
-        on { getFoodFromCache(any()) } doReturn Observable.just(Food())
-        on { updateFood(any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) } doReturn Observable.just(Food())
-        on { getShopPlansForFood(any()) } doReturn Observable.just(listOf())
-        on { getShopPlansForFoodFromCache(any()) } doReturn Observable.just(listOf())
-    }
-    private val apiShopPlanRepositoryMock = mock<ApiShopPlanRepository> { }
-
-    private lateinit var presenter: FoodPresenter
-
-    @Before
-    fun setUp() {
-        presenter = FoodPresenter(apiFoodRepositoryMock, apiBoxRepositoryMock, apiShopPlanRepositoryMock)
-        presenter.takeView(viewMock)
-    }
-
-    @Test
-    fun setFood() {
-        presenter.setFood(any())
-
-        verify(viewMock, times(1)).setFood(MockitoHelper.any<Food>())
-        verify(viewMock, times(1)).setSelectedUnit(MockitoHelper.any<Int>())
-    }
-
-    @Test
-    fun setUnits() {
-        presenter.setUnits(any())
-
-        verify(viewMock, times(1)).setUnits(MockitoHelper.any<List<Unit>>())
-        verify(viewMock, times(1)).setSelectedUnit(MockitoHelper.any<Int>())
-    }
-
-    @Test
-    fun getFood() {
-        presenter.getFood(any())
-
-        verify(viewMock, times(2)).setFood(any())
-        verify(viewMock, times(2)).setSelectedUnit(MockitoHelper.any<Int>())
-    }
-
-    @Test
-    fun getUnits() {
-        presenter.getUnits(any())
-
-        verify(viewMock, times(2)).setUnits(any())
-        verify(viewMock, times(2)).setSelectedUnit(MockitoHelper.any<Int>())
-    }
-
-    @Test
-    fun updateFood() {
-        val food = Food()
-
-        food.id = 1
-
-        presenter.setFood(food)
-        presenter.updateFood()
-
-        verify(viewMock, times(1)).showProgressBar()
-        verify(viewMock, times(1)).hideProgressBar()
-        verify(viewMock, times(1)).onUpdateCompleted(MockitoHelper.any<Food>())
-    }
-
-    @Test
-    fun selectUnit() {
-        presenter.selectUnit(any())
-
-        verify(viewMock, times(1)).setSelectedUnit(any())
-    }
-
-    @Test
-    fun editExpirationDate() {
-        presenter.editExpirationDate()
-
-        verify(viewMock, times(1)).showEditDateDialog(MockitoHelper.any<Date>())
-    }
-
-    @Test
-    fun updateName() {
-
-    }
-
-    @Test
-    fun updateAmount() {
-
-    }
-
-    @Test
-    fun updateNotice() {
-
-    }
-
-    @Test
-    fun updateExpirationDate() {
-        val date = Date()
-
-        presenter.updateExpirationDate(date)
-
-        verify(viewMock, times(1)).setExpirationDate(date)
-    }
+//
+//    lateinit var viewMock: FoodContract.View
+//    lateinit var apiFoodRepositoryMock: ApiFoodRepository
+//    lateinit var apiBoxRepositoryMock: ApiBoxRepository
+//    lateinit var apiShopPlanRepositoryMock: ApiShopPlanRepository
+//    lateinit var foodMock: Food
+//    lateinit var presenter: FoodPresenter
+//
+//    @Before
+//    fun setup() {
+//        viewMock = mock()
+//        apiFoodRepositoryMock = mock()
+//        apiBoxRepositoryMock = mock()
+//        apiShopPlanRepositoryMock = mock()
+//        presenter = FoodPresenter(apiFoodRepositoryMock, apiBoxRepositoryMock, apiShopPlanRepositoryMock)
+//        foodMock = Food()
+//
+//        presenter.takeView(viewMock)
+//    }
+//
+//    @Test
+//    fun getFood() {
+//        val food = Food()
+//        val unit = Unit()
+//
+//        food.id = 1
+//        unit.id = 1
+//        food.unit = unit
+//
+//        whenever(apiFoodRepositoryMock.getFoodFromCache(food.id)).then { Observable.just(food) }
+//        whenever(apiFoodRepositoryMock.getFood(food.id)).then { Observable.just(food) }
+//
+//        presenter.getFood(food.id)
+//
+//        verify(viewMock, times(2)).setFood(food)
+//    }
+//
+//    @Test
+//    fun getUnits() {
+//        val box = Box()
+//        val unit = Unit()
+//
+//        box.id = 1
+//
+//        whenever(apiBoxRepositoryMock.getUnitsForBoxFromCache(box.id)).then { Observable.just(listOf(unit))}
+//        whenever(apiBoxRepositoryMock.getUnitsForBox(box.id)).then { Observable.just(listOf(unit))}
+//
+//        presenter.getUnits(box.id)
+//
+//        verify(viewMock, times(2)).setUnits(any())
+//    }
+//
+//    @Test
+//    fun updateFood() {
+//        val box = Box()
+//        val food = Food()
+//        val unit = Unit()
+//        val name = "name"
+//        val amount = 2.0
+//        val expirationDate = Date()
+//        val image = null
+//
+//        food.id = 1
+//        food.box = box
+//        food.unit = unit
+//
+//        whenever(apiFoodRepositoryMock.updateFood(food.id, name, amount, expirationDate, image, box.id, unit.id)).then {Observable.just(food)}
+//
+//        presenter.updateFood(food.id, name, amount, expirationDate, image, box.id, unit.id)
+//
+//        verify(viewMock, times(1)).showProgressBar()
+//        verify(viewMock, times(1)).hideProgressBar()
+//        verify(viewMock, times(1)).onUpdateCompleted(food)
+//    }
+//
+//    @Test
+//    fun getShopPlans() {
+//
+//    }
+//
+//    @Test
+//    fun createShopPlan() {
+//
+//    }
+//
+//    @Test
+//    fun completeShopPlan() {
+//
+//    }
 }

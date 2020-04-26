@@ -136,3 +136,6 @@ app/staging/release/*
 !app/production/release/.keep
 !app/development/release/.keep
 !app/staging/release/.keep
+
+test-results
+test-reports
