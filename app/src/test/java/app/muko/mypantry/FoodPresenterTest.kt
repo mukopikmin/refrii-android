@@ -1,22 +1,6 @@
 package app.muko.mypantry
 
-import app.muko.mypantry.data.models.Box
-import app.muko.mypantry.data.models.Food
-import app.muko.mypantry.data.models.Notice
-import app.muko.mypantry.data.models.Unit
-import app.muko.mypantry.data.source.ApiBoxRepository
-import app.muko.mypantry.data.source.ApiFoodRepository
-import app.muko.mypantry.data.source.ApiShopPlanRepository
-import app.muko.mypantry.food.FoodContract
-import app.muko.mypantry.food.FoodPresenter
-import app.muko.mypantry.helpers.MockitoHelper
-import com.nhaarman.mockitokotlin2.*
 import io.realm.RealmList
-import org.junit.Before
-import org.junit.Test
-import rx.Observable
-import java.util.*
-import kotlin.math.exp
 
 class FoodPresenterTest {
 //
@@ -48,8 +32,8 @@ class FoodPresenterTest {
 //        unit.id = 1
 //        food.unit = unit
 //
-//        whenever(apiFoodRepositoryMock.getFoodFromCache(food.id)).then { Observable.just(food) }
-//        whenever(apiFoodRepositoryMock.getFood(food.id)).then { Observable.just(food) }
+//        whenever(apiFoodRepositoryMock.getFoodFromCache(food.id)).then { Flowable.just(food) }
+//        whenever(apiFoodRepositoryMock.getFood(food.id)).then { Flowable.just(food) }
 //
 //        presenter.getFood(food.id)
 //
@@ -63,8 +47,8 @@ class FoodPresenterTest {
 //
 //        box.id = 1
 //
-//        whenever(apiBoxRepositoryMock.getUnitsForBoxFromCache(box.id)).then { Observable.just(listOf(unit))}
-//        whenever(apiBoxRepositoryMock.getUnitsForBox(box.id)).then { Observable.just(listOf(unit))}
+//        whenever(apiBoxRepositoryMock.getUnitsForBoxFromCache(box.id)).then { Flowable.just(listOf(unit))}
+//        whenever(apiBoxRepositoryMock.getUnitsForBox(box.id)).then { Flowable.just(listOf(unit))}
 //
 //        presenter.getUnits(box.id)
 //
@@ -85,7 +69,7 @@ class FoodPresenterTest {
 //        food.box = box
 //        food.unit = unit
 //
-//        whenever(apiFoodRepositoryMock.updateFood(food.id, name, amount, expirationDate, image, box.id, unit.id)).then {Observable.just(food)}
+//        whenever(apiFoodRepositoryMock.updateFood(food.id, name, amount, expirationDate, image, box.id, unit.id)).then {Flowable.just(food)}
 //
 //        presenter.updateFood(food.id, name, amount, expirationDate, image, box.id, unit.id)
 //

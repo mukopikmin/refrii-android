@@ -5,7 +5,7 @@ import app.muko.mypantry.data.models.Invitation
 import app.muko.mypantry.data.models.User
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiInvitationRepository
-import rx.Subscriber
+import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class BoxInfoPresenter
@@ -48,13 +48,13 @@ constructor(
     override fun getBox(id: Int) {
         mApiBoxRepository.getBox(id)
                 .doOnSubscribe { mView?.onLoading() }
-                .doOnUnsubscribe { mView?.onLoaded() }
-                .subscribe(object : Subscriber<Box>() {
+                .doFinally { mView?.onLoaded() }
+                .subscribe(object : DisposableSubscriber<Box>() {
                     override fun onNext(t: Box?) {
                         setBox(t)
                     }
 
-                    override fun onCompleted() {}
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
@@ -66,23 +66,20 @@ constructor(
         mId?.let { id ->
             mApiBoxRepository.updateBox(id, mName, mNotice)
                     .doOnSubscribe { mView?.onLoading() }
-                    .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe(object : Subscriber<Box>() {
+                    .doFinally { mView?.onLoaded() }
+                    .subscribe(object : DisposableSubscriber<Box>() {
                         override fun onNext(t: Box?) {
                             mBox = t
                             mView?.setBox(t)
                             mView?.showSnackbar("カテゴリ ${t?.name} を更新しました")
                         }
 
-                        override fun onCompleted() {}
+                        override fun onComplete() {}
 
                         override fun onError(e: Throwable?) {
                             mView?.showToast(e?.message)
                         }
-
                     })
-
-
         }
     }
 
@@ -90,11 +87,11 @@ constructor(
         mId?.let { id ->
             mApiBoxRepository.removeBox(id)
                     .doOnSubscribe { mView?.onLoading() }
-                    .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe(object : Subscriber<Void>() {
+                    .doFinally { mView?.onLoaded() }
+                    .subscribe(object : DisposableSubscriber<Void>() {
                         override fun onNext(t: Void?) {}
 
-                        override fun onCompleted() {
+                        override fun onComplete() {
                             mView?.onDeleteCompleted(mName)
                         }
 
@@ -109,15 +106,15 @@ constructor(
         mId?.let { id ->
             mApiBoxRepository.invite(id, email)
                     .doOnSubscribe { mView?.onLoading() }
-                    .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe(object : Subscriber<Invitation>() {
+                    .doFinally { mView?.onLoaded() }
+                    .subscribe(object : DisposableSubscriber<Invitation>() {
                         override fun onNext(t: Invitation?) {
                             val name = t?.user?.name
 
                             mView?.showSnackbar("$name と共有しました")
                         }
 
-                        override fun onCompleted() {
+                        override fun onComplete() {
                             mId?.let {
                                 getBox(it)
                             }
@@ -126,6 +123,8 @@ constructor(
                         override fun onError(e: Throwable?) {
                             mView?.showToast(e?.message)
                         }
+
+
                     })
         }
     }
@@ -134,11 +133,11 @@ constructor(
         mInvitation?.id?.let { id ->
             mApiInvitationRepository.remove(id)
                     .doOnSubscribe { mView?.onLoading() }
-                    .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe(object : Subscriber<Void>() {
+                    .doFinally { mView?.onLoaded() }
+                    .subscribe(object : DisposableSubscriber<Void>() {
                         override fun onNext(t: Void?) {}
 
-                        override fun onCompleted() {
+                        override fun onComplete() {
                             mView?.showSnackbar("共有を解除しました")
                             mId?.let {
                                 getBox(it)
@@ -148,13 +147,15 @@ constructor(
                         override fun onError(e: Throwable?) {
                             mView?.showToast(e?.message)
                         }
+
+
                     })
         }
     }
 
     override fun showInviteUserDialog() {
         mInvitations?.let { invitations ->
-            mView?.showInviteUserDialog(invitations.mapNotNull { it.user })
+            mView?.showInviteUserDialog(invitations.map { it.user })
         }
     }
 

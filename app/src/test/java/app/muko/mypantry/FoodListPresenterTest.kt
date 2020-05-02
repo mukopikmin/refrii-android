@@ -1,19 +1,5 @@
 package app.muko.mypantry
 
-import app.muko.mypantry.data.models.Box
-import app.muko.mypantry.data.models.Food
-import app.muko.mypantry.data.models.User
-import app.muko.mypantry.data.source.ApiBoxRepository
-import app.muko.mypantry.data.source.ApiFoodRepository
-import app.muko.mypantry.data.source.ApiUserRepository
-import app.muko.mypantry.foodlist.FoodListContract
-import app.muko.mypantry.foodlist.FoodListPresenter
-import app.muko.mypantry.helpers.MockitoHelper
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import rx.Observable
-
 class FoodListPresenterTest {
 
 //    @Rule
@@ -22,20 +8,20 @@ class FoodListPresenterTest {
 //
 //    private val viewMock = mock<FoodListContract.View>()
 //    private val apiBoxRepositoryMock = mock<ApiBoxRepository> {
-//        on { getFoodsInBoxFromCache(any()) } doReturn Observable.just(listOf())
-//        on { getFoodsInBox(any()) } doReturn Observable.just(listOf())
-//        on { getBoxesFromCache() } doReturn Observable.just(listOf())
-//        on { getBoxes() } doReturn Observable.just(listOf())
-//        on { createBox(any(), any()) } doReturn Observable.just(Box())
+//        on { getFoodsInBoxFromCache(any()) } doReturn Flowable.just(listOf())
+//        on { getFoodsInBox(any()) } doReturn Flowable.just(listOf())
+//        on { getBoxesFromCache() } doReturn Flowable.just(listOf())
+//        on { getBoxes() } doReturn Flowable.just(listOf())
+//        on { createBox(any(), any()) } doReturn Flowable.just(Box())
 //    }
 //    private val apiFoodRepositoryMock = mock<ApiFoodRepository> {
-//        on { getExpiringFoodsFromCache() } doReturn Observable.just(listOf())
-//        on { getExpiringFoods() } doReturn Observable.just(listOf())
-//        on { updateFood(any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) } doReturn Observable.just(Food())
-//        on { removeFood(any()) } doReturn Observable.empty()
+//        on { getExpiringFoodsFromCache() } doReturn Flowable.just(listOf())
+//        on { getExpiringFoods() } doReturn Flowable.just(listOf())
+//        on { updateFood(any(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) } doReturn Flowable.just(Food())
+//        on { removeFood(any()) } doReturn Flowable.empty()
 //    }
 //    private val apiUserRepositoryMock = mock<ApiUserRepository> {
-//        on { registerPushToken(any(), any()) } doReturn Observable.just(User())
+//        on { registerPushToken(any(), any()) } doReturn Flowable.just(User())
 //        on { deleteLocalData() } doAnswer {}
 //    }
 //

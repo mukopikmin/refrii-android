@@ -2,7 +2,7 @@ package app.muko.mypantry.settings
 
 import app.muko.mypantry.data.models.User
 import app.muko.mypantry.data.source.ApiUserRepository
-import rx.Subscriber
+import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class SettingsPresenter
@@ -17,10 +17,10 @@ constructor(private val mApiUserRepository: ApiUserRepository) : SettingsContrac
 
     override fun updateUser(id: Int, name: String?) {
         mApiUserRepository.update(id, name)
-                .subscribe(object : Subscriber<User>() {
+                .subscribe(object : DisposableSubscriber<User>() {
                     override fun onNext(t: User?) {}
 
-                    override fun onCompleted() {}
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {}
                 })

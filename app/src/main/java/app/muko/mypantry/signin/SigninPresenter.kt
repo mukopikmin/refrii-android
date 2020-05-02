@@ -2,8 +2,8 @@ package app.muko.mypantry.signin
 
 import app.muko.mypantry.data.models.User
 import app.muko.mypantry.data.source.ApiUserRepository
+import io.reactivex.subscribers.DisposableSubscriber
 import retrofit2.HttpException
-import rx.Subscriber
 import javax.inject.Inject
 
 class SigninPresenter
@@ -18,12 +18,12 @@ constructor(private val mApiUserRepository: ApiUserRepository) : SigninContract.
 
     override fun verifyAccount() {
         mApiUserRepository.verify()
-                .subscribe(object : Subscriber<User>() {
+                .subscribe(object : DisposableSubscriber<User>() {
                     override fun onNext(t: User?) {
                         mView?.saveAccount(t)
                     }
 
-                    override fun onCompleted() {
+                    override fun onComplete() {
                         mView?.onLoginCompleted()
                     }
 
@@ -39,12 +39,12 @@ constructor(private val mApiUserRepository: ApiUserRepository) : SigninContract.
 
     override fun signup() {
         mApiUserRepository.signup()
-                .subscribe(object : Subscriber<User>() {
+                .subscribe(object : DisposableSubscriber<User>() {
                     override fun onNext(t: User?) {
                         mView?.saveAccount(t)
                     }
 
-                    override fun onCompleted() {
+                    override fun onComplete() {
                         mView?.onLoginCompleted()
                     }
 

@@ -1,51 +1,51 @@
 package app.muko.mypantry.data.models
 
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.util.*
 
-open class Food : Comparable<Food> {
-
-    open var id: Int = 0
-    open var name: String? = null
-    open var notices: List<Notice>? = null
-    open var amount: Double = 0.toDouble()
-    open var expirationDate: Date? = null
-    open var isNeedsAdding: Boolean = false
-    open var imageUrl: String? = null
-    open var createdAt: Date? = null
-    open var updatedAt: Date? = null
-    open var unit: Unit? = null
-    open var createdUser: User? = null
-    open var updatedUser: User? = null
-    open var box: Box? = null
-
+@Entity
+data class Food(
+        @PrimaryKey
+        val id: Int,
+        val name: String,
+        @Embedded(prefix = "notices_")
+        val notices: List<Notice>,
+        val amount: Double,
+        val expirationDate: Date,
+        val isNeedsAdding: Boolean,
+        val imageUrl: String,
+        val createdAt: Date,
+        val updatedAt: Date,
+        @Embedded(prefix = "unit_")
+        val unit: Unit,
+        @Embedded(prefix = "created_user_")
+        val createdUser: User,
+        @Embedded(prefix = "updated_user_")
+        val updatedUser: User,
+        @Embedded(prefix = "box_")
+        val box: Box
+) {
     override fun equals(other: Any?): Boolean {
-        other ?: return false
-
-        val food = other as Food
-        return this.id == food.id
+        return (other as Food).id == id
     }
-
-    override fun compareTo(other: Food): Int =
-            (this.expirationDate!!.time - other.expirationDate!!.time).toInt()
 
     override fun hashCode(): Int {
         var result = id
-        result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + name.hashCode()
         result = 31 * result + notices.hashCode()
         result = 31 * result + amount.hashCode()
-        result = 31 * result + (expirationDate?.hashCode() ?: 0)
+        result = 31 * result + expirationDate.hashCode()
         result = 31 * result + isNeedsAdding.hashCode()
-        result = 31 * result + (imageUrl?.hashCode() ?: 0)
-        result = 31 * result + (createdAt?.hashCode() ?: 0)
-        result = 31 * result + (updatedAt?.hashCode() ?: 0)
-        result = 31 * result + (unit?.hashCode() ?: 0)
-        result = 31 * result + (createdUser?.hashCode() ?: 0)
-        result = 31 * result + (updatedUser?.hashCode() ?: 0)
+        result = 31 * result + imageUrl.hashCode()
+        result = 31 * result + createdAt.hashCode()
+        result = 31 * result + updatedAt.hashCode()
+        result = 31 * result + unit.hashCode()
+        result = 31 * result + createdUser.hashCode()
+        result = 31 * result + updatedUser.hashCode()
+        result = 31 * result + box.hashCode()
         return result
     }
-
-    companion object {
-        @Suppress("unused")
-        private const val TAG = "Food"
-    }
 }
+

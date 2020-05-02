@@ -5,29 +5,29 @@ import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.Invitation
 import app.muko.mypantry.data.models.Unit
 import app.muko.mypantry.data.source.remote.services.BoxService
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 
 class ApiRemoteBoxSource(private val mRetrofit: Retrofit) {
 
-    fun getBoxes(): Observable<List<Box>> {
+    fun getBoxes(): Flowable<List<Box>> {
         return mRetrofit.create(BoxService::class.java)
                 .getBoxes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun getBox(id: Int): Observable<Box> {
+    fun getBox(id: Int): Flowable<Box> {
         return mRetrofit.create(BoxService::class.java)
                 .getBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun createBox(name: String, notice: String?): Observable<Box> {
+    fun createBox(name: String, notice: String?): Flowable<Box> {
         val builder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("name", name)
@@ -41,7 +41,7 @@ class ApiRemoteBoxSource(private val mRetrofit: Retrofit) {
     }
 
 
-    fun updateBox(id: Int, name: String?, notice: String?): Observable<Box> {
+    fun updateBox(id: Int, name: String?, notice: String?): Flowable<Box> {
         val builder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
 
@@ -54,28 +54,28 @@ class ApiRemoteBoxSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun removeBox(id: Int): Observable<Void> {
+    fun removeBox(id: Int): Flowable<Void> {
         return mRetrofit.create(BoxService::class.java)
                 .removeBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun getFoodsInBox(id: Int): Observable<List<Food>> {
+    fun getFoodsInBox(id: Int): Flowable<List<Food>> {
         return mRetrofit.create(BoxService::class.java)
                 .getFoodsInBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun getUnitsForBox(id: Int): Observable<List<Unit>> {
+    fun getUnitsForBox(id: Int): Flowable<List<Unit>> {
         return mRetrofit.create(BoxService::class.java)
                 .getUnitsForBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun invite(boxId: Int, email: String): Observable<Invitation> {
+    fun invite(boxId: Int, email: String): Flowable<Invitation> {
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("email", email)

@@ -1,16 +1,36 @@
 package app.muko.mypantry.data.models
 
-import java.io.Serializable
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.util.*
 
-open class ShopPlan {
+@Entity
+data class ShopPlan(
+        @PrimaryKey
+        val id: Int,
+        val notice: String,
+        val amount: Double,
+        val date: Date,
+        val done: Boolean,
+        val createdAt: Date,
+        val updatedAt: Date,
+        @Embedded(prefix = "food_")
+        val food: Food
+) {
+    override fun equals(other: Any?): Boolean {
+        return (other as ShopPlan).id == id
+    }
 
-    open var id: Int = 0
-    open var notice: String? = null
-    open var amount: Double = 0.toDouble()
-    open var date: Date? = null
-    open var done: Boolean = false
-    open var createdAt: Date? = null
-    open var updatedAt: Date? = null
-    open var food: Food? = null
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + notice.hashCode()
+        result = 31 * result + amount.hashCode()
+        result = 31 * result + date.hashCode()
+        result = 31 * result + done.hashCode()
+        result = 31 * result + createdAt.hashCode()
+        result = 31 * result + updatedAt.hashCode()
+        result = 31 * result + food.hashCode()
+        return result
+    }
 }

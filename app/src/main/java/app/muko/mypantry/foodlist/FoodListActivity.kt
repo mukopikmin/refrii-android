@@ -213,6 +213,10 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mPresenter.takeView(this)
         mPresenter.getBoxes()
         setNavigationHeader()
+
+//        mPresenter.liveData.observe(this, Observer {
+//            showToast(it.size.toString())
+//        })
     }
 
     override fun onBackPressed() {

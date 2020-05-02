@@ -7,7 +7,7 @@ import app.muko.mypantry.data.models.Unit
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiFoodRepository
 import app.muko.mypantry.data.source.ApiShopPlanRepository
-import rx.Subscriber
+import io.reactivex.subscribers.DisposableSubscriber
 import java.util.*
 import javax.inject.Inject
 
@@ -27,12 +27,12 @@ constructor(
 
     override fun getFood(id: Int) {
         mApiFoodRepository.getFood(id)
-                .subscribe(object : Subscriber<Food>() {
+                .subscribe(object : DisposableSubscriber<Food>() {
                     override fun onNext(t: Food?) {
                         mView?.setFood(t)
                     }
 
-                    override fun onCompleted() { }
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
@@ -42,12 +42,12 @@ constructor(
 
     override fun getUnits(boxId: Int) {
         mApiBoxRepository.getUnitsForBox(boxId)
-                .subscribe(object : Subscriber<List<Unit>>() {
+                .subscribe(object : DisposableSubscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>?) {
                         mView?.setUnits(t)
                     }
 
-                    override fun onCompleted() {}
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
@@ -58,13 +58,13 @@ constructor(
     override fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, image: Bitmap?, boxId: Int?, unitId: Int?) {
         mApiFoodRepository.updateFood(id, name, amount, expirationDate, image, boxId, unitId)
                 .doOnSubscribe { mView?.showProgressBar() }
-                .doOnUnsubscribe { mView?.hideProgressBar() }
-                .subscribe(object : Subscriber<Food>() {
+                .doFinally { mView?.hideProgressBar() }
+                .subscribe(object : DisposableSubscriber<Food>() {
                     override fun onNext(t: Food?) {
                         mView?.onUpdateCompleted(t)
                     }
 
-                    override fun onCompleted() {}
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
@@ -74,12 +74,12 @@ constructor(
 
     override fun getShopPlans(id: Int) {
         mApiFoodRepository.getShopPlansForFood(id)
-                .subscribe(object : Subscriber<List<ShopPlan>>() {
+                .subscribe(object : DisposableSubscriber<List<ShopPlan>>() {
                     override fun onNext(t: List<ShopPlan>?) {
                         mView?.setShopPlans(t?.filter { !it.done })
                     }
 
-                    override fun onCompleted() {}
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
@@ -90,11 +90,11 @@ constructor(
     override fun createShopPlan(amount: Double, date: Date, foodId: Int) {
         mApiShopPlanRepository.createShopPlan(foodId, amount, date)
                 .doOnSubscribe { mView?.showProgressBar() }
-                .doOnUnsubscribe { mView?.hideProgressBar() }
-                .subscribe(object : Subscriber<ShopPlan>() {
+                .doFinally { mView?.hideProgressBar() }
+                .subscribe(object : DisposableSubscriber<ShopPlan>() {
                     override fun onNext(t: ShopPlan?) {}
 
-                    override fun onCompleted() {
+                    override fun onComplete() {
                         getShopPlans(foodId)
                     }
 
@@ -107,8 +107,8 @@ constructor(
     override fun completeShopPlan(shopPlan: ShopPlan) {
         mApiShopPlanRepository.updateShopPlan(shopPlan.id, true)
                 .doOnSubscribe { mView?.showProgressBar() }
-                .doOnUnsubscribe { mView?.hideProgressBar() }
-                .subscribe(object : Subscriber<ShopPlan>() {
+                .doFinally { mView?.hideProgressBar() }
+                .subscribe(object : DisposableSubscriber<ShopPlan>() {
                     override fun onNext(t: ShopPlan?) {
                         mView?.onCompletedCompleteShopPlan(t)
                         t?.food?.id?.let {
@@ -116,7 +116,7 @@ constructor(
                         }
                     }
 
-                    override fun onCompleted() { }
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)

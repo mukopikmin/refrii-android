@@ -2,6 +2,7 @@ package app.muko.mypantry.newunit
 
 import app.muko.mypantry.data.models.Unit
 import app.muko.mypantry.data.source.ApiUnitRepository
+import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class NewUnitPresenter
@@ -18,12 +19,18 @@ constructor(private val mApiUnitRepository: ApiUnitRepository) : NewUnitContract
     override fun createUnit(label: String, amount: Double) {
         mApiUnitRepository.createUnit(label, amount)
                 .doOnSubscribe { mView?.showProgressBar() }
-                .doOnUnsubscribe { mView?.hideProgressBar() }
-                .subscribe({
-                    mUnit = it
-                    mView?.onCreateCompleted(mUnit)
-                }, {
-                    mView?.showToast(it.message)
+                .doFinally { mView?.hideProgressBar() }
+                .subscribe(object : DisposableSubscriber<Unit>() {
+                    override fun onComplete() {}
+
+                    override fun onNext(t: Unit?) {
+                        mUnit = t
+                        mView?.onCreateCompleted(mUnit)
+                    }
+
+                    override fun onError(t: Throwable?) {
+                        mView?.showToast(t?.message)
+                    }
                 })
     }
 }

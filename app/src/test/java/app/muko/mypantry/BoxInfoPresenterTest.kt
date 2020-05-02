@@ -13,7 +13,7 @@ package app.muko.mypantry
 //import org.junit.Test
 //import org.mockito.junit.MockitoJUnit
 //import org.mockito.junit.MockitoRule
-//import rx.Observable
+//import io.reactivex.Flowable
 //
 class BoxInfoPresenterTest {
 //
@@ -23,12 +23,12 @@ class BoxInfoPresenterTest {
 //
 //    private val viewMock = mock<BoxInfoContract.View>()
 //    private val apiBoxRepositoryMock = mock<ApiBoxRepository> {
-//        on { getBoxFromCache(any()) } doReturn Observable.just(Box())
-//        on { getBox(any()) } doReturn Observable.just(Box())
-//        on { updateBox(any(), any(), any()) } doReturn Observable.just(Box())
-//        on { removeBox(any()) } doReturn Observable.empty()
-//        on { invite(any(), any()) } doReturn Observable.just(Invitation())
-//        on { uninvite(any(), any()) } doReturn Observable.empty()
+//        on { getBoxFromCache(any()) } doReturn Flowable.just(Box())
+//        on { getBox(any()) } doReturn Flowable.just(Box())
+//        on { updateBox(any(), any(), any()) } doReturn Flowable.just(Box())
+//        on { removeBox(any()) } doReturn Flowable.empty()
+//        on { invite(any(), any()) } doReturn Flowable.just(Invitation())
+//        on { uninvite(any(), any()) } doReturn Flowable.empty()
 //    }
 //
 //    private lateinit var presenter: BoxInfoPresenter

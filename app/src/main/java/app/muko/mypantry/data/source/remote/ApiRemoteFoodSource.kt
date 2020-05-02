@@ -7,13 +7,13 @@ import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.ShopPlan
 import app.muko.mypantry.data.models.Unit
 import app.muko.mypantry.data.source.remote.services.FoodService
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Retrofit
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -26,28 +26,28 @@ class ApiRemoteFoodSource(
         private val mRetrofit: Retrofit
 ) {
 
-    fun getFoods(): Observable<List<Food>> {
+    fun getFoods(): Flowable<List<Food>> {
         return mRetrofit.create(FoodService::class.java)
                 .getAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun getFood(id: Int): Observable<Food> {
+    fun getFood(id: Int): Flowable<Food> {
         return mRetrofit.create(FoodService::class.java)
                 .getById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun getShopPlansForFood(id: Int): Observable<List<ShopPlan>> {
+    fun getShopPlansForFood(id: Int): Flowable<List<ShopPlan>> {
         return mRetrofit.create(FoodService::class.java)
                 .getShopPlans(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun createFood(name: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Observable<Food> {
+    fun createFood(name: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Flowable<Food> {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -64,7 +64,7 @@ class ApiRemoteFoodSource(
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(id: Int, name: String?, amount: Double?, expirationDate: Date?, bitmap: Bitmap?, boxId: Int?, unitId: Int?): Observable<Food> {
+    fun update(id: Int, name: String?, amount: Double?, expirationDate: Date?, bitmap: Bitmap?, boxId: Int?, unitId: Int?): Flowable<Food> {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val params: HashMap<String, RequestBody> = HashMap()
         var image: MultipartBody.Part? = null
@@ -97,14 +97,14 @@ class ApiRemoteFoodSource(
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun removeFood(id: Int): Observable<Void> {
+    fun removeFood(id: Int): Flowable<Void> {
         return mRetrofit.create(FoodService::class.java)
                 .remove(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun createNotice(foodId: Int, text: String): Observable<Food> {
+    fun createNotice(foodId: Int, text: String): Flowable<Food> {
         val bodyBuilder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("text", text)

@@ -1,7 +1,9 @@
 package app.muko.mypantry.data.models
 
-open class Version {
+import androidx.room.Entity
 
-    open var name: List<String>? = null
-    open var notice: List<String>? = null
-}
+@Entity
+data class Version(
+        val name: List<String>,
+        val notice: List<String>
+)

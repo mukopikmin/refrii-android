@@ -1,20 +1,20 @@
 package app.muko.mypantry.data.source.remote.services
 
 import app.muko.mypantry.data.models.User
+import io.reactivex.Flowable
 import okhttp3.RequestBody
 import retrofit2.http.*
-import rx.Observable
 
 interface UserService {
     @POST("/users/google")
-    fun signupWithGoogle(): Observable<User>
+    fun signupWithGoogle(): Flowable<User>
 
     @GET("/users/verify")
-    fun verify(): Observable<User>
+    fun verify(): Flowable<User>
 
     @POST("/users/{id}/push_tokens")
-    fun registerPushToken(@Path("id") id: Int, @Body body: RequestBody): Observable<User>
+    fun registerPushToken(@Path("id") id: Int, @Body body: RequestBody): Flowable<User>
 
     @PUT("/users/{id}")
-    fun update(@Path("id") id: Int, @Body body: RequestBody): Observable<User>
+    fun update(@Path("id") id: Int, @Body body: RequestBody): Flowable<User>
 }

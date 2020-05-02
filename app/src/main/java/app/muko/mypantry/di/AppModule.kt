@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import app.muko.mypantry.boxinfo.BoxInfoContract
 import app.muko.mypantry.boxinfo.BoxInfoPresenter
+import app.muko.mypantry.data.dao.LocalDatabase
 import app.muko.mypantry.data.source.*
 import app.muko.mypantry.food.FoodContract
 import app.muko.mypantry.food.FoodPresenter
@@ -47,8 +48,8 @@ class AppModule(private var mApplication: Application) {
     }
 
     @Provides
-    fun provideFoodListPresenter(boxRepository: ApiBoxRepository, foodRepository: ApiFoodRepository, userRepository: ApiUserRepository): FoodListContract.Presenter {
-        return FoodListPresenter(boxRepository, foodRepository, userRepository)
+    fun provideFoodListPresenter(localDatabase: LocalDatabase, boxRepository: ApiBoxRepository, foodRepository: ApiFoodRepository, userRepository: ApiUserRepository): FoodListContract.Presenter {
+        return FoodListPresenter(localDatabase, boxRepository, foodRepository, userRepository)
     }
 
     @Provides

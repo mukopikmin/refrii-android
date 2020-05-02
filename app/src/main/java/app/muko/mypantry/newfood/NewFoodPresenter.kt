@@ -5,7 +5,7 @@ import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.Unit
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiFoodRepository
-import rx.Subscriber
+import io.reactivex.subscribers.DisposableSubscriber
 import java.util.*
 import javax.inject.Inject
 
@@ -30,14 +30,14 @@ constructor(
         mBox?.let { box ->
             mApiFoodRepository.createFood(name, amount, box, unit, expirationDate)
                     .doOnSubscribe { mView?.showProgressBar() }
-                    .doOnUnsubscribe { mView?.hideProgressBar() }
-                    .subscribe(object : Subscriber<Food>() {
+                    .doFinally { mView?.hideProgressBar() }
+                    .subscribe(object : DisposableSubscriber<Food>() {
                         override fun onNext(t: Food?) {
                             mFood = t
                             mView?.createCompleted(t)
                         }
 
-                        override fun onCompleted() {}
+                        override fun onComplete() {}
 
                         override fun onError(e: Throwable?) {
                             mView?.showToast(e?.message)
@@ -48,7 +48,7 @@ constructor(
 
     override fun getUnits(boxId: Int) {
         mApiBoxRepository.getUnitsForBox(boxId)
-                .subscribe(object : Subscriber<List<Unit>>() {
+                .subscribe(object : DisposableSubscriber<List<Unit>>() {
                     override fun onNext(t: List<Unit>?) {
                         mUnits = t
                         mView?.setUnits(t)
@@ -58,7 +58,7 @@ constructor(
                         }
                     }
 
-                    override fun onCompleted() {}
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
@@ -68,13 +68,13 @@ constructor(
 
     override fun getBox(id: Int) {
         mApiBoxRepository.getBox(id)
-                .subscribe(object: Subscriber<Box>() {
+                .subscribe(object : DisposableSubscriber<Box>() {
                     override fun onNext(t: Box?) {
                         mBox = t
                         mView?.setBox(t)
                     }
 
-                    override fun onCompleted() { }
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)

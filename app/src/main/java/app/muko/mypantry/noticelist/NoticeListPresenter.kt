@@ -4,7 +4,7 @@ import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.Notice
 import app.muko.mypantry.data.source.ApiFoodRepository
 import app.muko.mypantry.data.source.ApiNoticeRepository
-import rx.Subscriber
+import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class NoticeListPresenter
@@ -29,12 +29,12 @@ constructor(
 
                     mApiFoodRepository.getFood(id)
                 }
-                .subscribe(object : Subscriber<Food>() {
+                .subscribe(object : DisposableSubscriber<Food>() {
                     override fun onNext(t: Food?) {
                         onGetFoodCompleted(t)
                     }
 
-                    override fun onCompleted() {}
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         e?.message?.let {
@@ -59,10 +59,10 @@ constructor(
     override fun createNotice(text: String) {
         mFood?.let { food ->
             mApiFoodRepository.createNotice(food.id, text)
-                    .subscribe(object : Subscriber<Food>() {
+                    .subscribe(object : DisposableSubscriber<Food>() {
                         override fun onNext(t: Food?) {}
 
-                        override fun onCompleted() {
+                        override fun onComplete() {
                             mView?.resetForm()
                             getFood(food.id)
                         }
@@ -79,10 +79,10 @@ constructor(
     override fun removeNotice() {
         mNotice?.let {
             mApiNoticeRepository.remove(it.id)
-                    .subscribe(object : Subscriber<Void>() {
+                    .subscribe(object : DisposableSubscriber<Void>() {
                         override fun onNext(t: Void?) {}
 
-                        override fun onCompleted() {
+                        override fun onComplete() {
                             mView?.onRemoveCompleted()
                         }
 

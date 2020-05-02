@@ -2,7 +2,7 @@ package app.muko.mypantry.shopplans
 
 import app.muko.mypantry.data.models.ShopPlan
 import app.muko.mypantry.data.source.ApiShopPlanRepository
-import rx.Subscriber
+import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class ShopPlansPresenter
@@ -18,13 +18,13 @@ constructor(private val mApiShopPlanRepository: ApiShopPlanRepository) : ShopPla
 
     override fun getShopPlans() {
         mApiShopPlanRepository.getShopPlans()
-                .subscribe(object : Subscriber<List<ShopPlan>>() {
+                .subscribe(object : DisposableSubscriber<List<ShopPlan>>() {
                     override fun onNext(t: List<ShopPlan>?) {
                         mShopPlans = t
                         mView?.setShopPlans(t)
                     }
 
-                    override fun onCompleted() {}
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         mView?.showToast(e?.message)
@@ -34,12 +34,12 @@ constructor(private val mApiShopPlanRepository: ApiShopPlanRepository) : ShopPla
 
     override fun completeShopPlan(shopPlan: ShopPlan) {
         mApiShopPlanRepository.updateShopPlan(shopPlan.id, true)
-                .subscribe(object : Subscriber<ShopPlan>() {
+                .subscribe(object : DisposableSubscriber<ShopPlan>() {
                     override fun onNext(t: ShopPlan?) {
                         mView?.showSnackBar("${t?.food?.name} の予定を完了しました")
                     }
 
-                    override fun onCompleted() {
+                    override fun onComplete() {
                         getShopPlans()
                     }
 

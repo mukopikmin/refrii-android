@@ -2,23 +2,23 @@ package app.muko.mypantry.data.source.remote
 
 import app.muko.mypantry.data.models.ShopPlan
 import app.muko.mypantry.data.source.remote.services.ShopPlanService
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import okhttp3.MultipartBody
 import retrofit2.Retrofit
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ApiRemoteShopPlanSource(private val mRetrofit: Retrofit) {
-    fun getShopPlans(): Observable<List<ShopPlan>> {
+    fun getShopPlans(): Flowable<List<ShopPlan>> {
         return mRetrofit.create(ShopPlanService::class.java)
                 .getShopPlans()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun createShopPlan(foodId: Int, amount: Double, date: Date): Observable<ShopPlan> {
+    fun createShopPlan(foodId: Int, amount: Double, date: Date): Flowable<ShopPlan> {
         val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -33,7 +33,7 @@ class ApiRemoteShopPlanSource(private val mRetrofit: Retrofit) {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun updateShopPlan(id: Int, done: Boolean?): Observable<ShopPlan> {
+    fun updateShopPlan(id: Int, done: Boolean?): Flowable<ShopPlan> {
         val body = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
 

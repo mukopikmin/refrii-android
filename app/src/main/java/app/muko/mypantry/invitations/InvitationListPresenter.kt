@@ -4,7 +4,7 @@ import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Invitation
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiInvitationRepository
-import rx.Subscriber
+import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class InvitationListPresenter
@@ -36,13 +36,13 @@ constructor(
     override fun getBox(id: Int) {
         mApiBoxRepository.getBox(id)
                 .doOnSubscribe { mView?.onLoading() }
-                .doOnUnsubscribe { mView?.onLoaded() }
-                .subscribe(object : Subscriber<Box>() {
+                .doFinally { mView?.onLoaded() }
+                .subscribe(object : DisposableSubscriber<Box>() {
                     override fun onNext(t: Box?) {
                         setBox(t)
                     }
 
-                    override fun onCompleted() {}
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         e?.message?.let {
@@ -56,13 +56,13 @@ constructor(
         mBox?.id?.let { id ->
             mApiBoxRepository.invite(id, email)
                     .doOnSubscribe { mView?.onLoading() }
-                    .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe(object : Subscriber<Invitation>() {
+                    .doFinally { mView?.onLoaded() }
+                    .subscribe(object : DisposableSubscriber<Invitation>() {
                         override fun onNext(t: Invitation?) {
                             t?.let { mView?.onInvitationCreated(it) }
                         }
 
-                        override fun onCompleted() {
+                        override fun onComplete() {
                             getBox(id)
                         }
 
@@ -79,11 +79,11 @@ constructor(
         mInvitation?.id?.let { id ->
             mApiInvitationRepository.remove(id)
                     .doOnSubscribe { mView?.onLoading() }
-                    .doOnUnsubscribe { mView?.onLoaded() }
-                    .subscribe(object : Subscriber<Void>() {
+                    .doFinally { mView?.onLoaded() }
+                    .subscribe(object : DisposableSubscriber<Void>() {
                         override fun onNext(t: Void?) {}
 
-                        override fun onCompleted() {
+                        override fun onComplete() {
                             mView?.showSnackbar("共有を解除しました")
                             mBox?.id?.let {
                                 getBox(it)
