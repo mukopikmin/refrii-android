@@ -6,38 +6,33 @@ import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.Invitation
 import app.muko.mypantry.data.models.Unit
 import app.muko.mypantry.data.source.remote.ApiRemoteBoxSource
+import app.muko.mypantry.data.source.remote.services.BoxService
 import io.reactivex.Flowable
-import retrofit2.Retrofit
 
-class ApiBoxRepository(retrofit: Retrofit, val room: LocalDatabase) {
+class ApiBoxRepository(boxService: BoxService, val room: LocalDatabase) {
 
-    private val mApiRemoteBoxSource = ApiRemoteBoxSource(retrofit)
+    private val mApiRemoteBoxSource = ApiRemoteBoxSource(boxService)
+    private val mDao = room.boxDao()
+    private val mFoodDao = room.foodDao()
 
     fun getBoxes(): Flowable<List<Box>> {
-        val dao = room.boxDao()
+        mApiRemoteBoxSource.getBoxes()
+                .flatMap { mDao.insertOrUpdate(it).andThen(Flowable.just(it)) }
+                .subscribe()
 
-        return mApiRemoteBoxSource.getBoxes()
-//                .flatMap {
-//                    dao.insertOrUpdate(it)
-//                    Flowable.just(it)
-//                }
-//                .flatMap { boxes ->
-//                    boxes.map { dao.insertOrUpdate(it).onCom }
-//
-//                    Flowable.just(boxes)
-//                }
+        return Flowable.just(mDao.getAll())
     }
-
-//    fun getBoxesFromCache(): Flowable<List<Box>> {
-//        return mApiLocalBoxSource.getBoxes()
-//    }
 
     fun getBox(id: Int): Flowable<Box> {
         return mApiRemoteBoxSource.getBox(id)
     }
 
-    fun getFoodsInBox(id: Int): Flowable<List<Food>> {
-        return mApiRemoteBoxSource.getFoodsInBox(id)
+    fun getFoods(id: Int): Flowable<List<Food>> {
+        mApiRemoteBoxSource.getFoodsInBox(id)
+                .flatMap { mFoodDao.insertOrUpdate(it).andThen(Flowable.just(it)) }
+                .subscribe()
+
+        return Flowable.just(mFoodDao.getAll().filter { it.box.id == id })
     }
 //
 //    fun getFoodsInBoxFromCache(id: Int): Flowable<List<Food>> {

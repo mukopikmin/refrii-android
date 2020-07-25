@@ -1,6 +1,5 @@
 package app.muko.mypantry.data.models
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.*
@@ -10,15 +9,15 @@ data class Box(
         @PrimaryKey
         val id: Int,
         val name: String,
-        val notice: String,
-        val imageUrl: String,
+        val notice: String?,
+        val imageUrl: String?,
         val isInvited: Boolean,
         val updatedAt: Date,
         val createdAt: Date,
         val invitations: List<Invitation>,
-        @Embedded(prefix = "owner_")
         val owner: User
 ) {
+
     override fun equals(other: Any?): Boolean {
         return (other as Box).id == id
     }

@@ -34,7 +34,7 @@ import javax.inject.Singleton
 
 
 @Module
-class AppModule(private var mApplication: Application) {
+class TestAppModule(private var mApplication: Application) {
 
     @Singleton
     @Provides
@@ -53,8 +53,8 @@ class AppModule(private var mApplication: Application) {
     }
 
     @Provides
-    fun provideFoodPresenter(localDatabase: LocalDatabase, foodRepository: ApiFoodRepository, boxRepository: ApiBoxRepository, shopPlanRepository: ApiShopPlanRepository): FoodContract.Presenter {
-        return FoodPresenter(localDatabase, foodRepository, boxRepository, shopPlanRepository)
+    fun provideFoodPresenter(foodRepository: ApiFoodRepository, boxRepository: ApiBoxRepository, shopPlanRepository: ApiShopPlanRepository): FoodContract.Presenter {
+        return FoodPresenter(foodRepository, boxRepository, shopPlanRepository)
     }
 
     @Provides

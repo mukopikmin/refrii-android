@@ -7,7 +7,7 @@ import app.muko.mypantry.di.DaggerAppComponent
 
 class App : Application() {
 
-    private lateinit var appComponent: AppComponent
+    lateinit var appComponent: AppComponent
 
     override fun onCreate() {
         super.onCreate()

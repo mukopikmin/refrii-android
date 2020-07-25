@@ -1,6 +1,5 @@
 package app.muko.mypantry
 
-import io.realm.RealmList
 
 class FoodPresenterTest {
 //

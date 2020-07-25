@@ -1,6 +1,7 @@
 package app.muko.mypantry.food
 
 import android.graphics.Bitmap
+import androidx.lifecycle.LiveData
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.ShopPlan
 import app.muko.mypantry.data.models.Unit
@@ -9,7 +10,6 @@ import java.util.*
 interface FoodContract {
 
     interface View {
-        fun setFood(food: Food?)
         fun showEditDateDialog()
         fun showProgressBar()
         fun hideProgressBar()
@@ -24,6 +24,7 @@ interface FoodContract {
 
     interface Presenter {
         fun takeView(view: View)
+        fun getLiveData(id: Int): LiveData<Food>
         fun getFood(id: Int)
         fun getUnits(boxId: Int)
         fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, image: Bitmap?, boxId: Int?, unitId: Int?)

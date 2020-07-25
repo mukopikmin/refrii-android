@@ -18,6 +18,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.FileProvider
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.muko.mypantry.App
@@ -47,30 +49,43 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     @BindView(R.id.constraintLayout)
     lateinit var mConstraintLayout: ConstraintLayout
+
     @BindView(R.id.foodProgressBar)
     lateinit var mProgressBar: ProgressBar
+
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
+
     @BindView(R.id.nameEditText)
     lateinit var mName: EditText
+
     @BindView(R.id.amountEditText)
     lateinit var mAmount: EditText
+
     @BindView(R.id.expirationDateTextView)
     lateinit var mExpirationDate: TextView
+
     @BindView(R.id.createdTextView)
     lateinit var mCreated: TextView
+
     @BindView(R.id.updatedTextView)
     lateinit var mUpdate: TextView
+
     @BindView(R.id.boxTextView)
     lateinit var mBoxName: TextView
+
     @BindView(R.id.fab)
     lateinit var mFab: FloatingActionButton
+
     @BindView(R.id.unitsSpinner)
     lateinit var mUnitsSpinner: Spinner
+
     @BindView(R.id.shopPlanecyclerView)
     lateinit var mRecyclerView: RecyclerView
+
     @BindView(R.id.addPlanButton)
     lateinit var mAddPlanButton: View
+
     @BindView(R.id.cameraImageView)
     lateinit var mCameraImageView: ImageView
 
@@ -78,8 +93,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     lateinit var mPresenter: FoodPresenter
 
     private lateinit var mPreference: SharedPreferences
+    private lateinit var mFoodLiveData: LiveData<Food>
     private var mImageLoaded = false
-    private var mFood: Food? = null
     private var mUnits: List<Unit>? = null
     private var mDate: Date? = null
     private var mImage: Bitmap? = null
@@ -115,21 +130,21 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun updateFood() {
-        val foodId = mFood?.id
+        val food = mFoodLiveData.value ?: return
         val name = mName.text.toString()
         val amount = mAmount.text.toString().toDouble()
         val unitLabel = mUnitsSpinner.selectedItem.toString()
         val unit = mUnits?.single { it.label == unitLabel }
 
-        foodId ?: return
+        food.id ?: return
 
-        mPresenter.updateFood(foodId, name, amount, mDate, mImage, mFood?.box?.id, unit?.id)
+        mPresenter.updateFood(food.id, name, amount, mDate, mImage, food.box.id, unit?.id)
     }
 
     private fun launchCameraOrShowImage() {
-        val imageUrl = mFood?.imageUrl
+        val food = mFoodLiveData.value ?: return
 
-        if (imageUrl.isNullOrEmpty()) {
+        if (food.imageUrl.isNullOrEmpty()) {
             launchCamera()
         } else {
             showImageDialog()
@@ -198,6 +213,11 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val intent = intent
         val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
+
+        mFoodLiveData = mPresenter.getLiveData(foodId)
+        mFoodLiveData.observe(this, Observer {
+            setFood(it)
+        })
 
         mPresenter.getFood(foodId)
         mPresenter.getUnits(boxId)
@@ -282,20 +302,18 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun createShopPlan(data: Intent?) {
+        val food = mFoodLiveData.value ?: return
         data ?: return
 
         val amount = data.getDoubleExtra("key_amount", 0.toDouble())
         val date = Date(data.getLongExtra("key_date", Date().time))
 
-        mFood?.id?.let {
-            mPresenter.createShopPlan(amount, date, it)
-        }
+        mPresenter.createShopPlan(amount, date, food.id)
     }
 
-    override fun setFood(food: Food?) {
+    private fun setFood(food: Food?) {
         val timeFormatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
 
-        mFood = food
         mToolbar.title = food?.name
         setSupportActionBar(mToolbar)
 
@@ -335,10 +353,11 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     override fun setShopPlans(shopPlans: List<ShopPlan>?) {
+        val food = mFoodLiveData.value ?: return
         shopPlans ?: return
 
         if (mRecyclerView.adapter == null) {
-            mFood?.let {
+            food.let {
                 mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(shopPlans, it)
             }
         } else {
@@ -389,7 +408,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     override fun showEditDateDialog() {
-        mFood?.expirationDate?.let {
+        mFoodLiveData.value?.expirationDate?.let {
             val fragment = CalendarPickerDialogFragment.newInstance(it)
 
             fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
@@ -426,7 +445,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     override fun showCreateShopPlanDialog() {
-        val label = mFood?.unit?.label ?: return
+        val label = mFoodLiveData.value?.unit?.label ?: return
         val fragment = CreateShopPlanDialogFragment.newInstance(label)
 
         fragment.setTargetFragment(null, CREATE_SHOP_PLAN_REQUEST_CODE)

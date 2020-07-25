@@ -9,20 +9,17 @@ import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.MultipartBody
-import retrofit2.Retrofit
 
-class ApiRemoteBoxSource(private val mRetrofit: Retrofit) {
+class ApiRemoteBoxSource(private val mBoxService: BoxService) {
 
     fun getBoxes(): Flowable<List<Box>> {
-        return mRetrofit.create(BoxService::class.java)
-                .getBoxes()
+        return mBoxService.getBoxes()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun getBox(id: Int): Flowable<Box> {
-        return mRetrofit.create(BoxService::class.java)
-                .getBox(id)
+        return mBoxService.getBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -34,8 +31,7 @@ class ApiRemoteBoxSource(private val mRetrofit: Retrofit) {
 
         notice?.let { builder.addFormDataPart("notice", notice) }
 
-        return mRetrofit.create(BoxService::class.java)
-                .createBox(builder.build())
+        return mBoxService.createBox(builder.build())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -48,29 +44,25 @@ class ApiRemoteBoxSource(private val mRetrofit: Retrofit) {
         name?.let { builder.addFormDataPart("name", it) }
         notice?.let { builder.addFormDataPart("notice", it) }
 
-        return mRetrofit.create(BoxService::class.java)
-                .updateBox(id, builder.build())
+        return mBoxService.updateBox(id, builder.build())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun removeBox(id: Int): Flowable<Void> {
-        return mRetrofit.create(BoxService::class.java)
-                .removeBox(id)
+        return mBoxService.removeBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun getFoodsInBox(id: Int): Flowable<List<Food>> {
-        return mRetrofit.create(BoxService::class.java)
-                .getFoodsInBox(id)
+        return mBoxService.getFoodsInBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun getUnitsForBox(id: Int): Flowable<List<Unit>> {
-        return mRetrofit.create(BoxService::class.java)
-                .getUnitsForBox(id)
+        return mBoxService.getUnitsForBox(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -81,8 +73,7 @@ class ApiRemoteBoxSource(private val mRetrofit: Retrofit) {
                 .addFormDataPart("email", email)
                 .build()
 
-        return mRetrofit.create(BoxService::class.java)
-                .invite(boxId, body)
+        return mBoxService.invite(boxId, body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

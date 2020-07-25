@@ -2,6 +2,7 @@ package app.muko.mypantry.di
 
 import android.content.Context
 import app.muko.mypantry.BuildConfig
+import app.muko.mypantry.data.source.remote.services.BoxService
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -30,6 +31,12 @@ class RetrofitModule {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(provideHttpClient(context))
                 .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideBoxService(retrofit: Retrofit): BoxService {
+        return retrofit.create(BoxService::class.java)
     }
 
     @Singleton

@@ -1,6 +1,8 @@
 package app.muko.mypantry.food
 
 import android.graphics.Bitmap
+import androidx.lifecycle.LiveData
+import app.muko.mypantry.data.dao.LocalDatabase
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.ShopPlan
 import app.muko.mypantry.data.models.Unit
@@ -14,6 +16,7 @@ import javax.inject.Inject
 class FoodPresenter
 @Inject
 constructor(
+        private val mLocalDatabase: LocalDatabase,
         private val mApiFoodRepository: ApiFoodRepository,
         private val mApiBoxRepository: ApiBoxRepository,
         private val mApiShopPlanRepository: ApiShopPlanRepository
@@ -25,11 +28,15 @@ constructor(
         mView = view
     }
 
+    override fun getLiveData(id: Int): LiveData<Food> {
+        return mLocalDatabase.foodDao().getLiveData(id)
+    }
+
     override fun getFood(id: Int) {
         mApiFoodRepository.getFood(id)
                 .subscribe(object : DisposableSubscriber<Food>() {
                     override fun onNext(t: Food?) {
-                        mView?.setFood(t)
+//                        mView?.setFood(t)
                     }
 
                     override fun onComplete() {}

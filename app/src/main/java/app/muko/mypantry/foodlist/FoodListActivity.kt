@@ -23,6 +23,9 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import app.muko.mypantry.App
 import app.muko.mypantry.R
@@ -54,16 +57,22 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
+
     @BindView(R.id.fab)
     lateinit var mFab: FloatingActionButton
+
     @BindView(R.id.drawer_layout)
-    lateinit var mDrawer: androidx.drawerlayout.widget.DrawerLayout
+    lateinit var mDrawer: DrawerLayout
+
     @BindView(R.id.nav_view)
     lateinit var mNavigationView: NavigationView
+
     @BindView(R.id.swipeRefreshLayout)
     lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
+
     @BindView(R.id.recyclerView)
-    lateinit var mRecyclerView: androidx.recyclerview.widget.RecyclerView
+    lateinit var mRecyclerView: RecyclerView
+
     @BindView(R.id.emptyBoxMessageContainer)
     lateinit var mEmptyMessageContainer: View
 
@@ -105,6 +114,13 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         initPushNotification()
         initView()
+
+        mPresenter.takeView(this)
+        mPresenter.mBoxesLiveData.observe(this, Observer {
+            setBoxes(it)
+        })
+        mPresenter.mFoodsLiveData.observe(this, Observer {
+        })
     }
 
     private fun initView() {
@@ -156,9 +172,9 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             )
 
             channel.enableLights(true)
-            channel.lightColor = Color.WHITE;
-            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC;
-            manager.createNotificationChannel(channel);
+            channel.lightColor = Color.WHITE
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            manager.createNotificationChannel(channel)
         }
 
         val token = mPreference.getString(getString(R.string.preference_key_push_token), "")
@@ -190,6 +206,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         super.onStart()
 
         hideBottomNavigation()
+        mPresenter.getBoxes()
+        setNavigationHeader()
     }
 
     override fun onPause() {
@@ -210,13 +228,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun onResume() {
         super.onResume()
 
-        mPresenter.takeView(this)
-        mPresenter.getBoxes()
-        setNavigationHeader()
-
-//        mPresenter.liveData.observe(this, Observer {
-//            showToast(it.size.toString())
-//        })
+//        mPresenter.getBoxes()
+//        setNavigationHeader()
     }
 
     override fun onBackPressed() {
@@ -365,8 +378,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         if (mRecyclerView.adapter == null) {
             val adapter = FoodRecyclerViewAdapter(foods, userId)
 
-            adapter.setOnClickListener(View.OnClickListener {
-                val position = mRecyclerView.getChildAdapterPosition(it)
+            adapter.setOnClickListener(View.OnClickListener { view ->
+                val position = mRecyclerView.getChildAdapterPosition(view)
                 val food = adapter.getItemAtPosition(position)
 
                 food?.let {
@@ -388,7 +401,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     override fun showConfirmDialog(food: Food?) {
         food ?: return
 
-        val fragment = ConfirmDialogFragment.newInstance(food.name!!, "削除していいですか？", food.id)
+        val fragment = ConfirmDialogFragment.newInstance(food.name, "削除していいですか？", food.id)
 
         fragment.setTargetFragment(null, REMOVE_FOOD_REQUEST_CODE)
         fragment.show(supportFragmentManager, "delete_food")
@@ -396,7 +409,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     override fun showBottomNavigation(food: Food) {
         mBottomNavigation.visibility = View.VISIBLE
-        food.notices?.let { notices ->
+        food.notices.let { notices ->
             mBottomNavigation.menu.getItem(3).itemId.let {
                 mBottomNavigation.getOrCreateBadge(it).apply {
                     number = notices.size
@@ -453,7 +466,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         val snackbar = Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_SHORT)
 
-        snackbar.animationMode = Snackbar.ANIMATION_MODE_SLIDE;
+        snackbar.animationMode = Snackbar.ANIMATION_MODE_SLIDE
         snackbar.show()
     }
 

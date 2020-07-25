@@ -42,7 +42,6 @@ interface FoodListContract {
         fun addFood()
         fun selectBox(box: Box)
         fun getExpiringFoods()
-        fun deleteLocalData()
         fun selectFood(food: Food)
         fun deselectFood()
         fun isFoodSelected(food: Food): Boolean

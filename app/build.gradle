@@ -89,6 +89,7 @@ android {
 dependencies {
     def dagger_version = '2.25.3'
     def room_version = "2.2.5"
+    def retrofit_version = "2.7.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -115,9 +116,10 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
     implementation "androidx.room:room-guava:$room_version"
-    implementation 'com.squareup.retrofit2:retrofit:2.7.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.7.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.7.0'
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+    implementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.anupcowkur:reservoir:3.1.0'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
@@ -125,11 +127,13 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.0.1'
     implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
     implementation 'org.yaml:snakeyaml:1.25'
     implementation 'net.steamcrafted:materialiconlib:1.1.5'
     implementation 'com.ethanhua:skeleton:1.1.2'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
+
+    testImplementation 'org.mockito:mockito-core:3.3.3'
 
     testImplementation "androidx.room:room-testing:$room_version"
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
@@ -142,8 +146,9 @@ dependencies {
 ////    testImplementation 'androidx.test:core:1.2.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
-
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.24.5'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.2'
 
     testImplementation 'androidx.test:core:1.2.0'
     testImplementation 'androidx.test:runner:1.2.0'
@@ -154,7 +159,7 @@ dependencies {
 
     testImplementation 'junit:junit:4.13'
     testImplementation 'org.robolectric:robolectric:4.3'
-
+//    testImplementation 'org.awaitility:awaitility-kotlin:4.0.2'
 
 
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
@@ -163,6 +168,8 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "androidx.room:room-compiler:$room_version"
+
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger_version"
 }
 
 kapt {

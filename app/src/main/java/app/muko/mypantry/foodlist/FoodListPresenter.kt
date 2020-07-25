@@ -1,5 +1,6 @@
 package app.muko.mypantry.foodlist
 
+import androidx.lifecycle.LiveData
 import app.muko.mypantry.data.dao.LocalDatabase
 import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Food
@@ -21,30 +22,26 @@ constructor(
 ) : FoodListContract.Presenter {
 
     private var mView: FoodListContract.View? = null
-    private var mBoxes: List<Box>? = null
     private var mBox: Box? = null
     private var mFoods: List<Food>? = null
     private var mFood: Food? = null
 
-//    lateinit var liveData: LiveData<List<Box>>
+    lateinit var mBoxesLiveData: LiveData<List<Box>>
+    lateinit var mFoodsLiveData: LiveData<List<Food>>
 
     override fun takeView(view: FoodListContract.View) {
         mView = view
-
-//        liveData = mLocalDatabase.boxDao().getAll()
-    }
-
-    fun setBoxes(boxes: List<Box>?) {
-        mBoxes = boxes
-
-        mView?.setBoxes(boxes)
+        mBoxesLiveData = mLocalDatabase.boxDao().getAllLiveData()
+        mFoodsLiveData = mLocalDatabase.foodDao().getAllLiveData()
     }
 
     fun setBox(box: Box?, foods: List<Food>? = null) {
-        mBox = box
-        mFoods = foods
+        box ?: return
 
-        mView?.setFoods(box?.name, foods)
+        mBox = box
+        mFoods = mFoodsLiveData.value?.filter { it.box.id == box.id }
+
+        mView?.setFoods(box.name, foods)
     }
 
     override fun getBox(): Box? {
@@ -58,7 +55,7 @@ constructor(
     }
 
     override fun pickBox(menuItemId: Int): Boolean {
-        val box = mBoxes?.firstOrNull { menuItemId == it.id } ?: return false
+        val box = mBoxesLiveData.value?.firstOrNull { menuItemId == it.id } ?: return false
 
         selectBox(box)
 
@@ -74,22 +71,18 @@ constructor(
                 .doFinally { mView?.hideProgressBar() }
                 .subscribe(object : DisposableSubscriber<List<Box>>() {
                     override fun onNext(t: List<Box>) {
-                        setBoxes(t)
-
                         if (t.isNullOrEmpty()) {
                             mView?.setNoBoxesMessage()
                         }
                     }
 
-                    override fun onComplete() {
-//                        mView?.showToast("同期が完了しました")
-                    }
+                    override fun onComplete() {}
 
                     override fun onError(e: Throwable) {
                         if (e is HttpException) {
                             mView?.showToast(e.response()?.message())
                         } else {
-                            mView?.showToast(e?.message)
+                            mView?.showToast(e.message)
                         }
                     }
 
@@ -98,7 +91,7 @@ constructor(
 
     override fun incrementFood() {
         mFood?.let {
-            val step: Double = it.unit?.step ?: 0.toDouble()
+            val step: Double = it.unit.step ?: 0.toDouble()
             val amount = it.amount + step
 
             updateFood(it, amount)
@@ -107,7 +100,7 @@ constructor(
 
     override fun decrementFood() {
         mFood?.let {
-            val step = it.unit?.step ?: 0.toDouble()
+            val step = it.unit.step ?: 0.toDouble()
             val amount = it.amount - step
 
             if (amount < 0) {
@@ -191,8 +184,11 @@ constructor(
 
     override fun selectBox(box: Box) {
         mBox = box
+        setBox(box)
 
-        mApiBoxRepository.getFoodsInBox(box.id)
+        mApiBoxRepository.getFoods(box.id)
+                .doOnSubscribe { mView?.showProgressBar() }
+                .doFinally { mView?.hideProgressBar() }
                 .subscribe(object : DisposableSubscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {
                         mBox?.let {
@@ -270,12 +266,5 @@ constructor(
         mFood?.let {
             mView?.showNotices(it)
         }
-    }
-
-    override fun deleteLocalData() {
-        mBox = null
-
-        mView?.clearBoxes()
-//        mApiUserRepository.deleteLocalData()
     }
 }

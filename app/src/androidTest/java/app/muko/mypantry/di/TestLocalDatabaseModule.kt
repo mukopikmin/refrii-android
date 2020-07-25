@@ -8,12 +8,12 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class LocalDatabaseModule {
+class TestLocalDatabaseModule {
 
     @Singleton
     @Provides
     fun provideLocalDatabase(context: Context): LocalDatabase {
-        return Room.databaseBuilder(context, LocalDatabase::class.java, "app.sqlite3")
+        return Room.inMemoryDatabaseBuilder(context, LocalDatabase::class.java)
                 .fallbackToDestructiveMigration()
                 .allowMainThreadQueries()
                 .build()
