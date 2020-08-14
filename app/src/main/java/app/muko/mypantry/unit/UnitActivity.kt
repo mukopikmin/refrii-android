@@ -60,8 +60,9 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
     private fun updateUnit() {
         val label = mLabelEditText.text.toString()
         val step = mStepEditText.text.toString().toDouble()
+        val unit = Unit.temp(label, step)
 
-        mPresenter.updateUnit(label, step)
+        mPresenter.updateUnit(unit)
     }
 
     override fun onStart() {

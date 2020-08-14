@@ -7,14 +7,14 @@ import androidx.room.RoomWarnings
 import java.util.*
 
 @SuppressWarnings(RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED)
-@Entity
+@Entity(tableName = "shop_plan")
 data class ShopPlan(
         @PrimaryKey
         val id: Int,
-        val notice: String,
+        val notice: String?,
         val amount: Double,
         val date: Date,
-        val done: Boolean,
+        var done: Boolean,
         val createdAt: Date,
         val updatedAt: Date,
         @Embedded(prefix = "food_")
@@ -34,5 +34,13 @@ data class ShopPlan(
         result = 31 * result + updatedAt.hashCode()
         result = 31 * result + food.hashCode()
         return result
+    }
+
+    companion object {
+        fun temp(notice: String?, amount: Double, date: Date, food: Food): ShopPlan {
+            val dummyTimestamp = Date()
+
+            return ShopPlan(-1, notice, amount, date, false, dummyTimestamp, dummyTimestamp, food)
+        }
     }
 }

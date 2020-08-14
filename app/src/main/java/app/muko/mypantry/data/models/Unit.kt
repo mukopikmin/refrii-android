@@ -1,6 +1,5 @@
 package app.muko.mypantry.data.models
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.RoomWarnings
@@ -15,8 +14,7 @@ data class Unit(
         val step: Double,
         val createdAt: Date,
         val updatedAt: Date,
-        @Embedded(prefix = "user_")
-        val user: User
+        val user: User?
 ) {
     override fun equals(other: Any?): Boolean {
         return (other as Unit).id == id
@@ -30,5 +28,13 @@ data class Unit(
         result = 31 * result + updatedAt.hashCode()
         result = 31 * result + user.hashCode()
         return result
+    }
+
+    companion object {
+        fun temp(label: String, step: Double): Unit {
+            val dummyTimestamp = Date()
+
+            return Unit(-1, label, step, dummyTimestamp, dummyTimestamp, null)
+        }
     }
 }

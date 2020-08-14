@@ -1,25 +1,30 @@
 package app.muko.mypantry.data.source.remote.services
 
 import app.muko.mypantry.data.models.Unit
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface UnitService {
+
     @GET("/units")
-    fun getUnits(): Flowable<List<Unit>>
+    fun getAll(): Flowable<List<Unit>>
+
+    @GET("/boxes/{boxId}/units")
+    fun getByBox(@Path("boxId") boxId: Int): Flowable<List<Unit>>
 
     @GET("/units/{id}")
-    fun getUnit(@Path("id") id: Int): Flowable<Unit>
+    fun get(@Path("id") id: Int): Flowable<Unit>
 
     @POST("/units")
-    fun createUnit(@Body body: RequestBody): Flowable<Unit>
+    fun create(@Body body: RequestBody): Completable
 
     @PUT("/units/{id}")
-    fun updateUnit(
+    fun update(
             @Path("id") id: Int,
-            @Body body: RequestBody): Flowable<Unit>
+            @Body body: RequestBody): Completable
 
     @DELETE("/units/{id}")
-    fun deleteUnit(@Path("id") id: Int): Flowable<Void>
+    fun remove(@Path("id") id: Int): Completable
 }

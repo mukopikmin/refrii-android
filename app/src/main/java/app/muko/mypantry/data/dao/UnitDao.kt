@@ -2,21 +2,28 @@ package app.muko.mypantry.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.Unit
-import io.reactivex.Completable
 
 @Dao
 interface UnitDao {
 
-    @Query("SELECT * FROM unit WHERE user_id = :userId")
-    fun getByUserLiveData(userId: Int): LiveData<List<Unit>>
+    @Query("SELECT * FROM unit")
+    fun getAllLiveData(): LiveData<List<Unit>>
 
-    @Query("SELECT * FROM unit WHERE user_id = :userId")
-    fun getByUser(userId: Int): List<Food>
+    @Query("SELECT * FROM unit")
+    fun getAll(): List<Unit>
+
+    @Query("SELECT * FROM unit WHERE id = :id")
+    fun getLiveData(id: Int): LiveData<Unit>
+
+    @Query("SELECT * FROM unit WHERE id = :id")
+    fun get(id: Int): Unit
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdate(unit: Unit): Completable
+    fun insertOrUpdate(unit: Unit)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertOrUpdate(unit: List<Unit>)
 
     @Update
     fun update(unit: Unit)

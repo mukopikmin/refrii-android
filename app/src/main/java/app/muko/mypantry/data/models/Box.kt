@@ -15,7 +15,7 @@ data class Box(
         val updatedAt: Date,
         val createdAt: Date,
         val invitations: List<Invitation>,
-        val owner: User
+        val owner: User?
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -33,5 +33,23 @@ data class Box(
         result = 31 * result + invitations.hashCode()
         result = 31 * result + owner.hashCode()
         return result
+    }
+
+    companion object {
+        fun temp(name: String, notice: String?): Box {
+            val dummyTimestamp = Date()
+
+            return Box(
+                    -1,
+                    name,
+                    notice,
+                    null,
+                    false,
+                    dummyTimestamp,
+                    dummyTimestamp,
+                    listOf(),
+                    null
+            )
+        }
     }
 }

@@ -2,12 +2,15 @@ package app.muko.mypantry.newunit
 
 import app.muko.mypantry.data.models.Unit
 import app.muko.mypantry.data.source.ApiUnitRepository
-import io.reactivex.subscribers.DisposableSubscriber
+import io.reactivex.CompletableObserver
+import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
 class NewUnitPresenter
 @Inject
-constructor(private val mApiUnitRepository: ApiUnitRepository) : NewUnitContract.Presenter {
+constructor(
+        private val mApiUnitRepository: ApiUnitRepository
+) : NewUnitContract.Presenter {
 
     private var mView: NewUnitContract.View? = null
     private var mUnit: Unit? = null
@@ -16,20 +19,19 @@ constructor(private val mApiUnitRepository: ApiUnitRepository) : NewUnitContract
         mView = view
     }
 
-    override fun createUnit(label: String, amount: Double) {
-        mApiUnitRepository.createUnit(label, amount)
+    override fun createUnit(unit: Unit) {
+        mApiUnitRepository.create(unit)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doFinally { mView?.hideProgressBar() }
-                .subscribe(object : DisposableSubscriber<Unit>() {
-                    override fun onComplete() {}
-
-                    override fun onNext(t: Unit?) {
-                        mUnit = t
-                        mView?.onCreateCompleted(mUnit)
+                .subscribe(object : CompletableObserver {
+                    override fun onComplete() {
+                        mView?.onCreateCompleted(unit)
                     }
 
-                    override fun onError(t: Throwable?) {
-                        mView?.showToast(t?.message)
+                    override fun onSubscribe(d: Disposable) {}
+
+                    override fun onError(e: Throwable) {
+                        mView?.showToast(e.message)
                     }
                 })
     }

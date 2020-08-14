@@ -34,45 +34,47 @@ constructor(
     }
 
     override fun getBox(id: Int) {
-        mApiBoxRepository.getBox(id)
-                .doOnSubscribe { mView?.onLoading() }
-                .doFinally { mView?.onLoaded() }
-                .subscribe(object : DisposableSubscriber<Box>() {
-                    override fun onNext(t: Box?) {
-                        setBox(t)
-                    }
-
-                    override fun onComplete() {}
-
-                    override fun onError(e: Throwable?) {
-                        e?.message?.let {
-                            mView?.showToast(it)
-                        }
-                    }
-                })
+//        TODO: Rewrite
+//        mApiBoxRepository.getBox(id)
+//                .doOnSubscribe { mView?.onLoading() }
+//                .doFinally { mView?.onLoaded() }
+//                .subscribe(object : DisposableSubscriber<Box>() {
+//                    override fun onNext(t: Box?) {
+//                        setBox(t)
+//                    }
+//
+//                    override fun onComplete() {}
+//
+//                    override fun onError(e: Throwable?) {
+//                        e?.message?.let {
+//                            mView?.showToast(it)
+//                        }
+//                    }
+//                })
     }
 
     override fun createInvitation(email: String) {
-        mBox?.id?.let { id ->
-            mApiBoxRepository.invite(id, email)
-                    .doOnSubscribe { mView?.onLoading() }
-                    .doFinally { mView?.onLoaded() }
-                    .subscribe(object : DisposableSubscriber<Invitation>() {
-                        override fun onNext(t: Invitation?) {
-                            t?.let { mView?.onInvitationCreated(it) }
-                        }
-
-                        override fun onComplete() {
-                            getBox(id)
-                        }
-
-                        override fun onError(e: Throwable?) {
-                            e?.message?.let {
-                                mView?.showToast(it)
-                            }
-                        }
-                    })
-        }
+//        TODO: Rewrite
+//        mBox?.id?.let { id ->
+//            mApiBoxRepository.invite(id, email)
+//                    .doOnSubscribe { mView?.onLoading() }
+//                    .doFinally { mView?.onLoaded() }
+//                    .subscribe(object : DisposableSubscriber<Invitation>() {
+//                        override fun onNext(t: Invitation?) {
+//                            t?.let { mView?.onInvitationCreated(it) }
+//                        }
+//
+//                        override fun onComplete() {
+//                            getBox(id)
+//                        }
+//
+//                        override fun onError(e: Throwable?) {
+//                            e?.message?.let {
+//                                mView?.showToast(it)
+//                            }
+//                        }
+//                    })
+//        }
     }
 
     override fun removeInvitation() {

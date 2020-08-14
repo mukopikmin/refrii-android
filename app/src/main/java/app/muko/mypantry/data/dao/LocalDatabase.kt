@@ -16,10 +16,12 @@ import app.muko.mypantry.data.models.Unit
             Unit::class,
             User::class
         ],
-        version = 4
+        version = 1
 )
 @TypeConverters(Converters::class)
 abstract class LocalDatabase : RoomDatabase() {
     abstract fun boxDao(): BoxDao
     abstract fun foodDao(): FoodDao
+    abstract fun unitDao(): UnitDao
+    abstract fun shopPlanDao(): ShopPlanDao
 }

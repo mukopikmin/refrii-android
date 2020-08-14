@@ -8,16 +8,16 @@ import java.util.*
 data class Food(
         @PrimaryKey
         val id: Int,
-        val name: String,
+        var name: String,
         val notices: List<Notice>,
-        val amount: Double,
+        var amount: Double,
         val expirationDate: Date,
         val imageUrl: String?,
         val createdAt: Date,
         val updatedAt: Date,
-        val unit: Unit,
-        val createdUser: User,
-        val updatedUser: User,
+        var unit: Unit,
+        val createdUser: User?,
+        val updatedUser: User?,
         val box: Box
 ) {
     override fun equals(other: Any?): Boolean {
@@ -30,7 +30,7 @@ data class Food(
         result = 31 * result + notices.hashCode()
         result = 31 * result + amount.hashCode()
         result = 31 * result + expirationDate.hashCode()
-        result = 31 * result + imageUrl.hashCode()
+        result = 31 * result + (imageUrl?.hashCode() ?: 0)
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + updatedAt.hashCode()
         result = 31 * result + unit.hashCode()
@@ -38,6 +38,27 @@ data class Food(
         result = 31 * result + updatedUser.hashCode()
         result = 31 * result + box.hashCode()
         return result
+    }
+
+    companion object {
+        fun temp(name: String, amount: Double, expirationDate: Date, unit: Unit, box: Box): Food {
+            val dummyTimestamp = Date()
+
+            return Food(
+                    -1,
+                    name,
+                    listOf(),
+                    amount,
+                    expirationDate,
+                    null,
+                    dummyTimestamp,
+                    dummyTimestamp,
+                    unit,
+                    null,
+                    null,
+                    box
+            )
+        }
     }
 }
 

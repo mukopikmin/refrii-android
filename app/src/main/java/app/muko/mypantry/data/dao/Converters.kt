@@ -21,18 +21,18 @@ class Converters {
     }
 
     @TypeConverter
-    fun boxListToString(list: List<Box>): String {
+    fun foodListToString(list: List<Food>): String {
         val gson = Gson()
 
         return list.joinToString(separator) { gson.toJson(it) }
     }
 
     @TypeConverter
-    fun stringToBoxList(str: String): List<Box> {
+    fun stringToFoodList(str: String): List<Food> {
         val gson = Gson()
 
         return str.split(separator)
-                .map { gson.fromJson(it, Box::class.java) }
+                .map { gson.fromJson(it, Food::class.java) }
     }
 
     @TypeConverter
@@ -121,4 +121,33 @@ class Converters {
 
         return gson.fromJson(str, User::class.java)
     }
+
+    @TypeConverter
+    fun shopPlanListToString(list: List<ShopPlan>): String {
+        val gson = Gson()
+
+        return list.joinToString(separator) { gson.toJson(it) }
+    }
+
+    @TypeConverter
+    fun stringToShopPlanList(str: String): List<ShopPlan> {
+        val gson = Gson()
+
+        return str.split(separator)
+                .map { gson.fromJson(it, ShopPlan::class.java) }
+    }
+
+//    @TypeConverter
+//    fun foodToString(food: Food): String {
+//        val gson = Gson()
+//
+//        return gson.toJson(food)
+//    }
+//
+//    @TypeConverter
+//    fun stringToFood(str: String): Food {
+//        val gson = Gson()
+//
+//        return gson.fromJson(str, Food::class.java)
+//    }
 }

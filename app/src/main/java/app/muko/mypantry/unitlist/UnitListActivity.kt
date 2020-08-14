@@ -121,6 +121,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
             UNIT_OPTIONS_REQUEST_CODE -> {
                 val option = data.getIntExtra("option", -1)
                 val unitId = data.getIntExtra("target_id", 0)
+                val unit = mPresenter.mUnits?.find { it.id == unitId }
 
                 when (option) {
                     // Show
@@ -131,7 +132,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
                         startActivity(intent)
                     }
                     // Remove
-                    1 -> mPresenter.removeUnit(unitId, userId)
+                    1 -> unit?.let { mPresenter.removeUnit(it) }
                     // Cancel
                     else -> return
                 }

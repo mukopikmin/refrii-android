@@ -8,6 +8,8 @@ import app.muko.mypantry.data.models.User
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiFoodRepository
 import app.muko.mypantry.data.source.ApiUserRepository
+import io.reactivex.CompletableObserver
+import io.reactivex.disposables.Disposable
 import io.reactivex.subscribers.DisposableSubscriber
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -22,7 +24,7 @@ constructor(
 ) : FoodListContract.Presenter {
 
     private var mView: FoodListContract.View? = null
-    private var mBox: Box? = null
+    var mBox: Box? = null
     private var mFoods: List<Food>? = null
     private var mFood: Food? = null
 
@@ -66,7 +68,7 @@ constructor(
         // Temporally clear boxes set in drawer, for updating cache
         mView?.clearBoxes()
 
-        mApiBoxRepository.getBoxes()
+        mApiBoxRepository.getAll()
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doFinally { mView?.hideProgressBar() }
                 .subscribe(object : DisposableSubscriber<List<Box>>() {
@@ -91,10 +93,10 @@ constructor(
 
     override fun incrementFood() {
         mFood?.let {
-            val step: Double = it.unit.step ?: 0.toDouble()
-            val amount = it.amount + step
+            val step: Double = it.unit.step
 
-            updateFood(it, amount)
+            it.amount = it.amount + step
+            updateFood(it)
         }
     }
 
@@ -104,27 +106,28 @@ constructor(
             val amount = it.amount - step
 
             if (amount < 0) {
-                updateFood(it, 0.toDouble())
+                it.amount = 0.0
             } else {
-                updateFood(it, amount)
+                it.amount = amount
             }
+
+            updateFood(it)
         }
     }
 
-    private fun updateFood(food: Food, amount: Double = 0.toDouble()) {
-        mApiFoodRepository.updateFood(food.id, null, amount, null, null, null, null)
+    private fun updateFood(food: Food) {
+        mApiFoodRepository.update(food)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doFinally { mView?.hideProgressBar() }
-                .subscribe(object : DisposableSubscriber<Food>() {
-                    override fun onNext(t: Food?) {
-                        mView?.onFoodUpdated(t)
-                        mView?.showSnackbar("${t?.name} の数量が更新されました")
+                .subscribe(object : CompletableObserver {
+                    override fun onComplete() {
+                        mView?.showSnackbar("${food.name} の数量が更新されました")
                     }
 
-                    override fun onComplete() {}
+                    override fun onSubscribe(d: Disposable) {}
 
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
+                    override fun onError(e: Throwable) {
+                        mView?.showToast(e.message)
                     }
                 })
     }
@@ -135,12 +138,10 @@ constructor(
 
     override fun removeFood() {
         mFood?.let {
-            mApiFoodRepository.removeFood(it.id)
+            mApiFoodRepository.remove(it)
                     .doOnSubscribe { mView?.showProgressBar() }
                     .doFinally { mView?.hideProgressBar() }
-                    .subscribe(object : DisposableSubscriber<Void>() {
-                        override fun onNext(t: Void?) {}
-
+                    .subscribe(object : CompletableObserver {
                         override fun onComplete() {
                             mFood = null
 
@@ -149,29 +150,32 @@ constructor(
                             getBoxes()
                         }
 
-                        override fun onError(e: Throwable?) {
-                            mView?.showToast(e?.message)
+                        override fun onSubscribe(d: Disposable) {}
+
+                        override fun onError(e: Throwable) {
+                            mView?.showToast(e.message)
                         }
                     })
         }
     }
 
     override fun createBox(name: String, notice: String) {
-        mApiBoxRepository.createBox(name, notice)
+        val box = Box.temp(name, notice)
+
+        mApiBoxRepository.create(box)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doFinally { mView?.hideProgressBar() }
-                .subscribe(object : DisposableSubscriber<Box>() {
-                    override fun onNext(t: Box?) {
-                        mView?.onBoxCreated()
-                        mView?.showSnackbar("${t?.name} が作成されました")
-                    }
-
+                .subscribe(object : CompletableObserver {
                     override fun onComplete() {
+                        mView?.onBoxCreated()
+                        mView?.showSnackbar("${box.name} が作成されました")
                         getBoxes()
                     }
 
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
+                    override fun onSubscribe(d: Disposable) {}
+
+                    override fun onError(e: Throwable) {
+                        mView?.showToast(e.message)
                     }
                 })
     }
@@ -186,7 +190,7 @@ constructor(
         mBox = box
         setBox(box)
 
-        mApiBoxRepository.getFoods(box.id)
+        mApiFoodRepository.getByBox(box.id)
                 .doOnSubscribe { mView?.showProgressBar() }
                 .doFinally { mView?.hideProgressBar() }
                 .subscribe(object : DisposableSubscriber<List<Food>>() {

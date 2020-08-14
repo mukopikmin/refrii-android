@@ -23,11 +23,11 @@ constructor(
     }
 
     override fun getFood(id: Int) {
-        mApiFoodRepository.getFood(id)
+        mApiFoodRepository.get(id)
                 .flatMap {
                     onGetFoodCompleted(it)
 
-                    mApiFoodRepository.getFood(id)
+                    mApiFoodRepository.get(id)
                 }
                 .subscribe(object : DisposableSubscriber<Food>() {
                     override fun onNext(t: Food?) {
@@ -57,23 +57,24 @@ constructor(
     }
 
     override fun createNotice(text: String) {
-        mFood?.let { food ->
-            mApiFoodRepository.createNotice(food.id, text)
-                    .subscribe(object : DisposableSubscriber<Food>() {
-                        override fun onNext(t: Food?) {}
-
-                        override fun onComplete() {
-                            mView?.resetForm()
-                            getFood(food.id)
-                        }
-
-                        override fun onError(e: Throwable?) {
-                            e?.message?.let {
-                                mView?.showToast(it)
-                            }
-                        }
-                    })
-        }
+//        TODO
+//        mFood?.let { food ->
+//            mApiFoodRepository.createNotice(food.id, text)
+//                    .subscribe(object : DisposableSubscriber<Food>() {
+//                        override fun onNext(t: Food?) {}
+//
+//                        override fun onComplete() {
+//                            mView?.resetForm()
+//                            getFood(food.id)
+//                        }
+//
+//                        override fun onError(e: Throwable?) {
+//                            e?.message?.let {
+//                                mView?.showToast(it)
+//                            }
+//                        }
+//                    })
+//        }
     }
 
     override fun removeNotice() {

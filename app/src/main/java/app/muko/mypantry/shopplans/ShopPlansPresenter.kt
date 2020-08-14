@@ -2,6 +2,8 @@ package app.muko.mypantry.shopplans
 
 import app.muko.mypantry.data.models.ShopPlan
 import app.muko.mypantry.data.source.ApiShopPlanRepository
+import io.reactivex.CompletableObserver
+import io.reactivex.disposables.Disposable
 import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
@@ -17,7 +19,7 @@ constructor(private val mApiShopPlanRepository: ApiShopPlanRepository) : ShopPla
     }
 
     override fun getShopPlans() {
-        mApiShopPlanRepository.getShopPlans()
+        mApiShopPlanRepository.getAll()
                 .subscribe(object : DisposableSubscriber<List<ShopPlan>>() {
                     override fun onNext(t: List<ShopPlan>?) {
                         mShopPlans = t
@@ -33,18 +35,19 @@ constructor(private val mApiShopPlanRepository: ApiShopPlanRepository) : ShopPla
     }
 
     override fun completeShopPlan(shopPlan: ShopPlan) {
-        mApiShopPlanRepository.updateShopPlan(shopPlan.id, true)
-                .subscribe(object : DisposableSubscriber<ShopPlan>() {
-                    override fun onNext(t: ShopPlan?) {
-                        mView?.showSnackBar("${t?.food?.name} の予定を完了しました")
-                    }
+        shopPlan.done = true
 
+        mApiShopPlanRepository.update(shopPlan)
+                .subscribe(object : CompletableObserver {
                     override fun onComplete() {
+                        mView?.showSnackBar("${shopPlan?.food?.name} の予定を完了しました")
                         getShopPlans()
                     }
 
-                    override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
+                    override fun onSubscribe(d: Disposable) {}
+
+                    override fun onError(e: Throwable) {
+                        mView?.showToast(e.message)
                     }
                 })
     }

@@ -53,8 +53,8 @@ class AppModule(private var mApplication: Application) {
     }
 
     @Provides
-    fun provideFoodPresenter(localDatabase: LocalDatabase, foodRepository: ApiFoodRepository, boxRepository: ApiBoxRepository, shopPlanRepository: ApiShopPlanRepository): FoodContract.Presenter {
-        return FoodPresenter(localDatabase, foodRepository, boxRepository, shopPlanRepository)
+    fun provideFoodPresenter(localDatabase: LocalDatabase, foodRepository: ApiFoodRepository, boxRepository: ApiBoxRepository, shopPlanRepository: ApiShopPlanRepository, apiUnitRepository: ApiUnitRepository): FoodContract.Presenter {
+        return FoodPresenter(localDatabase, foodRepository, boxRepository, shopPlanRepository, apiUnitRepository)
     }
 
     @Provides

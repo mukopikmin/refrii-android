@@ -46,7 +46,7 @@ constructor(
     }
 
     override fun getBox(id: Int) {
-        mApiBoxRepository.getBox(id)
+        mApiBoxRepository.get(id)
                 .doOnSubscribe { mView?.onLoading() }
                 .doFinally { mView?.onLoaded() }
                 .subscribe(object : DisposableSubscriber<Box>() {
@@ -63,70 +63,73 @@ constructor(
     }
 
     override fun updateBox() {
-        mId?.let { id ->
-            mApiBoxRepository.updateBox(id, mName, mNotice)
-                    .doOnSubscribe { mView?.onLoading() }
-                    .doFinally { mView?.onLoaded() }
-                    .subscribe(object : DisposableSubscriber<Box>() {
-                        override fun onNext(t: Box?) {
-                            mBox = t
-                            mView?.setBox(t)
-                            mView?.showSnackbar("カテゴリ ${t?.name} を更新しました")
-                        }
-
-                        override fun onComplete() {}
-
-                        override fun onError(e: Throwable?) {
-                            mView?.showToast(e?.message)
-                        }
-                    })
-        }
+//        TODO: Rewrite
+//        mId?.let { id ->
+//            mApiBoxRepository.updateBox(id, mName, mNotice)
+//                    .doOnSubscribe { mView?.onLoading() }
+//                    .doFinally { mView?.onLoaded() }
+//                    .subscribe(object : DisposableSubscriber<Box>() {
+//                        override fun onNext(t: Box?) {
+//                            mBox = t
+//                            mView?.setBox(t)
+//                            mView?.showSnackbar("カテゴリ ${t?.name} を更新しました")
+//                        }
+//
+//                        override fun onComplete() {}
+//
+//                        override fun onError(e: Throwable?) {
+//                            mView?.showToast(e?.message)
+//                        }
+//                    })
+//        }
     }
 
     override fun removeBox() {
-        mId?.let { id ->
-            mApiBoxRepository.removeBox(id)
-                    .doOnSubscribe { mView?.onLoading() }
-                    .doFinally { mView?.onLoaded() }
-                    .subscribe(object : DisposableSubscriber<Void>() {
-                        override fun onNext(t: Void?) {}
-
-                        override fun onComplete() {
-                            mView?.onDeleteCompleted(mName)
-                        }
-
-                        override fun onError(e: Throwable?) {
-                            mView?.showToast(e?.message)
-                        }
-                    })
-        }
+//        TODO: Rewrite
+//        mId?.let { id ->
+//            mApiBoxRepository.removeBox(id)
+//                    .doOnSubscribe { mView?.onLoading() }
+//                    .doFinally { mView?.onLoaded() }
+//                    .subscribe(object : DisposableSubscriber<Void>() {
+//                        override fun onNext(t: Void?) {}
+//
+//                        override fun onComplete() {
+//                            mView?.onDeleteCompleted(mName)
+//                        }
+//
+//                        override fun onError(e: Throwable?) {
+//                            mView?.showToast(e?.message)
+//                        }
+//                    })
+//        }
     }
 
     override fun createInvitation(email: String) {
-        mId?.let { id ->
-            mApiBoxRepository.invite(id, email)
-                    .doOnSubscribe { mView?.onLoading() }
-                    .doFinally { mView?.onLoaded() }
-                    .subscribe(object : DisposableSubscriber<Invitation>() {
-                        override fun onNext(t: Invitation?) {
-                            val name = t?.user?.name
-
-                            mView?.showSnackbar("$name と共有しました")
-                        }
-
-                        override fun onComplete() {
-                            mId?.let {
-                                getBox(it)
-                            }
-                        }
-
-                        override fun onError(e: Throwable?) {
-                            mView?.showToast(e?.message)
-                        }
-
-
-                    })
-        }
+//        TODO: Rewrite
+//        mId?.let { id ->
+//            mApiBoxRepository.invite(id, email)
+//                    .doOnSubscribe { mView?.onLoading() }
+//                    .doFinally { mView?.onLoaded() }
+//                    .subscribe(object : DisposableSubscriber<Invitation>() {
+//                        override fun onNext(t: Invitation?) {
+//                            val name = t?.user?.name
+//
+//                            mView?.showSnackbar("$name と共有しました")
+//                        }
+//
+//                        override fun onComplete() {
+//                            mId?.let {
+//                                getBox(it)
+//                            }
+//                        }
+//
+//                        override fun onError(e: Throwable?) {
+//                            mView?.showToast(e?.message)
+//                        }
+//
+//
+//                    })
+//        }
     }
 
     override fun removeInvitation() {

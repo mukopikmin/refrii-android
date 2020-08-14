@@ -1,66 +1,100 @@
 package app.muko.mypantry.data.source
 
-import android.content.Context
-import android.graphics.Bitmap
-import app.muko.mypantry.data.models.Box
+import app.muko.mypantry.data.dao.FoodDao
 import app.muko.mypantry.data.models.Food
-import app.muko.mypantry.data.models.ShopPlan
-import app.muko.mypantry.data.models.Unit
+import app.muko.mypantry.data.source.data.ApiFoodDataSource
+import app.muko.mypantry.data.source.local.ApiLocalFoodSource
 import app.muko.mypantry.data.source.remote.ApiRemoteFoodSource
+import app.muko.mypantry.data.source.remote.services.FoodService
+import io.reactivex.Completable
+import io.reactivex.CompletableObserver
 import io.reactivex.Flowable
-import retrofit2.Retrofit
-import java.util.*
+import io.reactivex.disposables.Disposable
 
-class ApiFoodRepository(context: Context, retrofit: Retrofit) {
+class ApiFoodRepository(
+        private val service: FoodService,
+        private val dao: FoodDao
+) : ApiFoodDataSource {
 
-    private val mApiRemoteFoodSource = ApiRemoteFoodSource(context, retrofit)
+    private val remote = ApiRemoteFoodSource(service)
 
-    fun getFoods(): Flowable<List<Food>> {
-        return mApiRemoteFoodSource.getFoods()
-    }
+    //    private val mAPiLocalFoodSource = ApiLocalFoodSource(room)
+//    private val mAPiLocalShopPlanSource = ApiLocalShopPlanSource(room)
+//    private val mShopPlanDao = room.shopPlanDao()
+    private val local = ApiLocalFoodSource(dao)
 
 
-//    fun getFoodsFromCache(): Flowable<List<Food>> {
-//        return mApiLocalFoodSource.getFoods()
+//    fun createFood(name: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Flowable<Food> {
+//        return remote.createFood(name, amount, box, unit, expirationDate)
 //    }
-
-    fun getFood(id: Int): Flowable<Food> {
-        return mApiRemoteFoodSource.getFood(id)
-    }
 //
-//    fun getFoodFromCache(id: Int): Flowable<Food?> {
-//        return mApiLocalFoodSource.getFood(id)
+//    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, bitmap: Bitmap?, boxId: Int?, unitId: Int?): Flowable<Food> {
+//        return remote.update(id, name, amount, expirationDate, bitmap, boxId, unitId)
+//    }
+//
+//    fun removeFood(id: Int): Flowable<Void> {
+//        return remote.removeFood(id)
+//    }
+//
+//    fun createNotice(foodId: Int, text: String): Flowable<Food> {
+//        return remote.createNotice(foodId, text)
 //    }
 
-    fun getShopPlansForFood(id: Int): Flowable<List<ShopPlan>> {
-        return mApiRemoteFoodSource.getShopPlansForFood(id)
+    override fun getByBox(boxId: Int): Flowable<List<Food>> {
+        local.getByBox(boxId)
+                .flatMap { foods ->
+                    foods.map { local.remove(it) }
+
+                    remote.getByBox(boxId)
+                }
+                .flatMap { foods ->
+                    Flowable.just(foods.map { local.create(it) })
+                }
+                .subscribe()
+
+        return local.getByBox(boxId)
     }
 
-//    fun getShopPlansForFoodFromCache(id: Int): Flowable<List<ShopPlan>> {
-//        return mApiLocalFoodSource.getShopPlansForFood(id)
-//    }
+    override fun get(id: Int): Flowable<Food?> {
+        remote.get(id)
+                .flatMap {
+                    local.create(it)
 
-//    fun getExpiringFoods(): Flowable<List<Food>> {
-//        return mApiLocalFoodSource.getExpiringFoods()
-//    }
+                    Flowable.just(it)
+                }
+                .subscribe()
 
-//    fun getExpiringFoodsFromCache(): Flowable<List<Food>> {
-//        return mApiLocalFoodSource.getExpiringFoods()
-//    }
-
-    fun createFood(name: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Flowable<Food> {
-        return mApiRemoteFoodSource.createFood(name, amount, box, unit, expirationDate)
+        return local.get(id)
     }
 
-    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, bitmap: Bitmap?, boxId: Int?, unitId: Int?): Flowable<Food> {
-        return mApiRemoteFoodSource.update(id, name, amount, expirationDate, bitmap, boxId, unitId)
+    override fun create(food: Food): Completable {
+        remote.create(food)
+                .andThen { local.create(food) }
+                .subscribe()
+
+        return local.create(food)
     }
 
-    fun removeFood(id: Int): Flowable<Void> {
-        return mApiRemoteFoodSource.removeFood(id)
+    override fun update(food: Food): Completable {
+        remote.update(food)
+                .andThen { local.update(food) }
+                .subscribe()
+
+        return local.update(food)
     }
 
-    fun createNotice(foodId: Int, text: String): Flowable<Food> {
-        return mApiRemoteFoodSource.createNotice(foodId, text)
+    override fun remove(food: Food): Completable {
+        remote.remove(food)
+                .subscribe(object : CompletableObserver {
+                    override fun onComplete() {}
+
+                    override fun onSubscribe(d: Disposable) {}
+
+                    override fun onError(e: Throwable) {
+                        create(food)
+                    }
+                })
+
+        return local.remove(food)
     }
 }

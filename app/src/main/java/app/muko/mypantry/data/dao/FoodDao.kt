@@ -3,7 +3,6 @@ package app.muko.mypantry.data.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import app.muko.mypantry.data.models.Food
-import io.reactivex.Completable
 
 @Dao
 interface FoodDao {
@@ -21,10 +20,10 @@ interface FoodDao {
     fun get(id: Int): Food
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdate(food: Food): Completable
+    fun insertOrUpdate(food: Food)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdate(foods: List<Food>): Completable
+    fun insertOrUpdate(foods: List<Food>)
 
     @Update
     fun update(food: Food)

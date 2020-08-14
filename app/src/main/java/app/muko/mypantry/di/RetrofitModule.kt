@@ -2,7 +2,7 @@ package app.muko.mypantry.di
 
 import android.content.Context
 import app.muko.mypantry.BuildConfig
-import app.muko.mypantry.data.source.remote.services.BoxService
+import app.muko.mypantry.data.source.remote.services.*
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -37,6 +37,30 @@ class RetrofitModule {
     @Provides
     fun provideBoxService(retrofit: Retrofit): BoxService {
         return retrofit.create(BoxService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFoodService(retrofit: Retrofit): FoodService {
+        return retrofit.create(FoodService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUnitService(retrofit: Retrofit): UnitService {
+        return retrofit.create(UnitService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideShopPlanService(retrofit: Retrofit): ShopPlanService {
+        return retrofit.create(ShopPlanService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideNoticeService(retrofit: Retrofit): NoticeService {
+        return retrofit.create(NoticeService::class.java)
     }
 
     @Singleton

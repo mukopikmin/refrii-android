@@ -1,32 +1,41 @@
 package app.muko.mypantry.data.source.local
 
-import app.muko.mypantry.data.dao.LocalDatabase
-import app.muko.mypantry.data.models.Box
-import app.muko.mypantry.data.source.ApiFoodDataSource
+import app.muko.mypantry.data.dao.FoodDao
+import app.muko.mypantry.data.models.Food
+import app.muko.mypantry.data.source.data.ApiFoodDataSource
+import io.reactivex.Completable
 import io.reactivex.Flowable
 
-class ApiLocalFoodSource(room: LocalDatabase) : ApiFoodDataSource {
+class ApiLocalFoodSource(
+        private val dao: FoodDao
+) : ApiFoodDataSource {
 
-    private val mFoodDao = room.foodDao()
+    override fun getByBox(boxId: Int): Flowable<List<Food>> {
+        val foods = dao.getAll()
+                .filter { it.box.id == boxId }
 
-    override fun getByBox(boxId: Int): Flowable<List<Box>> {
-        TODO("Not yet implemented")
+        return Flowable.just(foods)
     }
 
-    override fun get(id: Int): Flowable<Box?> {
-        TODO("Not yet implemented")
+    override fun get(id: Int): Flowable<Food?> {
+        return Flowable.just(dao.get(id))
     }
 
-    override fun create(name: String, notice: String?): Flowable<Box> {
-        TODO("Not yet implemented")
+    override fun create(food: Food): Completable {
+        dao.insertOrUpdate(food)
+
+        return Completable.complete()
     }
 
-    override fun update(id: Int, name: String?, notice: String?): Flowable<Box> {
-        TODO("Not yet implemented")
+    override fun update(food: Food): Completable {
+        dao.insertOrUpdate(food)
+
+        return Completable.complete()
     }
 
-    override fun remove(id: Int): Flowable<Void> {
-        TODO("Not yet implemented")
-    }
+    override fun remove(food: Food): Completable {
+        dao.delete(food)
 
+        return Completable.complete()
+    }
 }

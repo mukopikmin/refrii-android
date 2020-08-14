@@ -1,69 +1,131 @@
 package app.muko.mypantry.data.source
 
-import app.muko.mypantry.data.dao.LocalDatabase
+import app.muko.mypantry.data.dao.BoxDao
 import app.muko.mypantry.data.models.Box
-import app.muko.mypantry.data.models.Food
-import app.muko.mypantry.data.models.Invitation
-import app.muko.mypantry.data.models.Unit
+import app.muko.mypantry.data.source.data.ApiBoxDataSource
+import app.muko.mypantry.data.source.local.ApiLocalBoxSource
 import app.muko.mypantry.data.source.remote.ApiRemoteBoxSource
 import app.muko.mypantry.data.source.remote.services.BoxService
+import io.reactivex.Completable
+import io.reactivex.CompletableObserver
 import io.reactivex.Flowable
+import io.reactivex.disposables.Disposable
 
-class ApiBoxRepository(boxService: BoxService, val room: LocalDatabase) {
+class ApiBoxRepository(service: BoxService, dao: BoxDao) : ApiBoxDataSource {
 
-    private val mApiRemoteBoxSource = ApiRemoteBoxSource(boxService)
-    private val mDao = room.boxDao()
-    private val mFoodDao = room.foodDao()
+    private val remote = ApiRemoteBoxSource(service)
+    private val local = ApiLocalBoxSource(dao)
 
-    fun getBoxes(): Flowable<List<Box>> {
-        mApiRemoteBoxSource.getBoxes()
-                .flatMap { mDao.insertOrUpdate(it).andThen(Flowable.just(it)) }
-                .subscribe()
-
-        return Flowable.just(mDao.getAll())
-    }
-
-    fun getBox(id: Int): Flowable<Box> {
-        return mApiRemoteBoxSource.getBox(id)
-    }
-
-    fun getFoods(id: Int): Flowable<List<Food>> {
-        mApiRemoteBoxSource.getFoodsInBox(id)
-                .flatMap { mFoodDao.insertOrUpdate(it).andThen(Flowable.just(it)) }
-                .subscribe()
-
-        return Flowable.just(mFoodDao.getAll().filter { it.box.id == id })
-    }
+//    fun getBoxes(): Flowable<List<Box>> {
+//        remote.getBoxes()
+//                .flatMap { mDao.insertOrUpdate(it).andThen(Flowable.just(it)) }
+//                .subscribe()
 //
-//    fun getFoodsInBoxFromCache(id: Int): Flowable<List<Food>> {
-//        return mApiLocalBoxSource.getFoodsInBox(id)
+//        return Flowable.just(mDao.getAll())
 //    }
 //
-//    fun getBoxFromCache(id: Int): Flowable<Box?> {
-//        return mApiLocalBoxSource.getBox(id)
+//    fun getBox(id: Int): Flowable<Box> {
+//        return remote.getBox(id)
+//    }
+//
+//    fun getFoods(id: Int): Flowable<List<Food>> {
+//        remote.getFoodsInBox(id)
+//                .flatMap { mFoodDao.insertOrUpdate(it).andThen(Flowable.just(it)) }
+//                .subscribe()
+//
+//        return Flowable.just(mFoodDao.getAll().filter { it.box.id == id })
+//    }
+////
+////    fun getFoodsInBoxFromCache(id: Int): Flowable<List<Food>> {
+////        return mApiLocalBoxSource.getFoodsInBox(id)
+////    }
+////
+////    fun getBoxFromCache(id: Int): Flowable<Box?> {
+////        return mApiLocalBoxSource.getBox(id)
+////    }
+//
+//    fun createBox(name: String, notice: String?): Flowable<Box> {
+//        return remote.createBox(name, notice)
+//    }
+//
+//    fun getUnitsForBox(id: Int): Flowable<List<Unit>> {
+//        return remote.getUnitsForBox(id)
+//    }
+//
+////    fun getUnitsForBoxFromCache(id: Int): Flowable<List<Unit>> {
+////        return mApiLocalBoxSource.getUnitsForBox(id)
+////    }
+//
+//    fun updateBox(id: Int, name: String?, notice: String?): Flowable<Box> {
+//        return remote.updateBox(id, name, notice)
+//    }
+//
+//    fun removeBox(id: Int): Flowable<Void> {
+//        return remote.removeBox(id)
+//    }
+//
+//    fun invite(boxId: Int, email: String): Flowable<Invitation> {
+//        return remote.invite(boxId, email)
 //    }
 
-    fun createBox(name: String, notice: String?): Flowable<Box> {
-        return mApiRemoteBoxSource.createBox(name, notice)
+
+    override fun getAll(): Flowable<List<Box>> {
+        local.getAll()
+                .flatMap { boxes ->
+                    boxes.map { local.remove(it) }
+
+                    remote.getAll()
+                }
+                .flatMap { boxes ->
+                    boxes.map { local.create(it) }
+
+                    Flowable.just(boxes)
+                }
+                .subscribe()
+
+        return local.getAll()
     }
 
-    fun getUnitsForBox(id: Int): Flowable<List<Unit>> {
-        return mApiRemoteBoxSource.getUnitsForBox(id)
+    override fun get(id: Int): Flowable<Box?> {
+        remote.get(id)
+                .flatMap {
+                    local.create(it)
+
+                    Flowable.just(it)
+                }
+                .subscribe()
+
+        return local.get(id)
     }
 
-//    fun getUnitsForBoxFromCache(id: Int): Flowable<List<Unit>> {
-//        return mApiLocalBoxSource.getUnitsForBox(id)
-//    }
+    override fun create(box: Box): Completable {
+        remote.create(box)
+                .andThen { local.create(box) }
+                .subscribe()
 
-    fun updateBox(id: Int, name: String?, notice: String?): Flowable<Box> {
-        return mApiRemoteBoxSource.updateBox(id, name, notice)
+        return local.create(box)
     }
 
-    fun removeBox(id: Int): Flowable<Void> {
-        return mApiRemoteBoxSource.removeBox(id)
+    override fun update(box: Box): Completable {
+        remote.update(box)
+                .andThen { local.update(box) }
+                .subscribe()
+
+        return local.update(box)
     }
 
-    fun invite(boxId: Int, email: String): Flowable<Invitation> {
-        return mApiRemoteBoxSource.invite(boxId, email)
+    override fun remove(box: Box): Completable {
+        remote.remove(box)
+                .subscribe(object : CompletableObserver {
+                    override fun onComplete() {}
+
+                    override fun onSubscribe(d: Disposable) {}
+
+                    override fun onError(e: Throwable) {
+                        create(box)
+                    }
+                })
+
+        return local.remove(box)
     }
 }

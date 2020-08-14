@@ -1,6 +1,5 @@
 package app.muko.mypantry.data.models
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.RoomWarnings
@@ -12,9 +11,7 @@ data class Notice(
         @PrimaryKey
         val id: Int,
         val text: String,
-        @Embedded(prefix = "created_user_")
         val createdUser: User,
-        @Embedded(prefix = "updated_user_")
         val updatedUser: User,
         val createdAt: Date,
         val updatedAt: Date

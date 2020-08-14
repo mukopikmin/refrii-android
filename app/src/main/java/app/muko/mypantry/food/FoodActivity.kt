@@ -18,7 +18,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.FileProvider
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -93,9 +92,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     lateinit var mPresenter: FoodPresenter
 
     private lateinit var mPreference: SharedPreferences
-    private lateinit var mFoodLiveData: LiveData<Food>
+
     private var mImageLoaded = false
-    private var mUnits: List<Unit>? = null
     private var mDate: Date? = null
     private var mImage: Bitmap? = null
 
@@ -122,7 +120,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mPresenter.takeView(this)
 
         mRecyclerView.layoutManager = LinearLayoutManager(this)
-        mFab.setOnClickListener { updateFood() }
+        mFab.setOnClickListener { mPresenter.getUnits(1) }
         mAddPlanButton.setOnClickListener { showCreateShopPlanDialog() }
         mExpirationDate.setOnClickListener { showEditDateDialog() }
         mCameraImageView.setOnClickListener { launchCameraOrShowImage() }
@@ -130,19 +128,21 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun updateFood() {
-        val food = mFoodLiveData.value ?: return
-        val name = mName.text.toString()
-        val amount = mAmount.text.toString().toDouble()
+        val food = mPresenter.foodLiveData.value ?: return
+//        val name = mName.text.toString()
+//        val amount = mAmount.text.toString().toDouble()
         val unitLabel = mUnitsSpinner.selectedItem.toString()
-        val unit = mUnits?.single { it.label == unitLabel }
+        val unit = mPresenter.unitsLiveData.value?.single { it.label == unitLabel } ?: return
 
-        food.id ?: return
+        food.name = mName.text.toString()
+        food.amount = mAmount.text.toString().toDouble()
+        food.unit = unit
 
-        mPresenter.updateFood(food.id, name, amount, mDate, mImage, food.box.id, unit?.id)
+        mPresenter.updateFood(food)
     }
 
     private fun launchCameraOrShowImage() {
-        val food = mFoodLiveData.value ?: return
+        val food = mPresenter.foodLiveData.value ?: return
 
         if (food.imageUrl.isNullOrEmpty()) {
             launchCamera()
@@ -214,14 +214,26 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
-        mFoodLiveData = mPresenter.getLiveData(foodId)
-        mFoodLiveData.observe(this, Observer {
-            setFood(it)
-        })
-
+        mPresenter.initLiveData(foodId)
         mPresenter.getFood(foodId)
         mPresenter.getUnits(boxId)
         mPresenter.getShopPlans(foodId)
+
+        mPresenter.foodLiveData.observe(this, Observer {
+            setFood(it)
+
+            val shopPlans = mPresenter.shopPlansLiveData.value ?: return@Observer
+            setShopPlans(it, shopPlans)
+        })
+        mPresenter.shopPlansLiveData.observe(this, Observer {
+            val food = mPresenter.foodLiveData.value ?: return@Observer
+
+            setShopPlans(food, it)
+        })
+        mPresenter.unitsLiveData.observe(this, Observer {
+            setUnits(it)
+        })
+
         hideProgressBar()
     }
 
@@ -302,13 +314,15 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun createShopPlan(data: Intent?) {
-        val food = mFoodLiveData.value ?: return
+        val food = mPresenter.foodLiveData.value ?: return
         data ?: return
 
+        val notice = null
         val amount = data.getDoubleExtra("key_amount", 0.toDouble())
         val date = Date(data.getLongExtra("key_date", Date().time))
+        val shopPlan = ShopPlan.temp(notice, amount, date, food)
 
-        mPresenter.createShopPlan(amount, date, food.id)
+        mPresenter.createShopPlan(shopPlan)
     }
 
     private fun setFood(food: Food?) {
@@ -325,7 +339,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         setExpirationDate(food?.expirationDate)
 
-        mUnits?.let { units ->
+        mPresenter.unitsLiveData.value?.let { units ->
             val ids = units.map { it.id }
             val index = ids.indexOf(food?.unit?.id)
 
@@ -352,10 +366,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         }
     }
 
-    override fun setShopPlans(shopPlans: List<ShopPlan>?) {
-        val food = mFoodLiveData.value ?: return
-        shopPlans ?: return
-
+    private fun setShopPlans(food: Food, shopPlans: List<ShopPlan>) {
         if (mRecyclerView.adapter == null) {
             food.let {
                 mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(shopPlans, it)
@@ -396,19 +407,16 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         }
     }
 
-    override fun setUnits(units: List<Unit>?) {
-        units ?: return
+    fun setUnits(units: List<Unit>) {
+        val labels = units.map { it.label }?.toMutableList()
 
-        val labels = units.map { it.label }.toMutableList()
-
-        mUnits = units
         labels.let {
             mUnitsSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)
         }
     }
 
     override fun showEditDateDialog() {
-        mFoodLiveData.value?.expirationDate?.let {
+        mPresenter.foodLiveData.value?.expirationDate?.let {
             val fragment = CalendarPickerDialogFragment.newInstance(it)
 
             fragment.setTargetFragment(null, EDIT_EXPIRATION_DATE_REQUEST_CODE)
@@ -445,7 +453,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     override fun showCreateShopPlanDialog() {
-        val label = mFoodLiveData.value?.unit?.label ?: return
+        val label = mPresenter.foodLiveData.value?.unit?.label ?: return
         val fragment = CreateShopPlanDialogFragment.newInstance(label)
 
         fragment.setTargetFragment(null, CREATE_SHOP_PLAN_REQUEST_CODE)

@@ -56,8 +56,9 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
         mFab.setOnClickListener {
             val label = mLabelEditText.text.toString()
             val step = mStepEditText.text.toString().toDouble()
+            val unit = Unit.temp(label, step)
 
-            mPresenter.createUnit(label, step)
+            mPresenter.createUnit(unit)
         }
     }
 

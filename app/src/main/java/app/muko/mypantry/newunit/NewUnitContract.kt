@@ -12,7 +12,7 @@ interface NewUnitContract {
     }
 
     interface Presenter {
-        fun takeView(view: NewUnitContract.View)
-        fun createUnit(label: String, amount: Double)
+        fun takeView(view: View)
+        fun createUnit(unit: Unit)
     }
 }

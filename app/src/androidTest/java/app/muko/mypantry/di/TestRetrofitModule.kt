@@ -139,21 +139,21 @@ class TestRetrofitModule {
                 )
         )
 
-        override fun getBoxes(): Flowable<List<Box>> {
-            return delegate.returningResponse(boxes).getBoxes()
+        override fun getAll(): Flowable<List<Box>> {
+            return delegate.returningResponse(boxes).getAll()
         }
 
-        override fun getBox(id: Int): Flowable<Box> {
+        override fun get(id: Int): Flowable<Box> {
             val box = boxes.find { it.id == id }
 
-            return delegate.returningResponse(box).getBox(id)
+            return delegate.returningResponse(box).get(id)
         }
 
-        override fun createBox(body: RequestBody): Flowable<Box> {
+        override fun create(body: RequestBody): Flowable<Box> {
             TODO("Not yet implemented")
         }
 
-        override fun updateBox(id: Int, body: RequestBody): Flowable<Box> {
+        override fun update(id: Int, body: RequestBody): Flowable<Box> {
             TODO("Not yet implemented")
         }
 
@@ -175,7 +175,7 @@ class TestRetrofitModule {
             return delegate.returningResponse(units).getUnitsForBox(id)
         }
 
-        override fun removeBox(id: Int): Flowable<Void> {
+        override fun remove(id: Int): Flowable<Void> {
             TODO("Not yet implemented")
         }
     }

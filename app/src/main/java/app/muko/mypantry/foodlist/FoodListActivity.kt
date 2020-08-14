@@ -120,6 +120,9 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             setBoxes(it)
         })
         mPresenter.mFoodsLiveData.observe(this, Observer {
+            val box = mPresenter.mBox ?: return@Observer
+
+            setFoods(box.name, it)
         })
     }
 

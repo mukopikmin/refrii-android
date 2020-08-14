@@ -1,7 +1,7 @@
 package app.muko.mypantry.data.source.remote.services
 
 import app.muko.mypantry.data.models.Food
-import app.muko.mypantry.data.models.ShopPlan
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -13,13 +13,16 @@ interface FoodService {
     fun getAll(): Flowable<List<Food>>
 
     @GET("/foods/{id}")
-    fun getById(@Path("id") id: Int): Flowable<Food>
+    fun get(@Path("id") id: Int): Flowable<Food>
 
-    @GET("/foods/{id}/shop_plans")
-    fun getShopPlans(@Path("id") id: Int): Flowable<List<ShopPlan>>
+    @GET("/boxes/{boxId}/foods")
+    fun getByBox(@Path("boxId") boxId: Int): Flowable<List<Food>>
+
+//    @GET("/foods/{id}/shop_plans")
+//    fun getShopPlans(@Path("id") id: Int): Flowable<List<ShopPlan>>
 
     @POST("/foods")
-    fun create(@Body body: RequestBody): Flowable<Food>
+    fun create(@Body body: RequestBody): Completable
 
     @JvmSuppressWildcards
     @Multipart
@@ -28,11 +31,11 @@ interface FoodService {
             @Path("id") id: Int,
             @PartMap params: Map<String, RequestBody>,
             @Part files: MultipartBody.Part?
-    ): Flowable<Food>
+    ): Completable
 
     @DELETE("/foods/{id}")
-    fun remove(@Path("id") id: Int): Flowable<Void>
+    fun remove(@Path("id") id: Int): Completable
 
-    @POST("/foods/{id}/notices")
-    fun addNotice(@Path("id") id: Int, @Body body: RequestBody): Flowable<Food>
+//    @POST("/foods/{id}/notices")
+//    fun addNotice(@Path("id") id: Int, @Body body: RequestBody): Flowable<Food>
 }

@@ -26,22 +26,31 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
+
     @BindView(R.id.nameEditText)
     lateinit var mNameEditText: EditText
+
     @BindView(R.id.boxTextView)
     lateinit var mBoxNameText: TextView
+
     @BindView(R.id.amountEditText)
     lateinit var mAmountEditText: EditText
+
     @BindView(R.id.unitsSpinner)
     lateinit var mSpinner: Spinner
+
     @BindView(R.id.fab)
     lateinit var mFab: FloatingActionButton
+
     @BindView(R.id.expirationDateTextView)
     lateinit var mExpirationDateEditText: TextView
+
     @BindView(R.id.progressBar)
     lateinit var mProgressBar: ProgressBar
+
     @BindView(R.id.historyContainer)
     lateinit var mHistoryContainer: View
+
     @BindView(R.id.shopPlansContainer)
     lateinit var mShopPlansContainer: View
 
@@ -177,10 +186,12 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
         val name = mNameEditText.text.toString()
         val amount = mAmountEditText.text.toString().toDouble()
-        val unit = mPresenter.pickUnit(mSpinner.selectedItem.toString())
+        val unit = mPresenter.pickUnit(mSpinner.selectedItem.toString()) ?: return
         val expirationDate = formatter.parse(mExpirationDateEditText.text.toString())
+        val box = mPresenter.box ?: return
+        val food = Food.temp(name, amount, expirationDate, unit, box)
 
-        mPresenter.createFood(name, amount, unit, expirationDate)
+        mPresenter.createFood(food)
     }
 
     private fun showEditDateDialog() {

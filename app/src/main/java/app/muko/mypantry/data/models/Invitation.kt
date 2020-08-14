@@ -1,6 +1,5 @@
 package app.muko.mypantry.data.models
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.RoomWarnings
@@ -11,7 +10,6 @@ import java.util.*
 data class Invitation(
         @PrimaryKey
         val id: Int,
-        @Embedded(prefix = "user_")
         val user: User,
         val createdAt: Date,
         val updatedAt: Date

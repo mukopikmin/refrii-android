@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Food
-import io.reactivex.Completable
 
 @Dao
 interface BoxDao {
@@ -22,14 +21,14 @@ interface BoxDao {
     fun get(id: Int): Box
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdate(box: Box): Completable
+    fun insertOrUpdate(box: Box)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdate(boxes: List<Box>): Completable
+    fun insertOrUpdate(boxes: List<Box>)
 
     @Update
-    fun update(food: Food): Completable
+    fun update(food: Food)
 
     @Delete
-    fun delete(box: Box): Completable
+    fun delete(box: Box)
 }
