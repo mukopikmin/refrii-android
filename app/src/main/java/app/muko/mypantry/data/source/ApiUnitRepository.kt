@@ -8,7 +8,11 @@ import app.muko.mypantry.data.source.local.ApiLocalUnitSource
 import app.muko.mypantry.data.source.remote.ApiRemoteUnitSource
 import app.muko.mypantry.data.source.remote.services.UnitService
 import io.reactivex.Completable
+import io.reactivex.CompletableObserver
 import io.reactivex.Flowable
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.toFlowable
 
 class ApiUnitRepository(
         service: UnitService,
@@ -16,68 +20,37 @@ class ApiUnitRepository(
 ) : ApiUnitDataSource {
 
     private val remote = ApiRemoteUnitSource(service)
-
-    //    val dao = room.unitDao()
     private val local = ApiLocalUnitSource(dao)
 
-//    fun getUnits(userId: Int): Flowable<List<Unit>> {
-//        return mApiRemoteUnitSource.getUnits()
-//    }
-//
-//    fun getUnit(id: Int): Flowable<Unit> {
-//        return mApiRemoteUnitSource.getUnit(id)
-//    }
-//
-//    fun createUnit(label: String, step: Double): Flowable<Unit> {
-//        return mApiRemoteUnitSource.createUnit(label, step)
-//    }
-//
-//    fun updateUnit(id: Int, label: String?, step: Double?): Flowable<Unit> {
-//        return mApiRemoteUnitSource.updateUnit(id, label, step)
-//    }
-//
-//    fun removeUnit(id: Int): Flowable<Void> {
-//        return mApiRemoteUnitSource.removeUnit(id)
-//    }
-
     override fun getAll(): Flowable<List<Unit>> {
-        local.getAll()
-                .flatMap { units ->
-                    units.map { local.remove(it) }
-
-                    remote.getAll()
-                }
-                .flatMap { units ->
-                    units.map { local.create(it) }
-
-                    Flowable.just(units)
-                }
-                .subscribe()
+        Flowable.zip(
+                remote.getAll(),
+                local.getAll(),
+                BiFunction<List<Unit>, List<Unit>, Pair<List<Unit>, List<Unit>>> { r, l -> Pair(r, l) }
+        ).flatMap { pair ->
+            pair.second.forEach { local.remove(it) }
+            pair.first.map { local.create(it) }.toFlowable()
+        }.subscribe()
 
         return local.getAll()
     }
 
     override fun getByBox(box: Box): Flowable<List<Unit>> {
-        local.getByBox(box)
-                .flatMap { units ->
-                    units.map { local.remove(it) }
-
-                    remote.getByBox(box)
-                }
-                .flatMap { units ->
-                    Flowable.just(units.map { local.create(it) })
-                }
-                .subscribe()
+        Flowable.zip(
+                remote.getByBox(box),
+                local.getByBox(box),
+                BiFunction<List<Unit>, List<Unit>, Pair<List<Unit>, List<Unit>>> { r, l -> Pair(r, l) }
+        ).flatMap { pair ->
+            pair.second.forEach { local.remove(it) }
+            pair.first.map { local.create(it) }.toFlowable()
+        }.subscribe()
 
         return local.getByBox(box)
     }
 
     override fun get(id: Int): Flowable<Unit?> {
         remote.get(id)
-                .flatMap {
-                    local.create(it)
-                    Flowable.just(it)
-                }
+                .flatMap { local.create(it).toFlowable<Unit?>() }
                 .subscribe()
 
         return local.get(id)
@@ -99,7 +72,13 @@ class ApiUnitRepository(
 
     override fun remove(unit: Unit): Completable {
         remote.remove(unit)
-                .subscribe()
+                .subscribe(object : CompletableObserver {
+                    override fun onComplete() {}
+                    override fun onSubscribe(d: Disposable) {}
+                    override fun onError(e: Throwable) {
+                        local.create(unit)
+                    }
+                })
 
         return local.remove(unit)
     }

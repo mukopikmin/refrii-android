@@ -57,30 +57,22 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
-
     @BindView(R.id.fab)
     lateinit var mFab: FloatingActionButton
-
     @BindView(R.id.drawer_layout)
     lateinit var mDrawer: DrawerLayout
-
     @BindView(R.id.nav_view)
     lateinit var mNavigationView: NavigationView
-
     @BindView(R.id.swipeRefreshLayout)
     lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
-
     @BindView(R.id.recyclerView)
     lateinit var mRecyclerView: RecyclerView
-
     @BindView(R.id.emptyBoxMessageContainer)
     lateinit var mEmptyMessageContainer: View
-
     @BindView(R.id.noBoxesMessageContainer)
     lateinit var mNoBoxesMessageContainer: View
     @BindView(R.id.addButton)
     lateinit var mAddFoodButton: AppCompatButton
-
     @BindView(R.id.addBoxButton)
     lateinit var mAddBoxButton: AppCompatButton
     @BindView(R.id.coordinatorLayout)
@@ -115,14 +107,22 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         initPushNotification()
         initView()
 
-        mPresenter.takeView(this)
+        mPresenter.init(this)
         mPresenter.mBoxesLiveData.observe(this, Observer {
+            if (it.isNullOrEmpty()) {
+                setNoBoxesMessage()
+            } else {
+                mNoBoxesMessageContainer.visibility = View.GONE
+            }
+
             setBoxes(it)
         })
-        mPresenter.mFoodsLiveData.observe(this, Observer {
-            val box = mPresenter.mBox ?: return@Observer
+        mPresenter.mFoodsLiveData.observe(this, Observer { foods ->
+            val box = mPresenter.selectedBox ?: return@Observer
+            val foods = foods.filter { it.box.id == box.id }
 
-            setFoods(box.name, it)
+            setEmptyMessage(foods)
+            setFoods(box.name, foods)
         })
     }
 
@@ -222,7 +222,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
     private fun storeSelectedBoxState() {
         val editor = mPreference.edit()
 
-        mPresenter.getBox()?.let {
+        mPresenter.selectedBox?.let {
             editor.putInt(getString(R.string.preference_selected_box_id), it.id)
             editor.apply()
         }

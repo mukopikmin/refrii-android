@@ -10,58 +10,30 @@ import io.reactivex.Completable
 import io.reactivex.CompletableObserver
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.toFlowable
 
-class ApiFoodRepository(
-        private val service: FoodService,
-        private val dao: FoodDao
-) : ApiFoodDataSource {
+class ApiFoodRepository(service: FoodService, val dao: FoodDao) : ApiFoodDataSource {
 
     private val remote = ApiRemoteFoodSource(service)
-
-    //    private val mAPiLocalFoodSource = ApiLocalFoodSource(room)
-//    private val mAPiLocalShopPlanSource = ApiLocalShopPlanSource(room)
-//    private val mShopPlanDao = room.shopPlanDao()
     private val local = ApiLocalFoodSource(dao)
 
-
-//    fun createFood(name: String, amount: Double, box: Box, unit: Unit, expirationDate: Date): Flowable<Food> {
-//        return remote.createFood(name, amount, box, unit, expirationDate)
-//    }
-//
-//    fun updateFood(id: Int, name: String?, amount: Double?, expirationDate: Date?, bitmap: Bitmap?, boxId: Int?, unitId: Int?): Flowable<Food> {
-//        return remote.update(id, name, amount, expirationDate, bitmap, boxId, unitId)
-//    }
-//
-//    fun removeFood(id: Int): Flowable<Void> {
-//        return remote.removeFood(id)
-//    }
-//
-//    fun createNotice(foodId: Int, text: String): Flowable<Food> {
-//        return remote.createNotice(foodId, text)
-//    }
-
     override fun getByBox(boxId: Int): Flowable<List<Food>> {
-        local.getByBox(boxId)
-                .flatMap { foods ->
-                    foods.map { local.remove(it) }
-
-                    remote.getByBox(boxId)
-                }
-                .flatMap { foods ->
-                    Flowable.just(foods.map { local.create(it) })
-                }
-                .subscribe()
+        Flowable.zip(
+                remote.getByBox(boxId),
+                local.getByBox(boxId),
+                BiFunction<List<Food>, List<Food>, Pair<List<Food>, List<Food>>> { r, l -> Pair(r, l) }
+        ).flatMap { pair ->
+            pair.second.forEach { local.remove(it) }
+            pair.first.map { local.create(it) }.toFlowable()
+        }.subscribe()
 
         return local.getByBox(boxId)
     }
 
     override fun get(id: Int): Flowable<Food?> {
         remote.get(id)
-                .flatMap {
-                    local.create(it)
-
-                    Flowable.just(it)
-                }
+                .flatMap { local.create(it).toFlowable<Food>() }
                 .subscribe()
 
         return local.get(id)
@@ -69,7 +41,6 @@ class ApiFoodRepository(
 
     override fun create(food: Food): Completable {
         remote.create(food)
-                .andThen { local.create(food) }
                 .subscribe()
 
         return local.create(food)
@@ -77,7 +48,6 @@ class ApiFoodRepository(
 
     override fun update(food: Food): Completable {
         remote.update(food)
-                .andThen { local.update(food) }
                 .subscribe()
 
         return local.update(food)
@@ -87,9 +57,7 @@ class ApiFoodRepository(
         remote.remove(food)
                 .subscribe(object : CompletableObserver {
                     override fun onComplete() {}
-
                     override fun onSubscribe(d: Disposable) {}
-
                     override fun onError(e: Throwable) {
                         create(food)
                     }

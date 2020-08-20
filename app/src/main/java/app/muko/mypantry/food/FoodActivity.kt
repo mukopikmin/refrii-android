@@ -48,43 +48,30 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     @BindView(R.id.constraintLayout)
     lateinit var mConstraintLayout: ConstraintLayout
-
     @BindView(R.id.foodProgressBar)
     lateinit var mProgressBar: ProgressBar
-
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
-
     @BindView(R.id.nameEditText)
     lateinit var mName: EditText
-
     @BindView(R.id.amountEditText)
     lateinit var mAmount: EditText
-
     @BindView(R.id.expirationDateTextView)
     lateinit var mExpirationDate: TextView
-
     @BindView(R.id.createdTextView)
     lateinit var mCreated: TextView
-
     @BindView(R.id.updatedTextView)
     lateinit var mUpdate: TextView
-
     @BindView(R.id.boxTextView)
     lateinit var mBoxName: TextView
-
     @BindView(R.id.fab)
     lateinit var mFab: FloatingActionButton
-
     @BindView(R.id.unitsSpinner)
     lateinit var mUnitsSpinner: Spinner
-
     @BindView(R.id.shopPlanecyclerView)
     lateinit var mRecyclerView: RecyclerView
-
     @BindView(R.id.addPlanButton)
     lateinit var mAddPlanButton: View
-
     @BindView(R.id.cameraImageView)
     lateinit var mCameraImageView: ImageView
 
@@ -235,6 +222,12 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         })
 
         hideProgressBar()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        mPresenter.foodLiveData.removeObservers(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

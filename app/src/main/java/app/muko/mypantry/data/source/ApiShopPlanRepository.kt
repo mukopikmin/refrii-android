@@ -10,61 +10,40 @@ import io.reactivex.Completable
 import io.reactivex.CompletableObserver
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.toFlowable
 
 class ApiShopPlanRepository(
-        private val service: ShopPlanService,
+        service: ShopPlanService,
         private val dao: ShopPlanDao
 ) : ApiShopPlanDataSource {
 
     private val remote = ApiRemoteShopPlanSource(service)
     private val local = ApiLocalShopPlanSource(dao)
 
-//    fun getShopPlans(): Flowable<List<ShopPlan>> {
-//        return mApiRemoteShopPlanSource.getShopPlans()
-//    }
-//
-////    fun getShopPlansFromCache(): Flowable<List<ShopPlan>> {
-////        return mApiLocalShopPlanSource.getShopPlans()
-////    }
-//
-//    fun createShopPlan(foodId: Int, amount: Double, date: Date): Flowable<ShopPlan> {
-//        return mApiRemoteShopPlanSource.createShopPlan(foodId, amount, date)
-//                .flatMap {
-//                    mApiLocalShopPlanSource.create(it)
-//                }
-//    }
-//
-//    fun updateShopPlan(id: Int, done: Boolean?): Flowable<ShopPlan> {
-//        return mApiRemoteShopPlanSource.updateShopPlan(id, done)
-//    }
-
     override fun getAll(): Flowable<List<ShopPlan>> {
-        local.getAll()
-                .flatMap { plans ->
-                    plans.map { local.remove(it) }
-
-                    remote.getAll()
-                }
-                .flatMap { plans ->
-                    Flowable.just(plans.map { local.create(it) })
-                }
-                .subscribe()
+        Flowable.zip(
+                remote.getAll(),
+                local.getAll(),
+                BiFunction<List<ShopPlan>, List<ShopPlan>, Pair<List<ShopPlan>, List<ShopPlan>>> { r, l -> Pair(r, l) }
+        ).flatMap { pair ->
+            pair.second.forEach { local.remove(it) }
+            pair.first.map { local.create(it) }.toFlowable()
+        }.subscribe()
 
         return local.getAll()
 
     }
 
     override fun getByFood(foodId: Int): Flowable<List<ShopPlan>> {
-        local.getByFood(foodId)
-                .flatMap { plans ->
-                    plans.map { local.remove(it) }
-
-                    remote.getByFood(foodId)
-                }
-                .flatMap { plans ->
-                    Flowable.just(plans.map { local.create(it) })
-                }
-                .subscribe()
+        Flowable.zip(
+                remote.getByFood(foodId),
+                local.getByFood(foodId),
+                BiFunction<List<ShopPlan>, List<ShopPlan>, Pair<List<ShopPlan>, List<ShopPlan>>> { r, l -> Pair(r, l) }
+        ).flatMap { pair ->
+            pair.second.forEach { local.remove(it) }
+            pair.first.map { local.create(it) }.toFlowable()
+        }.subscribe()
 
         return local.getByFood(foodId)
     }
@@ -91,9 +70,7 @@ class ApiShopPlanRepository(
         remote.remove(shopPlan)
                 .subscribe(object : CompletableObserver {
                     override fun onComplete() {}
-
                     override fun onSubscribe(d: Disposable) {}
-
                     override fun onError(e: Throwable) {
                         create(shopPlan)
                     }

@@ -29,8 +29,7 @@ interface FoodListContract {
     }
 
     interface Presenter {
-        fun takeView(view: View)
-        fun getBox(): Box?
+        fun init(view: View)
         fun getBoxInfo()
         fun createBox(name: String, notice: String)
         fun pickBox(menuItemId: Int): Boolean
