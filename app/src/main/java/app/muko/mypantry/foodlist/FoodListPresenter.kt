@@ -11,6 +11,7 @@ import io.reactivex.CompletableObserver
 import io.reactivex.disposables.Disposable
 import io.reactivex.subscribers.DisposableSubscriber
 import retrofit2.HttpException
+import java.io.File
 import javax.inject.Inject
 
 class FoodListPresenter
@@ -109,8 +110,8 @@ constructor(
         }
     }
 
-    private fun updateFood(food: Food) {
-        foodRepository.update(food)
+    private fun updateFood(food: Food, imageFile: File? = null) {
+        foodRepository.update(food, imageFile)
                 .doOnSubscribe { view?.showProgressBar() }
                 .doFinally { view?.hideProgressBar() }
                 .subscribe(object : CompletableObserver {

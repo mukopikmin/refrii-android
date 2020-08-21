@@ -48,30 +48,43 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     @BindView(R.id.constraintLayout)
     lateinit var mConstraintLayout: ConstraintLayout
+
     @BindView(R.id.foodProgressBar)
     lateinit var mProgressBar: ProgressBar
+
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
+
     @BindView(R.id.nameEditText)
     lateinit var mName: EditText
+
     @BindView(R.id.amountEditText)
     lateinit var mAmount: EditText
+
     @BindView(R.id.expirationDateTextView)
     lateinit var mExpirationDate: TextView
+
     @BindView(R.id.createdTextView)
     lateinit var mCreated: TextView
+
     @BindView(R.id.updatedTextView)
     lateinit var mUpdate: TextView
+
     @BindView(R.id.boxTextView)
     lateinit var mBoxName: TextView
+
     @BindView(R.id.fab)
     lateinit var mFab: FloatingActionButton
+
     @BindView(R.id.unitsSpinner)
     lateinit var mUnitsSpinner: Spinner
+
     @BindView(R.id.shopPlanecyclerView)
     lateinit var mRecyclerView: RecyclerView
+
     @BindView(R.id.addPlanButton)
     lateinit var mAddPlanButton: View
+
     @BindView(R.id.cameraImageView)
     lateinit var mCameraImageView: ImageView
 
@@ -104,10 +117,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun initView() {
-        mPresenter.takeView(this)
-
         mRecyclerView.layoutManager = LinearLayoutManager(this)
-        mFab.setOnClickListener { mPresenter.getUnits(1) }
+        mFab.setOnClickListener { updateFood() }
         mAddPlanButton.setOnClickListener { showCreateShopPlanDialog() }
         mExpirationDate.setOnClickListener { showEditDateDialog() }
         mCameraImageView.setOnClickListener { launchCameraOrShowImage() }
@@ -116,16 +127,15 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
     private fun updateFood() {
         val food = mPresenter.foodLiveData.value ?: return
-//        val name = mName.text.toString()
-//        val amount = mAmount.text.toString().toDouble()
         val unitLabel = mUnitsSpinner.selectedItem.toString()
         val unit = mPresenter.unitsLiveData.value?.single { it.label == unitLabel } ?: return
 
         food.name = mName.text.toString()
         food.amount = mAmount.text.toString().toDouble()
         food.unit = unit
+        mDate?.let { food.expirationDate = it }
 
-        mPresenter.updateFood(food)
+        mPresenter.updateFood(food, File(filesDir, TEMP_IMAGE_FILENAME))
     }
 
     private fun launchCameraOrShowImage() {
@@ -201,7 +211,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         val foodId = intent.getIntExtra(getString(R.string.key_food_id), 0)
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
-        mPresenter.initLiveData(foodId)
+        mPresenter.init(this, foodId)
         mPresenter.getFood(foodId)
         mPresenter.getUnits(boxId)
         mPresenter.getShopPlans(foodId)

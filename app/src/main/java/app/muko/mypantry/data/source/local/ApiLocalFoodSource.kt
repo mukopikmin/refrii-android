@@ -5,6 +5,7 @@ import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.source.data.ApiFoodDataSource
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import java.io.File
 
 class ApiLocalFoodSource(
         private val dao: FoodDao
@@ -27,7 +28,7 @@ class ApiLocalFoodSource(
         return Completable.complete()
     }
 
-    override fun update(food: Food): Completable {
+    override fun update(food: Food, imageFile: File?): Completable {
         dao.insertOrUpdate(food)
 
         return Completable.complete()

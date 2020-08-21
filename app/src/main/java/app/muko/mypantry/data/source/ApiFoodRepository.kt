@@ -12,6 +12,7 @@ import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.toFlowable
+import java.io.File
 
 class ApiFoodRepository(service: FoodService, val dao: FoodDao) : ApiFoodDataSource {
 
@@ -46,11 +47,11 @@ class ApiFoodRepository(service: FoodService, val dao: FoodDao) : ApiFoodDataSou
         return local.create(food)
     }
 
-    override fun update(food: Food): Completable {
-        remote.update(food)
+    override fun update(food: Food, imageFile: File?): Completable {
+        remote.update(food, imageFile)
                 .subscribe()
 
-        return local.update(food)
+        return local.update(food, imageFile)
     }
 
     override fun remove(food: Food): Completable {

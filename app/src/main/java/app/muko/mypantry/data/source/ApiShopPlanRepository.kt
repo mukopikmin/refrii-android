@@ -15,7 +15,7 @@ import io.reactivex.rxkotlin.toFlowable
 
 class ApiShopPlanRepository(
         service: ShopPlanService,
-        private val dao: ShopPlanDao
+        val dao: ShopPlanDao
 ) : ApiShopPlanDataSource {
 
     private val remote = ApiRemoteShopPlanSource(service)

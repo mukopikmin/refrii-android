@@ -11,7 +11,7 @@ data class Food(
         var name: String,
         val notices: List<Notice>,
         var amount: Double,
-        val expirationDate: Date,
+        var expirationDate: Date,
         val imageUrl: String?,
         val createdAt: Date,
         val updatedAt: Date,
