@@ -24,7 +24,7 @@ interface FoodListContract {
         fun savePushToken(token: String)
         fun deselectFood()
         fun showNotices(food: Food)
-        fun setNoBoxesMessage()
+        fun setNoBoxesMessage(boxes: List<Box>)
         fun onBoxCreated()
     }
 

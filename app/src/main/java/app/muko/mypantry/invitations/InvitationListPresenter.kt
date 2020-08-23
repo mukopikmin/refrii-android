@@ -4,14 +4,16 @@ import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Invitation
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiInvitationRepository
+import io.reactivex.CompletableObserver
+import io.reactivex.disposables.Disposable
 import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class InvitationListPresenter
 @Inject
 constructor(
-        private val mApiBoxRepository: ApiBoxRepository,
-        private val mApiInvitationRepository: ApiInvitationRepository
+        private val apiBoxRepository: ApiBoxRepository,
+        private val apiInvitationRepository: ApiInvitationRepository
 ) : InvitationListContract.Presenter {
 
     private var mView: InvitationListContract.View? = null
@@ -34,23 +36,22 @@ constructor(
     }
 
     override fun getBox(id: Int) {
-//        TODO: Rewrite
-//        mApiBoxRepository.getBox(id)
-//                .doOnSubscribe { mView?.onLoading() }
-//                .doFinally { mView?.onLoaded() }
-//                .subscribe(object : DisposableSubscriber<Box>() {
-//                    override fun onNext(t: Box?) {
-//                        setBox(t)
-//                    }
-//
-//                    override fun onComplete() {}
-//
-//                    override fun onError(e: Throwable?) {
-//                        e?.message?.let {
-//                            mView?.showToast(it)
-//                        }
-//                    }
-//                })
+        apiBoxRepository.get(id)
+                .doOnSubscribe { mView?.onLoading() }
+                .doFinally { mView?.onLoaded() }
+                .subscribe(object : DisposableSubscriber<Box>() {
+                    override fun onNext(t: Box?) {
+                        setBox(t)
+                    }
+
+                    override fun onComplete() {}
+
+                    override fun onError(e: Throwable?) {
+                        e?.message?.let {
+                            mView?.showToast(it)
+                        }
+                    }
+                })
     }
 
     override fun createInvitation(email: String) {
@@ -78,13 +79,11 @@ constructor(
     }
 
     override fun removeInvitation() {
-        mInvitation?.id?.let { id ->
-            mApiInvitationRepository.remove(id)
+        mInvitation?.let {
+            apiInvitationRepository.remove(it)
                     .doOnSubscribe { mView?.onLoading() }
                     .doFinally { mView?.onLoaded() }
-                    .subscribe(object : DisposableSubscriber<Void>() {
-                        override fun onNext(t: Void?) {}
-
+                    .subscribe(object : CompletableObserver {
                         override fun onComplete() {
                             mView?.showSnackbar("共有を解除しました")
                             mBox?.id?.let {
@@ -92,8 +91,10 @@ constructor(
                             }
                         }
 
-                        override fun onError(e: Throwable?) {
-                            e?.message?.let {
+                        override fun onSubscribe(d: Disposable) {}
+
+                        override fun onError(e: Throwable) {
+                            e.message?.let {
                                 mView?.showToast(it)
                             }
                         }

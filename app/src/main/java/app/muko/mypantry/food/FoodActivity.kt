@@ -18,7 +18,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.FileProvider
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.muko.mypantry.App
@@ -216,20 +215,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mPresenter.getUnits(boxId)
         mPresenter.getShopPlans(foodId)
 
-        mPresenter.foodLiveData.observe(this, Observer {
-            setFood(it)
 
-            val shopPlans = mPresenter.shopPlansLiveData.value ?: return@Observer
-            setShopPlans(it, shopPlans)
-        })
-        mPresenter.shopPlansLiveData.observe(this, Observer {
-            val food = mPresenter.foodLiveData.value ?: return@Observer
-
-            setShopPlans(food, it)
-        })
-        mPresenter.unitsLiveData.observe(this, Observer {
-            setUnits(it)
-        })
 
         hideProgressBar()
     }
@@ -328,7 +314,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         mPresenter.createShopPlan(shopPlan)
     }
 
-    private fun setFood(food: Food?) {
+    override fun setFood(food: Food?) {
         val timeFormatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
 
         mToolbar.title = food?.name
@@ -369,7 +355,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         }
     }
 
-    private fun setShopPlans(food: Food, shopPlans: List<ShopPlan>) {
+    override fun setShopPlans(food: Food, shopPlans: List<ShopPlan>) {
         if (mRecyclerView.adapter == null) {
             food.let {
                 mRecyclerView.adapter = ShopPlanRecyclerViewAdapter(shopPlans, it)

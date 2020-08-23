@@ -24,7 +24,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import app.muko.mypantry.App
@@ -57,26 +56,37 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
+
     @BindView(R.id.fab)
     lateinit var mFab: FloatingActionButton
+
     @BindView(R.id.drawer_layout)
     lateinit var mDrawer: DrawerLayout
+
     @BindView(R.id.nav_view)
     lateinit var mNavigationView: NavigationView
+
     @BindView(R.id.swipeRefreshLayout)
     lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
+
     @BindView(R.id.recyclerView)
     lateinit var mRecyclerView: RecyclerView
+
     @BindView(R.id.emptyBoxMessageContainer)
     lateinit var mEmptyMessageContainer: View
+
     @BindView(R.id.noBoxesMessageContainer)
     lateinit var mNoBoxesMessageContainer: View
+
     @BindView(R.id.addButton)
     lateinit var mAddFoodButton: AppCompatButton
+
     @BindView(R.id.addBoxButton)
     lateinit var mAddBoxButton: AppCompatButton
+
     @BindView(R.id.coordinatorLayout)
     lateinit var mCoordinatorLayout: CoordinatorLayout
+
     @BindView(R.id.bottomNavigation)
     lateinit var mBottomNavigation: BottomNavigationView
 
@@ -108,22 +118,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         initView()
 
         mPresenter.init(this)
-        mPresenter.mBoxesLiveData.observe(this, Observer {
-            if (it.isNullOrEmpty()) {
-                setNoBoxesMessage()
-            } else {
-                mNoBoxesMessageContainer.visibility = View.GONE
-            }
-
-            setBoxes(it)
-        })
-        mPresenter.mFoodsLiveData.observe(this, Observer { foods ->
-            val box = mPresenter.selectedBox ?: return@Observer
-            val foods = foods.filter { it.box.id == box.id }
-
-            setEmptyMessage(foods)
-            setFoods(box.name, foods)
-        })
     }
 
     private fun initView() {
@@ -546,8 +540,8 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         mEmptyMessageContainer.visibility = if (foods.isEmpty()) View.VISIBLE else View.GONE
     }
 
-    override fun setNoBoxesMessage() {
-        mNoBoxesMessageContainer.visibility = View.VISIBLE
+    override fun setNoBoxesMessage(boxes: List<Box>) {
+        mNoBoxesMessageContainer.visibility = if (boxes.isEmpty()) View.VISIBLE else View.GONE
     }
 
     override fun onBoxCreated() {

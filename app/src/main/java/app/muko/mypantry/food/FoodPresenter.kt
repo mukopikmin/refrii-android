@@ -1,6 +1,7 @@
 package app.muko.mypantry.food
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.ShopPlan
 import app.muko.mypantry.data.models.Unit
@@ -27,10 +28,25 @@ constructor(
     lateinit var shopPlansLiveData: LiveData<List<ShopPlan>>
 
     override fun init(view: FoodContract.View, foodId: Int) {
-        this.view = view
+        this.view = view as FoodActivity
         foodLiveData = apiFoodRepository.dao.getLiveData(foodId)
         unitsLiveData = apiUnitRepository.dao.getAllLiveData()
         shopPlansLiveData = apiShopPlanRepository.dao.getLiveDataByFood(foodId)
+
+        foodLiveData.observe(view, Observer {
+            val shopPlans = shopPlansLiveData.value ?: return@Observer
+
+            view.setFood(it)
+            view.setShopPlans(it, shopPlans)
+        })
+        shopPlansLiveData.observe(view, Observer {
+            val food = foodLiveData.value ?: return@Observer
+
+            view.setShopPlans(food, it)
+        })
+        unitsLiveData.observe(view, Observer {
+            view.setUnits(it)
+        })
     }
 
     override fun getFood(id: Int) {

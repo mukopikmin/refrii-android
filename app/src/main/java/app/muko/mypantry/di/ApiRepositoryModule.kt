@@ -5,10 +5,7 @@ import app.muko.mypantry.data.dao.FoodDao
 import app.muko.mypantry.data.dao.ShopPlanDao
 import app.muko.mypantry.data.dao.UnitDao
 import app.muko.mypantry.data.source.*
-import app.muko.mypantry.data.source.remote.services.BoxService
-import app.muko.mypantry.data.source.remote.services.FoodService
-import app.muko.mypantry.data.source.remote.services.ShopPlanService
-import app.muko.mypantry.data.source.remote.services.UnitService
+import app.muko.mypantry.data.source.remote.services.*
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -55,7 +52,7 @@ class ApiRepositoryModule {
 
     @Singleton
     @Provides
-    fun provideApiInvitationRepository(retrofit: Retrofit): ApiInvitationRepository {
-        return ApiInvitationRepository(retrofit)
+    fun provideApiInvitationRepository(service: InvitationService): ApiInvitationRepository {
+        return ApiInvitationRepository(service)
     }
 }

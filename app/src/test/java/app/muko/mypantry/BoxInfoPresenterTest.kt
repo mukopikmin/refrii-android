@@ -36,7 +36,7 @@ class BoxInfoPresenterTest {
     @Before
     fun setUp() {
         presenter = BoxInfoPresenter(apiBoxRepositoryMock)
-        presenter.takeView(viewMock)
+        presenter.init(viewMock)
     }
 
     @Test

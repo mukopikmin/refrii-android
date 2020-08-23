@@ -14,53 +14,6 @@ class ApiRemoteUnitSource(
         private val service: UnitService
 ) : ApiUnitDataSource {
 
-//    fun getUnits(): Flowable<List<Unit>> {
-//        return retrofit.create(UnitService::class.java)
-//                .getUnits()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//    }
-//
-//    fun getUnit(id: Int): Flowable<Unit> {
-//        return retrofit.create(UnitService::class.java)
-//                .getUnit(id)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//    }
-//
-//    fun createUnit(label: String, step: Double): Flowable<Unit> {
-//        val body = MultipartBody.Builder()
-//                .setType(MultipartBody.FORM)
-//                .addFormDataPart("label", label)
-//                .addFormDataPart("step", step.toString())
-//                .build()
-//
-//        return retrofit.create(UnitService::class.java)
-//                .createUnit(body)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//    }
-//
-//    fun updateUnit(id: Int, label: String?, step: Double?): Flowable<Unit> {
-//        val builder = MultipartBody.Builder()
-//                .setType(MultipartBody.FORM)
-//
-//        label?.let { builder.addFormDataPart("label", it) }
-//        step?.let { builder.addFormDataPart("step", it.toString()) }
-//
-//        return retrofit.create(UnitService::class.java)
-//                .updateUnit(id, builder.build())
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//    }
-//
-//    fun removeUnit(id: Int): Flowable<Void> {
-//        return retrofit.create(UnitService::class.java)
-//                .deleteUnit(id)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//    }
-
     override fun getAll(): Flowable<List<Unit>> {
         return service.getAll()
                 .subscribeOn(Schedulers.io())

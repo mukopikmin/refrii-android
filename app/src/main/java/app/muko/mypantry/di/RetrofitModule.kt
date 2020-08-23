@@ -65,6 +65,12 @@ class RetrofitModule {
 
     @Singleton
     @Provides
+    fun provideInvitationService(retrofit: Retrofit): InvitationService {
+        return retrofit.create(InvitationService::class.java)
+    }
+
+    @Singleton
+    @Provides
     fun provideHttpClient(context: Context): OkHttpClient {
         return OkHttpClient.Builder()
                 .addInterceptor(AuthorizationInterceptor(context))

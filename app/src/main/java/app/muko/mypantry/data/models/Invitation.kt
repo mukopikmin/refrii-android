@@ -10,10 +10,12 @@ import java.util.*
 data class Invitation(
         @PrimaryKey
         val id: Int,
+        val box: Box,
         val user: User,
         val createdAt: Date,
         val updatedAt: Date
 ) {
+
     override fun equals(other: Any?): Boolean {
         return (other as Invitation).id == id
     }

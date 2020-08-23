@@ -8,8 +8,8 @@ import java.util.*
 data class Box(
         @PrimaryKey
         val id: Int,
-        val name: String,
-        val notice: String?,
+        var name: String,
+        var notice: String?,
         val imageUrl: String?,
         val isInvited: Boolean,
         val updatedAt: Date,

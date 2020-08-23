@@ -3,8 +3,6 @@ package app.muko.mypantry.boxinfo
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -18,9 +16,7 @@ import app.muko.mypantry.App
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Invitation
-import app.muko.mypantry.data.models.User
 import app.muko.mypantry.dialogs.ConfirmDialogFragment
-import app.muko.mypantry.dialogs.InviteUserDialogFragment
 import app.muko.mypantry.invitations.InvitationListActivity
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -34,37 +30,30 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
     @BindView(R.id.nameEditText)
     lateinit var mNameEditText: EditText
+
     @BindView(R.id.noticeEditText)
     lateinit var mNoticeEditText: EditText
+
     @BindView(R.id.ownerTextView)
     lateinit var mOwnerText: TextView
+
     @BindView(R.id.createdTextView)
     lateinit var mCreatedText: TextView
+
     @BindView(R.id.updatedTextView)
     lateinit var mUpdatedText: TextView
+
     @BindView(R.id.floatingActionButton)
     lateinit var mFab: FloatingActionButton
+
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
+
     @BindView(R.id.progressBar)
     lateinit var mProgressBar: ProgressBar
+
     @BindView(R.id.sharedCountTextView)
     lateinit var mSharedCountText: TextView
-
-    private val mNameTextWatcher = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) {}
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            mPresenter.updateName(s.toString())
-        }
-    }
-    private val mNoticeTextWatcher = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) {}
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            mPresenter.updateNotice(s.toString())
-        }
-    }
 
     @Inject
     lateinit var mPresenter: BoxInfoPresenter
@@ -83,10 +72,15 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        mNameEditText.addTextChangedListener(mNameTextWatcher)
-        mNoticeEditText.addTextChangedListener(mNoticeTextWatcher)
-        mFab.setOnClickListener { mPresenter.updateBox() }
+        mFab.setOnClickListener { updateBox() }
         mSharedCountText.setOnClickListener { mPresenter.showInvitations() }
+    }
+
+    private fun updateBox() {
+        val name = mNameEditText.text.toString()
+        val notice = mNoticeEditText.text.toString()
+
+        mPresenter.updateBox(name, notice)
     }
 
     override fun onStart() {
@@ -94,7 +88,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
-        mPresenter.takeView(this)
+        mPresenter.init(this, boxId)
         mPresenter.getBox(boxId)
         onLoaded()
     }
@@ -141,31 +135,9 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         data ?: return
 
-        when(requestCode) {
+        when (requestCode) {
             REMOVE_BOX_REQUEST_CODE -> mPresenter.removeBox()
-            REMOVE_INVITATION_REQUEST_CODE -> mPresenter.removeInvitation()
-            EDIT_SHARED_USERS_REQUEST_CODE -> onInviteRequested(data)
         }
-    }
-
-    override fun removeInvitation(boxName: String?, invitation: Invitation) {
-        boxName ?: return
-
-        val user = invitation.user
-        val userId = invitation.user?.id ?: return
-        val message = "${user?.name} への $boxName の共有を解除していいですか？"
-        val fragment = ConfirmDialogFragment.newInstance("共有の解除", message, userId)
-
-        fragment.setTargetFragment(null, REMOVE_INVITATION_REQUEST_CODE)
-        fragment.show(supportFragmentManager, "delete_invitation")
-    }
-
-    private fun onInviteRequested(data: Intent?) {
-        data ?: return
-
-        val email = data.getStringExtra("email")
-
-        mPresenter.createInvitation(email)
     }
 
     override fun setBox(box: Box?) {
@@ -182,36 +154,10 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         mUpdatedText.text = formatter.format(box.updatedAt)
 
         box.owner?.let { mOwnerText.text = it.name }
-
-//        if (box.isInvited) {
-//            mInviteLayout.visibility = View.GONE
-//        }
     }
 
-    override fun setInvitations(invitations: List<Invitation>, box: Box) {
+    override fun setInvitations(invitations: List<Invitation>) {
         mSharedCountText.text = "${invitations.count()} 人のユーザーと共有しています"
-//        if (mSharedUsersRecycler.adapter == null) {
-//            val adapter = InvitationsRecyclerViewAdapter(invitations, box)
-//
-//            adapter.setDeinviteClickListener(View.OnClickListener {
-//                val position = mSharedUsersRecycler.getChildAdapterPosition(it)
-//                val user = adapter.getItemAtPosition(position)
-//
-//                mPresenter.confirmRemovingInvitation(user)
-//            })
-//            mSharedUsersRecycler.adapter = adapter
-//        } else {
-//            (mSharedUsersRecycler.adapter as InvitationsRecyclerViewAdapter).setInvitations(invitations)
-//        }
-    }
-
-    override fun showInviteUserDialog(users: List<User>?) {
-        users ?: return
-
-        val fragment = InviteUserDialogFragment.newInstance(users)
-
-        fragment.setTargetFragment(null, EDIT_SHARED_USERS_REQUEST_CODE)
-        fragment.show(supportFragmentManager, "invite")
     }
 
     override fun showSnackbar(message: String?) {
@@ -243,8 +189,6 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     }
 
     companion object {
-        private const val EDIT_SHARED_USERS_REQUEST_CODE = 103
         private const val REMOVE_BOX_REQUEST_CODE = 104
-        private const val REMOVE_INVITATION_REQUEST_CODE = 105
     }
 }

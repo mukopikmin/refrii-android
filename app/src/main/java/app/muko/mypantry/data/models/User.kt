@@ -15,6 +15,7 @@ data class User(
         val updatedAt: Date,
         val createdAt: Date
 ) {
+
     override fun equals(other: Any?): Boolean {
         return (other as User).id == id
     }

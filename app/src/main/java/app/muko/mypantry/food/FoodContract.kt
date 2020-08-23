@@ -7,6 +7,8 @@ import java.io.File
 interface FoodContract {
 
     interface View {
+        fun setFood(food: Food?)
+        fun setShopPlans(food: Food, shopPlans: List<ShopPlan>)
         fun showEditDateDialog()
         fun showProgressBar()
         fun hideProgressBar()

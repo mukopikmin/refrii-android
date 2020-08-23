@@ -7,6 +7,7 @@ import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface BoxService {
+
     @GET("/boxes")
     fun getAll(): Flowable<List<Box>>
 
@@ -20,11 +21,6 @@ interface BoxService {
     fun update(
             @Path("id") id: Int,
             @Body body: RequestBody): Completable
-
-//    @POST("/boxes/{id}/invitations")
-//    fun invite(
-//            @Path("id") id: Int,
-//            @Body body: RequestBody): Flowable<Invitation>
 //
 //    @GET("/boxes/{id}/foods")
 //    fun getFoodsInBox(@Path("id") id: Int): Flowable<List<Food>>
