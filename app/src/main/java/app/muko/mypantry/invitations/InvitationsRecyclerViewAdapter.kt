@@ -5,12 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import app.muko.mypantry.R
-import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Invitation
 
 class InvitationsRecyclerViewAdapter(
-        private var mInvitations: List<Invitation>,
-        private val mBox: Box
+        private var mInvitations: List<Invitation>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     //    private var mDeinviteClickListener: View.OnClickListener? = null
@@ -30,7 +28,7 @@ class InvitationsRecyclerViewAdapter(
         val invitation = mInvitations[position]
 
         onLongClockListener?.let {
-            (holder as InvitationViewHolder).bind(invitation, mBox, it)
+            (holder as InvitationViewHolder).bind(invitation, it)
         }
     }
 

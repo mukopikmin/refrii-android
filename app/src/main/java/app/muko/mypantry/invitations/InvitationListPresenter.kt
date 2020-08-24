@@ -1,7 +1,8 @@
 package app.muko.mypantry.invitations
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import app.muko.mypantry.data.models.Box
-import app.muko.mypantry.data.models.Invitation
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiInvitationRepository
 import io.reactivex.CompletableObserver
@@ -16,103 +17,85 @@ constructor(
         private val apiInvitationRepository: ApiInvitationRepository
 ) : InvitationListContract.Presenter {
 
-    private var mView: InvitationListContract.View? = null
-    private var mBox: Box? = null
-    private var mInvitations: List<Invitation>? = null
-    private var mInvitation: Invitation? = null
+    private lateinit var view: InvitationListContract.View
+    private lateinit var boxLiveData: LiveData<Box>
 
-    override fun takeView(view: InvitationListContract.View) {
-        mView = view
-    }
+    override fun init(view: InvitationListContract.View, boxId: Int) {
+        this.view = view as InvitationListActivity
+        boxLiveData = apiBoxRepository.dao.getLiveData(boxId)
 
-    fun setBox(box: Box?) {
-        mBox = box
-        mInvitations = box?.invitations
-
-        box?.invitations?.let { invitations ->
-            mView?.setBox(box)
-            mView?.setInvitations(invitations, box)
-        }
+        boxLiveData.observe(view, Observer {
+            view.setBox(it)
+            view.setInvitations(it.invitations)
+        })
     }
 
     override fun getBox(id: Int) {
         apiBoxRepository.get(id)
-                .doOnSubscribe { mView?.onLoading() }
-                .doFinally { mView?.onLoaded() }
+                .doOnSubscribe { view.onLoading() }
+                .doFinally { view.onLoaded() }
                 .subscribe(object : DisposableSubscriber<Box>() {
-                    override fun onNext(t: Box?) {
-                        setBox(t)
-                    }
+                    override fun onNext(t: Box?) {}
 
                     override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
                         e?.message?.let {
-                            mView?.showToast(it)
+                            view.showToast(it)
                         }
                     }
                 })
     }
 
     override fun createInvitation(email: String) {
-//        TODO: Rewrite
-//        mBox?.id?.let { id ->
-//            mApiBoxRepository.invite(id, email)
-//                    .doOnSubscribe { mView?.onLoading() }
-//                    .doFinally { mView?.onLoaded() }
-//                    .subscribe(object : DisposableSubscriber<Invitation>() {
-//                        override fun onNext(t: Invitation?) {
-//                            t?.let { mView?.onInvitationCreated(it) }
-//                        }
-//
-//                        override fun onComplete() {
-//                            getBox(id)
-//                        }
-//
-//                        override fun onError(e: Throwable?) {
-//                            e?.message?.let {
-//                                mView?.showToast(it)
-//                            }
-//                        }
-//                    })
-//        }
-    }
+        val box = boxLiveData.value ?: return
 
-    override fun removeInvitation() {
-        mInvitation?.let {
-            apiInvitationRepository.remove(it)
-                    .doOnSubscribe { mView?.onLoading() }
-                    .doFinally { mView?.onLoaded() }
-                    .subscribe(object : CompletableObserver {
-                        override fun onComplete() {
-                            mView?.showSnackbar("共有を解除しました")
-                            mBox?.id?.let {
-                                getBox(it)
-                            }
+        apiInvitationRepository.create(box, email)
+                .doOnSubscribe { view.onLoading() }
+                .doFinally { view.onLoaded() }
+                .subscribe(object : CompletableObserver {
+                    override fun onComplete() {
+                        getBox(box.id)
+                        view.onInvitationCreated(box)
+                    }
+
+                    override fun onSubscribe(d: Disposable) {}
+
+                    override fun onError(e: Throwable) {
+                        e.message?.let {
+                            view.showToast(it)
                         }
+                    }
+                })
+    }
 
-                        override fun onSubscribe(d: Disposable) {}
+    override fun removeInvitation(invitationId: Int) {
+        val box = boxLiveData.value ?: return
+        val invitation = box.invitations.findLast { it.id == invitationId } ?: return
 
-                        override fun onError(e: Throwable) {
-                            e.message?.let {
-                                mView?.showToast(it)
-                            }
+        apiInvitationRepository.remove(invitation)
+                .doOnSubscribe { view.onLoading() }
+                .doFinally { view.onLoaded() }
+                .subscribe(object : CompletableObserver {
+                    override fun onComplete() {
+                        view.showSnackbar("共有を解除しました")
+                        getBox(box.id)
+                    }
+
+                    override fun onSubscribe(d: Disposable) {}
+
+                    override fun onError(e: Throwable) {
+                        e.message?.let {
+                            view.showToast(it)
                         }
-                    })
-        }
+                    }
+                })
     }
 
-    override fun showOptionsDialog(invitation: Invitation) {
-        mInvitation = invitation
+    override fun confirmRemovingInvitation(invitationId: Int) {
+        val box = boxLiveData.value ?: return
+        val invitation = box.invitations.findLast { it.id == invitationId } ?: return
 
-        mView?.showOptionsDialog()
-    }
-
-    override fun confirmRemovingInvitation() {
-        mInvitation?.let { invitation ->
-            mBox?.name?.let {
-                mView?.removeInvitation(it, invitation)
-            }
-        }
+        view.removeInvitation(invitation, box)
     }
 }

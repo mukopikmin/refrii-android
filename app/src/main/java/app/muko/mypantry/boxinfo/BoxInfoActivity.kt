@@ -29,34 +29,34 @@ import javax.inject.Inject
 class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
     @BindView(R.id.nameEditText)
-    lateinit var mNameEditText: EditText
+    lateinit var nameEditText: EditText
 
     @BindView(R.id.noticeEditText)
-    lateinit var mNoticeEditText: EditText
+    lateinit var noticeEditText: EditText
 
     @BindView(R.id.ownerTextView)
-    lateinit var mOwnerText: TextView
+    lateinit var ownerNameText: TextView
 
     @BindView(R.id.createdTextView)
-    lateinit var mCreatedText: TextView
+    lateinit var createdAtText: TextView
 
     @BindView(R.id.updatedTextView)
-    lateinit var mUpdatedText: TextView
+    lateinit var updatedAtText: TextView
 
     @BindView(R.id.floatingActionButton)
-    lateinit var mFab: FloatingActionButton
+    lateinit var fab: FloatingActionButton
 
     @BindView(R.id.toolbar)
-    lateinit var mToolbar: Toolbar
+    lateinit var toolbar: Toolbar
 
     @BindView(R.id.progressBar)
-    lateinit var mProgressBar: ProgressBar
+    lateinit var progressBar: ProgressBar
 
     @BindView(R.id.sharedCountTextView)
-    lateinit var mSharedCountText: TextView
+    lateinit var invitationsStatusText: TextView
 
     @Inject
-    lateinit var mPresenter: BoxInfoPresenter
+    lateinit var presenter: BoxInfoPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,22 +65,15 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         setContentView(R.layout.activity_box_info)
         ButterKnife.bind(this)
-        setSupportActionBar(mToolbar)
+        setSupportActionBar(toolbar)
 
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
-        mFab.setOnClickListener { updateBox() }
-        mSharedCountText.setOnClickListener { mPresenter.showInvitations() }
-    }
-
-    private fun updateBox() {
-        val name = mNameEditText.text.toString()
-        val notice = mNoticeEditText.text.toString()
-
-        mPresenter.updateBox(name, notice)
+        fab.setOnClickListener { updateBox() }
+        invitationsStatusText.setOnClickListener { presenter.showInvitations() }
     }
 
     override fun onStart() {
@@ -88,8 +81,8 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
-        mPresenter.init(this, boxId)
-        mPresenter.getBox(boxId)
+        presenter.init(this, boxId)
+        presenter.getBox(boxId)
         onLoaded()
     }
 
@@ -105,8 +98,8 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         when (id) {
             android.R.id.home -> finish()
-            R.id.menu_invite -> mPresenter.showInvitations()
-            R.id.menu_remove_box -> mPresenter.confirmRemovingBox()
+            R.id.menu_invite -> presenter.showInvitations()
+            R.id.menu_remove_box -> presenter.confirmRemovingBox()
             else -> result = super.onOptionsItemSelected(item)
         }
 
@@ -136,7 +129,7 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         data ?: return
 
         when (requestCode) {
-            REMOVE_BOX_REQUEST_CODE -> mPresenter.removeBox()
+            REMOVE_BOX_REQUEST_CODE -> presenter.removeBox()
         }
     }
 
@@ -145,25 +138,25 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
 
         val formatter = SimpleDateFormat(getString(R.string.format_datetime), Locale.getDefault())
 
-        mToolbar.title = box.name
-        setSupportActionBar(mToolbar)
+        toolbar.title = box.name
+        setSupportActionBar(toolbar)
 
-        mNameEditText.setText(box.name)
-        mNoticeEditText.setText(box.notice)
-        mCreatedText.text = formatter.format(box.createdAt)
-        mUpdatedText.text = formatter.format(box.updatedAt)
+        nameEditText.setText(box.name)
+        noticeEditText.setText(box.notice)
+        createdAtText.text = formatter.format(box.createdAt)
+        updatedAtText.text = formatter.format(box.updatedAt)
 
-        box.owner?.let { mOwnerText.text = it.name }
+        box.owner?.let { ownerNameText.text = it.name }
     }
 
     override fun setInvitations(invitations: List<Invitation>) {
-        mSharedCountText.text = "${invitations.count()} 人のユーザーと共有しています"
+        invitationsStatusText.text = getString(R.string.text_invitations_status, invitations.count())
     }
 
     override fun showSnackbar(message: String?) {
         message ?: return
 
-        Snackbar.make(mNameEditText, message, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(nameEditText, message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun showToast(message: String?) {
@@ -173,11 +166,11 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
     }
 
     override fun onLoaded() {
-        mProgressBar.visibility = View.GONE
+        progressBar.visibility = View.GONE
     }
 
     override fun onLoading() {
-        mProgressBar.visibility = View.VISIBLE
+        progressBar.visibility = View.VISIBLE
     }
 
     override fun onDeleteCompleted(name: String?) {
@@ -186,6 +179,13 @@ class BoxInfoActivity : AppCompatActivity(), BoxInfoContract.View {
         intent.putExtra("key_box_name", name)
         setResult(Activity.RESULT_OK, intent)
         finish()
+    }
+
+    private fun updateBox() {
+        val name = nameEditText.text.toString()
+        val notice = noticeEditText.text.toString()
+
+        presenter.updateBox(name, notice)
     }
 
     companion object {

@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import app.muko.mypantry.App
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Box
@@ -24,16 +25,19 @@ import javax.inject.Inject
 class InvitationListActivity : AppCompatActivity(), InvitationListContract.View {
 
     @BindView(R.id.sharedUsersLayout)
-    lateinit var mSharedUsersRecycler: androidx.recyclerview.widget.RecyclerView
+    lateinit var invitedUserList: RecyclerView
+
     @BindView(R.id.progressBar)
-    lateinit var mProgressBar: ProgressBar
+    lateinit var progressBar: ProgressBar
+
     @BindView(R.id.emailEditText)
-    lateinit var mEmailEditText: EditText
+    lateinit var emailEditText: EditText
+
     @BindView(R.id.button)
-    lateinit var mButton: Button
+    lateinit var submitButton: Button
 
     @Inject
-    lateinit var mPresenter: InvitationListPresenter
+    lateinit var presenter: InvitationListPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,15 +53,9 @@ class InvitationListActivity : AppCompatActivity(), InvitationListContract.View 
             it.setHomeButtonEnabled(true)
         }
 
-        mSharedUsersRecycler.addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
-        mSharedUsersRecycler.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
-        mButton.setOnClickListener { createInvitation() }
-    }
-
-    private fun createInvitation() {
-        val email = mEmailEditText.text.toString()
-
-        mPresenter.createInvitation(email)
+        invitedUserList.addItemDecoration(androidx.recyclerview.widget.DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL))
+        invitedUserList.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        submitButton.setOnClickListener { createInvitation() }
     }
 
     override fun onStart() {
@@ -65,8 +63,8 @@ class InvitationListActivity : AppCompatActivity(), InvitationListContract.View 
 
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
-        mPresenter.takeView(this)
-        mPresenter.getBox(boxId)
+        presenter.init(this, boxId)
+        presenter.getBox(boxId)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -89,11 +87,19 @@ class InvitationListActivity : AppCompatActivity(), InvitationListContract.View 
         when (requestCode) {
             INVITATION_OPTIONS_REQUEST_CODE -> {
                 when (data.getIntExtra("option", -1)) {
-                    0 -> mPresenter.confirmRemovingInvitation()
+                    0 -> {
+                        val id = data.getIntExtra("target_id", -1)
+
+                        presenter.confirmRemovingInvitation(id)
+                    }
                     else -> return
                 }
             }
-            REMOVE_INVITATION_REQUEST_CODE -> mPresenter.removeInvitation()
+            REMOVE_INVITATION_REQUEST_CODE -> {
+                val id = data.getIntExtra("target_id", -1)
+
+                presenter.removeInvitation(id)
+            }
         }
     }
 
@@ -102,11 +108,11 @@ class InvitationListActivity : AppCompatActivity(), InvitationListContract.View 
     }
 
     override fun onLoading() {
-        mProgressBar.visibility = View.VISIBLE
+        progressBar.visibility = View.VISIBLE
     }
 
     override fun onLoaded() {
-        mProgressBar.visibility = View.GONE
+        progressBar.visibility = View.GONE
     }
 
     override fun showSnackbar(message: String) {
@@ -117,48 +123,54 @@ class InvitationListActivity : AppCompatActivity(), InvitationListContract.View 
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun setInvitations(invitations: List<Invitation>, box: Box) {
-        if (mSharedUsersRecycler.adapter == null) {
-            val adapter = InvitationsRecyclerViewAdapter(invitations, box)
+    override fun setInvitations(invitations: List<Invitation>) {
+        if (invitedUserList.adapter == null) {
+            val adapter = InvitationsRecyclerViewAdapter(invitations)
 
             adapter.setOnLongClickListener(View.OnLongClickListener {
-                val position = mSharedUsersRecycler.getChildAdapterPosition(it)
+                val position = invitedUserList.getChildAdapterPosition(it)
                 val invitation = adapter.getItemAtPosition(position)
 
-                mPresenter.showOptionsDialog(invitation)
+                showOptionsDialog(invitation)
 
                 true
             })
-            mSharedUsersRecycler.adapter = adapter
+            invitedUserList.adapter = adapter
         } else {
-            (mSharedUsersRecycler.adapter as InvitationsRecyclerViewAdapter).setInvitations(invitations)
+            (invitedUserList.adapter as InvitationsRecyclerViewAdapter).setInvitations(invitations)
         }
     }
 
-    override fun removeInvitation(boxName: String, invitation: Invitation) {
+    override fun removeInvitation(invitation: Invitation, box: Box) {
         val user = invitation.user
-        val userId = invitation.user?.id ?: return
-        val message = "${user?.name} への $boxName の共有を解除していいですか？"
-        val fragment = ConfirmDialogFragment.newInstance("共有の解除", message, userId)
+        val userId = invitation.user.id
+        val message = "${user.name} への ${box.name} の共有を解除していいですか？"
+        val fragment = ConfirmDialogFragment.newInstance("共有の解除", message, invitation.id)
 
         fragment.setTargetFragment(null, REMOVE_INVITATION_REQUEST_CODE)
         fragment.show(supportFragmentManager, "delete_invitation")
     }
 
-    override fun onInvitationCreated(invitation: Invitation) {
-        mEmailEditText.editableText.clear()
-        showSnackbar("${invitation.user?.name} さんと共有しました")
+    override fun onInvitationCreated(box: Box) {
+        emailEditText.editableText.clear()
+        showSnackbar("${box.name} を共有しました")
     }
 
-    override fun showOptionsDialog() {
+    private fun showOptionsDialog(invitation: Invitation) {
         val options = arrayOf(
-                "削除する",
+                getString(R.string.text_remove),
                 getString(R.string.message_cancel)
         )
-        val fragment = OptionsPickerDialogFragment.newInstance(null, options, null)
+        val fragment = OptionsPickerDialogFragment.newInstance(null, options, invitation.id)
 
         fragment.setTargetFragment(null, INVITATION_OPTIONS_REQUEST_CODE)
         fragment.show(supportFragmentManager, "invitation_option")
+    }
+
+    private fun createInvitation() {
+        val email = emailEditText.text.toString()
+
+        presenter.createInvitation(email)
     }
 
     companion object {

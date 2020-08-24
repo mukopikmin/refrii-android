@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import app.muko.mypantry.R
-import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Invitation
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -18,10 +17,13 @@ class InvitationViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     @BindView(R.id.invitationRowContainer)
     lateinit var mInvitationRowContainer: View
+
     @BindView(R.id.nameTextView)
     lateinit var mNameText: TextView
+
     @BindView(R.id.emailTextView)
     lateinit var mEmailText: TextView
+
     @BindView(R.id.avatarImageView)
     lateinit var mAvatarImage: ImageView
 
@@ -29,7 +31,7 @@ class InvitationViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         ButterKnife.bind(this, view)
     }
 
-    fun bind(invitation: Invitation, box: Box, listener: View.OnLongClickListener) {
+    fun bind(invitation: Invitation, listener: View.OnLongClickListener) {
         val user = invitation.user
 
         mNameText.text = user?.name

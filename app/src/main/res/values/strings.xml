@@ -36,7 +36,7 @@
 
     <string name="nav_add_box">カテゴリの追加</string>
     <string name="nav_categories">カテゴリ</string>
-    <string name="nav_expiring">期限が1週間以内</string>
+    <string name="nav_expiring">期限が 1 週間以内</string>
     <string name="nav_filter">フィルター</string>
     <string name="nav_settings">設定</string>
     <string name="nav_shared_categories">共有</string>
@@ -72,4 +72,6 @@
     <string name="message_plan">予定</string>
     <string name="message_shop_plan">買い物の予定</string>
     <string name="message_box_name">カテゴリの名前</string>
+    <string name="text_invitations_status">%1$d 人のユーザーと共有しています</string>
+    <string name="text_remove">削除する</string>
 </resources>
