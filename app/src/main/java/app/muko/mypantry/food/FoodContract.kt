@@ -21,6 +21,7 @@ interface FoodContract {
 
     interface Presenter {
         fun init(view: View, foodId: Int)
+        fun terminate()
         fun getFood(id: Int)
         fun getUnits(boxId: Int)
         fun updateFood(food: Food, imageFile: File?)

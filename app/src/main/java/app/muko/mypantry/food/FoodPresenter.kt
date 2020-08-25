@@ -49,6 +49,12 @@ constructor(
         })
     }
 
+    override fun terminate() {
+        foodLiveData.removeObservers(view as FoodActivity)
+        unitsLiveData.removeObservers(view as FoodActivity)
+        shopPlansLiveData.removeObservers(view as FoodActivity)
+    }
+
     override fun getFood(id: Int) {
         apiFoodRepository.get(id)
                 .subscribe(object : DisposableSubscriber<Food>() {

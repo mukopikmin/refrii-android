@@ -31,6 +31,7 @@ import app.muko.mypantry.R
 import app.muko.mypantry.boxinfo.BoxInfoActivity
 import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Food
+import app.muko.mypantry.data.models.User
 import app.muko.mypantry.dialogs.ConfirmDialogFragment
 import app.muko.mypantry.dialogs.CreateBoxDialogFragment
 import app.muko.mypantry.food.FoodActivity
@@ -204,7 +205,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
 
         hideBottomNavigation()
         mPresenter.getBoxes()
-        setNavigationHeader()
+        mPresenter.getAccount()
     }
 
     override fun onPause() {
@@ -220,13 +221,6 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             editor.putInt(getString(R.string.preference_selected_box_id), it.id)
             editor.apply()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-//        mPresenter.getBoxes()
-//        setNavigationHeader()
     }
 
     override fun onBackPressed() {
@@ -332,22 +326,29 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
                 .subMenu.add(Menu.NONE, box.id, Menu.NONE, box.name)
     }
 
-    private fun setNavigationHeader() {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+    fun saveAccount(user: User?) {
+        user ?: return
+
+        val editor = mPreference.edit()
+
+        editor.putInt(getString(R.string.preference_key_id), user.id)
+        editor.apply()
+    }
+
+    override fun setNavigationHeader(user: User?) {
+        user ?: return
+
         val headerView = mNavigationView.getHeaderView(0)
         val nameTextView = headerView.findViewById<TextView>(R.id.nameNavHeaderTextView)
         val mailTextView = headerView.findViewById<TextView>(R.id.mailNavHeaderTextView)
         val avatarImageView = headerView.findViewById<ImageView>(R.id.lastUpdatedUserAvatarImageView)
-        val name = sharedPreferences.getString(getString(R.string.preference_key_name), getString(R.string.default_name))
-        val mail = sharedPreferences.getString(getString(R.string.preference_key_mail), getString(R.string.default_mail))
-        val avatarUrl = sharedPreferences.getString(getString(R.string.preference_key_avatar), null)
 
         mNavigationView.setNavigationItemSelectedListener(this)
 
-        nameTextView.text = name
-        mailTextView.text = mail
+        nameTextView.text = user.name
+        mailTextView.text = user.email
 
-        Picasso.get().load(avatarUrl).into(avatarImageView)
+        Picasso.get().load(user.avatarUrl).into(avatarImageView)
     }
 
     override fun showFood(id: Int, box: Box?) {

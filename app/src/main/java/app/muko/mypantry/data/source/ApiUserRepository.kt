@@ -24,8 +24,4 @@ class ApiUserRepository(retrofit: Retrofit) {
     fun update(id: Int, name: String?): Flowable<User> {
         return mAPiRemoteUserSource.update(id, name)
     }
-
-//    fun deleteLocalData() {
-//        mApiLocalUserSource.deleteAll()
-//    }
 }

@@ -26,21 +26,26 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
 
     @BindView(R.id.toolbar)
     lateinit var toolbar: Toolbar
+
     @BindView(R.id.listView)
     lateinit var listView: ListView
+
     @BindView(R.id.fab)
     lateinit var fab: FloatingActionButton
+
     @BindView(R.id.progressBar)
     lateinit var progressBar: ProgressBar
+
     @BindView(R.id.emptyUnitMessage)
-    lateinit var mEmptyUnitMessage: View
+    lateinit var emptyUnitListMessage: View
+
     @BindView(R.id.addButton)
-    lateinit var mAddUnitButton: Button
+    lateinit var addUnitButton: Button
 
     @Inject
-    lateinit var mPresenter: UnitListPresenter
+    lateinit var presenter: UnitListPresenter
 
-    private lateinit var mPreference: SharedPreferences
+    private lateinit var preference: SharedPreferences
 
     private val onItemClickListActivity = AdapterView.OnItemClickListener { adapterView, _, i, _ ->
         val unit = adapterView.getItemAtPosition(i) as Unit
@@ -52,7 +57,11 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
 
     private val onItemLongClickListener = AdapterView.OnItemLongClickListener { adapterView, _, i, _ ->
         val unit = adapterView.getItemAtPosition(i) as Unit
-        val options = arrayOf(getString(R.string.message_show_detail), getString(R.string.message_delete), getString(R.string.message_cancel))
+        val options = arrayOf(
+                getString(R.string.message_show_detail),
+                getString(R.string.message_delete),
+                getString(R.string.message_cancel)
+        )
         val fragment = OptionsPickerDialogFragment.newInstance(unit.label!!, options, unit.id)
 
         fragment.setTargetFragment(null, UNIT_OPTIONS_REQUEST_CODE)
@@ -76,12 +85,12 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        preference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         listView.onItemClickListener = onItemClickListActivity
         listView.onItemLongClickListener = onItemLongClickListener
 
         fab.setOnClickListener { addUnit() }
-        mAddUnitButton.setOnClickListener { addUnit() }
+        addUnitButton.setOnClickListener { addUnit() }
 
         hideEmptyMessage()
     }
@@ -95,16 +104,15 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
     override fun onStart() {
         super.onStart()
 
-        mPresenter.takeView(this)
+        presenter.init(this)
     }
 
     override fun onResume() {
         super.onResume()
 
-        val preference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val userId = preference.getInt(getString(R.string.preference_key_id), -1)
 
-        mPresenter.getUnits(userId)
+        presenter.getUnits(userId)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -117,11 +125,10 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
         data ?: return
 
         when (requestCode) {
-            NEW_UNIT_REQUEST_CODE -> mPresenter.getUnits(userId)
+            NEW_UNIT_REQUEST_CODE -> presenter.getUnits(userId)
             UNIT_OPTIONS_REQUEST_CODE -> {
                 val option = data.getIntExtra("option", -1)
                 val unitId = data.getIntExtra("target_id", 0)
-                val unit = mPresenter.mUnits?.find { it.id == unitId }
 
                 when (option) {
                     // Show
@@ -132,7 +139,7 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
                         startActivity(intent)
                     }
                     // Remove
-                    1 -> unit?.let { mPresenter.removeUnit(it) }
+                    1 -> presenter.removeUnit(unitId)
                     // Cancel
                     else -> return
                 }
@@ -141,19 +148,19 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
     }
 
     override fun showEmptyMessage() {
-        mEmptyUnitMessage.visibility = View.VISIBLE
+        emptyUnitListMessage.visibility = View.VISIBLE
     }
 
     override fun hideEmptyMessage() {
-        mEmptyUnitMessage.visibility = View.GONE
+        emptyUnitListMessage.visibility = View.GONE
     }
 
     override fun onUnitCreateCompleted(unit: Unit?) {
-        val userId = mPreference.getInt(getString(R.string.preference_key_id), 0)
+        val userId = preference.getInt(getString(R.string.preference_key_id), 0)
         val label = unit?.label ?: ""
 
         showSnackbar("単位 \"$label\" が追加されました")
-        mPresenter.getUnits(userId)
+        presenter.getUnits(userId)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -171,7 +178,10 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
     override fun setUnits(units: List<Unit>?) {
         units ?: return
 
-        listView.adapter = UnitListAdapter(this@UnitListActivity, units)
+        val userId = preference.getInt(getString(R.string.preference_key_id), -1)
+        val ownUnits = units.filter { it.user?.id == userId }
+
+        listView.adapter = UnitListAdapter(this@UnitListActivity, ownUnits)
     }
 
     override fun showProgressBar() {

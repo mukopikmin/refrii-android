@@ -16,9 +16,9 @@ interface UnitListContract {
     }
 
     interface Presenter {
-        fun takeView(view: View)
+        fun init(view: View)
         fun getUnits(userId: Int)
-        fun removeUnit(unit: Unit)
+        fun removeUnit(id: Int)
         fun getUnit(id: Int)
     }
 }

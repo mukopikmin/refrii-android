@@ -28,8 +28,8 @@ constructor(
     private var mFoods: List<Food>? = null
     private var mFood: Food? = null
 
-    lateinit var mBoxesLiveData: LiveData<List<Box>>
-    lateinit var mFoodsLiveData: LiveData<List<Food>>
+    private lateinit var mBoxesLiveData: LiveData<List<Box>>
+    private lateinit var mFoodsLiveData: LiveData<List<Food>>
 
     override fun init(view: FoodListContract.View) {
         this.view = view as FoodListActivity
@@ -92,6 +92,22 @@ constructor(
                     }
 
                 })
+    }
+
+    override fun getAccount() {
+        userRepository.verify()
+                .subscribe(object : DisposableSubscriber<User>() {
+                    override fun onComplete() {}
+
+                    override fun onNext(t: User?) {
+                        view?.setNavigationHeader(t)
+                    }
+
+                    override fun onError(t: Throwable?) {
+                        view?.showToast(t?.message)
+                    }
+                })
+
     }
 
     override fun incrementFood() {

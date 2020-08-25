@@ -2,6 +2,7 @@ package app.muko.mypantry.foodlist
 
 import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Food
+import app.muko.mypantry.data.models.User
 
 interface FoodListContract {
 
@@ -26,11 +27,13 @@ interface FoodListContract {
         fun showNotices(food: Food)
         fun setNoBoxesMessage(boxes: List<Box>)
         fun onBoxCreated()
+        fun setNavigationHeader(user: User?)
     }
 
     interface Presenter {
         fun init(view: View)
         fun getBoxInfo()
+        fun getAccount()
         fun createBox(name: String, notice: String)
         fun pickBox(menuItemId: Int): Boolean
         fun getBoxes()
