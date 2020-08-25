@@ -21,14 +21,16 @@ import javax.inject.Inject
 class ShopPlansActivity : AppCompatActivity(), ShopPlansContract.View {
 
     @BindView(R.id.toolbar)
-    lateinit var mToolbar: Toolbar
+    lateinit var toolbar: Toolbar
+
     @BindView(R.id.recyclerView)
-    lateinit var mRecyclerView: RecyclerView
+    lateinit var shopPlanListRecycler: RecyclerView
+
     @BindView(R.id.progressBar)
-    lateinit var mProgressBar: ProgressBar
+    lateinit var progressBar: ProgressBar
 
     @Inject
-    lateinit var mPresenter: ShopPlansPresenter
+    lateinit var presenter: ShopPlansPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +38,7 @@ class ShopPlansActivity : AppCompatActivity(), ShopPlansContract.View {
         (application as App).getComponent().inject(this)
         setContentView(R.layout.activity_shop_plans)
         ButterKnife.bind(this)
-        setSupportActionBar(mToolbar)
+        setSupportActionBar(toolbar)
 
         title = "買い物の予定"
 
@@ -45,36 +47,36 @@ class ShopPlansActivity : AppCompatActivity(), ShopPlansContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        mRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        mRecyclerView.layoutManager = LinearLayoutManager(this)
+        shopPlanListRecycler.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        shopPlanListRecycler.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onStart() {
         super.onStart()
 
-        mPresenter.takeView(this)
-        mPresenter.getShopPlans()
+        presenter.init(this)
+        presenter.getShopPlans()
 
-        mProgressBar.visibility = View.GONE
+        progressBar.visibility = View.GONE
     }
 
-    override fun setShopPlans(shopPlans: List<ShopPlan>?) {
-        shopPlans?.let {
-            if (mRecyclerView.adapter == null) {
-                val adapter = ShopPlansRecyclerViewAdapter(it)
+    override fun setShopPlans(shopPlans: List<ShopPlan>) {
+        val donePlans = shopPlans.filterNot { it.done }
 
-                mRecyclerView.adapter = adapter
-            } else {
-                val adapter = mRecyclerView.adapter as ShopPlansRecyclerViewAdapter
+        if (shopPlanListRecycler.adapter == null) {
+            val adapter = ShopPlansRecyclerViewAdapter(donePlans)
 
-                adapter.setShopPlans(it)
-                adapter.setOnClickListener(View.OnClickListener {
-                    val position = mRecyclerView.getChildAdapterPosition(it)
-                    val plan = adapter.getItemAtPosition(position)
+            shopPlanListRecycler.adapter = adapter
+        } else {
+            val adapter = shopPlanListRecycler.adapter as ShopPlansRecyclerViewAdapter
 
-                    mPresenter.completeShopPlan(plan)
-                })
-            }
+            adapter.setShopPlans(donePlans)
+            adapter.setOnClickListener(View.OnClickListener {
+                val position = shopPlanListRecycler.getChildAdapterPosition(it)
+                val plan = adapter.getItemAtPosition(position)
+
+                presenter.completeShopPlan(plan)
+            })
         }
     }
 
@@ -99,6 +101,6 @@ class ShopPlansActivity : AppCompatActivity(), ShopPlansContract.View {
     override fun showSnackBar(message: String?) {
         message ?: return
 
-        Snackbar.make(mRecyclerView, message, Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(shopPlanListRecycler, message, Snackbar.LENGTH_SHORT).show()
     }
 }

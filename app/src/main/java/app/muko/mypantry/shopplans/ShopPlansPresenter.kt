@@ -1,5 +1,7 @@
 package app.muko.mypantry.shopplans
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import app.muko.mypantry.data.models.ShopPlan
 import app.muko.mypantry.data.source.ApiShopPlanRepository
 import io.reactivex.CompletableObserver
@@ -9,27 +11,31 @@ import javax.inject.Inject
 
 class ShopPlansPresenter
 @Inject
-constructor(private val mApiShopPlanRepository: ApiShopPlanRepository) : ShopPlansContract.Presenter {
+constructor(
+        private val apiShopPlanRepository: ApiShopPlanRepository
+) : ShopPlansContract.Presenter {
 
-    private var mView: ShopPlansContract.View? = null
-    private var mShopPlans: List<ShopPlan>? = null
+    private lateinit var view: ShopPlansContract.View
+    private lateinit var shopPlansLiveData: LiveData<List<ShopPlan>>
 
-    override fun takeView(view: ShopPlansContract.View) {
-        mView = view
+    override fun init(view: ShopPlansContract.View) {
+        this.view = view as ShopPlansActivity
+        shopPlansLiveData = apiShopPlanRepository.dao.getAllLiveData()
+
+        shopPlansLiveData.observe(view, Observer {
+            view.setShopPlans(it)
+        })
     }
 
     override fun getShopPlans() {
-        mApiShopPlanRepository.getAll()
+        apiShopPlanRepository.getAll()
                 .subscribe(object : DisposableSubscriber<List<ShopPlan>>() {
-                    override fun onNext(t: List<ShopPlan>?) {
-                        mShopPlans = t
-                        mView?.setShopPlans(t)
-                    }
+                    override fun onNext(t: List<ShopPlan>?) {}
 
                     override fun onComplete() {}
 
                     override fun onError(e: Throwable?) {
-                        mView?.showToast(e?.message)
+                        view.showToast(e?.message)
                     }
                 })
     }
@@ -37,17 +43,17 @@ constructor(private val mApiShopPlanRepository: ApiShopPlanRepository) : ShopPla
     override fun completeShopPlan(shopPlan: ShopPlan) {
         shopPlan.done = true
 
-        mApiShopPlanRepository.update(shopPlan)
+        apiShopPlanRepository.update(shopPlan)
                 .subscribe(object : CompletableObserver {
                     override fun onComplete() {
-                        mView?.showSnackBar("${shopPlan?.food?.name} の予定を完了しました")
+                        view.showSnackBar("${shopPlan.food.name} の予定を完了しました")
                         getShopPlans()
                     }
 
                     override fun onSubscribe(d: Disposable) {}
 
                     override fun onError(e: Throwable) {
-                        mView?.showToast(e.message)
+                        view.showToast(e.message)
                     }
                 })
     }
