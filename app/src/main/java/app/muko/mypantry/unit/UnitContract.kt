@@ -13,8 +13,8 @@ interface UnitContract {
     }
 
     interface Presenter {
-        fun takeView(view: View)
+        fun init(view: View, id: Int)
         fun getUnit(id: Int)
-        fun updateUnit(unit: Unit)
+        fun updateUnit(label: String, step: Double)
     }
 }

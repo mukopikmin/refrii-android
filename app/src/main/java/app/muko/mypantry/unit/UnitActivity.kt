@@ -24,22 +24,28 @@ import javax.inject.Inject
 class UnitActivity : AppCompatActivity(), UnitContract.View {
 
     @BindView(R.id.toolbar)
-    lateinit var mToolbar: Toolbar
+    lateinit var toolbar: Toolbar
+
     @BindView(R.id.labelEditText)
-    lateinit var mLabelEditText: EditText
+    lateinit var labelEditText: EditText
+
     @BindView(R.id.stepEditText)
-    lateinit var mStepEditText: EditText
+    lateinit var stepEditText: EditText
+
     @BindView(R.id.createdTextView)
-    lateinit var mCreated: TextView
+    lateinit var createdAtText: TextView
+
     @BindView(R.id.updatedTextView)
-    lateinit var mUpdated: TextView
+    lateinit var updatedAtText: TextView
+
     @BindView(R.id.fab)
-    lateinit var mFab: FloatingActionButton
+    lateinit var fab: FloatingActionButton
+
     @BindView(R.id.progressBar)
-    lateinit var mProgressBar: ProgressBar
+    lateinit var progressBar: ProgressBar
 
     @Inject
-    lateinit var mPresenter: UnitPresenter
+    lateinit var presenter: UnitPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,21 +54,20 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
 
         setContentView(R.layout.activity_unit)
         ButterKnife.bind(this)
-        setSupportActionBar(mToolbar)
+        setSupportActionBar(toolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
-        mFab.setOnClickListener { updateUnit() }
+        fab.setOnClickListener { updateUnit() }
     }
 
     private fun updateUnit() {
-        val label = mLabelEditText.text.toString()
-        val step = mStepEditText.text.toString().toDouble()
-        val unit = Unit.temp(label, step)
+        val label = labelEditText.text.toString()
+        val step = stepEditText.text.toString().toDouble()
 
-        mPresenter.updateUnit(unit)
+        presenter.updateUnit(label, step)
     }
 
     override fun onStart() {
@@ -71,8 +76,8 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
         val intent = intent
         val unitId = intent.getIntExtra("unit_id", 0)
 
-        mPresenter.takeView(this)
-        mPresenter.getUnit(unitId)
+        presenter.init(this, unitId)
+        presenter.getUnit(unitId)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -93,21 +98,20 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
         val dateFormatter = SimpleDateFormat(getString(R.string.format_datetime), Locale.getDefault())
 
         title = unit.label
-        mLabelEditText.setText(unit.label)
-        mStepEditText.setText(String.format("%.2f", unit.step))
-        mCreated.text = dateFormatter.format(unit.createdAt)
-        mUpdated.text = dateFormatter.format(unit.updatedAt)
+        labelEditText.setText(unit.label)
+        stepEditText.setText(String.format("%.2f", unit.step))
+        createdAtText.text = dateFormatter.format(unit.createdAt)
+        updatedAtText.text = dateFormatter.format(unit.updatedAt)
     }
 
     override fun onLoading() {
-        mProgressBar.visibility = View.VISIBLE
-        mFab.hide()
+        progressBar.visibility = View.VISIBLE
+        fab.hide()
     }
 
     override fun onLoaded() {
-        mProgressBar.visibility = View.GONE
-        mFab.show()
-
+        progressBar.visibility = View.GONE
+        fab.show()
     }
 
     override fun showToast(message: String?) {
@@ -117,6 +121,6 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
     override fun showSnackbar(message: String?) {
         message ?: return
 
-        Snackbar.make(mLabelEditText, message, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(labelEditText, message, Snackbar.LENGTH_LONG).show()
     }
 }

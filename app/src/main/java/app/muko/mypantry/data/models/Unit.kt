@@ -10,8 +10,8 @@ import java.util.*
 data class Unit(
         @PrimaryKey
         val id: Int,
-        val label: String,
-        val step: Double,
+        var label: String,
+        var step: Double,
         val createdAt: Date,
         val updatedAt: Date,
         val user: User?
