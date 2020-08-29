@@ -76,4 +76,16 @@ class ApiRemoteFoodSource(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+    override fun createNotice(food: Food, text: String): Flowable<Food> {
+        val bodyBuilder = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("text", text)
+
+        return service.create(food.id, bodyBuilder.build())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
 }

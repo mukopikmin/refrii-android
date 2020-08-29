@@ -46,8 +46,8 @@ class ApiRepositoryModule {
 
     @Singleton
     @Provides
-    fun provideApiNoticeRepository(retrofit: Retrofit): ApiNoticeRepository {
-        return ApiNoticeRepository(retrofit)
+    fun provideApiNoticeRepository(service: NoticeService): ApiNoticeRepository {
+        return ApiNoticeRepository(service)
     }
 
     @Singleton

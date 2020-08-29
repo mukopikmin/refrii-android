@@ -25,8 +25,10 @@ class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
 
     @BindView(R.id.recyclerView)
     lateinit var mRecyclerView: RecyclerView
+
     @BindView(R.id.noticeEditText)
     lateinit var mNoticeEditText: EditText
+
     @BindView(R.id.button)
     lateinit var mButton: Button
 
@@ -39,7 +41,6 @@ class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
         (application as App).getComponent().inject(this)
         setContentView(R.layout.activity_notice_list)
         ButterKnife.bind(this)
-
 
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
@@ -57,7 +58,7 @@ class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
 
         val foodId = intent.getIntExtra(getString(R.string.key_food_id), -1)
 
-        mPresenter.init(this)
+        mPresenter.init(this, foodId)
         mPresenter.getFood(foodId)
     }
 

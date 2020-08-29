@@ -83,21 +83,23 @@ constructor(
                 .subscribe(object : DisposableSubscriber<List<Box>>() {
                     override fun onNext(t: List<Box>) {}
                     override fun onComplete() {}
-                    override fun onError(e: Throwable) {
+                    override fun onError(e: Throwable?) {
                         if (e is HttpException) {
                             view?.showToast(e.response()?.message())
                         } else {
-                            view?.showToast(e.message)
+                            view?.showToast(e?.message)
                         }
                     }
-
                 })
     }
 
     override fun getAccount() {
         userRepository.verify()
                 .subscribe(object : DisposableSubscriber<User>() {
-                    override fun onComplete() {}
+                    override fun onComplete() {
+//                        TODO: Fix timing to fetch
+                        getBoxes()
+                    }
 
                     override fun onNext(t: User?) {
                         view?.setNavigationHeader(t)

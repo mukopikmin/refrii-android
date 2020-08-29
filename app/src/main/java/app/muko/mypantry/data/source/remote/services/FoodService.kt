@@ -36,6 +36,10 @@ interface FoodService {
     @DELETE("/foods/{id}")
     fun remove(@Path("id") id: Int): Completable
 
-//    @POST("/foods/{id}/notices")
-//    fun addNotice(@Path("id") id: Int, @Body body: RequestBody): Flowable<Food>
+    @POST("/foods/{id}/notices")
+    fun create(
+            @Path("id") id: Int,
+            @Body body: RequestBody
+    ): Flowable<Food>
+
 }

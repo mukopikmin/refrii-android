@@ -15,7 +15,7 @@ interface NoticeListContract {
     }
 
     interface Presenter {
-        fun init(view: View)
+        fun init(view: View, foodId: Int)
         fun getFood(id: Int)
         fun createNotice(text: String)
         fun confirmRemovingNotice(notice: Notice)

@@ -204,7 +204,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
         super.onStart()
 
         hideBottomNavigation()
-        mPresenter.getBoxes()
+//        mPresenter.getBoxes()
         mPresenter.getAccount()
     }
 

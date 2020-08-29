@@ -12,4 +12,5 @@ interface ApiFoodDataSource {
     fun create(food: Food): Completable
     fun update(food: Food, imageFile: File?): Completable
     fun remove(food: Food): Completable
+    fun createNotice(food: Food, text: String): Flowable<Food>
 }

@@ -11,10 +11,10 @@ data class Notice(
         @PrimaryKey
         val id: Int,
         val text: String,
-        val createdUser: User,
-        val updatedUser: User,
-        val createdAt: Date,
-        val updatedAt: Date
+        val createdUser: User?,
+        val updatedUser: User?,
+        val createdAt: Date?,
+        val updatedAt: Date?
 ) {
     override fun equals(other: Any?): Boolean {
         return (other as Notice).id == id

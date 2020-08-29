@@ -1,14 +1,16 @@
 package app.muko.mypantry.data.source
 
+import app.muko.mypantry.data.models.Notice
+import app.muko.mypantry.data.source.data.ApiNoticeDataSource
 import app.muko.mypantry.data.source.remote.ApiRemoteNoticeSource
-import io.reactivex.Flowable
-import retrofit2.Retrofit
+import app.muko.mypantry.data.source.remote.services.NoticeService
+import io.reactivex.Completable
 
-class ApiNoticeRepository(retrofit: Retrofit) {
+class ApiNoticeRepository(service: NoticeService) : ApiNoticeDataSource {
 
-    private val mApiRemoteNoticeSource = ApiRemoteNoticeSource(retrofit)
+    private val remote = ApiRemoteNoticeSource(service)
 
-    fun remove(id: Int): Flowable<Void> {
-        return mApiRemoteNoticeSource.remove(id)
+    override fun remove(notice: Notice): Completable {
+        return remote.remove(notice)
     }
 }

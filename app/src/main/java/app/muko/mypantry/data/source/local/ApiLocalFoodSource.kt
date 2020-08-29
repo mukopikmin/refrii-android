@@ -39,4 +39,8 @@ class ApiLocalFoodSource(
 
         return Completable.complete()
     }
+
+    override fun createNotice(food: Food, text: String): Flowable<Food> {
+        TODO("Not yet implemented")
+    }
 }

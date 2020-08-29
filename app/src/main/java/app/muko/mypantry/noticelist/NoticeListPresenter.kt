@@ -1,106 +1,96 @@
 package app.muko.mypantry.noticelist
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.Notice
 import app.muko.mypantry.data.source.ApiFoodRepository
 import app.muko.mypantry.data.source.ApiNoticeRepository
+import io.reactivex.CompletableObserver
+import io.reactivex.disposables.Disposable
 import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 class NoticeListPresenter
 @Inject
 constructor(
-        private val mApiFoodRepository: ApiFoodRepository,
-        private val mApiNoticeRepository: ApiNoticeRepository
+        private val apiFoodRepository: ApiFoodRepository,
+        private val apiNoticeRepository: ApiNoticeRepository
 ) : NoticeListContract.Presenter {
 
-    private var mView: NoticeListContract.View? = null
-    private var mFood: Food? = null
-    private var mNotice: Notice? = null
+    private lateinit var view: NoticeListContract.View
 
-    override fun init(view: NoticeListContract.View) {
-        mView = view
+    //    private var mFood: Food? = null
+    private var notice: Notice? = null
+    private lateinit var foodLiveData: LiveData<Food>
+
+    override fun init(view: NoticeListContract.View, foodId: Int) {
+        this.view = view as NoticeListActivity
+        foodLiveData = apiFoodRepository.dao.getLiveData(foodId)
+
+        foodLiveData.observe(view, Observer {
+            view.setFood(it)
+            view.setNotices(it.notices)
+        })
     }
 
     override fun getFood(id: Int) {
-        mApiFoodRepository.get(id)
-                .flatMap {
-                    onGetFoodCompleted(it)
-
-                    mApiFoodRepository.get(id)
-                }
+        apiFoodRepository.get(id)
                 .subscribe(object : DisposableSubscriber<Food>() {
-                    override fun onNext(t: Food?) {
-                        onGetFoodCompleted(t)
-                    }
-
+                    override fun onNext(t: Food?) {}
                     override fun onComplete() {}
-
                     override fun onError(e: Throwable?) {
                         e?.message?.let {
-                            mView?.showToast(it)
+                            view.showToast(it)
                         }
                     }
                 })
     }
 
-    private fun onGetFoodCompleted(food: Food?) {
-        food?.let {
-            mFood = it
-            mView?.setFood(it)
-
-            food.notices?.let {
-                mView?.setNotices(it)
-            }
-        }
-
-    }
-
     override fun createNotice(text: String) {
-//        TODO
-//        mFood?.let { food ->
-//            mApiFoodRepository.createNotice(food.id, text)
-//                    .subscribe(object : DisposableSubscriber<Food>() {
-//                        override fun onNext(t: Food?) {}
-//
-//                        override fun onComplete() {
-//                            mView?.resetForm()
-//                            getFood(food.id)
-//                        }
-//
-//                        override fun onError(e: Throwable?) {
-//                            e?.message?.let {
-//                                mView?.showToast(it)
-//                            }
-//                        }
-//                    })
-//        }
+        val food = foodLiveData.value ?: return
+
+        apiFoodRepository.createNotice(food, text)
+                .subscribe(object : DisposableSubscriber<Food>() {
+                    override fun onNext(t: Food?) {}
+
+                    override fun onComplete() {
+                        view.resetForm()
+                        getFood(food.id)
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        e?.message?.let {
+                            view.showToast(it)
+                        }
+                    }
+                })
     }
 
     override fun removeNotice() {
-        mNotice?.let {
-            mApiNoticeRepository.remove(it.id)
-                    .subscribe(object : DisposableSubscriber<Void>() {
-                        override fun onNext(t: Void?) {}
-
+        notice?.let {
+            apiNoticeRepository.remove(it)
+                    .subscribe(object : CompletableObserver {
                         override fun onComplete() {
-                            mView?.onRemoveCompleted()
+                            view.onRemoveCompleted()
                         }
 
-                        override fun onError(e: Throwable?) {
-                            e?.message?.let {
-                                mView?.showToast(it)
+                        override fun onSubscribe(d: Disposable) {}
+
+                        override fun onError(e: Throwable) {
+                            e.message?.let {
+                                view.showToast(it)
                             }
                         }
                     })
         }
     }
 
-    override fun confirmRemovingNotice(notice: Notice) {
-        mNotice = notice
 
-        mFood?.name?.let {
-            mView?.showRemoveConfirmation(it, notice)
-        }
+    override fun confirmRemovingNotice(notice: Notice) {
+        val food = foodLiveData.value ?: return
+
+        this.notice = notice
+        view.showRemoveConfirmation(food.name, notice)
     }
 }

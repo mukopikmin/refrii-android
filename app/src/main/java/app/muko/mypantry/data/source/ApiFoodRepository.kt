@@ -66,4 +66,9 @@ class ApiFoodRepository(service: FoodService, val dao: FoodDao) : ApiFoodDataSou
 
         return local.remove(food)
     }
+
+    override fun createNotice(food: Food, text: String): Flowable<Food> {
+//        TODO: Impl caching
+        return remote.createNotice(food, text)
+    }
 }
