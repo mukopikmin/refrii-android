@@ -21,20 +21,25 @@ import javax.inject.Inject
 class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
 
     @BindView(R.id.toolbar)
-    lateinit var mToolbar: Toolbar
+    lateinit var toolbar: Toolbar
+
     @BindView(R.id.labelEditText)
-    lateinit var mLabelEditText: EditText
+    lateinit var labelEditText: EditText
+
     @BindView(R.id.stepEditText)
-    lateinit var mStepEditText: EditText
+    lateinit var stepEditText: EditText
+
     @BindView(R.id.fab)
-    lateinit var mFab: FloatingActionButton
+    lateinit var fab: FloatingActionButton
+
     @BindView(R.id.progressBar)
-    lateinit var mProgressBar: ProgressBar
+    lateinit var progressBar: ProgressBar
+
     @BindView(R.id.timestampContainer)
-    lateinit var mTimestamp: View
+    lateinit var timestamp: View
 
     @Inject
-    lateinit var mPresenter: NewUnitContract.Presenter
+    lateinit var presenter: NewUnitContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,28 +49,28 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
         setContentView(R.layout.activity_new_unit)
         ButterKnife.bind(this)
         hideProgressBar()
-        setSupportActionBar(mToolbar)
-        mToolbar.title = getString(R.string.title_add_unit)
-        mTimestamp.visibility = View.GONE
-        setSupportActionBar(mToolbar)
+        setSupportActionBar(toolbar)
+        toolbar.title = getString(R.string.title_add_unit)
+        timestamp.visibility = View.GONE
+        setSupportActionBar(toolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
 
-        mFab.setOnClickListener {
-            val label = mLabelEditText.text.toString()
-            val step = mStepEditText.text.toString().toDouble()
+        fab.setOnClickListener {
+            val label = labelEditText.text.toString()
+            val step = stepEditText.text.toString().toDouble()
             val unit = Unit.temp(label, step)
 
-            mPresenter.createUnit(unit)
+            presenter.createUnit(unit)
         }
     }
 
     override fun onStart() {
         super.onStart()
 
-        mPresenter.takeView(this)
+        presenter.init(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -91,11 +96,11 @@ class NewUnitActivity : AppCompatActivity(), NewUnitContract.View {
     }
 
     override fun showProgressBar() {
-        mProgressBar.visibility = View.VISIBLE
+        progressBar.visibility = View.VISIBLE
     }
 
     override fun hideProgressBar() {
-        mProgressBar.visibility = View.GONE
+        progressBar.visibility = View.GONE
     }
 
     override fun showToast(message: String?) {

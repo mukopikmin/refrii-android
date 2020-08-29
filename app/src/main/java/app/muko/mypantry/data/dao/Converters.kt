@@ -109,14 +109,14 @@ class Converters {
     }
 
     @TypeConverter
-    fun userToString(user: User): String {
+    fun userToString(user: User?): String? {
         val gson = Gson()
 
         return gson.toJson(user)
     }
 
     @TypeConverter
-    fun stringToUser(str: String): User {
+    fun stringToUser(str: String?): User? {
         val gson = Gson()
 
         return gson.fromJson(str, User::class.java)

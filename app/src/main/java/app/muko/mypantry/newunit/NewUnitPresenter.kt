@@ -9,29 +9,28 @@ import javax.inject.Inject
 class NewUnitPresenter
 @Inject
 constructor(
-        private val mApiUnitRepository: ApiUnitRepository
+        private val apiUnitRepository: ApiUnitRepository
 ) : NewUnitContract.Presenter {
 
-    private var mView: NewUnitContract.View? = null
-    private var mUnit: Unit? = null
+    private var view: NewUnitContract.View? = null
 
-    override fun takeView(view: NewUnitContract.View) {
-        mView = view
+    override fun init(view: NewUnitContract.View) {
+        this.view = view
     }
 
     override fun createUnit(unit: Unit) {
-        mApiUnitRepository.create(unit)
-                .doOnSubscribe { mView?.showProgressBar() }
-                .doFinally { mView?.hideProgressBar() }
+        apiUnitRepository.create(unit)
+                .doOnSubscribe { view?.showProgressBar() }
+                .doFinally { view?.hideProgressBar() }
                 .subscribe(object : CompletableObserver {
                     override fun onComplete() {
-                        mView?.onCreateCompleted(unit)
+                        view?.onCreateCompleted(unit)
                     }
 
                     override fun onSubscribe(d: Disposable) {}
 
                     override fun onError(e: Throwable) {
-                        mView?.showToast(e.message)
+                        view?.showToast(e.message)
                     }
                 })
     }

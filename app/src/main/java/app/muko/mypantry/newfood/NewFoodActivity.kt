@@ -89,8 +89,7 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
         val intent = intent
         val boxId = intent.getIntExtra(getString(R.string.key_box_id), 0)
 
-        mPresenter.takeView(this)
-        mPresenter.getUnits(boxId)
+        mPresenter.init(this, boxId)
         mPresenter.getBox(boxId)
     }
 
@@ -186,12 +185,10 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
 
         val name = mNameEditText.text.toString()
         val amount = mAmountEditText.text.toString().toDouble()
-        val unit = mPresenter.pickUnit(mSpinner.selectedItem.toString()) ?: return
+        val unitLabel = mSpinner.selectedItem.toString()
         val expirationDate = formatter.parse(mExpirationDateEditText.text.toString())
-        val box = mPresenter.box ?: return
-        val food = Food.temp(name, amount, expirationDate, unit, box)
 
-        mPresenter.createFood(food)
+        mPresenter.createFood(name, amount, expirationDate, unitLabel)
     }
 
     private fun showEditDateDialog() {

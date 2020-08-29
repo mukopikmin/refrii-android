@@ -49,33 +49,19 @@ class ApiRemoteFoodSource(
     override fun update(food: Food, imageFile: File?): Completable {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val params: HashMap<String, RequestBody> = HashMap()
-//        var image: MultipartBody.Part? = null
-        val image = MultipartBody.Part.createFormData(
-                "image",
-                "image.jpg",
-                RequestBody.create(MediaType.parse("image/jpeg"), imageFile)
-        )
+        var image: MultipartBody.Part? = null
+
+        imageFile?.let {
+            image = MultipartBody.Part.createFormData(
+                    "image",
+                    "image.jpg",
+                    RequestBody.create(MediaType.parse("image/jpeg"), it)
+            )
+        }
 
         food.name.let { params["name"] = RequestBody.create(MediaType.parse("multipart/form-data"), it) }
         food.amount.let { params["amount"] = RequestBody.create(MediaType.parse("multipart/form-data"), it.toString()) }
         food.expirationDate.let { params["expiration_date"] = RequestBody.create(MediaType.parse("multipart/form-data"), simpleDateFormat.format(it)) }
-//        bitmap?.let {
-//            val imageFile = File(context.cacheDir, "temp.jpg")
-//            val byteArrayOutputStream = ByteArrayOutputStream()
-//
-//            imageFile.createNewFile()
-//            it.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-//
-//            val bitmapByteArray = byteArrayOutputStream.toByteArray()
-//            val fileOutputStream = FileOutputStream(imageFile)
-//
-//            fileOutputStream.write(bitmapByteArray)
-//            fileOutputStream.flush()
-//            fileOutputStream.close()
-//
-//            image = MultipartBody.Part.createFormData("image", "image.jpg", RequestBody.create(MediaType.parse("image/jpeg"), File(context.cacheDir, "temp.jpg")));
-//        }
-
         food.box.id.let { params["box_id"] = RequestBody.create(MediaType.parse("multipart/form-data"), it.toString()) }
         food.unit.id.let { params["unit_id"] = RequestBody.create(MediaType.parse("multipart/form-data"), it.toString()) }
 
@@ -83,6 +69,7 @@ class ApiRemoteFoodSource(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
 
     override fun remove(food: Food): Completable {
         return service.remove(food.id)

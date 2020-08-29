@@ -3,6 +3,7 @@ package app.muko.mypantry.newfood
 import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.Unit
+import java.util.*
 
 interface NewFoodContract {
 
@@ -17,10 +18,10 @@ interface NewFoodContract {
     }
 
     interface Presenter {
-        fun takeView(view: View)
-        fun getUnits(boxId: Int)
+        fun init(view: View, boxId: Int)
+        fun getUnits(box: Box)
         fun getBox(id: Int)
         fun pickUnit(label: String): Unit?
-        fun createFood(food: Food)
+        fun createFood(name: String, amount: Double, expirationDate: Date, unitLabel: String)
     }
 }

@@ -57,8 +57,8 @@ class AppModule(private var mApplication: Application) {
     }
 
     @Provides
-    fun provideNewFoodPresenter(boxRepository: ApiBoxRepository, foodRepository: ApiFoodRepository): NewFoodContract.Presenter {
-        return NewFoodPresenter(boxRepository, foodRepository)
+    fun provideNewFoodPresenter(boxRepository: ApiBoxRepository, foodRepository: ApiFoodRepository, unitRepository: ApiUnitRepository): NewFoodContract.Presenter {
+        return NewFoodPresenter(boxRepository, foodRepository, unitRepository)
     }
 
     @Provides
