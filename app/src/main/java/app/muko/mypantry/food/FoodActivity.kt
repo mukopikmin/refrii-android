@@ -127,14 +127,21 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     private fun updateFood() {
         val food = presenter.foodLiveData.value ?: return
         val unitLabel = unitsSpinner.selectedItem.toString()
-        val unit = presenter.unitsLiveData.value?.single { it.label == unitLabel } ?: return
+        val unit = presenter.unitsLiveData.value
+                ?.filter { it.user?.id == food.box.owner?.id }
+                ?.single { it.label == unitLabel } ?: return
+        var imageFile: File? = null
 
         food.name = nameEditText.text.toString()
         food.amount = amountEditText.text.toString().toDouble()
         food.unit = unit
         date?.let { food.expirationDate = it }
 
-        presenter.updateFood(food, File(filesDir, TEMP_IMAGE_FILENAME))
+        if (image != null) {
+            imageFile = File(filesDir, TEMP_IMAGE_FILENAME)
+        }
+
+        presenter.updateFood(food, imageFile)
     }
 
     private fun launchCameraOrShowImage() {
@@ -212,7 +219,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
 
         presenter.init(this, foodId)
         presenter.getFood(foodId)
-        presenter.getUnits(boxId)
+//        presenter.getUnits(boxId)
         presenter.getShopPlans(foodId)
 
         hideProgressBar()
@@ -248,8 +255,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         if (data == null) return
 
         when (requestCode) {
-            EDIT_NAME_REQUEST_CODE -> nameEditText.setText(data.getStringExtra("text")) //mPresenter.updateName(data.getStringExtra("text"))
-            EDIT_AMOUNT_REQUEST_CODE -> amountEditText.setText(data.getDoubleExtra("number", 0.toDouble()).toString()) //mPresenter.updateAmount(data.getDoubleExtra("number", 0.toDouble()))
+            EDIT_NAME_REQUEST_CODE -> nameEditText.setText(data.getStringExtra("text"))
+            EDIT_AMOUNT_REQUEST_CODE -> amountEditText.setText(data.getDoubleExtra("number", 0.toDouble()).toString())
             EDIT_EXPIRATION_DATE_REQUEST_CODE -> updateExpirationDate(data)
             CREATE_SHOP_PLAN_REQUEST_CODE -> createShopPlan(data)
             IMAGE_OPTIONS_REQUEST_CODE -> {
@@ -395,7 +402,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     fun setUnits(units: List<Unit>) {
-        val labels = units.map { it.label }?.toMutableList()
+        val labels = units.map { it.label }
 
         labels.let {
             unitsSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, it)

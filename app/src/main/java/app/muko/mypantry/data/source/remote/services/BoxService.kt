@@ -21,12 +21,6 @@ interface BoxService {
     fun update(
             @Path("id") id: Int,
             @Body body: RequestBody): Completable
-//
-//    @GET("/boxes/{id}/foods")
-//    fun getFoodsInBox(@Path("id") id: Int): Flowable<List<Food>>
-//
-//    @GET("/boxes/{id}/units")
-//    fun getUnitsForBox(@Path("id") id: Int): Flowable<List<Unit>>
 
     @DELETE("/boxes/{id}")
     fun remove(@Path("id") id: Int): Completable

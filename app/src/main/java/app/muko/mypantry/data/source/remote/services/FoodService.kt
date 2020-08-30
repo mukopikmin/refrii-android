@@ -18,9 +18,6 @@ interface FoodService {
     @GET("/boxes/{boxId}/foods")
     fun getByBox(@Path("boxId") boxId: Int): Flowable<List<Food>>
 
-//    @GET("/foods/{id}/shop_plans")
-//    fun getShopPlans(@Path("id") id: Int): Flowable<List<ShopPlan>>
-
     @POST("/foods")
     fun create(@Body body: RequestBody): Completable
 

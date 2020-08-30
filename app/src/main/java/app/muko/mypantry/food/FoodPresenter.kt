@@ -2,6 +2,7 @@ package app.muko.mypantry.food
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.ShopPlan
 import app.muko.mypantry.data.models.Unit
@@ -22,7 +23,7 @@ constructor(
         private val apiUnitRepository: ApiUnitRepository
 ) : FoodContract.Presenter {
 
-    private var view: FoodContract.View? = null
+    private lateinit var view: FoodContract.View
     lateinit var foodLiveData: LiveData<Food>
     lateinit var unitsLiveData: LiveData<List<Unit>>
     lateinit var shopPlansLiveData: LiveData<List<ShopPlan>>
@@ -33,9 +34,10 @@ constructor(
         unitsLiveData = apiUnitRepository.dao.getAllLiveData()
         shopPlansLiveData = apiShopPlanRepository.dao.getLiveDataByFood(foodId)
 
-        foodLiveData.observe(view, Observer {
+        foodLiveData.observe(view, Observer { it ->
             val shopPlans = shopPlansLiveData.value ?: return@Observer
 
+            getUnitsByBox(it.box)
             view.setFood(it)
             view.setShopPlans(it, shopPlans)
         })
@@ -43,9 +45,14 @@ constructor(
             val food = foodLiveData.value ?: return@Observer
 
             view.setShopPlans(food, it)
+            view.setFood(food)
         })
-        unitsLiveData.observe(view, Observer {
-            view.setUnits(it)
+        unitsLiveData.observe(view, Observer { units ->
+            val food = foodLiveData.value ?: return@Observer
+            val assignableUnits = units.filter { it.user?.id == food.box.owner?.id }
+
+            view.setUnits(assignableUnits)
+            view.setFood(food)
         })
     }
 
@@ -61,7 +68,18 @@ constructor(
                     override fun onNext(t: Food?) {}
                     override fun onComplete() {}
                     override fun onError(e: Throwable?) {
-                        view?.showToast(e?.message)
+                        view.showToast(e?.message)
+                    }
+                })
+    }
+
+    fun getUnitsByBox(box: Box) {
+        apiUnitRepository.getByBox(box)
+                .subscribe(object : DisposableSubscriber<List<Unit>>() {
+                    override fun onNext(t: List<Unit>?) {}
+                    override fun onComplete() {}
+                    override fun onError(e: Throwable?) {
+                        view.showToast(e?.message)
                     }
                 })
     }
@@ -72,20 +90,20 @@ constructor(
                     override fun onNext(t: List<Unit>?) {}
                     override fun onComplete() {}
                     override fun onError(e: Throwable?) {
-                        view?.showToast(e?.message)
+                        view.showToast(e?.message)
                     }
                 })
     }
 
     override fun updateFood(food: Food, imageFile: File?) {
-        apiFoodRepository.update(food, imageFile)
-                .doOnSubscribe { view?.showProgressBar() }
-                .doFinally { view?.hideProgressBar() }
+        apiFoodRepository.update(food, null)
+                .doOnSubscribe { view.showProgressBar() }
+                .doFinally { view.hideProgressBar() }
                 .subscribe(object : CompletableObserver {
                     override fun onComplete() {}
                     override fun onSubscribe(d: Disposable) {}
                     override fun onError(e: Throwable) {
-                        view?.showToast(e.message)
+                        view.showToast(e.message)
                     }
                 })
     }
@@ -96,20 +114,20 @@ constructor(
                     override fun onNext(t: List<ShopPlan>?) {}
                     override fun onComplete() {}
                     override fun onError(e: Throwable?) {
-                        view?.showToast(e?.message)
+                        view.showToast(e?.message)
                     }
                 })
     }
 
     override fun createShopPlan(shopPlan: ShopPlan) {
         apiShopPlanRepository.create(shopPlan)
-                .doOnSubscribe { view?.showProgressBar() }
-                .doFinally { view?.hideProgressBar() }
+                .doOnSubscribe { view.showProgressBar() }
+                .doFinally { view.hideProgressBar() }
                 .subscribe(object : CompletableObserver {
                     override fun onComplete() {}
                     override fun onSubscribe(d: Disposable) {}
                     override fun onError(e: Throwable) {
-                        view?.showToast(e.message)
+                        view.showToast(e.message)
                     }
                 })
     }
@@ -118,13 +136,13 @@ constructor(
         shopPlan.done = true
 
         apiShopPlanRepository.update(shopPlan)
-                .doOnSubscribe { view?.showProgressBar() }
-                .doFinally { view?.hideProgressBar() }
+                .doOnSubscribe { view.showProgressBar() }
+                .doFinally { view.hideProgressBar() }
                 .subscribe(object : CompletableObserver {
                     override fun onComplete() {}
                     override fun onSubscribe(d: Disposable) {}
                     override fun onError(e: Throwable) {
-                        view?.showToast(e.message)
+                        view.showToast(e.message)
                     }
                 })
     }
