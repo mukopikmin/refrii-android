@@ -48,12 +48,6 @@
   skip: true
 - artifact: androidx.constraintlayout:constraintlayout:+
   skip: true
-- artifact: io.realm:+:+
-  name: Realm
-  copyrightHolder: Realm
-  license: The Apache Software License, Version 2.0
-  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
-  url: http://realm.io
 - artifact: org.yaml:snakeyaml:+
   name: SnakeYAML
   copyrightHolder: snakeyaml
@@ -124,12 +118,6 @@
   skip: true
 - artifact: androidx.core:core:+
   skip: true
-- artifact: io.reactivex:+:+
-  name: RxAndroid
-  copyrightHolder: RxAndroid authors
-  license: The Apache Software License, Version 2.0
-  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
-  url: https://github.com/ReactiveX/RxAndroid
 - artifact: com.google.errorprone:error_prone_annotations:+
   skip: true
 - artifact: androidx.recyclerview:recyclerview:+
@@ -148,12 +136,6 @@
   skip: true
 - artifact: androidx.arch.core:core-runtime:+
   skip: true
-- artifact: com.getkeepsafe.relinker:relinker:+
-  name: ReLinker
-  copyrightHolder: Keepsafe Software Inc.
-  license: The Apache Software License, Version 2.0
-  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
-  url: https://github.com/KeepSafe/ReLinker
 - artifact: androidx.arch.core:core-common:+
   skip: true
 - artifact: androidx.asynclayoutinflater:asynclayoutinflater:+
@@ -196,7 +178,7 @@
 - artifact: androidx.viewpager2:+:+
   skip: true
   name: AndroidX Widget ViewPager2
-  copyrightHolder: #COPYRIGHT_HOLDER#
+  copyrightHolder: Android Open Source Project
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: https://developer.android.com/jetpack/androidx
@@ -210,3 +192,39 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: https://github.com/team-supercharge/ShimmerLayout
+- artifact: io.reactivex.rxjava2:rxkotlin:+
+  name: rxkotlin
+  copyrightHolder: Netflix, Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/ReactiveX/RxKotlin
+- artifact: org.jetbrains.kotlinx:+:+
+  name: kotlinx-coroutines-android
+  copyrightHolder: JetBrains s.r.o. and Kotlin Programming Language contributors
+  license: The Apache Software License, Version 2.0
+  licenseUrl: https://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/Kotlin/kotlinx.coroutines
+- artifact: androidx.room:+:+
+  name: Android Room-Runtime
+  copyrightHolder: Android Open Source Project
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/topic/libraries/architecture/index.html
+- artifact: io.reactivex.rxjava2:+:+
+  name: RxJava
+  copyrightHolder: RxJava Contributors
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/ReactiveX/RxJava
+- artifact: androidx.sqlite:+:+
+  name: Android DB
+  copyrightHolder: Android Open Source Project
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/topic/libraries/architecture/index.html
+- artifact: org.reactivestreams:+:+
+  name: reactive-streams
+  copyrightHolder: Android Open Source Project
+  license: CC0
+  licenseUrl: http://creativecommons.org/publicdomain/zero/1.0/
+  url: http://www.reactive-streams.org/
