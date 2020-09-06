@@ -36,10 +36,10 @@ class Converters {
     }
 
     @TypeConverter
-    fun noticeListToString(list: List<Notice>): String {
+    fun noticeListToString(list: List<Notice>?): String? {
         val gson = Gson()
 
-        return list.joinToString(separator) { gson.toJson(it) }
+        return list?.joinToString(separator) { gson.toJson(it) }
     }
 
     @TypeConverter

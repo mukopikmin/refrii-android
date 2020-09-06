@@ -1,9 +1,11 @@
 package app.muko.mypantry.di
 
-import android.content.Context
-import app.muko.mypantry.data.dao.LocalDatabase
+import app.muko.mypantry.data.dao.BoxDao
+import app.muko.mypantry.data.dao.FoodDao
+import app.muko.mypantry.data.dao.ShopPlanDao
+import app.muko.mypantry.data.dao.UnitDao
 import app.muko.mypantry.data.source.*
-import app.muko.mypantry.data.source.remote.services.BoxService
+import app.muko.mypantry.data.source.remote.services.*
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -14,26 +16,26 @@ class ApiRepositoryModule {
 
     @Singleton
     @Provides
-    fun provideApiBoxRepository(boxService: BoxService, room: LocalDatabase): ApiBoxRepository {
-        return ApiBoxRepository(boxService, room)
+    fun provideApiBoxRepository(service: BoxService, dao: BoxDao): ApiBoxRepository {
+        return ApiBoxRepository(service, dao)
     }
 
     @Singleton
     @Provides
-    fun provideApiFoodRepository(retrofit: Retrofit, context: Context): ApiFoodRepository {
-        return ApiFoodRepository(context, retrofit)
+    fun provideApiFoodRepository(service: FoodService, dao: FoodDao): ApiFoodRepository {
+        return ApiFoodRepository(service, dao)
     }
 
     @Singleton
     @Provides
-    fun provideApiShopPlanRepository(retrofit: Retrofit): ApiShopPlanRepository {
-        return ApiShopPlanRepository(retrofit)
+    fun provideApiShopPlanRepository(service: ShopPlanService, dao: ShopPlanDao): ApiShopPlanRepository {
+        return ApiShopPlanRepository(service, dao)
     }
 
     @Singleton
     @Provides
-    fun provideApiUnitRepository(retrofit: Retrofit): ApiUnitRepository {
-        return ApiUnitRepository(retrofit)
+    fun provideApiUnitRepository(service: UnitService, dao: UnitDao): ApiUnitRepository {
+        return ApiUnitRepository(service, dao)
     }
 
     @Singleton
@@ -44,13 +46,13 @@ class ApiRepositoryModule {
 
     @Singleton
     @Provides
-    fun provideApiNoticeRepository(retrofit: Retrofit): ApiNoticeRepository {
-        return ApiNoticeRepository(retrofit)
+    fun provideApiNoticeRepository(service: NoticeService): ApiNoticeRepository {
+        return ApiNoticeRepository(service)
     }
 
     @Singleton
     @Provides
-    fun provideApiInvitationRepository(retrofit: Retrofit): ApiInvitationRepository {
-        return ApiInvitationRepository(retrofit)
+    fun provideApiInvitationRepository(service: InvitationService): ApiInvitationRepository {
+        return ApiInvitationRepository(service)
     }
 }

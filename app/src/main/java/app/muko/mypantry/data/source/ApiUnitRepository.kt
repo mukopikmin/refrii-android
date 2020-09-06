@@ -8,11 +8,8 @@ import app.muko.mypantry.data.source.local.ApiLocalUnitSource
 import app.muko.mypantry.data.source.remote.ApiRemoteUnitSource
 import app.muko.mypantry.data.source.remote.services.UnitService
 import io.reactivex.Completable
-import io.reactivex.CompletableObserver
 import io.reactivex.Flowable
-import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
-import io.reactivex.rxkotlin.toFlowable
 
 class ApiUnitRepository(
         service: UnitService,
@@ -23,63 +20,45 @@ class ApiUnitRepository(
     private val local = ApiLocalUnitSource(dao)
 
     override fun getAll(): Flowable<List<Unit>> {
-        Flowable.zip(
+        return Flowable.zip(
                 remote.getAll(),
                 local.getAll(),
                 BiFunction<List<Unit>, List<Unit>, Pair<List<Unit>, List<Unit>>> { r, l -> Pair(r, l) }
         ).flatMap { pair ->
             pair.second.forEach { local.remove(it) }
-            pair.first.map { local.create(it) }.toFlowable()
-        }.subscribe()
+            pair.first.map { local.create(it) }
 
-        return local.getAll()
+            Flowable.just(pair.first)
+        }
     }
 
     override fun getByBox(box: Box): Flowable<List<Unit>> {
-        Flowable.zip(
+        return Flowable.zip(
                 remote.getByBox(box),
                 local.getByBox(box),
                 BiFunction<List<Unit>, List<Unit>, Pair<List<Unit>, List<Unit>>> { r, l -> Pair(r, l) }
         ).flatMap { pair ->
             pair.second.forEach { local.remove(it) }
-            pair.first.map { local.create(it) }.toFlowable()
-        }.subscribe()
+            pair.first.map { local.create(it) }
 
-        return local.getByBox(box)
+            Flowable.just(pair.first)
+        }
     }
 
     override fun get(id: Int): Flowable<Unit?> {
-        remote.get(id)
+        return remote.get(id)
                 .flatMap { local.create(it).toFlowable<Unit?>() }
-                .subscribe()
-
-        return local.get(id)
     }
 
     override fun create(unit: Unit): Completable {
-        remote.create(unit)
-                .subscribe()
-
-        return local.create(unit)
+        return remote.create(unit)
     }
 
     override fun update(unit: Unit): Completable {
-        remote.update(unit)
-                .subscribe()
-
-        return local.update(unit)
+        return remote.update(unit)
     }
 
     override fun remove(unit: Unit): Completable {
-        remote.remove(unit)
-                .subscribe(object : CompletableObserver {
-                    override fun onComplete() {}
-                    override fun onSubscribe(d: Disposable) {}
-                    override fun onError(e: Throwable) {
-                        local.create(unit)
-                    }
-                })
-
-        return local.remove(unit)
+        return remote.remove(unit)
     }
 }
