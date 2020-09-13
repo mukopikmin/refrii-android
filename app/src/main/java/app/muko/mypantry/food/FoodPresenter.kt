@@ -34,7 +34,7 @@ constructor(
         unitsLiveData = apiUnitRepository.dao.getAllLiveData()
         shopPlansLiveData = apiShopPlanRepository.dao.getLiveDataByFood(foodId)
 
-        foodLiveData.observe(view, Observer { it ->
+        foodLiveData.observe(view, Observer {
             val shopPlans = shopPlansLiveData.value ?: return@Observer
 
             getUnitsByBox(it.box)

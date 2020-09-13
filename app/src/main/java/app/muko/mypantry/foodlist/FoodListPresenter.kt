@@ -214,8 +214,8 @@ constructor(
         setBox(box)
 
         foodRepository.getByBox(box.id)
-                .doOnSubscribe { view.showProgressBar() }
-                .doFinally { view.hideProgressBar() }
+//                .doOnSubscribe { view.showProgressBar() }
+//                .doFinally { view.hideProgressBar() }
                 .subscribe(object : DisposableSubscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {
                         selectedBox?.let {

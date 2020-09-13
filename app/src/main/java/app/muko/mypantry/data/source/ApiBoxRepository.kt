@@ -8,7 +8,7 @@ import app.muko.mypantry.data.source.remote.ApiRemoteBoxSource
 import app.muko.mypantry.data.source.remote.services.BoxService
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.Flowables
 
 class ApiBoxRepository(service: BoxService, val dao: BoxDao) : ApiBoxDataSource {
 
@@ -16,16 +16,30 @@ class ApiBoxRepository(service: BoxService, val dao: BoxDao) : ApiBoxDataSource 
     private val local = ApiLocalBoxSource(dao)
 
     override fun getAll(): Flowable<List<Box>> {
-        return Flowable.zip(
+        return Flowables.zip(
                 remote.getAll(),
-                local.getAll(),
-                BiFunction<List<Box>, List<Box>, Pair<List<Box>, List<Box>>> { r, l -> Pair(r, l) }
-        ).flatMap { pair ->
-            pair.second.forEach { local.remove(it) }
-            pair.first.map { local.create(it) }
+                local.getAll()
+        ) { r, l -> Pair(r, l) }
+                .flatMap { pair ->
+                    val remoteBoxes = pair.first
+                    val localBoxes = pair.second
 
-            Flowable.just(pair.first)
-        }
+                    localBoxes.forEach {
+                        if (!remoteBoxes.contains(it)) {
+                            local.remove(it)
+                        }
+                    }
+
+                    remoteBoxes.forEach {
+                        if (localBoxes.contains(it)) {
+                            local.update(it)
+                        } else {
+                            local.create(it)
+                        }
+                    }
+
+                    Flowable.just(remoteBoxes)
+                }
     }
 
     override fun get(id: Int): Flowable<Box?> {

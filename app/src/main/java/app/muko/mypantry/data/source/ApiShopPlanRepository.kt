@@ -9,6 +9,7 @@ import app.muko.mypantry.data.source.remote.services.ShopPlanService
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.Flowables
 
 class ApiShopPlanRepository(
         service: ShopPlanService,
@@ -19,16 +20,30 @@ class ApiShopPlanRepository(
     private val local = ApiLocalShopPlanSource(dao)
 
     override fun getAll(): Flowable<List<ShopPlan>> {
-        return Flowable.zip(
+        return Flowables.zip(
                 remote.getAll(),
-                local.getAll(),
-                BiFunction<List<ShopPlan>, List<ShopPlan>, Pair<List<ShopPlan>, List<ShopPlan>>> { r, l -> Pair(r, l) }
-        ).flatMap { pair ->
-            pair.second.forEach { local.remove(it) }
-            pair.first.map { local.create(it) }
+                local.getAll()
+        ) { r, l -> Pair(r, l) }
+                .flatMap { pair ->
+                    val remotePlans = pair.first
+                    val localPlans = pair.second
 
-            Flowable.just(pair.first)
-        }
+                    localPlans.forEach {
+                        if (!remotePlans.contains(it)) {
+                            local.remove(it)
+                        }
+                    }
+
+                    remotePlans.forEach {
+                        if (localPlans.contains(it)) {
+                            local.update(it)
+                        } else {
+                            local.create(it)
+                        }
+                    }
+
+                    Flowable.just(remotePlans)
+                }
     }
 
     override fun getByFood(foodId: Int): Flowable<List<ShopPlan>> {

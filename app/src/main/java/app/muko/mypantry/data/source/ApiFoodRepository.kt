@@ -8,7 +8,7 @@ import app.muko.mypantry.data.source.remote.ApiRemoteFoodSource
 import app.muko.mypantry.data.source.remote.services.FoodService
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.Flowables
 import java.io.File
 
 class ApiFoodRepository(service: FoodService, val dao: FoodDao) : ApiFoodDataSource {
@@ -17,16 +17,30 @@ class ApiFoodRepository(service: FoodService, val dao: FoodDao) : ApiFoodDataSou
     private val local = ApiLocalFoodSource(dao)
 
     override fun getByBox(boxId: Int): Flowable<List<Food>> {
-        return Flowable.zip(
+        return Flowables.zip(
                 remote.getByBox(boxId),
-                local.getByBox(boxId),
-                BiFunction<List<Food>, List<Food>, Pair<List<Food>, List<Food>>> { r, l -> Pair(r, l) }
-        ).flatMap { pair ->
-            pair.second.forEach { local.remove(it) }
-            pair.first.map { local.create(it) }
+                local.getByBox(boxId)
+        ) { r, l -> Pair(r, l) }
+                .flatMap { pair ->
+                    val remoteFoods = pair.first
+                    val localFoods = pair.second
 
-            Flowable.just(pair.first)
-        }
+                    localFoods.forEach {
+                        if (!remoteFoods.contains(it)) {
+                            local.remove(it)
+                        }
+                    }
+
+                    remoteFoods.forEach {
+                        if (localFoods.contains(it)) {
+                            local.update(it, null)
+                        } else {
+                            local.create((it))
+                        }
+                    }
+
+                    Flowable.just(remoteFoods)
+                }
     }
 
     override fun get(id: Int): Flowable<Food?> {

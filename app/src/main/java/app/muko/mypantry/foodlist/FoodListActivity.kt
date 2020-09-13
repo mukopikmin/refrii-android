@@ -411,7 +411,7 @@ class FoodListActivity : AppCompatActivity(), FoodListContract.View, NavigationV
             mBottomNavigation.menu.getItem(3).itemId.let {
                 mBottomNavigation.getOrCreateBadge(it).apply {
                     number = notices.size
-                    isVisible = notices.size > 0
+                    isVisible = notices.isNotEmpty()
                     backgroundColor = getColor(R.color.colorAccent)
                     badgeTextColor = getColor(android.R.color.white)
                 }

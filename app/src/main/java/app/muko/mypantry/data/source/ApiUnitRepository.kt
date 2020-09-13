@@ -10,6 +10,7 @@ import app.muko.mypantry.data.source.remote.services.UnitService
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.functions.BiFunction
+import io.reactivex.rxkotlin.Flowables
 
 class ApiUnitRepository(
         service: UnitService,
@@ -20,16 +21,30 @@ class ApiUnitRepository(
     private val local = ApiLocalUnitSource(dao)
 
     override fun getAll(): Flowable<List<Unit>> {
-        return Flowable.zip(
+        return Flowables.zip(
                 remote.getAll(),
-                local.getAll(),
-                BiFunction<List<Unit>, List<Unit>, Pair<List<Unit>, List<Unit>>> { r, l -> Pair(r, l) }
-        ).flatMap { pair ->
-            pair.second.forEach { local.remove(it) }
-            pair.first.map { local.create(it) }
+                local.getAll()
+        ) { r, l -> Pair(r, l) }
+                .flatMap { pair ->
+                    val remoteUnits = pair.first
+                    val localUnits = pair.second
 
-            Flowable.just(pair.first)
-        }
+                    localUnits.forEach {
+                        if (!remoteUnits.contains(it)) {
+                            local.remove(it)
+                        }
+                    }
+
+                    remoteUnits.forEach {
+                        if (localUnits.contains(it)) {
+                            local.update(it)
+                        } else {
+                            local.create((it))
+                        }
+                    }
+
+                    Flowable.just(remoteUnits)
+                }
     }
 
     override fun getByBox(box: Box): Flowable<List<Unit>> {
