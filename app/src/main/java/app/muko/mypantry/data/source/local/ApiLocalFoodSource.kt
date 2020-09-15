@@ -29,7 +29,7 @@ class ApiLocalFoodSource(
     }
 
     override fun update(food: Food, imageFile: File?): Completable {
-        dao.insertOrUpdate(food)
+        dao.update(food)
 
         return Completable.complete()
     }

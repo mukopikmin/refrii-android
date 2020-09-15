@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import app.muko.mypantry.data.models.*
 import app.muko.mypantry.data.models.Unit
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.util.*
 
 class Converters {
@@ -21,64 +22,52 @@ class Converters {
     }
 
     @TypeConverter
-    fun foodListToString(list: List<Food>): String {
+    fun noticeListToString(list: List<Notice>): String {
         val gson = Gson()
+        val type = object : TypeToken<List<Notice>>() {}.type
 
-        return list.joinToString(separator) { gson.toJson(it) }
-    }
-
-    @TypeConverter
-    fun stringToFoodList(str: String): List<Food> {
-        val gson = Gson()
-
-        return str.split(separator)
-                .map { gson.fromJson(it, Food::class.java) }
-    }
-
-    @TypeConverter
-    fun noticeListToString(list: List<Notice>?): String? {
-        val gson = Gson()
-
-        return list?.joinToString(separator) { gson.toJson(it) }
+        return gson.toJson(list, type)
     }
 
     @TypeConverter
     fun stringToNoticeList(str: String): List<Notice> {
         val gson = Gson()
+        val type = object : TypeToken<List<Notice>>() {}.type
 
-        return str.split(separator)
-                .map { gson.fromJson(it, Notice::class.java) }
-    }
-
-    @TypeConverter
-    fun stringToInvitationList(str: String): List<Invitation> {
-        val gson = Gson()
-
-        return str.split(separator)
-                .map { gson.fromJson(it, Invitation::class.java) }
+        return gson.fromJson(str, type)
     }
 
     @TypeConverter
     fun invitationListToString(list: List<Invitation>): String {
         val gson = Gson()
+        val type = object : TypeToken<List<Invitation>>() {}.type
 
-        return list.joinToString(separator) { gson.toJson(it) }
+        return gson.toJson(list, type)
     }
 
     @TypeConverter
-    fun stringListToString(list: List<String>): String {
+    fun stringToInvitationList(str: String): List<Invitation> {
         val gson = Gson()
+        val type = object : TypeToken<List<Invitation>>() {}.type
 
-        return list.joinToString(separator) { gson.toJson(it) }
+        return gson.fromJson(str, type)
     }
 
-    @TypeConverter
-    fun stringToStringList(str: String): List<String> {
-        val gson = Gson()
-
-        return str.split(separator)
-                .map { gson.fromJson(it, String::class.java) }
-    }
+//    @TypeConverter
+//    fun stringListToString(list: List<String>): String {
+//        val gson = Gson()
+//        val type = object : TypeToken<List<String>>() {}.type
+//
+//        return gson.toJson(list, type)
+//    }
+//
+//    @TypeConverter
+//    fun stringToStringList(str: String): List<String> {
+//        val gson = Gson()
+//        val type = object : TypeToken<List<String>>() {}.type
+//
+//        return gson.fromJson(str, type)
+//    }
 
     @TypeConverter
     fun unitToString(unit: Unit): String {
@@ -125,16 +114,17 @@ class Converters {
     @TypeConverter
     fun shopPlanListToString(list: List<ShopPlan>): String {
         val gson = Gson()
+        val type = object : TypeToken<List<ShopPlan>>() {}.type
 
-        return list.joinToString(separator) { gson.toJson(it) }
+        return gson.toJson(list, type)
     }
 
     @TypeConverter
     fun stringToShopPlanList(str: String): List<ShopPlan> {
         val gson = Gson()
+        val type = object : TypeToken<List<ShopPlan>>() {}.type
 
-        return str.split(separator)
-                .map { gson.fromJson(it, ShopPlan::class.java) }
+        return gson.fromJson(str, type)
     }
 
 //    @TypeConverter
