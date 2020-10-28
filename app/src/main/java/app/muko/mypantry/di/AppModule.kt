@@ -2,13 +2,14 @@ package app.muko.mypantry.di
 
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import app.muko.mypantry.boxinfo.BoxInfoContract
 import app.muko.mypantry.boxinfo.BoxInfoPresenter
 import app.muko.mypantry.data.source.*
 import app.muko.mypantry.food.FoodContract
 import app.muko.mypantry.food.FoodPresenter
 import app.muko.mypantry.foodlist.FoodListContract
-import app.muko.mypantry.foodlist.FoodListPresenter
 import app.muko.mypantry.invitations.InvitationListContract
 import app.muko.mypantry.invitations.InvitationListPresenter
 import app.muko.mypantry.newfood.NewFoodContract
@@ -35,10 +36,28 @@ import javax.inject.Singleton
 @Module
 class AppModule(private var mApplication: Application) {
 
+//    @Singleton
+//    @Provides
+//    fun provideApplicationContext(): Context {
+//        return mApplication.applicationContext
+//    }
+
+//    @Provides
+//    @Singleton
+//    fun provideContext(application: Application?): Application? {
+//        return application
+//    }
+
     @Singleton
     @Provides
     fun provideApplicationContext(): Context {
         return mApplication.applicationContext
+    }
+
+    @Singleton
+    @Provides
+    fun provideSharedPreference(context: Context): SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(context)
     }
 
     @Provides
@@ -46,10 +65,10 @@ class AppModule(private var mApplication: Application) {
         return SigninPresenter(apiUserRepository)
     }
 
-    @Provides
-    fun provideFoodListPresenter(boxRepository: ApiBoxRepository, foodRepository: ApiFoodRepository, userRepository: ApiUserRepository): FoodListContract.Presenter {
-        return FoodListPresenter(boxRepository, foodRepository, userRepository)
-    }
+//    @Provides
+//    fun provideFoodListPresenter(boxRepository: ApiBoxRepository, foodRepository: ApiFoodRepository, userRepository: ApiUserRepository): FoodListContract.Presenter {
+//        return FoodListPresenter(boxRepository, foodRepository, userRepository)
+//    }
 
     @Provides
     fun provideFoodPresenter(foodRepository: ApiFoodRepository, shopPlanRepository: ApiShopPlanRepository, apiUnitRepository: ApiUnitRepository): FoodContract.Presenter {

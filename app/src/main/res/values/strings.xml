@@ -74,4 +74,6 @@
     <string name="message_box_name">カテゴリの名前</string>
     <string name="text_invitations_status">%1$d 人のユーザーと共有しています</string>
     <string name="text_remove">削除する</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

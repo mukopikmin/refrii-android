@@ -1,4 +1,4 @@
-package app.muko.mypantry.foodlist
+package app.muko.mypantry.fragments.foodlist
 
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Food
 import butterknife.BindView
@@ -16,20 +17,26 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
-class FoodViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+class FoodViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     @BindView(R.id.constraintLayout)
     lateinit var mContainer: View
+
     @BindView(R.id.nameFoodListTextView)
     lateinit var mName: TextView
+
     @BindView(R.id.expirationDateFoodListTextView)
     lateinit var mExpirationDate: TextView
+
     @BindView(R.id.amountFoodListTextView)
     lateinit var mAmount: TextView
+
     @BindView(R.id.lastUpdatedUserAvatarImageView)
     lateinit var mUpdatedUserAvatar: ImageView
+
     @BindView(R.id.noticeCountView)
     lateinit var mNoticeIcon: View
+
     @BindView(R.id.noticeCountTextView)
     lateinit var mNoticeCount: TextView
 

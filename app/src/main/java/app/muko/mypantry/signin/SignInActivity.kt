@@ -26,6 +26,7 @@ import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import dagger.android.AndroidInjection
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -61,7 +62,8 @@ class SignInActivity : AppCompatActivity(), SigninContract.View {
                 .requestEmail()
                 .build()
 
-        (application as App).getComponent().inject(this)
+        AndroidInjection.inject(this)
+//        (application as App).getComponent().inject(this)
         setContentView(R.layout.activity_signin)
         ButterKnife.bind(this)
 

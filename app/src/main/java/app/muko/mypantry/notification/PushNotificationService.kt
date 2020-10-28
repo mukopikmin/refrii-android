@@ -16,6 +16,7 @@ import app.muko.mypantry.data.source.ApiUserRepository
 import app.muko.mypantry.foodlist.FoodListActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 
@@ -29,7 +30,8 @@ class PushNotificationService : FirebaseMessagingService() {
     override fun onCreate() {
         super.onCreate()
 
-        (application as App).getComponent().inject(this)
+        AndroidInjection.inject(this)
+//        (application as App).getComponent().inject(this)
 
         mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
     }

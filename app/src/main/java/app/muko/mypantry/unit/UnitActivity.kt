@@ -16,6 +16,7 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import dagger.android.AndroidInjection
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -50,7 +51,8 @@ class UnitActivity : AppCompatActivity(), UnitContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (application as App).getComponent().inject(this)
+        AndroidInjection.inject(this)
+//        (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_unit)
         ButterKnife.bind(this)

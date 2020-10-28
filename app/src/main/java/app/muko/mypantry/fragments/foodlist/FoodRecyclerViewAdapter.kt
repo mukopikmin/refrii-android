@@ -1,4 +1,4 @@
-package app.muko.mypantry.foodlist
+package app.muko.mypantry.fragments.foodlist
 
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +27,14 @@ class FoodRecyclerViewAdapter(
         val view = LayoutInflater.from(parent.context).inflate(R.layout.row_food, parent, false)
 
         return FoodViewHolder(view)
+    }
+
+    fun select(food: Food?) {
+        if (food==null) {
+            mSelectedPosition=null
+        } else {
+            mSelectedPosition=mFoods.map{it.id}.indexOf(food.id)
+        }
     }
 
     fun setFoods(foods: List<Food>) {

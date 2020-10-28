@@ -8,13 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import app.muko.mypantry.App
 import app.muko.mypantry.R
-import app.muko.mypantry.signin.SignInActivity
+import app.muko.mypantry.fragments.signin.DrawerLocker
+import app.muko.mypantry.fragments.signin.SigninCompletable
+import app.muko.mypantry.fragments.signin.SigninFragment
 import app.muko.mypantry.webview.WebViewActivity
+import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity(), SigninCompletable, DrawerLocker {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +41,18 @@ class SettingsActivity : AppCompatActivity() {
         return result
     }
 
+    override fun signinCompleted() {
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.settings, SettingsFragment())
+                .commit()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun setDrawerLocked(shouldLock: Boolean) {
+
+    }
+
     class SettingsFragment : PreferenceFragmentCompat(), SettingsContract.View {
 
         @Inject
@@ -55,7 +69,8 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
-            (activity?.application as App).getComponent().inject(this)
+            AndroidSupportInjection.inject(this)
+//            (activity?.application as App).getComponent().inject(this)
 
             setPreferenceLinkListener("privacy_policy", "https://refrii.com/privacy")
             setPreferenceLinkListener("oss_license", "file:///android_asset/licenses.html")
@@ -112,9 +127,12 @@ class SettingsActivity : AppCompatActivity() {
             val pref = findPreference<Preference>("signout")
 
             pref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-                val intent = Intent(activity, SignInActivity::class.java)
+                val editor = mPreferences?.edit()
 
-                startActivity(intent)
+                editor?.remove(activity?.getString(R.string.preference_key_jwt))
+                editor?.apply()
+
+                activity?.finish()
 
                 true
             }

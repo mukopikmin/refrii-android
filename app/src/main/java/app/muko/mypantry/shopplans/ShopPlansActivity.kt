@@ -16,6 +16,7 @@ import app.muko.mypantry.data.models.ShopPlan
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.snackbar.Snackbar
+import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 class ShopPlansActivity : AppCompatActivity(), ShopPlansContract.View {
@@ -35,7 +36,8 @@ class ShopPlansActivity : AppCompatActivity(), ShopPlansContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (application as App).getComponent().inject(this)
+        AndroidInjection.inject(this)
+//        (application as App).getComponent().inject(this)
         setContentView(R.layout.activity_shop_plans)
         ButterKnife.bind(this)
         setSupportActionBar(toolbar)

@@ -19,6 +19,7 @@ import app.muko.mypantry.dialogs.ConfirmDialogFragment
 import app.muko.mypantry.dialogs.OptionsPickerDialogFragment
 import butterknife.BindView
 import butterknife.ButterKnife
+import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_invitation_list.*
 import javax.inject.Inject
 
@@ -42,7 +43,8 @@ class InvitationListActivity : AppCompatActivity(), InvitationListContract.View 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (application as App).getComponent().inject(this)
+        AndroidInjection.inject(this)
+//        (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_invitation_list)
         ButterKnife.bind(this)

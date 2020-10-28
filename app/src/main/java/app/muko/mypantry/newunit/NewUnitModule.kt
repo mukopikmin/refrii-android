@@ -3,6 +3,7 @@ package app.muko.mypantry.newunit
 import app.muko.mypantry.di.ActivityScoped
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 
 @Module
 abstract class NewUnitModule {

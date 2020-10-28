@@ -18,6 +18,7 @@ import app.muko.mypantry.unitlist.UnitListActivity
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.android.AndroidInjection
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -62,7 +63,8 @@ class NewFoodActivity : AppCompatActivity(), NewFoodContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (application as App).getComponent().inject(this)
+        AndroidInjection.inject(this)
+//        (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_new_food)
         ButterKnife.bind(this)

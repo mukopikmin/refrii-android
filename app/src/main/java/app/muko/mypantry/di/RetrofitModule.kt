@@ -74,7 +74,7 @@ class RetrofitModule {
     fun provideHttpClient(context: Context): OkHttpClient {
         return OkHttpClient.Builder()
                 .addInterceptor(AuthorizationInterceptor(context))
-                .addInterceptor(ApiErrorInterceptor(context))
+//                .addInterceptor(ApiErrorInterceptor(context))
                 .build()
     }
 

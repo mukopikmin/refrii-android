@@ -36,6 +36,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import dagger.android.AndroidInjection
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -99,7 +100,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (application as App).getComponent().inject(this)
+        AndroidInjection.inject(this)
+//        (application as App).getComponent().inject(this)
 
         setContentView(R.layout.activity_food)
         ButterKnife.bind(this)

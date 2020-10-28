@@ -19,6 +19,7 @@ import app.muko.mypantry.data.models.Notice
 import app.muko.mypantry.dialogs.ConfirmDialogFragment
 import butterknife.BindView
 import butterknife.ButterKnife
+import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
@@ -38,7 +39,8 @@ class NoticeListActivity : AppCompatActivity(), NoticeListContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (application as App).getComponent().inject(this)
+        AndroidInjection.inject(this)
+//        (application as App).getComponent().inject(this)
         setContentView(R.layout.activity_notice_list)
         ButterKnife.bind(this)
 

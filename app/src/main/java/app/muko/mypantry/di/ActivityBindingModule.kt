@@ -5,7 +5,14 @@ import app.muko.mypantry.boxinfo.BoxInfoModule
 import app.muko.mypantry.food.FoodActivity
 import app.muko.mypantry.food.FoodModule
 import app.muko.mypantry.foodlist.FoodListActivity
+import app.muko.mypantry.fragments.foodlist.FoodListFragment
 import app.muko.mypantry.foodlist.FoodListModule
+import app.muko.mypantry.fragments.foodlist.FoodListViewModelModule
+import app.muko.mypantry.fragments.navigation.FoodActionDialogFragment
+import app.muko.mypantry.fragments.navigation.FoodActionDialogViewModel
+import app.muko.mypantry.fragments.navigation.FoodActionDialogViewModelModule
+import app.muko.mypantry.fragments.signin.SigninFragment
+import app.muko.mypantry.fragments.signin.SigninViewModelModule
 import app.muko.mypantry.invitations.InvitationListActivity
 import app.muko.mypantry.invitations.InvitationListModule
 import app.muko.mypantry.newfood.NewFoodActivity
@@ -35,8 +42,28 @@ abstract class ActivityBindingModule {
     abstract fun signinActivity(): SignInActivity
 
     @ActivityScoped
-    @ContributesAndroidInjector(modules = [(FoodListModule::class)])
+    @ContributesAndroidInjector(modules = [
+        FoodListModule::class
+    ])
     abstract fun foodListActivity(): FoodListActivity
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = [
+        FoodListViewModelModule::class
+    ])
+    abstract fun foodListFragment(): FoodListFragment
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = [
+        FoodActionDialogViewModelModule::class
+    ])
+    abstract fun foodActionDialogFragment(): FoodActionDialogFragment
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = [
+        SigninViewModelModule::class
+    ])
+    abstract fun signinFragment(): SigninFragment
 
     @ActivityScoped
     @ContributesAndroidInjector(modules = [(FoodModule::class)])
