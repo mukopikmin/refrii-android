@@ -45,7 +45,9 @@ constructor(
 
     override fun createFood(name: String, amount: Double, expirationDate: Date, unitLabel: String) {
         val box = boxLiveData.value ?: return
-        val unit = unitsLiveData.value?.findLast { it.label == unitLabel } ?: return
+        val unit = unitsLiveData.value
+                ?.find { it.label == unitLabel && it.user?.id == box.owner?.id }
+                ?: return
         val food = Food.temp(name, amount, expirationDate, unit, box)
 
         apiFoodRepository.create(food)

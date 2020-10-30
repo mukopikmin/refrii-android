@@ -30,7 +30,6 @@ import app.muko.mypantry.fragments.message.EmptyBoxMessageFragment
 import app.muko.mypantry.fragments.signin.DrawerLocker
 import app.muko.mypantry.fragments.signin.SigninCompletable
 import app.muko.mypantry.fragments.signin.SigninFragment
-import app.muko.mypantry.newfood.NewFoodActivity
 import app.muko.mypantry.noticelist.NoticeListActivity
 import app.muko.mypantry.settings.SettingsActivity
 import app.muko.mypantry.shopplans.ShopPlansActivity
@@ -104,7 +103,8 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
     }
 
     fun setEmptyBoxMessage() {
-        val fragment = EmptyBoxMessageFragment.newInstance()
+        val boxId = viewModel.selectedBoxId.value ?: return
+        val fragment = EmptyBoxMessageFragment.newInstance(boxId)
         val fragmentTransaction = supportFragmentManager.beginTransaction()
 
         fragmentTransaction.replace(R.id.testLinearLayout, fragment)
@@ -485,25 +485,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
         fragment.setTargetFragment(null, CREATE_BOX_REQUEST_CODE)
         fragment.show(supportFragmentManager, "create_box")
-    }
-
-    fun addFood(box: Box?) {
-        box ?: return
-
-        val intent = Intent(this@FoodListActivity, NewFoodActivity::class.java)
-
-        intent.putExtra(getString(R.string.key_box_id), box.id)
-        startActivityForResult(intent, ADD_FOOD_REQUEST_CODE)
-    }
-
-    fun setEmptyMessage(foods: List<Food>?) {
-        foods ?: return
-
-//        mEmptyMessageContainer.visibility = if (foods.isEmpty()) View.VISIBLE else View.GONE
-    }
-
-    fun setNoBoxesMessage(boxes: List<Box>) {
-//        mNoBoxesMessageContainer.visibility = if (boxes.isEmpty()) View.VISIBLE else View.GONE
     }
 
     fun onBoxCreated() {

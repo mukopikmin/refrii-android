@@ -12,14 +12,14 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.muko.mypantry.R
-import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.di.ViewModelFactory
-import app.muko.mypantry.food.FoodActivity
 import app.muko.mypantry.foodlist.FoodListActivity
 import app.muko.mypantry.fragments.navigation.FoodActionDialogFragment
+import app.muko.mypantry.newfood.NewFoodActivity
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.android.HasAndroidInjector
 import dagger.android.support.DaggerFragment
 import javax.inject.Inject
@@ -49,6 +49,9 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector {
     @BindView(R.id.recyclerView)
     lateinit var recyclerView: RecyclerView
 
+    @BindView(R.id.addFoodFab)
+    lateinit var fab: FloatingActionButton
+
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
@@ -65,6 +68,8 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector {
         recyclerView.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
+        fab.setOnClickListener { addFood() }
+
         return view
     }
 
@@ -80,6 +85,7 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector {
 
         viewModel.box.observe(viewLifecycleOwner, Observer {
             (activity as FoodListActivity).setActionBar(it.name)
+            viewModel.getFoods()
         })
 
         viewModel.foods.observe(viewLifecycleOwner, Observer { foods ->
@@ -94,10 +100,16 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector {
         })
 
         viewModel.selectedFood.observe(viewLifecycleOwner, Observer {
-            val adapter =recyclerView.adapter as FoodRecyclerViewAdapter
-
-            adapter.select(it)
+            (recyclerView.adapter as FoodRecyclerViewAdapter).select(it)
         })
+    }
+
+    private fun addFood() {
+        val box = viewModel.box.value ?: return
+        val intent = Intent(activity, NewFoodActivity::class.java)
+
+        intent.putExtra(getString(R.string.key_box_id), box.id)
+        startActivityForResult(intent, ADD_FOOD_REQUEST_CODE)
     }
 
     private fun setFoods(boxName: String, foods: List<Food>) {
@@ -109,17 +121,14 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector {
             adapter.setOnClickListener(View.OnClickListener { view ->
                 val position = recyclerView.getChildAdapterPosition(view)
                 val food = adapter.getItemAtPosition(position)
-//
-//                food?.id?.let {
-//                    showFood(it, null)
-//                }
 
-                food?.let{
-                val bottomSheetFragment = FoodActionDialogFragment.newInstance(it)
-                bottomSheetFragment?.show(activity!!.supportFragmentManager, bottomSheetFragment?.tag)
+                food?.let {
+                    val fragment = FoodActionDialogFragment.newInstance(food)
+
+                    activity?.supportFragmentManager?.let {
+                        fragment.show(it, fragment.tag)
+                    }
                 }
-
-//                viewModel.selectFood(food)
             })
 
             recyclerView.adapter = adapter
@@ -128,14 +137,5 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector {
 
             adapter.setFoods(foods)
         }
-    }
-
-    fun showFood(id: Int, box: Box?) {
-        val intent = Intent(context, FoodActivity::class.java)
-
-        intent.putExtra(getString(R.string.key_food_id), id)
-        intent.putExtra(getString(R.string.key_box_id), box?.id)
-
-        startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
     }
 }
