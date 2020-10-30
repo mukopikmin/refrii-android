@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.di.ViewModelFactory
@@ -24,7 +25,7 @@ import dagger.android.HasAndroidInjector
 import dagger.android.support.DaggerFragment
 import javax.inject.Inject
 
-class FoodListFragment : DaggerFragment(), HasAndroidInjector {
+class FoodListFragment : DaggerFragment(), HasAndroidInjector, SwipeRefreshLayout.OnRefreshListener {
 
     companion object {
         private const val ADD_BOX_REQUEST_CODE = 101
@@ -52,6 +53,9 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector {
     @BindView(R.id.addFoodFab)
     lateinit var fab: FloatingActionButton
 
+    @BindView(R.id.swipeRefreshLayout)
+    lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
@@ -69,6 +73,7 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector {
         recyclerView.layoutManager = LinearLayoutManager(activity)
 
         fab.setOnClickListener { addFood() }
+        swipeRefreshLayout.setOnRefreshListener(this)
 
         return view
     }
@@ -97,11 +102,17 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector {
             } else {
                 setFoods(box.name, foodsInBox)
             }
+
+            swipeRefreshLayout.isRefreshing = false
         })
 
         viewModel.selectedFood.observe(viewLifecycleOwner, Observer {
             (recyclerView.adapter as FoodRecyclerViewAdapter).select(it)
         })
+    }
+
+    override fun onRefresh() {
+        viewModel.getFoods()
     }
 
     private fun addFood() {
