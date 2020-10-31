@@ -136,8 +136,6 @@ class SigninFragment : DaggerFragment() {
     }
 
     private  fun saveAccount(user: User) {
-        user ?: return
-
         val editor = preference.edit()
 
         editor.apply {

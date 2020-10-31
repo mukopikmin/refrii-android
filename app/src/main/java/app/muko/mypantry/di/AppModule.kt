@@ -9,7 +9,6 @@ import app.muko.mypantry.boxinfo.BoxInfoPresenter
 import app.muko.mypantry.data.source.*
 import app.muko.mypantry.food.FoodContract
 import app.muko.mypantry.food.FoodPresenter
-import app.muko.mypantry.foodlist.FoodListContract
 import app.muko.mypantry.invitations.InvitationListContract
 import app.muko.mypantry.invitations.InvitationListPresenter
 import app.muko.mypantry.newfood.NewFoodContract
@@ -22,8 +21,6 @@ import app.muko.mypantry.settings.SettingsContract
 import app.muko.mypantry.settings.SettingsPresenter
 import app.muko.mypantry.shopplans.ShopPlansContract
 import app.muko.mypantry.shopplans.ShopPlansPresenter
-import app.muko.mypantry.signin.SigninContract
-import app.muko.mypantry.signin.SigninPresenter
 import app.muko.mypantry.unit.UnitContract
 import app.muko.mypantry.unit.UnitPresenter
 import app.muko.mypantry.unitlist.UnitListContract
@@ -36,18 +33,6 @@ import javax.inject.Singleton
 @Module
 class AppModule(private var mApplication: Application) {
 
-//    @Singleton
-//    @Provides
-//    fun provideApplicationContext(): Context {
-//        return mApplication.applicationContext
-//    }
-
-//    @Provides
-//    @Singleton
-//    fun provideContext(application: Application?): Application? {
-//        return application
-//    }
-
     @Singleton
     @Provides
     fun provideApplicationContext(): Context {
@@ -59,16 +44,6 @@ class AppModule(private var mApplication: Application) {
     fun provideSharedPreference(context: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(context)
     }
-
-    @Provides
-    fun provideSigninPresenter(apiUserRepository: ApiUserRepository): SigninContract.Presenter {
-        return SigninPresenter(apiUserRepository)
-    }
-
-//    @Provides
-//    fun provideFoodListPresenter(boxRepository: ApiBoxRepository, foodRepository: ApiFoodRepository, userRepository: ApiUserRepository): FoodListContract.Presenter {
-//        return FoodListPresenter(boxRepository, foodRepository, userRepository)
-//    }
 
     @Provides
     fun provideFoodPresenter(foodRepository: ApiFoodRepository, shopPlanRepository: ApiShopPlanRepository, apiUnitRepository: ApiUnitRepository): FoodContract.Presenter {
