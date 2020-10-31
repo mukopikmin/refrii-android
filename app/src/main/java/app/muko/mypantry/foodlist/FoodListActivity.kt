@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -30,7 +32,6 @@ import app.muko.mypantry.fragments.message.EmptyBoxMessageFragment
 import app.muko.mypantry.fragments.signin.DrawerLocker
 import app.muko.mypantry.fragments.signin.SigninCompletable
 import app.muko.mypantry.fragments.signin.SigninFragment
-import app.muko.mypantry.noticelist.NoticeListActivity
 import app.muko.mypantry.settings.SettingsActivity
 import app.muko.mypantry.shopplans.ShopPlansActivity
 import app.muko.mypantry.unitlist.UnitListActivity
@@ -55,6 +56,9 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
     @BindView(R.id.nav_view)
     lateinit var mNavigationView: NavigationView
 
+    @BindView(R.id.progressBar)
+    lateinit var progressBar: ProgressBar
+
     private lateinit var mFirebaseAuth: FirebaseAuth
     private lateinit var mPreference: SharedPreferences
 
@@ -75,8 +79,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
         setSupportActionBar(mToolbar)
 
-        hideProgressBar()
-
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mDrawer.addDrawerListener(ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close))
         toggle.syncState()
@@ -93,13 +95,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         } else {
             mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         }
-    }
-
-    fun showNotices(food: Food) {
-        val intent = Intent(this, NoticeListActivity::class.java)
-
-        intent.putExtra(getString(R.string.key_food_id), food.id)
-        startActivity(intent)
     }
 
     fun setEmptyBoxMessage() {
@@ -127,7 +122,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
             fragmentTransaction.replace(R.id.testLinearLayout, fragment)
             fragmentTransaction.commit()
         } else {
-            hideBottomNavigation()
             viewModel.getBoxes()
 
             viewModel.selectedBoxId.value?.let {
@@ -151,6 +145,10 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
                 val box = viewModel.boxes.value?.find { it.id == boxId } ?: return@Observer
 
                 setBox(box)
+            })
+
+            viewModel.syncing.observe(this, Observer {
+                progressBar.visibility = if (it) View.VISIBLE else View.GONE
             })
         }
     }
@@ -187,7 +185,7 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_box_info -> showBoxInfo()
-//            R.id.action_box_sync -> mPresenter.getBoxes()
+            R.id.action_box_sync -> viewModel.sync()
         }
 
         return super.onOptionsItemSelected(item)
@@ -208,8 +206,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
         editor.putInt(getString(R.string.preference_selected_box_id), id)
         editor.apply()
-
-        hideBottomNavigation()
 
         if (!viewModel.isBoxPicked(id)) {
             when (id) {
@@ -303,22 +299,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
     fun setActionBar(title: String) {
         toolbar.title = title
-
-//        val fragment = SigninFragment.newInstance()
-//        val fragmentTransaction = supportFragmentManager.beginTransaction()
-//
-//        fragmentTransaction.replace(R.id.testLinearLayout, fragment)
-//        fragmentTransaction.commit()
-    }
-
-    private fun updateFoods(boxName: String, foods: List<Food>) {
-//        val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
-//
-//        title = boxName
-//        adapter.setFoods(foods)
-    }
-
-    fun setFoods(boxName: String?, foods: List<Food>?) {
     }
 
     fun setBox(box: Box) {
@@ -327,34 +307,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
         fragmentTransaction.replace(R.id.testLinearLayout, fragment)
         fragmentTransaction.commit()
-
-
-//        boxName ?: return
-//        foods ?: return
-//
-//        val userId = mPreference.getInt(getString(R.string.preference_key_id), -1)
-//
-//        if (mRecyclerView.adapter == null) {
-//            val adapter = FoodRecyclerViewAdapter(foods, userId)
-//
-//            adapter.setOnClickListener(View.OnClickListener { view ->
-//                val position = mRecyclerView.getChildAdapterPosition(view)
-//                val food = adapter.getItemAtPosition(position)
-//
-//                food?.let {
-//                    if (mPresenter.isFoodSelected(it)) {
-//                        mPresenter.deselectFood()
-//                    } else {
-//                        mPresenter.selectFood(it)
-//                    }
-//                }
-//            })
-//
-//            mRecyclerView.adapter = adapter
-//            title = boxName
-//        } else {
-//            updateFoods(boxName, foods)
-//        }
     }
 
     fun showConfirmDialog(food: Food?) {
@@ -366,37 +318,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         fragment.show(supportFragmentManager, "delete_food")
     }
 
-    fun showBottomNavigation(food: Food) {
-//        mBottomNavigation.visibility = View.VISIBLE
-//        food.notices.let { notices ->
-//            mBottomNavigation.menu.getItem(3).itemId.let {
-//                mBottomNavigation.getOrCreateBadge(it).apply {
-//                    number = notices.size
-//                    isVisible = notices.isNotEmpty()
-//                    backgroundColor = getColor(R.color.colorAccent)
-//                    badgeTextColor = getColor(android.R.color.white)
-//                }
-//            }
-//        }
-//
-//        if (mRecyclerView.adapter != null) {
-//            val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
-//
-//            mRecyclerView.scrollToPosition(adapter.getItemPosition(food))
-//            adapter.selectItem(adapter.getItemPosition(food))
-//        }
-    }
-
-    fun hideBottomNavigation() {
-//        mBottomNavigation.visibility = View.GONE
-//
-//        if (mRecyclerView.adapter != null) {
-//            val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
-//
-//            adapter.deselectItem()
-//        }
-    }
-
     fun onFoodUpdated(food: Food?) {
 //        food ?: return
 //
@@ -404,16 +325,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 //
 //        adapter.updateItem(food)
 //        mPresenter.selectFood(food)
-    }
-
-    fun showProgressBar() {
-//        mSwipeRefreshLayout.isRefreshing = true
-//        mFab.hide()
-    }
-
-    fun hideProgressBar() {
-//        mSwipeRefreshLayout.isRefreshing = false
-//        mFab.show()
     }
 
     fun showToast(message: String?) {

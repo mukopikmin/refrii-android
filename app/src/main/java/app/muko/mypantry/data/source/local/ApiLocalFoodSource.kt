@@ -11,6 +11,10 @@ class ApiLocalFoodSource(
         private val dao: FoodDao
 ) : ApiFoodDataSource {
 
+    override fun getAll(): Flowable<List<Food>> {
+        return Flowable.just(dao.getAll())
+    }
+
     override fun getByBox(boxId: Int): Flowable<List<Food>> {
         val foods = dao.getAll()
                 .filter { it.box.id == boxId }

@@ -18,6 +18,12 @@ class ApiRemoteFoodSource(
         private val service: FoodService
 ) : ApiFoodDataSource {
 
+    override fun getAll(): Flowable<List<Food>> {
+        return service.getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     override fun getByBox(boxId: Int): Flowable<List<Food>> {
         return service.getByBox(boxId)
                 .subscribeOn(Schedulers.io())

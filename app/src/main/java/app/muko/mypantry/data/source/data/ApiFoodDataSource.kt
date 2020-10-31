@@ -7,6 +7,7 @@ import java.io.File
 
 interface ApiFoodDataSource {
 
+    fun getAll(): Flowable<List<Food>>
     fun getByBox(boxId: Int): Flowable<List<Food>>
     fun get(id: Int): Flowable<Food?>
     fun create(food: Food): Completable

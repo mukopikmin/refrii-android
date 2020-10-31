@@ -16,6 +16,33 @@ class ApiFoodRepository(service: FoodService, val dao: FoodDao) : ApiFoodDataSou
     private val remote = ApiRemoteFoodSource(service)
     private val local = ApiLocalFoodSource(dao)
 
+    override fun getAll(): Flowable<List<Food>> {
+        return Flowables.zip(
+                remote.getAll(),
+                local.getAll()
+        ) { r, l -> Pair(r, l) }
+                .flatMap { pair ->
+                    val remoteFoods = pair.first
+                    val localFoods = pair.second
+
+                    localFoods.forEach {
+                        if (!remoteFoods.contains(it)) {
+                            local.remove(it)
+                        }
+                    }
+
+                    remoteFoods.forEach {
+                        if (localFoods.contains(it)) {
+                            local.update(it, null)
+                        } else {
+                            local.create((it))
+                        }
+                    }
+
+                    Flowable.just(remoteFoods)
+                }
+    }
+
     override fun getByBox(boxId: Int): Flowable<List<Food>> {
         return Flowables.zip(
                 remote.getByBox(boxId),
