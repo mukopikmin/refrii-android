@@ -107,12 +107,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         fragmentTransaction.commit()
     }
 
-    override fun onStart() {
-        super.onStart()
-
-//        detectSigninStatus()
-    }
-
     private fun detectSigninStatus() {
         val token = mPreference.getString(getString(R.string.preference_key_jwt), null)
 
@@ -151,12 +145,17 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
             viewModel.syncing.observe(this, Observer {
                 progressBar.visibility = if (it) View.VISIBLE else View.GONE
             })
+
+            viewModel.user.observe(this, Observer {
+                setNavigationHeader(it)
+            })
         }
     }
 
     override fun onResume() {
         super.onResume()
 
+        viewModel.verifyAccount()
         restoreSelectedBoxState()
         detectSigninStatus()
     }

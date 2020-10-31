@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import app.muko.mypantry.data.models.Box
+import app.muko.mypantry.data.models.User
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiFoodRepository
+import app.muko.mypantry.data.source.ApiUserRepository
 import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
@@ -13,9 +15,11 @@ class FoodListViewModel
 @Inject
 constructor(
         private val boxRepository: ApiBoxRepository,
-        private val foodRepository: ApiFoodRepository
+        private val foodRepository: ApiFoodRepository,
+        private val userRepository: ApiUserRepository
 ) : ViewModel() {
 
+    val user: MutableLiveData<User?> = MutableLiveData(null)
     val boxes: LiveData<List<Box>> = boxRepository.dao.getAllLiveData()
     val selectedBoxId: MutableLiveData<Int?> = MutableLiveData()
     val syncing: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -32,6 +36,19 @@ constructor(
 //                            view.showToast(e?.message)
 //                        }
                     }
+                })
+    }
+
+    fun verifyAccount() {
+        userRepository.verify()
+                .subscribe(object : DisposableSubscriber<User>() {
+                    override fun onComplete() {}
+
+                    override fun onNext(t: User?) {
+                        user.value = t
+                    }
+
+                    override fun onError(t: Throwable?) {}
                 })
     }
 
