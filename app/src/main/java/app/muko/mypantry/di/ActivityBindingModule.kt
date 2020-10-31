@@ -6,6 +6,8 @@ import app.muko.mypantry.food.FoodActivity
 import app.muko.mypantry.food.FoodModule
 import app.muko.mypantry.foodlist.FoodListActivity
 import app.muko.mypantry.foodlist.FoodListModule
+import app.muko.mypantry.fragments.expiring.ExpiringFoodsFragment
+import app.muko.mypantry.fragments.expiring.ExpiringFoodsViewModelModule
 import app.muko.mypantry.fragments.foodlist.FoodListFragment
 import app.muko.mypantry.fragments.foodlist.FoodListViewModelModule
 import app.muko.mypantry.fragments.navigation.FoodActionDialogFragment
@@ -45,6 +47,12 @@ abstract class ActivityBindingModule {
         FoodListViewModelModule::class
     ])
     abstract fun foodListFragment(): FoodListFragment
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = [
+        ExpiringFoodsViewModelModule::class
+    ])
+    abstract fun expiringFoodsFragment(): ExpiringFoodsFragment
 
     @ActivityScoped
     @ContributesAndroidInjector(modules = [

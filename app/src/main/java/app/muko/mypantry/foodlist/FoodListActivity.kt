@@ -27,6 +27,7 @@ import app.muko.mypantry.di.ViewModelFactory
 import app.muko.mypantry.dialogs.ConfirmDialogFragment
 import app.muko.mypantry.dialogs.CreateBoxDialogFragment
 import app.muko.mypantry.food.FoodActivity
+import app.muko.mypantry.fragments.expiring.ExpiringFoodsFragment
 import app.muko.mypantry.fragments.foodlist.FoodListFragment
 import app.muko.mypantry.fragments.message.EmptyBoxMessageFragment
 import app.muko.mypantry.fragments.signin.DrawerLocker
@@ -109,7 +110,7 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
     override fun onStart() {
         super.onStart()
 
-        detectSigninStatus()
+//        detectSigninStatus()
     }
 
     private fun detectSigninStatus() {
@@ -153,10 +154,25 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        restoreSelectedBoxState()
+        detectSigninStatus()
+    }
+
     override fun onPause() {
         super.onPause()
 
         storeSelectedBoxState()
+    }
+
+    private fun restoreSelectedBoxState() {
+        val boxId = mPreference.getInt(getString(R.string.preference_selected_box_id), -1)
+
+        if (boxId != -1) {
+            viewModel.selectedBoxId.value = boxId
+        }
     }
 
     private fun storeSelectedBoxState() {
@@ -209,7 +225,7 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
         if (!viewModel.isBoxPicked(id)) {
             when (id) {
-//                R.id.nav_expiring -> mPresenter.getExpiringFoods()
+                R.id.nav_expiring -> showExpiringFoods()
                 R.id.nav_add_box -> addBox()
                 R.id.nav_settings -> startActivity(Intent(this, SettingsActivity::class.java))
                 R.id.nav_units -> startActivity(Intent(this, UnitListActivity::class.java))
@@ -220,6 +236,14 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         mDrawer.closeDrawer(GravityCompat.START)
 
         return true
+    }
+
+    private fun showExpiringFoods() {
+        val fragment = ExpiringFoodsFragment.newInstance()
+        val fragmentTransaction = supportFragmentManager.beginTransaction()
+
+        fragmentTransaction.replace(R.id.testLinearLayout, fragment)
+        fragmentTransaction.commit()
     }
 
     private fun clearBoxes() {

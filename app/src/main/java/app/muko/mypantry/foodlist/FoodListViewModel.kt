@@ -44,8 +44,15 @@ constructor(
     }
 
     fun isBoxPicked(boxId: Int): Boolean {
-        this.selectedBoxId.value = boxId
+        val isBox = boxes.value
+                ?.map { it.id }
+                ?.contains(boxId)
+                ?: return false
 
-        return boxes.value?.map { it.id }?.contains(boxId) ?: false
+        if (isBox) {
+            this.selectedBoxId.value = boxId
+        }
+
+        return isBox
     }
 }
