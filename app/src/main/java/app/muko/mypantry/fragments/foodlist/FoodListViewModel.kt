@@ -7,6 +7,8 @@ import app.muko.mypantry.data.models.Box
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiFoodRepository
+import io.reactivex.subscribers.DisposableSubscriber
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class FoodListViewModel
@@ -17,8 +19,8 @@ constructor(
 ) : ViewModel() {
 
     lateinit var box: LiveData<Box>
-    val foods: LiveData<List<Food>> = foodRepository.dao.getAllLiveData()
-    var selectedFood: MutableLiveData<Food?> = MutableLiveData()
+    val foods = foodRepository.dao.getAllLiveData()
+    var selectedFood = MutableLiveData<Food?>()
 
     fun initBox(boxId: Int) {
         box = boxRepository.dao.getLiveData(boxId)
@@ -27,26 +29,43 @@ constructor(
     fun getBox() {
         val id = this.box.value?.id ?: return
 
-        this.boxRepository.get(id).subscribe()
+        this.boxRepository.get(id)
+                .flatMap { foodRepository.getByBox(id) }
+                .subscribe(object : DisposableSubscriber<Any>() {
+                    override fun onNext(t: Any?) {
+                    }
+
+                    override fun onError(t: Throwable?) {
+                        if (t is HttpException) {
+                            unauthorizedHandler(t)
+                        }
+                    }
+
+                    override fun onComplete() {
+                    }
+                })
     }
 
     fun getFoods() {
-        val id = this.box.value?.id ?: return
+        foodRepository.getAll()
+                .subscribe(object : DisposableSubscriber<Any>() {
+                    override fun onNext(t: Any?) {
+                    }
 
-        foodRepository.getByBox(id).subscribe()
+                    override fun onError(t: Throwable?) {
+                        if (t is HttpException) {
+                            unauthorizedHandler(t)
+                        }
+                    }
+
+                    override fun onComplete() {
+                    }
+                })
     }
 
-    fun selectFood(food: Food?) {
-        val previous = this.selectedFood.value
-
-        if (previous == null) {
-            this.selectedFood.value = food
-        } else {
-            if (previous.id == food?.id) {
-                this.selectedFood.value=null
-            } else {
-                this.selectedFood.value=food
-            }
+    private fun unauthorizedHandler(e: HttpException) {
+        if (e.code() == 401) {
+            print("aaaaaaaaaa")
         }
     }
 }

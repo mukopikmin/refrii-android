@@ -7,9 +7,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -57,8 +55,8 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
     @BindView(R.id.nav_view)
     lateinit var mNavigationView: NavigationView
 
-    @BindView(R.id.progressBar)
-    lateinit var progressBar: ProgressBar
+//    @BindView(R.id.progressBar)
+//    lateinit var progressBar: ProgressBar
 
     private lateinit var mFirebaseAuth: FirebaseAuth
     private lateinit var mPreference: SharedPreferences
@@ -88,6 +86,8 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(FoodListViewModel::class.java)
+
+        detectSigninStatus()
     }
 
     override fun setDrawerLocked(shouldLock: Boolean) {
@@ -112,28 +112,36 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
         if (token == null) {
             val fragment = SigninFragment.newInstance()
-            val fragmentTransaction = supportFragmentManager.beginTransaction()
 
-            fragmentTransaction.replace(R.id.testLinearLayout, fragment)
-            fragmentTransaction.commit()
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.testLinearLayout, fragment)
+                    .commit()
         } else {
             viewModel.getBoxes()
 
             viewModel.selectedBoxId.value?.let {
                 val fragment = FoodListFragment.newInstance(it)
-                val fragmentTransaction = supportFragmentManager.beginTransaction()
 
-                fragmentTransaction.replace(R.id.testLinearLayout, fragment)
-                fragmentTransaction.commit()
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.testLinearLayout, fragment)
+                        .commit()
             }
 
             viewModel.boxes.observe(this, Observer {
                 setBoxes(it)
 
                 if (viewModel.selectedBoxId.value == null) {
-                    viewModel.selectedBoxId.value = it?.first()?.id
+                    viewModel.selectedBoxId.value = it?.firstOrNull()?.id
                 }
             })
+
+//            viewModel.foods.observe(this, Observer {
+//                val boxes= viewModel.boxes.value
+//
+//                if (viewModel.selectedBoxId.value == null) {
+//                    viewModel.selectedBoxId.value = boxes?.firstOrNull()?.id
+//                }
+//            })
 
             viewModel.selectedBoxId.observe(this, Observer {
                 val boxId = viewModel.selectedBoxId.value ?: return@Observer
@@ -143,11 +151,23 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
             })
 
             viewModel.syncing.observe(this, Observer {
-                progressBar.visibility = if (it) View.VISIBLE else View.GONE
+//                progressBar.visibility = if (it) View.VISIBLE else View.GONE
             })
 
             viewModel.user.observe(this, Observer {
                 setNavigationHeader(it)
+            })
+
+            viewModel.isSignedIn.observe(this, Observer {
+                if (it) {
+                    viewModel.sync()
+                } else {
+                    val fragment = SigninFragment.newInstance()
+
+                    supportFragmentManager.beginTransaction()
+                            .replace(R.id.testLinearLayout, fragment)
+                            .commit()
+                }
             })
         }
     }
@@ -326,10 +346,10 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
     fun setBox(box: Box) {
         val fragment = FoodListFragment.newInstance(box.id)
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
 
-        fragmentTransaction.replace(R.id.testLinearLayout, fragment)
-        fragmentTransaction.commit()
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.testLinearLayout, fragment)
+                .commit()
     }
 
     fun showConfirmDialog(food: Food?) {

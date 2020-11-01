@@ -24,23 +24,18 @@ class AuthorizationInterceptor(private val context: Context) : Interceptor {
 
         if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
             if (expiresAt < Date().time) {
-                val task = currentUser?.getIdToken(true)?.addOnCompleteListener {
-                    val editor = sharedPreferences.edit()
-
-                    editor.apply {
-                        putString(context.getString(R.string.preference_key_jwt), it.result?.token)
-
-                        it.result?.expirationTimestamp?.let {
-                            putLong(context.getString(R.string.preference_key_expiration_timestamp), it)
-                        }
-                    }
-                    editor.apply()
-                }
+                val task = currentUser?.getIdToken(true)
 
                 if (task != null) {
-                    Tasks.await(task).token?.let {
-                        request.header("Authorization", "Bearer $it")
-                    }
+                    val tokenResult = Tasks.await(task)
+                    val token = tokenResult.token
+
+                    sharedPreferences.edit().apply {
+                        putString(context.getString(R.string.preference_key_jwt), token)
+                        putLong(context.getString(R.string.preference_key_expiration_timestamp), tokenResult.expirationTimestamp)
+                    }.apply()
+
+                    request.header("Authorization", "Bearer $token")
                 }
             }
 

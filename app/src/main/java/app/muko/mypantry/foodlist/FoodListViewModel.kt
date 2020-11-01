@@ -1,14 +1,15 @@
 package app.muko.mypantry.foodlist
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import app.muko.mypantry.data.models.Box
+import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.User
 import app.muko.mypantry.data.source.ApiBoxRepository
 import app.muko.mypantry.data.source.ApiFoodRepository
 import app.muko.mypantry.data.source.ApiUserRepository
 import io.reactivex.subscribers.DisposableSubscriber
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class FoodListViewModel
@@ -19,10 +20,12 @@ constructor(
         private val userRepository: ApiUserRepository
 ) : ViewModel() {
 
-    val user: MutableLiveData<User?> = MutableLiveData(null)
-    val boxes: LiveData<List<Box>> = boxRepository.dao.getAllLiveData()
-    val selectedBoxId: MutableLiveData<Int?> = MutableLiveData()
-    val syncing: MutableLiveData<Boolean> = MutableLiveData(false)
+    val user = MutableLiveData<User?>(null)
+    val boxes = boxRepository.dao.getAllLiveData()
+    val foods = foodRepository.dao.getAllLiveData()
+    val selectedBoxId = MutableLiveData<Int?>()
+    val syncing = MutableLiveData<Boolean>(false)
+    val isSignedIn = MutableLiveData<Boolean>(true)
 
     fun getBoxes() {
         boxRepository.getAll()
@@ -57,7 +60,17 @@ constructor(
                 .doOnSubscribe { syncing.value = true }
                 .doFinally { syncing.value = false }
                 .flatMap { foodRepository.getAll() }
-                .subscribe()
+                .subscribe(object : DisposableSubscriber<List<Food>>() {
+                    override fun onNext(t: List<Food>?) {}
+
+                    override fun onError(t: Throwable?) {
+                        if (t is HttpException && t.code() == 401) {
+                            isSignedIn.value = false
+                        }
+                    }
+
+                    override fun onComplete() {}
+                })
     }
 
     fun isBoxPicked(boxId: Int): Boolean {
@@ -66,7 +79,7 @@ constructor(
                 ?.contains(boxId)
                 ?: return false
 
-        if (isBox) {
+        if (isBox && this.selectedBoxId.value != boxId) {
             this.selectedBoxId.value = boxId
         }
 

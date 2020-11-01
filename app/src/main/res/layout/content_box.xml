@@ -21,8 +21,6 @@
 
     </FrameLayout>
 
-    <include layout="@layout/progressbar" />
-
     <!--    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
     <!--        android:id="@+id/swipeRefreshLayout"-->
     <!--        android:layout_width="match_parent"-->

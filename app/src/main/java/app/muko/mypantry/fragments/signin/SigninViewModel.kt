@@ -1,6 +1,5 @@
 package app.muko.mypantry.fragments.signin
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import app.muko.mypantry.data.models.User
@@ -16,10 +15,13 @@ constructor(
 ) : ViewModel() {
 
     val user: MutableLiveData<User?> = MutableLiveData()
+    val isAuthorizing: MutableLiveData<Boolean> = MutableLiveData(false)
     val errorMessage: MutableLiveData<String> = MutableLiveData()
 
     fun verifyAccount() {
         userRepository.verify()
+                .doOnSubscribe { isAuthorizing.value = true }
+                .doFinally { isAuthorizing.value = false }
                 .subscribe(object : DisposableSubscriber<User>() {
                     override fun onNext(t: User?) {
                         user.value = t
@@ -39,6 +41,8 @@ constructor(
 
     fun signup() {
         userRepository.signup()
+                .doOnSubscribe { isAuthorizing.value = true }
+                .doFinally { isAuthorizing.value = false }
                 .subscribe(object : DisposableSubscriber<User>() {
                     override fun onNext(t: User?) {
                         user.value = t

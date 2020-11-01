@@ -35,7 +35,7 @@ class ApiFoodRepository(service: FoodService, val dao: FoodDao) : ApiFoodDataSou
                         if (localFoods.contains(it)) {
                             local.update(it, null)
                         } else {
-                            local.create((it))
+                            local.create(it)
                         }
                     }
 

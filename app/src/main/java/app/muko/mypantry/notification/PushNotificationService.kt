@@ -10,13 +10,14 @@ import android.os.Build
 import android.preference.PreferenceManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import app.muko.mypantry.App
 import app.muko.mypantry.R
+import app.muko.mypantry.data.models.User
 import app.muko.mypantry.data.source.ApiUserRepository
 import app.muko.mypantry.foodlist.FoodListActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.android.AndroidInjection
+import io.reactivex.subscribers.DisposableSubscriber
 import javax.inject.Inject
 
 
@@ -57,13 +58,20 @@ class PushNotificationService : FirebaseMessagingService() {
         val userId = mPreference.getInt(application.getString(R.string.preference_key_id), 0)
 
         mApiUserRepository.registerPushToken(userId, token)
-                .subscribe({
-                    val editor = mPreference.edit()
+                .subscribe(object : DisposableSubscriber<User>() {
+                    override fun onNext(t: User?) {
+                        val editor = mPreference.edit()
 
-                    editor.putString(application.getString(R.string.preference_key_push_token), token)
-                    editor.apply()
-                }, {
-                    Toast.makeText(applicationContext, it.message, Toast.LENGTH_LONG).show()
+                        editor.putString(application.getString(R.string.preference_key_push_token), token)
+                        editor.apply()
+                    }
+
+                    override fun onError(t: Throwable?) {
+                        Toast.makeText(applicationContext, t?.message, Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onComplete() {}
+
                 })
     }
 

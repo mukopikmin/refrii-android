@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -40,8 +41,8 @@ class SigninFragment : DaggerFragment() {
     @BindView(R.id.googleSignupButton)
     lateinit var signUpButton: SignInButton
 
-//    @BindView(R.id.progressBar)
-//    lateinit var progressBar: ProgressBar
+    @BindView(R.id.progressBar)
+    lateinit var progressBar: ProgressBar
 
     @BindView(R.id.textViewSignup)
     lateinit var signUpTextView: TextView
@@ -70,7 +71,7 @@ class SigninFragment : DaggerFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view= inflater.inflate(R.layout.signin_fragment, container, false)
+        val view = inflater.inflate(R.layout.signin_fragment, container, false)
         val appName = getString(R.string.app_name)
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -102,10 +103,13 @@ class SigninFragment : DaggerFragment() {
         drawerLocker.setDrawerLocked(true)
         (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
         viewModel.user.observe(viewLifecycleOwner, Observer {
-            if (it != null ){
+            if (it != null) {
                 saveAccount(it)
                 (activity as SigninCompletable).signinCompleted()
             }
+        })
+        viewModel.isAuthorizing.observe(viewLifecycleOwner, Observer {
+            progressBar.visibility = if (it) View.VISIBLE else View.GONE
         })
     }
 
@@ -135,13 +139,10 @@ class SigninFragment : DaggerFragment() {
         }
     }
 
-    private  fun saveAccount(user: User) {
-        val editor = preference.edit()
-
-        editor.apply {
+    private fun saveAccount(user: User) {
+        preference.edit().apply {
             putInt(getString(R.string.preference_key_id), user.id)
-        }
-        editor.apply()
+        }.apply()
     }
 
     private fun googleSignIn() {
@@ -180,36 +181,25 @@ class SigninFragment : DaggerFragment() {
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount?, requestCode: Int) {
         account ?: return
 
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        activity?.let {
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
-        firebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener(activity!!) { task ->
-                    if (task.isSuccessful) {
-                        val editor = preference.edit()
+            firebaseAuth.signInWithCredential(credential)
+                    .addOnCompleteListener(it) { task ->
+                        if (!task.isSuccessful) {
+                            showToast("Failed to login")
 
-                        firebaseAuth.currentUser?.getIdToken(true)?.addOnCompleteListener {
-                            editor.apply {
-                                putString(getString(R.string.preference_key_jwt), it.result?.token)
-                                putString(getString(R.string.preference_key_mail), account.email)
-                                putString(getString(R.string.preference_key_name), account.displayName)
-                                putString(getString(R.string.preference_key_avatar), account.photoUrl.toString())
-                                putString(getString(R.string.preference_key_signin_provider), it.result?.signInProvider)
+                            return@addOnCompleteListener
+                        }
 
-                                it.result?.expirationTimestamp?.let {
-                                    putLong(getString(R.string.preference_key_expiration_timestamp), it)
-                                }
-                            }
-                            editor.apply()
-
+                        firebaseAuth.currentUser?.getIdToken(true)?.addOnCompleteListener { tokenTask ->
                             when (requestCode) {
                                 GOOGLE_SIGN_IN_REQUEST_CODE -> viewModel.verifyAccount()
                                 GOOGLE_SIGN_UP_REQUEST_CODE -> viewModel.signup()
                             }
                         }
-                    } else {
-                        showToast("Failed to login")
                     }
-                }
+        }
     }
 
     private fun showToast(message: String) {
