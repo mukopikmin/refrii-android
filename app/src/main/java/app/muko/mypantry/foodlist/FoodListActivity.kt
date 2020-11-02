@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
@@ -24,7 +23,6 @@ import app.muko.mypantry.data.models.User
 import app.muko.mypantry.di.ViewModelFactory
 import app.muko.mypantry.dialogs.ConfirmDialogFragment
 import app.muko.mypantry.dialogs.CreateBoxDialogFragment
-import app.muko.mypantry.food.FoodActivity
 import app.muko.mypantry.fragments.expiring.ExpiringFoodsFragment
 import app.muko.mypantry.fragments.foodlist.FoodListFragment
 import app.muko.mypantry.fragments.message.EmptyBoxMessageFragment
@@ -37,7 +35,6 @@ import app.muko.mypantry.unitlist.UnitListActivity
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import dagger.android.HasAndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
@@ -58,8 +55,8 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 //    @BindView(R.id.progressBar)
 //    lateinit var progressBar: ProgressBar
 
-    private lateinit var mFirebaseAuth: FirebaseAuth
-    private lateinit var mPreference: SharedPreferences
+    @Inject
+    lateinit var mPreference: SharedPreferences
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -75,7 +72,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
         setContentView(R.layout.activity_box)
         ButterKnife.bind(this)
-
         setSupportActionBar(mToolbar)
 
         val toggle = ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -83,11 +79,7 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         toggle.syncState()
         mNavigationView.setNavigationItemSelectedListener(this@FoodListActivity)
 
-        mPreference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-
         viewModel = ViewModelProvider(this, viewModelFactory).get(FoodListViewModel::class.java)
-
-        detectSigninStatus()
     }
 
     override fun setDrawerLocked(shouldLock: Boolean) {
@@ -118,65 +110,52 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
                     .commit()
         } else {
             viewModel.getBoxes()
+        }
+    }
 
-            viewModel.selectedBoxId.value?.let {
-                val fragment = FoodListFragment.newInstance(it)
+    override fun onStart() {
+        super.onStart()
+
+        viewModel.boxes.observe(this, Observer {
+            setBoxes(it)
+            restoreSelectedBoxState()
+
+            if (viewModel.selectedBoxId.value == null) {
+                it?.firstOrNull()?.id?.let { boxId ->
+                    viewModel.selectBox(boxId)
+                }
+            }
+        })
+
+        viewModel.selectedBoxId.observe(this, Observer { boxId ->
+            val box = viewModel.boxes.value
+                    ?.find { it.id == boxId }
+                    ?: return@Observer
+
+            setBox(box)
+        })
+
+        viewModel.syncing.observe(this, Observer {
+//                progressBar.visibility = if (it) View.VISIBLE else View.GONE
+        })
+
+        viewModel.user.observe(this, Observer { setNavigationHeader(it) })
+
+        viewModel.isSignedIn.observe(this, Observer {
+            if (it) {
+                viewModel.sync()
+            } else {
+                val fragment = SigninFragment.newInstance()
 
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.testLinearLayout, fragment)
                         .commit()
             }
+        })
 
-            viewModel.boxes.observe(this, Observer {
-                setBoxes(it)
-
-                if (viewModel.selectedBoxId.value == null) {
-                    viewModel.selectedBoxId.value = it?.firstOrNull()?.id
-                }
-            })
-
-//            viewModel.foods.observe(this, Observer {
-//                val boxes= viewModel.boxes.value
-//
-//                if (viewModel.selectedBoxId.value == null) {
-//                    viewModel.selectedBoxId.value = boxes?.firstOrNull()?.id
-//                }
-//            })
-
-            viewModel.selectedBoxId.observe(this, Observer {
-                val boxId = viewModel.selectedBoxId.value ?: return@Observer
-                val box = viewModel.boxes.value?.find { it.id == boxId } ?: return@Observer
-
-                setBox(box)
-            })
-
-            viewModel.syncing.observe(this, Observer {
-//                progressBar.visibility = if (it) View.VISIBLE else View.GONE
-            })
-
-            viewModel.user.observe(this, Observer {
-                setNavigationHeader(it)
-            })
-
-            viewModel.isSignedIn.observe(this, Observer {
-                if (it) {
-                    viewModel.sync()
-                } else {
-                    val fragment = SigninFragment.newInstance()
-
-                    supportFragmentManager.beginTransaction()
-                            .replace(R.id.testLinearLayout, fragment)
-                            .commit()
-                }
-            })
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
+        viewModel.error.observe(this, Observer { showToast(it) })
 
         viewModel.verifyAccount()
-        restoreSelectedBoxState()
         detectSigninStatus()
     }
 
@@ -186,11 +165,23 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         storeSelectedBoxState()
     }
 
+    override fun onStop() {
+        super.onStop()
+
+        viewModel.boxes.removeObservers(this)
+        viewModel.foods.removeObservers(this)
+        viewModel.user.removeObservers(this)
+        viewModel.selectedBoxId.removeObservers(this)
+        viewModel.syncing.removeObservers(this)
+        viewModel.isSignedIn.removeObservers(this)
+        viewModel.error.removeObservers(this)
+    }
+
     private fun restoreSelectedBoxState() {
         val boxId = mPreference.getInt(getString(R.string.preference_selected_box_id), -1)
 
         if (boxId != -1) {
-            viewModel.selectedBoxId.value = boxId
+            viewModel.selectBox(boxId)
         }
     }
 
@@ -329,15 +320,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         mailTextView.text = user.email
 
         Picasso.get().load(user.avatarUrl).into(avatarImageView)
-    }
-
-    fun showFood(id: Int, box: Box?) {
-        val intent = Intent(this@FoodListActivity, FoodActivity::class.java)
-
-        intent.putExtra(getString(R.string.key_food_id), id)
-        intent.putExtra(getString(R.string.key_box_id), box?.id)
-
-        startActivityForResult(intent, EDIT_FOOD_REQUEST_CODE)
     }
 
     fun setActionBar(title: String) {

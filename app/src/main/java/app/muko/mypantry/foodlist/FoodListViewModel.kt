@@ -1,5 +1,6 @@
 package app.muko.mypantry.foodlist
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import app.muko.mypantry.data.models.Box
@@ -20,24 +21,27 @@ constructor(
         private val userRepository: ApiUserRepository
 ) : ViewModel() {
 
-    val user = MutableLiveData<User?>(null)
+    private val mutableUser = MutableLiveData<User?>(null)
+    private val mutableSelectedBoxId = MutableLiveData<Int?>(null)
+    private val mutableSyncing = MutableLiveData<Boolean>(false)
+    private val mutableIsSignedIn = MutableLiveData<Boolean>(true)
+    private val mutableError = MutableLiveData<String?>()
+
     val boxes = boxRepository.dao.getAllLiveData()
     val foods = foodRepository.dao.getAllLiveData()
-    val selectedBoxId = MutableLiveData<Int?>()
-    val syncing = MutableLiveData<Boolean>(false)
-    val isSignedIn = MutableLiveData<Boolean>(true)
+    val user: LiveData<User?> = mutableUser
+    val selectedBoxId: LiveData<Int?> = mutableSelectedBoxId
+    val syncing: LiveData<Boolean> = mutableSyncing
+    val isSignedIn: LiveData<Boolean> = mutableIsSignedIn
+    val error: LiveData<String?> = mutableError
 
     fun getBoxes() {
         boxRepository.getAll()
                 .subscribe(object : DisposableSubscriber<List<Box>>() {
                     override fun onNext(t: List<Box>) {}
                     override fun onComplete() {}
-                    override fun onError(e: Throwable?) {
-//                        if (e is HttpException) {
-//                            view.showToast(e.response()?.message())
-//                        } else {
-//                            view.showToast(e?.message)
-//                        }
+                    override fun onError(t: Throwable?) {
+                        notifyError(t)
                     }
                 })
     }
@@ -48,29 +52,41 @@ constructor(
                     override fun onComplete() {}
 
                     override fun onNext(t: User?) {
-                        user.value = t
+                        mutableUser.value = t
                     }
 
-                    override fun onError(t: Throwable?) {}
+                    override fun onError(t: Throwable?) {
+                        notifyError(t)
+                    }
                 })
     }
 
     fun sync() {
         boxRepository.getAll()
-                .doOnSubscribe { syncing.value = true }
-                .doFinally { syncing.value = false }
+                .doOnSubscribe { mutableSyncing.value = true }
+                .doFinally { mutableSyncing.value = false }
                 .flatMap { foodRepository.getAll() }
                 .subscribe(object : DisposableSubscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {}
 
                     override fun onError(t: Throwable?) {
+                        notifyError(t)
+
                         if (t is HttpException && t.code() == 401) {
-                            isSignedIn.value = false
+                            mutableIsSignedIn.value = false
                         }
                     }
 
                     override fun onComplete() {}
                 })
+    }
+
+    private fun notifyError(e: Throwable?) {
+        if (e is HttpException) {
+            mutableError.value = e.response()?.message()
+        } else {
+            mutableError.value = e?.message
+        }
     }
 
     fun isBoxPicked(boxId: Int): Boolean {
@@ -79,10 +95,16 @@ constructor(
                 ?.contains(boxId)
                 ?: return false
 
-        if (isBox && this.selectedBoxId.value != boxId) {
-            this.selectedBoxId.value = boxId
+        if (isBox) {
+            selectBox(boxId)
         }
 
         return isBox
+    }
+
+    fun selectBox(boxId: Int) {
+        if (this.selectedBoxId.value != boxId) {
+            mutableSelectedBoxId.value = boxId
+        }
     }
 }
