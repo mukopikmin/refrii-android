@@ -25,7 +25,8 @@ constructor(
     private val mutableSelectedBoxId = MutableLiveData<Int?>(null)
     private val mutableSyncing = MutableLiveData<Boolean>(false)
     private val mutableIsSignedIn = MutableLiveData<Boolean>(true)
-    private val mutableError = MutableLiveData<String?>()
+    private val mutableError = MutableLiveData<String?>(null)
+    private val mutableNotification = MutableLiveData<String?>(null)
 
     val boxes = boxRepository.dao.getAllLiveData()
     val foods = foodRepository.dao.getAllLiveData()
@@ -34,6 +35,7 @@ constructor(
     val syncing: LiveData<Boolean> = mutableSyncing
     val isSignedIn: LiveData<Boolean> = mutableIsSignedIn
     val error: LiveData<String?> = mutableError
+    val notification: LiveData<String?> = mutableNotification
 
     fun getBoxes() {
         boxRepository.getAll()
@@ -81,12 +83,37 @@ constructor(
                 })
     }
 
+    fun createBox(name: String) {
+        val box = Box.temp(name, null)
+
+        boxRepository.create(box)
+                .andThen(boxRepository.getAll())
+                .subscribe(object : DisposableSubscriber<List<Box>>() {
+                    override fun onComplete() {
+                        notify("カテゴリに $name が追加されました")
+                    }
+
+                    override fun onError(t: Throwable) {
+                        notifyError(t)
+                    }
+
+                    override fun onNext(t: List<Box>?) {}
+                })
+    }
+
     private fun notifyError(e: Throwable?) {
         if (e is HttpException) {
             mutableError.value = e.response()?.message()
         } else {
             mutableError.value = e?.message
         }
+
+        mutableError.value = null
+    }
+
+    private fun notify(message: String?) {
+        mutableNotification.value = message
+        mutableNotification.value = null
     }
 
     fun isBoxPicked(boxId: Int): Boolean {
@@ -103,7 +130,7 @@ constructor(
     }
 
     fun selectBox(boxId: Int) {
-        if (this.selectedBoxId.value != boxId) {
+        if (selectedBoxId.value != boxId) {
             mutableSelectedBoxId.value = boxId
         }
     }

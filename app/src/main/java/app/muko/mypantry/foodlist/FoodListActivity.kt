@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -35,6 +36,7 @@ import app.muko.mypantry.unitlist.UnitListActivity
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import dagger.android.HasAndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
@@ -42,6 +44,9 @@ import kotlinx.android.synthetic.main.app_bar_box.*
 import javax.inject.Inject
 
 class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, NavigationView.OnNavigationItemSelectedListener, DrawerLocker, SigninCompletable {
+
+    @BindView(R.id.contentBoxLayout)
+    lateinit var viewContainer: View
 
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
@@ -154,6 +159,7 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         })
 
         viewModel.error.observe(this, Observer { showToast(it) })
+        viewModel.notification.observe(this, Observer { showSnackBar(it) })
 
         viewModel.verifyAccount()
         detectSigninStatus()
@@ -175,6 +181,7 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         viewModel.syncing.removeObservers(this)
         viewModel.isSignedIn.removeObservers(this)
         viewModel.error.removeObservers(this)
+        viewModel.notification.removeObservers(this)
     }
 
     private fun restoreSelectedBoxState() {
@@ -343,26 +350,17 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         fragment.show(supportFragmentManager, "delete_food")
     }
 
-    fun onFoodUpdated(food: Food?) {
-//        food ?: return
-//
-//        val adapter = mRecyclerView.adapter as FoodRecyclerViewAdapter
-//
-//        adapter.updateItem(food)
-//        mPresenter.selectFood(food)
-    }
-
     fun showToast(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    fun showSnackbar(message: String?) {
-//        message ?: return
-//
-//        val snackbar = Snackbar.make(mCoordinatorLayout, message, Snackbar.LENGTH_SHORT)
-//
-//        snackbar.animationMode = Snackbar.ANIMATION_MODE_SLIDE
-//        snackbar.show()
+    private fun showSnackBar(message: String?) {
+        message ?: return
+
+        val snackBar = Snackbar.make(viewContainer, message, Snackbar.LENGTH_SHORT)
+
+        snackBar.animationMode = Snackbar.ANIMATION_MODE_SLIDE
+        snackBar.show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -382,28 +380,26 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
     private fun createBox(data: Intent?) {
         val name = data?.getStringExtra("name") ?: return
-        val notice = ""
 
-//        mPresenter.createBox(name, notice)
+        viewModel.createBox(name)
     }
 
     private fun onAddFoodCompleted() {
-        showSnackbar(getString(R.string.message_add_food_completed))
-//        mPresenter.getBoxes()
+        showSnackBar(getString(R.string.message_add_food_completed))
     }
 
     private fun onEditFoodCompleted(data: Intent?) {
         data?.let {
             val name = it.getStringExtra(getString(R.string.key_food_name))
 
-            showSnackbar("$name が更新されました")
+            showSnackBar("$name が更新されました")
         }
 
 //        mPresenter.getBoxes()
     }
 
     private fun onAddBoxCompleted() {
-        showSnackbar(getString(R.string.message_add_box_completed))
+        showSnackBar(getString(R.string.message_add_box_completed))
     }
 
     private fun onRemoveFoodCompleted() {
@@ -413,7 +409,7 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
     private fun onRemoveBoxCompleted(data: Intent?) {
         val name = data?.getStringExtra("key_box_name") ?: return
 
-        showSnackbar("$name が削除されました")
+        showSnackBar("$name が削除されました")
     }
 
     private fun addBox() {
@@ -421,10 +417,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
 
         fragment.setTargetFragment(null, CREATE_BOX_REQUEST_CODE)
         fragment.show(supportFragmentManager, "create_box")
-    }
-
-    fun onBoxCreated() {
-//        mNoBoxesMessageContainer.visibility = View.GONE
     }
 
     companion object {
