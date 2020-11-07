@@ -96,7 +96,7 @@ constructor(
     }
 
     override fun updateFood(food: Food, imageFile: File?) {
-        apiFoodRepository.update(food, null)
+        apiFoodRepository.update(food, imageFile)
                 .doOnSubscribe { view.showProgressBar() }
                 .doFinally { view.hideProgressBar() }
                 .subscribe(object : CompletableObserver {

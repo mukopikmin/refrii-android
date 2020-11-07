@@ -2,10 +2,9 @@ package app.muko.mypantry.di
 
 import app.muko.mypantry.boxinfo.BoxInfoActivity
 import app.muko.mypantry.boxinfo.BoxInfoModule
+import app.muko.mypantry.di.scope.ActivityScoped
 import app.muko.mypantry.food.FoodActivity
 import app.muko.mypantry.food.FoodModule
-import app.muko.mypantry.foodlist.FoodListActivity
-import app.muko.mypantry.foodlist.FoodListModule
 import app.muko.mypantry.invitations.InvitationListActivity
 import app.muko.mypantry.invitations.InvitationListModule
 import app.muko.mypantry.newfood.NewFoodActivity
@@ -20,6 +19,8 @@ import app.muko.mypantry.shopplans.ShopPlansActivity
 import app.muko.mypantry.shopplans.ShopPlansModule
 import app.muko.mypantry.signin.SignInActivity
 import app.muko.mypantry.signin.SigninModule
+import app.muko.mypantry.ui.activities.foodlist.FoodListActivity
+import app.muko.mypantry.ui.activities.foodlist.FoodListModule
 import app.muko.mypantry.unit.UnitActivity
 import app.muko.mypantry.unit.UnitModule
 import app.muko.mypantry.unitlist.UnitListActivity

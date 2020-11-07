@@ -9,7 +9,7 @@
     android:orientation="horizontal"
     android:paddingTop="@dimen/list_item_spacing_half"
     android:paddingBottom="@dimen/list_item_spacing_half"
-    tools:context=".fragments.navigation.FoodActionDialogFragment">
+    tools:context=".ui.fragments.navigation.FoodActionDialogFragment">
 
     <TextView
         android:id="@+id/navigationFoodNameTextView"

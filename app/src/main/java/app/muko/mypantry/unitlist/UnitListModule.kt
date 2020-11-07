@@ -1,6 +1,6 @@
 package app.muko.mypantry.unitlist
 
-import app.muko.mypantry.di.ActivityScoped
+import app.muko.mypantry.di.scope.ActivityScoped
 import dagger.Binds
 import dagger.Module
 

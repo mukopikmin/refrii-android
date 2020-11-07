@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#328ae9"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".fragments.signin.SigninFragment">
+    tools:context=".ui.fragments.signin.SigninFragment">
 
     <com.google.android.gms.common.SignInButton
         android:id="@+id/googleSignupButton"

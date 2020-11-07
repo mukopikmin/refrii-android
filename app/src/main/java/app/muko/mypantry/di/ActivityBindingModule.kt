@@ -2,18 +2,9 @@ package app.muko.mypantry.di
 
 import app.muko.mypantry.boxinfo.BoxInfoActivity
 import app.muko.mypantry.boxinfo.BoxInfoModule
+import app.muko.mypantry.di.scope.ActivityScoped
 import app.muko.mypantry.food.FoodActivity
 import app.muko.mypantry.food.FoodModule
-import app.muko.mypantry.foodlist.FoodListActivity
-import app.muko.mypantry.foodlist.FoodListModule
-import app.muko.mypantry.fragments.expiring.ExpiringFoodsFragment
-import app.muko.mypantry.fragments.expiring.ExpiringFoodsViewModelModule
-import app.muko.mypantry.fragments.foodlist.FoodListFragment
-import app.muko.mypantry.fragments.foodlist.FoodListViewModelModule
-import app.muko.mypantry.fragments.navigation.FoodActionDialogFragment
-import app.muko.mypantry.fragments.navigation.FoodActionDialogViewModelModule
-import app.muko.mypantry.fragments.signin.SigninFragment
-import app.muko.mypantry.fragments.signin.SigninViewModelModule
 import app.muko.mypantry.invitations.InvitationListActivity
 import app.muko.mypantry.invitations.InvitationListModule
 import app.muko.mypantry.newfood.NewFoodActivity
@@ -26,6 +17,16 @@ import app.muko.mypantry.settings.SettingsActivity
 import app.muko.mypantry.settings.SettingsModule
 import app.muko.mypantry.shopplans.ShopPlansActivity
 import app.muko.mypantry.shopplans.ShopPlansModule
+import app.muko.mypantry.ui.activities.foodlist.FoodListActivity
+import app.muko.mypantry.ui.activities.foodlist.FoodListModule
+import app.muko.mypantry.ui.fragments.expiring.ExpiringFoodsFragment
+import app.muko.mypantry.ui.fragments.expiring.ExpiringFoodsViewModelModule
+import app.muko.mypantry.ui.fragments.foodlist.FoodListFragment
+import app.muko.mypantry.ui.fragments.foodlist.FoodListViewModelModule
+import app.muko.mypantry.ui.fragments.navigation.FoodActionDialogFragment
+import app.muko.mypantry.ui.fragments.navigation.FoodActionDialogViewModelModule
+import app.muko.mypantry.ui.fragments.signin.SigninFragment
+import app.muko.mypantry.ui.fragments.signin.SigninViewModelModule
 import app.muko.mypantry.unit.UnitActivity
 import app.muko.mypantry.unit.UnitModule
 import app.muko.mypantry.unitlist.UnitListActivity

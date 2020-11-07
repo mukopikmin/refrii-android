@@ -8,8 +8,6 @@ import app.muko.mypantry.data.dao.LocalDatabase
 import app.muko.mypantry.data.source.*
 import app.muko.mypantry.food.FoodContract
 import app.muko.mypantry.food.FoodPresenter
-import app.muko.mypantry.foodlist.FoodListContract
-import app.muko.mypantry.foodlist.FoodListPresenter
 import app.muko.mypantry.invitations.InvitationListContract
 import app.muko.mypantry.invitations.InvitationListPresenter
 import app.muko.mypantry.newfood.NewFoodContract
@@ -24,6 +22,7 @@ import app.muko.mypantry.shopplans.ShopPlansContract
 import app.muko.mypantry.shopplans.ShopPlansPresenter
 import app.muko.mypantry.signin.SigninContract
 import app.muko.mypantry.signin.SigninPresenter
+import app.muko.mypantry.ui.activities.foodlist.FoodListPresenter
 import app.muko.mypantry.unit.UnitContract
 import app.muko.mypantry.unit.UnitPresenter
 import app.muko.mypantry.unitlist.UnitListContract

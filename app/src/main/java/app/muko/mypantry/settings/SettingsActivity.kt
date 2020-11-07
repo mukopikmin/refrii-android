@@ -9,8 +9,8 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import app.muko.mypantry.R
-import app.muko.mypantry.fragments.signin.DrawerLocker
-import app.muko.mypantry.fragments.signin.SigninCompletable
+import app.muko.mypantry.ui.fragments.signin.SigninCallback
+import app.muko.mypantry.ui.utils.DrawerLocker
 import app.muko.mypantry.webview.WebViewActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-class SettingsActivity : AppCompatActivity(), SigninCompletable, DrawerLocker {
+class SettingsActivity : AppCompatActivity(), SigninCallback, DrawerLocker {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.User
 import app.muko.mypantry.data.source.ApiUserRepository
-import app.muko.mypantry.foodlist.FoodListActivity
+import app.muko.mypantry.ui.activities.foodlist.FoodListActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.android.AndroidInjection

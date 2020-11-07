@@ -5,7 +5,7 @@
     android:id="@+id/emptyBoxMessageContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.message.EmptyBoxMessageFragment">
+    tools:context=".ui.fragments.message.EmptyBoxMessageFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

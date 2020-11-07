@@ -23,9 +23,8 @@
             android:name=".invitations.InvitationListActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".noticelist.NoticeListActivity" />
-        <activity android:name=".welcome.WelcomeActivity" />
         <activity
-            android:name=".foodlist.FoodListActivity"
+            android:name="app.muko.mypantry.ui.activities.foodlist.FoodListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
