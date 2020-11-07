@@ -130,7 +130,6 @@ class SigninFragment : DaggerFragment() {
                 try {
                     val account = task.getResult(ApiException::class.java)
 
-//                    onLoading()
                     firebaseAuthWithGoogle(account, requestCode)
                 } catch (e: ApiException) {
                     showToast("Login failed with code: " + e.statusCode)
@@ -192,7 +191,7 @@ class SigninFragment : DaggerFragment() {
                             return@addOnCompleteListener
                         }
 
-                        firebaseAuth.currentUser?.getIdToken(true)?.addOnCompleteListener { tokenTask ->
+                        firebaseAuth.currentUser?.getIdToken(true)?.addOnCompleteListener {
                             when (requestCode) {
                                 GOOGLE_SIGN_IN_REQUEST_CODE -> viewModel.verifyAccount()
                                 GOOGLE_SIGN_UP_REQUEST_CODE -> viewModel.signup()

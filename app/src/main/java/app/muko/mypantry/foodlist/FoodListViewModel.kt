@@ -23,7 +23,6 @@ constructor(
 
     private val mutableUser = MutableLiveData<User?>(null)
     private val mutableSelectedBoxId = MutableLiveData<Int?>(null)
-    private val mutableSyncing = MutableLiveData<Boolean>(false)
     private val mutableIsSignedIn = MutableLiveData<Boolean>(true)
     private val mutableError = MutableLiveData<String?>(null)
     private val mutableNotification = MutableLiveData<String?>(null)
@@ -32,7 +31,6 @@ constructor(
     val foods = foodRepository.dao.getAllLiveData()
     val user: LiveData<User?> = mutableUser
     val selectedBoxId: LiveData<Int?> = mutableSelectedBoxId
-    val syncing: LiveData<Boolean> = mutableSyncing
     val isSignedIn: LiveData<Boolean> = mutableIsSignedIn
     val error: LiveData<String?> = mutableError
     val notification: LiveData<String?> = mutableNotification
@@ -65,8 +63,6 @@ constructor(
 
     fun sync() {
         boxRepository.getAll()
-                .doOnSubscribe { mutableSyncing.value = true }
-                .doFinally { mutableSyncing.value = false }
                 .flatMap { foodRepository.getAll() }
                 .subscribe(object : DisposableSubscriber<List<Food>>() {
                     override fun onNext(t: List<Food>?) {}
@@ -97,7 +93,11 @@ constructor(
                         notifyError(t)
                     }
 
-                    override fun onNext(t: List<Box>?) {}
+                    override fun onNext(t: List<Box>?) {
+                        t?.find { it.name == name }?.id?.let { boxId ->
+                            isBoxPicked(boxId)
+                        }
+                    }
                 })
     }
 

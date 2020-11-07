@@ -10,36 +10,36 @@ import okhttp3.*
 import java.util.*
 
 class AuthorizationInterceptor(private val context: Context) : Interceptor {
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         val expiresAt = sharedPreferences.getLong(context.getString(R.string.preference_key_expiration_timestamp), 0) * 1000
         val currentUser = FirebaseAuth.getInstance().currentUser
         val original = chain.request()
-        val jwt = sharedPreferences.getString(context.getString(R.string.preference_key_jwt), null)
+        var jwt = sharedPreferences.getString(context.getString(R.string.preference_key_jwt), null)
         val request = original.newBuilder()
-                .header("Accept", "application/json")
-                .header("Authorization", "Bearer $jwt")
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetworkInfo = connectivityManager.activeNetworkInfo
 
         if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
-            if (expiresAt < Date().time) {
+            if (expiresAt < Date().time || jwt == null) {
                 val task = currentUser?.getIdToken(true)
 
                 if (task != null) {
                     val tokenResult = Tasks.await(task)
-                    val token = tokenResult.token
+
+                    jwt = tokenResult.token
 
                     sharedPreferences.edit().apply {
-                        putString(context.getString(R.string.preference_key_jwt), token)
+                        putString(context.getString(R.string.preference_key_jwt), jwt)
                         putLong(context.getString(R.string.preference_key_expiration_timestamp), tokenResult.expirationTimestamp)
                     }.apply()
-
-                    request.header("Authorization", "Bearer $token")
                 }
             }
 
-            request.method(original.method(), original.body())
+            request.header("Accept", "application/json")
+                    .header("Authorization", "Bearer $jwt")
+                    .method(original.method(), original.body())
 
             return chain.proceed(request.build())
         } else {

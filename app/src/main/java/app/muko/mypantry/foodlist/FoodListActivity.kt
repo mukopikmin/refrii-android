@@ -57,9 +57,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
     @BindView(R.id.nav_view)
     lateinit var mNavigationView: NavigationView
 
-//    @BindView(R.id.progressBar)
-//    lateinit var progressBar: ProgressBar
-
     @Inject
     lateinit var mPreference: SharedPreferences
 
@@ -122,12 +119,18 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         super.onStart()
 
         viewModel.boxes.observe(this, Observer {
+            val selectedBoxId = viewModel.selectedBoxId.value
+
             setBoxes(it)
             restoreSelectedBoxState()
 
-            if (viewModel.selectedBoxId.value == null) {
+            if (selectedBoxId == null) {
                 it?.firstOrNull()?.id?.let { boxId ->
                     viewModel.selectBox(boxId)
+                }
+            } else {
+                if (viewModel.isBoxPicked(selectedBoxId).not()) {
+                    viewModel.selectBox(it.first().id)
                 }
             }
         })
@@ -138,10 +141,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
                     ?: return@Observer
 
             setBox(box)
-        })
-
-        viewModel.syncing.observe(this, Observer {
-//                progressBar.visibility = if (it) View.VISIBLE else View.GONE
         })
 
         viewModel.user.observe(this, Observer { setNavigationHeader(it) })
@@ -178,7 +177,6 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
         viewModel.foods.removeObservers(this)
         viewModel.user.removeObservers(this)
         viewModel.selectedBoxId.removeObservers(this)
-        viewModel.syncing.removeObservers(this)
         viewModel.isSignedIn.removeObservers(this)
         viewModel.error.removeObservers(this)
         viewModel.notification.removeObservers(this)
@@ -351,10 +349,12 @@ class FoodListActivity : DaggerAppCompatActivity(), HasAndroidInjector, Navigati
     }
 
     fun showToast(message: String?) {
+        message ?: return
+
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    private fun showSnackBar(message: String?) {
+    fun showSnackBar(message: String?) {
         message ?: return
 
         val snackBar = Snackbar.make(viewContainer, message, Snackbar.LENGTH_SHORT)

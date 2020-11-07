@@ -11,8 +11,10 @@ import androidx.preference.PreferenceManager
 import app.muko.mypantry.R
 import app.muko.mypantry.fragments.signin.DrawerLocker
 import app.muko.mypantry.fragments.signin.SigninCompletable
-import app.muko.mypantry.fragments.signin.SigninFragment
 import app.muko.mypantry.webview.WebViewActivity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -128,8 +130,15 @@ class SettingsActivity : AppCompatActivity(), SigninCompletable, DrawerLocker {
 
             pref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 val editor = mPreferences?.edit()
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .build()
+                val googleSignInClient = GoogleSignIn.getClient(activity!!, gso)
 
-                editor?.remove(activity?.getString(R.string.preference_key_jwt))
+                googleSignInClient.revokeAccess()
+                FirebaseAuth.getInstance().signOut()
+
+                editor?.clear()
                 editor?.apply()
 
                 activity?.finish()

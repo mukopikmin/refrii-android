@@ -1,5 +1,6 @@
 package app.muko.mypantry.fragments.foodlist
 
+import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -76,19 +77,9 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector, SwipeRefreshLayou
         boxId?.let {
             viewModel.initBox(it)
         }
-        viewModel.getFoods()
-
-        viewModel.box.observe(viewLifecycleOwner, Observer {
-            onBoxChanged(it)
-        })
-
-        viewModel.foods.observe(viewLifecycleOwner, Observer {
-            onFoodsChanged(it)
-        })
-
-        viewModel.selectedFood.observe(viewLifecycleOwner, Observer {
-            onSelectedFoodChanged(it)
-        })
+        viewModel.box.observe(viewLifecycleOwner, Observer { onBoxChanged(it) })
+        viewModel.foods.observe(viewLifecycleOwner, Observer { onFoodsChanged(it) })
+        viewModel.selectedFood.observe(viewLifecycleOwner, Observer { onSelectedFoodChanged(it) })
     }
 
     override fun onRefresh() {
@@ -149,6 +140,22 @@ class FoodListFragment : DaggerFragment(), HasAndroidInjector, SwipeRefreshLayou
 
             adapter.setFoods(foods)
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode != Activity.RESULT_OK || data == null) return
+
+        when (requestCode) {
+            ADD_FOOD_REQUEST_CODE -> onAddFoodCompleted()
+        }
+    }
+
+    private fun onAddFoodCompleted() {
+//        TODO: define with interface
+        (activity as FoodListActivity).showSnackBar("ストックが追加されました")
+        viewModel.getFoods()
     }
 
     companion object {
