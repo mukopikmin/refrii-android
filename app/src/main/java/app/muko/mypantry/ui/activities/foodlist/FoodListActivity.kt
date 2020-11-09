@@ -25,7 +25,7 @@ import app.muko.mypantry.di.ViewModelFactory
 import app.muko.mypantry.dialogs.ConfirmDialogFragment
 import app.muko.mypantry.dialogs.CreateBoxDialogFragment
 import app.muko.mypantry.settings.SettingsActivity
-import app.muko.mypantry.shopplans.ShopPlansActivity
+import app.muko.mypantry.ui.activities.shopplans.ShopPlansActivity
 import app.muko.mypantry.ui.fragments.expiring.ExpiringFoodsFragment
 import app.muko.mypantry.ui.fragments.foodlist.FoodListFragment
 import app.muko.mypantry.ui.fragments.message.EmptyBoxMessageFragment

@@ -1,4 +1,4 @@
-package app.muko.mypantry.shopplans
+package app.muko.mypantry.ui.activities.shopplans
 
 import android.view.LayoutInflater
 import android.view.View

@@ -14,8 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.di.ViewModelFactory
-import app.muko.mypantry.food.FoodActivity
 import app.muko.mypantry.noticelist.NoticeListActivity
+import app.muko.mypantry.ui.activities.food.FoodActivity
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -83,7 +83,7 @@ class FoodActionDialogFragment : BottomSheetDialogFragment() {
 
     private fun setFood(food: Food) {
         nameView.text = food.name
-        amountView.text = "${food.amount} ${food.unit.label}"
+        amountView.text = "${String.format("%.2f", food.amount)} ${food.unit.label}"
         increaseButton.text = food.unit.step.toString()
         decreaseButton.text = food.unit.step.toString()
     }
@@ -93,6 +93,7 @@ class FoodActionDialogFragment : BottomSheetDialogFragment() {
 
         intent.putExtra(getString(R.string.key_food_id), foodId)
         startActivity(intent)
+        dismiss()
     }
 
     private fun editFood(foodId:Int) {
@@ -100,6 +101,7 @@ class FoodActionDialogFragment : BottomSheetDialogFragment() {
 
         intent.putExtra(getString(R.string.key_food_id), foodId)
         startActivity(intent)
+        dismiss()
     }
 
     companion object {

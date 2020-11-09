@@ -1,4 +1,4 @@
-package app.muko.mypantry.food
+package app.muko.mypantry.ui.activities.food
 
 import android.app.Activity
 import android.content.Intent
@@ -20,7 +20,6 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import app.muko.mypantry.App
 import app.muko.mypantry.BuildConfig
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Food

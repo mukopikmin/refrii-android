@@ -1,4 +1,4 @@
-package app.muko.mypantry.food
+package app.muko.mypantry.ui.activities.food
 
 import app.muko.mypantry.di.scope.ActivityScoped
 import dagger.Binds

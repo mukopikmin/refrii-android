@@ -1,4 +1,4 @@
-package app.muko.mypantry.shopplans
+package app.muko.mypantry.ui.activities.shopplans
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer

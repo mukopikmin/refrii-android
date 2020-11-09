@@ -112,6 +112,10 @@ class SigninFragment : DaggerFragment() {
         viewModel.isAuthorizing.observe(viewLifecycleOwner, Observer {
             progressBar.visibility = if (it) View.VISIBLE else View.GONE
         })
+
+        preference.edit().apply {
+            clear()
+        }.apply()
     }
 
     override fun onDestroyView() {

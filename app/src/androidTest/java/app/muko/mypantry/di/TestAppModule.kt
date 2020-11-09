@@ -6,8 +6,6 @@ import app.muko.mypantry.boxinfo.BoxInfoContract
 import app.muko.mypantry.boxinfo.BoxInfoPresenter
 import app.muko.mypantry.data.dao.LocalDatabase
 import app.muko.mypantry.data.source.*
-import app.muko.mypantry.food.FoodContract
-import app.muko.mypantry.food.FoodPresenter
 import app.muko.mypantry.invitations.InvitationListContract
 import app.muko.mypantry.invitations.InvitationListPresenter
 import app.muko.mypantry.newfood.NewFoodContract
@@ -18,11 +16,13 @@ import app.muko.mypantry.noticelist.NoticeListContract
 import app.muko.mypantry.noticelist.NoticeListPresenter
 import app.muko.mypantry.settings.SettingsContract
 import app.muko.mypantry.settings.SettingsPresenter
-import app.muko.mypantry.shopplans.ShopPlansContract
-import app.muko.mypantry.shopplans.ShopPlansPresenter
 import app.muko.mypantry.signin.SigninContract
 import app.muko.mypantry.signin.SigninPresenter
+import app.muko.mypantry.ui.activities.food.FoodContract
+import app.muko.mypantry.ui.activities.food.FoodPresenter
 import app.muko.mypantry.ui.activities.foodlist.FoodListPresenter
+import app.muko.mypantry.ui.activities.shopplans.ShopPlansContract
+import app.muko.mypantry.ui.activities.shopplans.ShopPlansPresenter
 import app.muko.mypantry.unit.UnitContract
 import app.muko.mypantry.unit.UnitPresenter
 import app.muko.mypantry.unitlist.UnitListContract

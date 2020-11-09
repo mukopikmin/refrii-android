@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="app.muko.mypantry.food.FoodActivity"
+    tools:context=".ui.activities.food.FoodActivity"
     tools:showIn="@layout/activity_food">
 
     <androidx.constraintlayout.widget.ConstraintLayout

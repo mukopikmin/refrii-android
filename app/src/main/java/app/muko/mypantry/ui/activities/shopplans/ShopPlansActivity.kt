@@ -1,4 +1,4 @@
-package app.muko.mypantry.shopplans
+package app.muko.mypantry.ui.activities.shopplans
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -10,7 +10,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import app.muko.mypantry.App
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.ShopPlan
 import butterknife.BindView

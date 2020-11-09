@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="app.muko.mypantry.shopplans.ShopPlansActivity"
+    tools:context=".ui.activities.shopplans.ShopPlansActivity"
     tools:showIn="@layout/activity_shop_plans">
 
     <androidx.recyclerview.widget.RecyclerView

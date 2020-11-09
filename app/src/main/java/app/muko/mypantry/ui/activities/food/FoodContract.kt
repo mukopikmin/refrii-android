@@ -1,4 +1,4 @@
-package app.muko.mypantry.food
+package app.muko.mypantry.ui.activities.food
 
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.data.models.ShopPlan

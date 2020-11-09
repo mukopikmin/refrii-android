@@ -1,4 +1,4 @@
-package app.muko.mypantry.food
+package app.muko.mypantry.ui.activities.food
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -124,7 +124,10 @@ constructor(
                 .doOnSubscribe { view.showProgressBar() }
                 .doFinally { view.hideProgressBar() }
                 .subscribe(object : CompletableObserver {
-                    override fun onComplete() {}
+                    override fun onComplete() {
+                        getShopPlans(shopPlan.food.id)
+                    }
+
                     override fun onSubscribe(d: Disposable) {}
                     override fun onError(e: Throwable) {
                         view.showToast(e.message)
@@ -139,7 +142,10 @@ constructor(
                 .doOnSubscribe { view.showProgressBar() }
                 .doFinally { view.hideProgressBar() }
                 .subscribe(object : CompletableObserver {
-                    override fun onComplete() {}
+                    override fun onComplete() {
+                        getShopPlans(shopPlan.food.id)
+                    }
+
                     override fun onSubscribe(d: Disposable) {}
                     override fun onError(e: Throwable) {
                         view.showToast(e.message)
