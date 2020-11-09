@@ -25,6 +25,8 @@ jobs:
       run: ./gradlew generateLicensePage
     - name: Build with Gradle
       run: ./gradlew assembleDevelopment
+    - name: Decode keystore
+      run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
     - name: Build signed APK
       run: |
         jarsigner \
@@ -41,8 +43,6 @@ jobs:
         KEYSTORE_ALIAS_PASSWORD: ${{secrets.KEYSTORE_ALIAS_PASSWORD}}
         KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
         KEYSTORE_ALIAS: ${{secrets.KEYSTORE_ALIAS}}
-    - name: Decode keystore
-      run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
     - name: Release to DeployGate
       run: ./gradlew uploadDeployGateDevelopmentRelease
       env:
