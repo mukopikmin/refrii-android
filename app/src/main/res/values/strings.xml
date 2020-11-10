@@ -60,7 +60,7 @@
     <string name="preference_key_signin_provider">preference_key_signin_provider</string>
     <string name="preference_selected_box_id">preference_selected_box_id</string>
 
-    <string name="privacy_policy_url">https://refrii.com/privacy</string>
+    <string name="privacy_policy_url">https://mypantry.muko.app/privacy</string>
 
     <string name="settings_display_name">ユーザー名</string>
     <string name="settings_title">設定</string>

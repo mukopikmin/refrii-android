@@ -74,7 +74,7 @@ class SettingsActivity : AppCompatActivity(), SigninCallback, DrawerLocker {
             AndroidSupportInjection.inject(this)
 //            (activity?.application as App).getComponent().inject(this)
 
-            setPreferenceLinkListener("privacy_policy", "https://refrii.com/privacy")
+            setPreferenceLinkListener("privacy_policy", "https://mypantry.muko.app/privacy")
             setPreferenceLinkListener("oss_license", "file:///android_asset/licenses.html")
             setVersionPreference()
             setSignoutPreference()
