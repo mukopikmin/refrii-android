@@ -2,7 +2,6 @@ package app.muko.mypantry.dialogs
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.app.DialogFragment
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +9,7 @@ import android.view.LayoutInflater
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.User
 import app.muko.mypantry.dialogs.adapters.UserListAdapter
@@ -19,15 +19,15 @@ class UserPickerDialogFragment : DialogFragment() {
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val activity = activity
-        val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val inflater = activity?.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val content = inflater.inflate(R.layout.dialog_shared_users, null)
         val bundle = arguments
-        val title = bundle.getString("title")
-        val names = bundle.getStringArrayList("names")
-        val emails = bundle.getStringArrayList("emails")
+        val title = bundle?.getString("title")
+        val names = bundle?.getStringArrayList("names")
+        val emails = bundle?.getStringArrayList("emails")
         val listView = content.findViewById<ListView>(R.id.listView)
         val shareTextView = content.findViewById<TextView>(R.id.foodNameTextView)
-        val adapter = UserListAdapter(activity, names, emails)
+        val adapter = UserListAdapter(activity, names!!, emails!!)
 
         listView.adapter = adapter
         shareTextView.setOnClickListener { Log.e(TAG, "share") }

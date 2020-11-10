@@ -24,7 +24,7 @@ class CalendarPickerDialogFragment : androidx.fragment.app.DialogFragment() {
         calendar.time = date
 
         return DatePickerDialog(
-                activity,
+                context!!,
                 DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
                     val intent = Intent()
 
