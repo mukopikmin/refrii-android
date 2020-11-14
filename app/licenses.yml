@@ -234,3 +234,45 @@
   license: The Apache Software License, Version 2.0
   licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
   url: https://developer.android.com/jetpack/androidx
+- artifact: androidx.fragment:fragment-ktx:+
+  skip: true
+  name: Fragment Kotlin Extensions
+  copyrightHolder: #COPYRIGHT_HOLDER#
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/jetpack/androidx
+- artifact: androidx.activity:activity-ktx:+
+  skip: true
+  name: Activity Kotlin Extensions
+  copyrightHolder: #COPYRIGHT_HOLDER#
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/jetpack/androidx
+- artifact: androidx.collection:collection-ktx:+
+  skip: true
+  name: Collections Kotlin Extensions
+  copyrightHolder: #COPYRIGHT_HOLDER#
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://developer.android.com/tools/extras/support-library.html
+- artifact: androidx.core:core-ktx:+
+  skip: true
+  name: Core Kotlin Extensions
+  copyrightHolder: #COPYRIGHT_HOLDER#
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/jetpack/androidx
+- artifact: androidx.annotation:annotation-experimental:+
+  skip: true
+  name: Experimental annotation
+  copyrightHolder: #COPYRIGHT_HOLDER#
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/jetpack/androidx
+- artifact: androidx.preference:preference-ktx:+
+  skip: true
+  name: Android Preferences KTX
+  copyrightHolder: #COPYRIGHT_HOLDER#
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://developer.android.com/jetpack/androidx
