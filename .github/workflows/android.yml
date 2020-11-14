@@ -1,10 +1,8 @@
 name: Android CI
-
 on:
   push:
     branches:
       - master
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,11 +20,13 @@ jobs:
         run: ./gradlew generateLicensePage
       - name: Build with Gradle
         run: ./gradlew assembleDevelopment
+      - name: Create archive for artifacts
+        run: tar -cvf artifacts.tar app/build/outputs/apk/development/release
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: App binary
-          path: app/development/release/app-development-release.apk
+          name: app-binary
+          path: artifacts.tar
           retention-days: 7
   release:
     runs-on: ubuntu-latest
@@ -36,11 +36,15 @@ jobs:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v2
         with:
-          name: App binary
-          path: app/development/release/app-development-release.apk
+          name: app-binary
+          path: .
+      - name: test
+        run: mkdir -p app/build/outputs/apk/development/release
+      - name: Extract artifacts archive
+        run: tar -xvf artifacts.tar && ls -la app/build/outputs/apk/development/release
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
-      - name: Build signed APK
+      - name: Sign APK
         run: |
           jarsigner \
             -verbose \
