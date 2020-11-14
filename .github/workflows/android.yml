@@ -20,28 +20,6 @@ jobs:
         run: ./gradlew generateLicensePage
       - name: Build with Gradle
         run: ./gradlew assembleDevelopment
-      - name: Create archive for artifacts
-        run: tar -cvf artifacts.tar app/build/outputs/apk/development/release
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: app-binary
-          path: artifacts.tar
-          retention-days: 7
-  release:
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - name: Download a Build Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: app-binary
-          path: .
-      - name: test
-        run: mkdir -p app/build/outputs/apk/development/release
-      - name: Extract artifacts archive
-        run: tar -xvf artifacts.tar && ls -la app/build/outputs/apk/development/release
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
       - name: Sign APK
@@ -60,6 +38,22 @@ jobs:
           KEYSTORE_ALIAS_PASSWORD: ${{secrets.KEYSTORE_ALIAS_PASSWORD}}
           KEYSTORE_PASSWORD: ${{secrets.KEYSTORE_PASSWORD}}
           KEYSTORE_ALIAS: ${{secrets.KEYSTORE_ALIAS}}
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-binary
+          path: app/development/release
+          retention-days: 7
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: app-binary
+          path: .
       - name: Release to DeployGate
         run: ./gradlew uploadDeployGateDevelopmentRelease
         env:
