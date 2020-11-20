@@ -1,4 +1,4 @@
-package app.muko.mypantry.ui.fragments.navigation
+package app.muko.mypantry.ui.fragments.foodaction
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -65,6 +65,25 @@ constructor(
 
                     override fun onError(e: Throwable) {
 //                        view.showToast(e.message)
+                    }
+                })
+    }
+
+    fun removeFood() {
+        val food = food.value ?: return
+
+        foodRepository.remove(food)
+                .subscribe(object : CompletableObserver {
+                    override fun onSubscribe(d: Disposable) {
+                        print("")
+                    }
+
+                    override fun onComplete() {
+                        print("")
+                    }
+
+                    override fun onError(e: Throwable) {
+                        print("")
                     }
                 })
     }

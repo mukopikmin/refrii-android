@@ -15,8 +15,8 @@ import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.di.ViewModelFactory
 import app.muko.mypantry.ui.activities.foodlist.FoodListActivity
+import app.muko.mypantry.ui.fragments.foodaction.FoodActionDialogFragment
 import app.muko.mypantry.ui.fragments.foodlist.FoodRecyclerViewAdapter
-import app.muko.mypantry.ui.fragments.navigation.FoodActionDialogFragment
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.floatingactionbutton.FloatingActionButton

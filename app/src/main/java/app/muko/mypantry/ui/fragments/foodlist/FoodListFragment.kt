@@ -19,7 +19,7 @@ import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.di.ViewModelFactory
 import app.muko.mypantry.newfood.NewFoodActivity
 import app.muko.mypantry.ui.activities.foodlist.FoodListActivity
-import app.muko.mypantry.ui.fragments.navigation.FoodActionDialogFragment
+import app.muko.mypantry.ui.fragments.foodaction.FoodActionDialogFragment
 import app.muko.mypantry.ui.utils.CallbackNotification
 import butterknife.BindView
 import butterknife.ButterKnife

@@ -14,6 +14,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import app.muko.mypantry.R
@@ -376,6 +377,13 @@ class FoodListActivity : DaggerAppCompatActivity(),
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode != Activity.RESULT_OK || data == null) return
+
+        val fragments: List<Fragment>? = supportFragmentManager.fragments
+        if (fragments != null) {
+            for (fragment in fragments) {
+                fragment.onActivityResult(requestCode, resultCode, data)
+            }
+        }
 
         when (requestCode) {
             ADD_FOOD_REQUEST_CODE -> onAddFoodCompleted()

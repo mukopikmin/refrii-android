@@ -9,7 +9,7 @@
     android:orientation="horizontal"
     android:paddingTop="@dimen/list_item_spacing_half"
     android:paddingBottom="@dimen/list_item_spacing_half"
-    tools:context=".ui.fragments.navigation.FoodActionDialogFragment">
+    tools:context=".ui.fragments.foodaction.FoodActionDialogFragment">
 
     <TextView
         android:id="@+id/navigationFoodNameTextView"
@@ -68,7 +68,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:background="@null"
-        android:padding="8dp"
+        android:padding="4dp"
         android:src="@drawable/ic_baseline_chat_bubble_outline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/navigationFoodNameTextView" />
@@ -80,9 +80,21 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:background="@null"
-        android:padding="8dp"
+        android:padding="4dp"
         android:src="@drawable/ic_edit_black"
         app:layout_constraintStart_toEndOf="@+id/navigationNoticeButton"
+        app:layout_constraintTop_toBottomOf="@+id/navigationFoodNameTextView" />
+
+    <ImageButton
+        android:id="@+id/navigationDeleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@null"
+        android:padding="4dp"
+        android:src="@drawable/ic_outline_delete"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/navigationFoodNameTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

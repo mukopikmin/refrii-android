@@ -1,4 +1,4 @@
-package app.muko.mypantry.ui.fragments.navigation
+package app.muko.mypantry.ui.fragments.foodaction
 
 import androidx.lifecycle.ViewModel
 import app.muko.mypantry.di.ViewModelKey

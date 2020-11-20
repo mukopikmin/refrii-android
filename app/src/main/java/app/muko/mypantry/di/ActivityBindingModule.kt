@@ -21,10 +21,10 @@ import app.muko.mypantry.ui.activities.shopplans.ShopPlansActivity
 import app.muko.mypantry.ui.activities.shopplans.ShopPlansModule
 import app.muko.mypantry.ui.fragments.expiring.ExpiringFoodsFragment
 import app.muko.mypantry.ui.fragments.expiring.ExpiringFoodsViewModelModule
+import app.muko.mypantry.ui.fragments.foodaction.FoodActionDialogFragment
+import app.muko.mypantry.ui.fragments.foodaction.FoodActionDialogViewModelModule
 import app.muko.mypantry.ui.fragments.foodlist.FoodListFragment
 import app.muko.mypantry.ui.fragments.foodlist.FoodListViewModelModule
-import app.muko.mypantry.ui.fragments.navigation.FoodActionDialogFragment
-import app.muko.mypantry.ui.fragments.navigation.FoodActionDialogViewModelModule
 import app.muko.mypantry.ui.fragments.signin.SigninFragment
 import app.muko.mypantry.ui.fragments.signin.SigninViewModelModule
 import app.muko.mypantry.unit.UnitActivity

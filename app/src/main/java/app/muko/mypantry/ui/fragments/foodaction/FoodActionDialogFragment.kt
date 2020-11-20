@@ -1,4 +1,4 @@
-package app.muko.mypantry.ui.fragments.navigation
+package app.muko.mypantry.ui.fragments.foodaction
 
 import android.content.Context
 import android.content.Intent
@@ -14,8 +14,10 @@ import androidx.lifecycle.ViewModelProvider
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Food
 import app.muko.mypantry.di.ViewModelFactory
+import app.muko.mypantry.dialogs.ConfirmDialogFragment
 import app.muko.mypantry.noticelist.NoticeListActivity
 import app.muko.mypantry.ui.activities.food.FoodActivity
+import app.muko.mypantry.ui.activities.foodlist.FoodListActivity
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -42,6 +44,9 @@ class FoodActionDialogFragment : BottomSheetDialogFragment() {
 
     @BindView(R.id.navigationEditButton)
     lateinit var editButton: ImageButton
+
+    @BindView(R.id.navigationDeleteButton)
+    lateinit var deleteButton: ImageButton
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -73,12 +78,28 @@ class FoodActionDialogFragment : BottomSheetDialogFragment() {
 
         increaseButton.setOnClickListener { viewModel.incrementFood() }
         decreaseButton.setOnClickListener { viewModel.decrementFood() }
-        noticeButton.setOnClickListener {showNotices(args.getInt(ARG_FOOD_ID))}
-        editButton.setOnClickListener{editFood(args.getInt(ARG_FOOD_ID))}
+        noticeButton.setOnClickListener { showNotices(args.getInt(ARG_FOOD_ID)) }
+        editButton.setOnClickListener { editFood(args.getInt(ARG_FOOD_ID)) }
+        deleteButton.setOnClickListener { showDeleteConfirmDialog() }
 
         viewModel.food.observe(viewLifecycleOwner, Observer {
-            this.setFood(it)
+            if (it == null) {
+                (activity as FoodListActivity).showSnackBar("ストックを削除しました")
+                dismiss()
+            } else {
+                this.setFood(it)
+            }
         })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        data ?: return
+
+        when (requestCode) {
+            REMOVE_BOX_REQUEST_CODE -> viewModel.removeFood()
+        }
     }
 
     private fun setFood(food: Food) {
@@ -96,7 +117,7 @@ class FoodActionDialogFragment : BottomSheetDialogFragment() {
         dismiss()
     }
 
-    private fun editFood(foodId:Int) {
+    private fun editFood(foodId: Int) {
         val intent = Intent(activity, FoodActivity::class.java)
 
         intent.putExtra(getString(R.string.key_food_id), foodId)
@@ -104,8 +125,17 @@ class FoodActionDialogFragment : BottomSheetDialogFragment() {
         dismiss()
     }
 
+    private fun showDeleteConfirmDialog() {
+        val food = viewModel.food.value ?: return
+        val fragment = ConfirmDialogFragment.newInstance(food.name, "削除していいですか？", food.id)
+
+        fragment.setTargetFragment(null, REMOVE_BOX_REQUEST_CODE)
+        fragment.show(childFragmentManager, "delete_box")
+    }
+
     companion object {
         private const val ARG_FOOD_ID = "food_id"
+        private const val REMOVE_BOX_REQUEST_CODE = 104
 
         fun newInstance(food: Food): FoodActionDialogFragment =
                 FoodActionDialogFragment().apply {
