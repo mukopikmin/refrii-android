@@ -9,7 +9,6 @@ import app.muko.mypantry.data.source.remote.ApiRemoteUnitSource
 import app.muko.mypantry.data.source.remote.services.UnitService
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.functions.BiFunction
 import io.reactivex.rxkotlin.Flowables
 
 class ApiUnitRepository(
@@ -51,7 +50,7 @@ class ApiUnitRepository(
         return Flowable.zip(
                 remote.getByBox(box),
                 local.getByBox(box),
-                BiFunction<List<Unit>, List<Unit>, Pair<List<Unit>, List<Unit>>> { r, l -> Pair(r, l) }
+                { r, l -> Pair(r, l) }
         ).flatMap { pair ->
             pair.second.forEach { local.remove(it) }
             pair.first.map { local.create(it) }

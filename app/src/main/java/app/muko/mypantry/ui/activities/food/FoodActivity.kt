@@ -335,7 +335,9 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         setExpirationDate(food?.expirationDate)
 
         presenter.unitsLiveData.value?.let { units ->
-            val ids = units.map { it.id }
+            val ids = units
+                    .filter { it.user?.id == food?.box?.owner?.id }
+                    .map { it.id }
             val index = ids.indexOf(food?.unit?.id)
 
             unitsSpinner.setSelection(index)
