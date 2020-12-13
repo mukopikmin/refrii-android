@@ -95,6 +95,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     private var imageLoaded = false
     private var date: Date? = null
     private var image: Bitmap? = null
+    private var tempImageFilename: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,8 +139,10 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         food.unit = unit
         date?.let { food.expirationDate = it }
 
-        if (image != null) {
-            imageFile = File(filesDir, TEMP_IMAGE_FILENAME)
+        if (tempImageFilename != null) {
+            imageFile = File(filesDir, tempImageFilename)
+            // Reset as image process completed
+            tempImageFilename = null
         }
 
         presenter.updateFood(food, imageFile)
@@ -182,6 +185,8 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun launchCamera() {
+        tempImageFilename = "/temp/" + Date().time.toString() + ".jpg"
+
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         val file = createOutputFile()
         val uri = getTempImageUri(file)
@@ -196,7 +201,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun createOutputFile(): File {
-        val tempFile = File(filesDir, TEMP_IMAGE_FILENAME)
+        val tempFile = File(filesDir, tempImageFilename)
 
         if (!tempFile.exists()) {
             try {
@@ -274,7 +279,7 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
     }
 
     private fun onTookPicture() {
-        val file = File(filesDir, TEMP_IMAGE_FILENAME)
+        val file = File(filesDir, tempImageFilename)
         val uri = getTempImageUri(file)
         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
 
@@ -464,6 +469,5 @@ class FoodActivity : AppCompatActivity(), FoodContract.View {
         private const val CREATE_SHOP_PLAN_REQUEST_CODE = 104
         private const val RESULT_CAMERA = 105
         private const val IMAGE_OPTIONS_REQUEST_CODE = 106
-        private const val TEMP_IMAGE_FILENAME = "temp/temp.jpg"
     }
 }
