@@ -4,13 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import app.muko.mypantry.App
 import app.muko.mypantry.R
 import app.muko.mypantry.data.models.Unit
 import app.muko.mypantry.dialogs.OptionsPickerDialogFragment
@@ -46,7 +44,8 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
     @Inject
     lateinit var presenter: UnitListPresenter
 
-    private lateinit var preference: SharedPreferences
+    @Inject
+    lateinit var preference: SharedPreferences
 
     private val onItemClickListActivity = AdapterView.OnItemClickListener { adapterView, _, i, _ ->
         val unit = adapterView.getItemAtPosition(i) as Unit
@@ -87,7 +86,6 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
             it.setHomeButtonEnabled(true)
         }
 
-        preference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         listView.onItemClickListener = onItemClickListActivity
         listView.onItemLongClickListener = onItemLongClickListener
 
@@ -120,7 +118,6 @@ class UnitListActivity : AppCompatActivity(), UnitListContract.View {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val preference = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         val userId = preference.getInt(getString(R.string.preference_key_id), -1)
 
         if (resultCode != Activity.RESULT_OK) return

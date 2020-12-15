@@ -151,7 +151,10 @@ class FoodListActivity : DaggerAppCompatActivity(),
             setBox(box)
         })
 
-        viewModel.user.observe(this, Observer { setNavigationHeader(it) })
+        viewModel.user.observe(this, {
+            setNavigationHeader(it)
+            saveAccount(it)
+        })
 
         viewModel.isSignedIn.observe(this, Observer {
             if (it) {
