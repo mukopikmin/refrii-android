@@ -59,7 +59,7 @@ jobs:
         env:
           GOOGLE_SERVICES_JSON: ${{secrets.GOOGLE_SERVICES_JSON}}
       - name: Download a Build Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: app-binary
           path: app/development/release
